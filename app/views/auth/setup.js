@@ -308,7 +308,7 @@ class AuthSetupView extends Component<Props, State> {
   }
 
   authSetup = (recovery: string) => {
-    this.setState({loading: true})
+    this.setState({loading: true, setupError: ''})
     const req: AuthSetupRequest = {
       password: this.state.password,
       pepper: recovery,

@@ -68,7 +68,7 @@ class KeyIndexView extends Component<Props, State> {
   }
 
   add = () => {
-    this.setState({loading: true})
+    this.setState({loading: true, error: ''})
     const req: PullRequest = {
       kid: this.props.kid,
       user: '',
@@ -78,10 +78,11 @@ class KeyIndexView extends Component<Props, State> {
       pull(
         req,
         (resp: PullResponse) => {
+          this.setState({loading: false})
           this.loadKey()
         },
         (err: RPCError) => {
-          this.setState({error: err.message, loading: false})
+          this.setState({loading: false, error: err.message})
         }
       )
     )
@@ -106,7 +107,7 @@ class KeyIndexView extends Component<Props, State> {
   }
 
   loadKey = () => {
-    this.setState({loading: true})
+    this.setState({loading: true, error: ''})
     const req: KeyRequest = {
       kid: this.props.kid,
       user: '',
@@ -124,7 +125,7 @@ class KeyIndexView extends Component<Props, State> {
           }
         },
         (err: RPCError) => {
-          this.setState({error: err.message, loading: false})
+          this.setState({loading: false, error: err.message})
         }
       )
     )

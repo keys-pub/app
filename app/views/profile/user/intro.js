@@ -41,7 +41,7 @@ type Props = {
 
 class UserIntroView extends Component<Props> {
   select = (service: string) => {
-    // this.setState({loading: true})
+    // this.setState({loading: true, error: ''})
     const req: UserServiceRequest = {
       kid: '', // Default
       service: service,

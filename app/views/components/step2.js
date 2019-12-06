@@ -40,32 +40,10 @@ export default class Step extends Component<Props> {
     const style = this.props.style || {}
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" style={{marginLeft: 10, marginRight: 10}}>
-        {title !== '' && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            style={{
-              marginBottom: 16,
-            }}
-          >
-            <Box style={{width: '100%', maxWidth: 600, alignSelf: 'center'}}>
-              <Typography
-                style={{
-                  fontSize: 24,
-                  fontWeight: 600,
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                }}
-              >
-                {title}
-              </Typography>
-            </Box>
-            <Box style={{marginLeft: -10, marginRight: -10}}>
-              {!loading && <Divider style={{marginBottom: 3}} />}
-              {loading && <LinearProgress />}
-            </Box>
-          </Box>
-        )}
+        <Box style={{marginLeft: -10, marginRight: -10}}>
+          {!loading && <Divider style={{marginBottom: 3}} />}
+          {loading && <LinearProgress />}
+        </Box>
 
         <Box
           display="flex"
@@ -77,7 +55,14 @@ export default class Step extends Component<Props> {
             ...style,
           }}
         >
-          <Box style={{paddingLeft: 20, paddingRight: 20}}>{this.props.children}</Box>
+          <Box style={{paddingTop: 20, paddingLeft: 20, paddingRight: 20}}>
+            {title !== '' && (
+              <Typography variant="h5" style={{paddingBottom: 10, marginTop: 10}}>
+                {title}
+              </Typography>
+            )}
+            {this.props.children}
+          </Box>
         </Box>
 
         {hasButtons && (

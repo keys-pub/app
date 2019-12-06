@@ -34,15 +34,20 @@ const cstyles = {
 }
 
 class Debug extends Component<Props> {
-  error = () => {
-    throw new Error('error!')
-  }
-
   push = (route: string) => {
     const r = route
     return () => {
       this.props.dispatch(push(r))
     }
+  }
+
+  resetPrompts = () => {
+    this.props.dispatch({type: 'PROMPT_PUBLISH', payload: true})
+    this.props.dispatch({type: 'PROMPT_USER', payload: true})
+  }
+
+  error = () => {
+    throw new Error('error!')
   }
 
   renderDebugActions() {
@@ -53,6 +58,7 @@ class Debug extends Component<Props> {
           <Link onClick={() => this.props.dispatch(push('/db'))} paragraph>
             Show DB
           </Link>
+          <Link onClick={this.resetPrompts}>Reset Prompts</Link>
           <Link onClick={this.error}>Error</Link>
         </Box>
       </Box>

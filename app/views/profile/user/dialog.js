@@ -9,6 +9,8 @@ import {
   DialogContentText,
   DialogTitle,
   DialogActions,
+  Divider,
+  LinearProgress,
   Typography,
 } from '@material-ui/core'
 
@@ -37,17 +39,27 @@ type Props = {
   dispatch: (action: any) => any,
 }
 
-class UserIntroDialog extends Component<Props> {
+type State = {
+  loading: boolean,
+  error?: string,
+}
+
+class UserIntroDialog extends Component<Props, State> {
+  state = {
+    loading: false,
+  }
+
   select = (service: string) => {
-    // this.setState({loading: true})
+    this.setState({loading: true, error: ''})
     const req: UserServiceRequest = {
       kid: '', // Default
       service: service,
     }
     this.props.dispatch(
       userService(req, (resp: UserServiceResponse) => {
-        // this.setState({loading: false})
+        this.setState({loading: false})
         this.props.dispatch(push('/profile/user/name'))
+        this.close()
       })
     )
   }
@@ -72,12 +84,18 @@ class UserIntroDialog extends Component<Props> {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
+        <Box display="flex" flex={1} flexDirection="column">
+          <Typography
+            id="alert-dialog-title"
+            variant="h5"
+            style={{paddingBottom: 7, paddingLeft: 20, paddingTop: 15, fontWeight: 600}}
+          >
+            Link your Key
+          </Typography>
+          {!this.state.loading && <Divider style={{marginBottom: 3}} />}
+          {this.state.loading && <LinearProgress />}
+        </Box>
         <DialogContent>
-          <Box display="flex" flex={1}>
-            <Typography id="alert-dialog-title" variant="h4" style={{paddingBottom: 10}}>
-              Link your Key
-            </Typography>
-          </Box>
           <DialogContentText id="alert-dialog-description">
             Link your key with a Github or Twitter account by generating a signed message and posting it
             there. This helps others find your key and verify who you are. For more information, see{' '}
@@ -156,7 +174,7 @@ class UserIntroDialog extends Component<Props> {
 
 const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {
   const status = currentStatus(state.rpc)
-  const open = !!state.app.promptUser && status.promptUser
+  const open = !status.promptPublish && !!state.app.promptUser && status.promptUser
   return {
     open,
   }

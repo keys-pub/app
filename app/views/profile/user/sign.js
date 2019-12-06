@@ -27,7 +27,7 @@ import {goBack, go} from 'connected-react-router'
 import {currentKey} from '../../state'
 import {serviceName} from '../../helper'
 
-import {configSet, keyGenerate, userAdd, userSign} from '../../../rpc/rpc'
+import {configSet, status, userAdd, userSign} from '../../../rpc/rpc'
 import type {
   ConfigSetRequest,
   ConfigSetResponse,
@@ -70,7 +70,7 @@ class UserSignView extends Component<Props, State> {
       url: this.state.url,
       local: false,
     }
-    this.setState({loading: true})
+    this.setState({loading: true, error: ''})
 
     // setTimeout(() => {
     //   this.props.dispatch(go(-2))
@@ -82,6 +82,7 @@ class UserSignView extends Component<Props, State> {
         req,
         (resp: UserAddResponse) => {
           this.props.dispatch(go(-2))
+          this.props.dispatch(status({}))
           this.setState({loading: false})
         },
         (err: RPCError) => {

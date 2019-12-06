@@ -89,7 +89,7 @@ export default (props: Props) => {
               <Box display="flex" flexDirection="column">
                 <Typography align="right">Created</Typography>
                 <Typography align="right">Published</Typography>
-                <Typography align="right">Saved</Typography>
+                <Typography align="right">Added</Typography>
                 <Typography align="right">Updated</Typography>
               </Box>
             </TableCell>

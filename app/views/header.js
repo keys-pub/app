@@ -19,7 +19,10 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" style={{backgroundColor}}>
       <Box display="flex" flexDirection="row">
-        <IconButton onClick={props.goBack} style={{marginTop: -4, marginLeft: -4, height: 41, color}}>
+        <IconButton
+          onClick={props.goBack}
+          style={{marginTop: -6, marginBottom: -2, marginLeft: -4, height: 41, color}}
+        >
           <ChevronLeft />
         </IconButton>
       </Box>

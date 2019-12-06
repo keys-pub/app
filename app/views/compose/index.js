@@ -13,7 +13,7 @@ import {styles} from '../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
 import {search, messageCreate} from '../../rpc/rpc'
-import type {SearchResult} from '../../rpc/types'
+import type {Key} from '../../rpc/types'
 import type {
   MessageCreateRequest,
   MessageCreateResponse,
@@ -27,7 +27,7 @@ export type Props = {
 }
 
 type State = {
-  results: Array<SearchResult>,
+  results: Array<Key>,
   loading: boolean,
 }
 
@@ -37,13 +37,13 @@ class ComposeView extends Component<Props, State> {
     results: [],
   }
 
-  search = (q: string): Promise<Array<SearchResult>> => {
+  search = (q: string): Promise<Array<Key>> => {
     return new Promise((resolve, reject) => {
       this.props.dispatch(
         search(
           {query: q, index: 0, limit: 30},
           (resp: SearchResponse) => {
-            resolve(resp.results || [])
+            resolve(resp.keys || [])
           },
           (err: RPCError) => {
             reject(err)
@@ -53,7 +53,7 @@ class ComposeView extends Component<Props, State> {
     })
   }
 
-  select = (results: Array<SearchResult>) => {
+  select = (results: Array<Key>) => {
     this.setState({results})
   }
 

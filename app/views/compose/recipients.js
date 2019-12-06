@@ -11,16 +11,16 @@ import {goBack, push} from 'connected-react-router'
 
 import {styles} from '../components'
 
-import type {SearchResult} from '../../rpc/types'
+import type {Key} from '../../rpc/types'
 // import type {SearchResponse} from '../../rpc/rpc'
 
 export type Props = {
-  search: (q: string) => Promise<Array<SearchResult>>,
-  select: (results: Array<SearchResult>) => *,
+  search: (q: string) => Promise<Array<Key>>,
+  select: (results: Array<Key>) => *,
 }
 
 type State = {
-  results: Array<SearchResult>,
+  results: Array<Key>,
   selected: Array<any>,
   input: string,
 }
@@ -33,7 +33,7 @@ class Recipients extends Component<Props, State> {
   }
 
   requestSuggestions = (req: {value: string}) => {
-    this.props.search(req.value).then((results: Array<SearchResult>) => {
+    this.props.search(req.value).then((results: Array<Key>) => {
       this.setState({
         results: results,
       })
@@ -52,7 +52,7 @@ class Recipients extends Component<Props, State> {
     })
   }
 
-  add = (result: SearchResult) => {
+  add = (result: Key) => {
     const selected = [...this.state.selected, result]
     this.setState({
       selected,
@@ -61,7 +61,7 @@ class Recipients extends Component<Props, State> {
     this.props.select(selected)
   }
 
-  delete = (result: SearchResult, index: number) => {
+  delete = (result: Key, index: number) => {
     let temp = this.state.selected
     temp.splice(index, 1)
     this.setState({selected: temp})
@@ -77,7 +77,7 @@ class Recipients extends Component<Props, State> {
         renderSuggestionsContainer={renderSuggestionsContainer}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
-        onSuggestionSelected={(e, value: {suggestion: SearchResult}) => {
+        onSuggestionSelected={(e, value: {suggestion: Key}) => {
           this.add(value.suggestion)
           // e.preventDefault()
         }}
@@ -123,7 +123,7 @@ const autosuggest = {
 const renderInput = inputProps => {
   const {autoFocus, value, onChange, onAdd, onDelete, selected, ref, ...other} = inputProps
 
-  const names = selected.map((result: SearchResult) => {
+  const names = selected.map((result: Key) => {
     if (result.users && result.users.length > 0) {
       const user = result.users[0]
       return user.name + '@' + user.service
@@ -152,7 +152,7 @@ const renderInput = inputProps => {
   )
 }
 
-const renderSuggestion = (result: SearchResult, opts: {query: string, isHighlighted: boolean}) => {
+const renderSuggestion = (result: Key, opts: {query: string, isHighlighted: boolean}) => {
   // return (
   //   <Row value={result.key || {kid: '', users: [], type: 'PUBLIC_KEY_TYPE'}} selected={opts.isHighlighted} />
   // )
@@ -169,7 +169,7 @@ const renderSuggestionsContainer = options => {
   )
 }
 
-const getSuggestionValue = (result: SearchResult) => {
+const getSuggestionValue = (result: Key) => {
   return result.kid || ''
 }
 

@@ -60,7 +60,8 @@ class ProfileView extends Component<Props> {
     const req: AuthLockRequest = {}
     this.props.dispatch(
       authLock(req, () => {
-        // ?
+        // This triggers permission error, showing lock screen
+        this.refresh()
       })
     )
   }
@@ -71,7 +72,7 @@ class ProfileView extends Component<Props> {
       return
     }
 
-    // this.setState({loading: true})
+    // this.setState({loading: true, error: ''})
     const req: UserServiceRequest = {
       kid: '', // Default
       service: service,
@@ -102,6 +103,7 @@ class ProfileView extends Component<Props> {
 
     return (
       <Box>
+        <Divider style={{marginBottom: 8}} />
         <Table size="small">
           <TableBody>
             <TableRow>
@@ -121,10 +123,25 @@ class ProfileView extends Component<Props> {
             </TableRow>
             <TableRow>
               <TableCell style={cstyles.cell}>
+                <Typography align="right">User</Typography>
+              </TableCell>
+              <TableCell style={cstyles.cell}>
+                {(users || []).map((user: User) => (
+                  <Box display="flex" flexDirection="column" key={user.kid}>
+                    <NameView user={user} />
+                    <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
+                  </Box>
+                ))}
+                {users.length === 0 && <Link onClick={() => this.select('github')}>Link to Github</Link>}
+                {users.length === 0 && <Link onClick={() => this.select('twitter')}>Link to Twitter</Link>}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="column">
                   <Typography align="right">Created</Typography>
                   <Typography align="right">Published</Typography>
-                  <Typography align="right">Saved</Typography>
+                  <Typography align="right">Added</Typography>
                   <Typography align="right">Updated</Typography>
                 </Box>
               </TableCell>
@@ -137,22 +154,6 @@ class ProfileView extends Component<Props> {
                 </Box>
 
                 {!publishedAt && <Link onClick={() => this.promptPublish()}>Publish Key</Link>}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell style={cstyles.cell}>
-                <Typography align="right">User</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                {(users || []).map((user: User) => (
-                  <Box display="flex" flexDirection="column" key={user.kid}>
-                    <NameView user={user} />
-                    <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
-                  </Box>
-                ))}
-                {users.length === 0 && <Link onClick={() => this.select('github')}>Link to Github</Link>}
-                {users.length === 0 && <Link onClick={() => this.select('twitter')}>Link to Twitter</Link>}
-                {users.length === 0 && <Link onClick={() => this.select('')}>Link</Link>}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -183,8 +184,8 @@ class ProfileView extends Component<Props> {
             </TableRow>
           </TableBody>
         </Table>
-        <AuthPublishDialog />
         <UserIntroDialog />
+        <AuthPublishDialog />
       </Box>
     )
   }

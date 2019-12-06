@@ -9,8 +9,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  IconButton,
+  LinearProgress,
   Typography,
 } from '@material-ui/core'
+import {shell} from 'electron'
+
+import CloseIcon from '@material-ui/icons/Close'
 
 import {styles, Link, Step} from '../components'
 
@@ -19,9 +25,15 @@ import {currentStatus, keyEmpty} from '../state'
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {configSet, push as publish} from '../../rpc/rpc'
+import {configSet, push as publish, status} from '../../rpc/rpc'
 
-import type {ConfigSetRequest, ConfigSetResponse, PushRequest, PushResponse} from '../../rpc/types'
+import type {
+  ConfigSetRequest,
+  ConfigSetResponse,
+  PushRequest,
+  PushResponse,
+  StatusRequest,
+} from '../../rpc/types'
 import type {AppState, RPCState, RPCError} from '../../reducers/app'
 
 type Props = {
@@ -40,7 +52,8 @@ class AuthPublishDialog extends Component<Props, State> {
     loading: false,
   }
 
-  close = () => {
+  close = (event: any, reason: string) => {
+    // if (reason === 'backdropClick') return
     this.props.dispatch({type: 'PROMPT_PUBLISH', payload: false})
   }
 
@@ -52,53 +65,94 @@ class AuthPublishDialog extends Component<Props, State> {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle disableTypography style={{paddingBottom: 10}}>
-          <Typography id="alert-dialog-title" variant="h5">
-            Publish your Public Key
-          </Typography>
-        </DialogTitle>
+        <Box display="flex" flex={1} flexDirection="column">
+          <Box display="flex" flex={1} flexDirection="row">
+            <Typography
+              id="alert-dialog-title"
+              variant="h5"
+              style={{paddingBottom: 7, paddingLeft: 20, paddingTop: 15, width: '100%', fontWeight: 600}}
+            >
+              Publish your Key
+            </Typography>
+            {/*<IconButton aria-label="close" onClick={event => this.close(event, 'button')}>
+              <CloseIcon />
+            </IconButton>
+            */}
+          </Box>
+          {!this.state.loading && <Divider style={{marginBottom: 3}} />}
+          {this.state.loading && <LinearProgress />}
+        </Box>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            You've created your key. Do you want to publish your public key to the server? This allows others
+            to search for it. For more information, see{' '}
+            <Link inline onClick={() => shell.openExternal('https://docs.keys.pub/specs/key#publickey')}>
+              docs.keys.pub/specs/key
+            </Link>
+            .
+          </DialogContentText>
+          {this.state.error && (
+            <Typography style={{color: 'red', paddingBottom: 10}}>Error: {this.state.error}</Typography>
+          )}
+          <Box display="flex" flexDirection="column" style={{alignItems: 'center'}}>
+            <Button
+              color="primary"
+              variant="outlined"
+              style={{
+                width: 200,
+                height: 50,
+                fontSize: 18,
+                marginBottom: 20,
+              }}
+              disabled={this.state.loading}
+              onClick={event => this.publish(event)}
+            >
+              Publish
+            </Button>
 
-        <DialogContent dividers>
-          <Typography gutterBottom>Do you want to publish your public key to the server?</Typography>
-          <Typography gutterBottom>TODO: Fill copy</Typography>
-          <Typography gutterBottom>
-            Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl
-            consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.
-          </Typography>
+            <Box marginBottom={2}>
+              <Typography>
+                <Link
+                  inline={true}
+                  onClick={event => this.nothanks(event, false)}
+                  style={{width: 300, textAlign: 'center'}}
+                >
+                  Remind me later
+                </Link>
+                &nbsp; &mdash; &nbsp;
+                <Link
+                  inline
+                  onClick={event => this.nothanks(event, true)}
+                  style={{width: 300, textAlign: 'center'}}
+                >
+                  Don't remind me
+                </Link>
+              </Typography>
+            </Box>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => this.nothanks(false)} disabled={this.state.loading}>
-            Remind me later
-          </Button>
-          <Button onClick={this.publish} disabled={this.state.loading} color="primary" autoFocus>
-            Publish
-          </Button>
-        </DialogActions>
       </Dialog>
     )
   }
 
-  close = () => {
-    this.props.dispatch({type: 'PROMPT_PUBLISH', payload: false})
-  }
-
-  nothanks = (skip: boolean) => {
+  nothanks = (event: any, skip: boolean) => {
     this.props.dispatch(
       configSet({key: 'disablePromptPublish', value: skip ? '1' : '0'}, (resp: ConfigSetResponse) => {
-        this.close()
+        this.close(event, 'button')
       })
     )
   }
 
-  publish = () => {
+  publish = (event: any) => {
     this.setState({loading: true, error: ''})
     const req: PushRequest = {}
     this.props.dispatch(
       publish(
         req,
         (resp: PushResponse) => {
+          this.close(event, 'publish')
+          this.props.dispatch(status({}))
           this.setState({loading: false})
-          this.close()
         },
         (err: RPCError) => {
           this.setState({loading: false, error: err.message})

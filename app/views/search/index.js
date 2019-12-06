@@ -7,8 +7,9 @@ import {
   Divider,
   Table,
   TableBody,
-  TableRow,
   TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@material-ui/core'
@@ -19,11 +20,13 @@ import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import KeyDialog from '../key/dialog'
+import {KeyTypeView} from '../key/view'
+
 import {NamesView} from '../profile/user/views'
 import {styles} from '../components'
 import {keyEmpty} from '../state'
 
-import type {Key, SearchResult, User} from '../../rpc/types'
+import type {Key, User} from '../../rpc/types'
 import type {SearchRequest, SearchResponse, RPCError, RPCState} from '../../rpc/rpc'
 
 type Props = {
@@ -32,7 +35,7 @@ type Props = {
 
 type State = {
   input: string,
-  results: Array<SearchResult>,
+  keys: Array<Key>,
   query: string,
   dialogOpen: boolean,
   key: Key,
@@ -42,7 +45,7 @@ class SearchView extends Component<Props, State> {
   state = {
     input: '',
     query: '',
-    results: [],
+    keys: [],
     dialogOpen: false,
     key: keyEmpty(),
   }
@@ -63,7 +66,7 @@ class SearchView extends Component<Props, State> {
         if (this.state.input === query) {
           this.setState({
             query: query,
-            results: resp.results || [],
+            keys: resp.keys || [],
           })
         }
       })
@@ -76,9 +79,9 @@ class SearchView extends Component<Props, State> {
     })
   }
 
-  select = (result: SearchResult) => {
+  select = (key: Key) => {
     // this.setState({dialogOpen: true, key: key})
-    this.props.dispatch(push('/key?kid=' + result.kid))
+    this.props.dispatch(push('/key?kid=' + key.kid))
   }
 
   render() {
@@ -97,22 +100,37 @@ class SearchView extends Component<Props, State> {
         </Box>
         <Divider />
         <Box display="flex" flexDirection="column">
-          <Table size="small">
+          <Table size="small" stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Typography style={{...styles.mono}}>Type</Typography>
+                </TableCell>
+
+                <TableCell>
+                  <Typography style={{...styles.mono}}>User</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography style={{...styles.mono}}>Key ID</Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
-              {this.state.results.map((result: SearchResult, index: number): any => {
-                return (
-                  <TableRow hover onClick={event => this.select(result)} key={result.kid}>
-                    <TableCell>
-                      <Box display="flex" flexDirection="row">
-                        <NamesView users={result.users || []} />
-                        <Typography style={{...styles.mono, color: '#3f3f3f'}} noWrap>
-                          {result.kid}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
+              {this.state.keys.map((key: Key, index: number): any => (
+                <TableRow hover onClick={event => this.select(key)} key={key.kid}>
+                  <TableCell component="th" scope="row" style={{width: 1}}>
+                    <KeyTypeView type={key.type || 'NO_KEY_TYPE'} description={false} />
+                  </TableCell>
+                  <TableCell>
+                    <NamesView users={key.users || []} />
+                  </TableCell>
+                  <TableCell>
+                    <Typography style={{...styles.mono}} noWrap>
+                      {key.kid}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </Box>

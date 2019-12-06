@@ -489,7 +489,8 @@ message PushRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
 }
 message PushResponse {
-  repeated string urls = 1 [(gogoproto.customname) = "URLs"];
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  repeated string urls = 2 [(gogoproto.customname) = "URLs"];
 }
 
 message KeyShareRequest {
@@ -604,20 +605,13 @@ message MessagesResponse {
   repeated Message messages = 1;
 }
 
-message SearchResult {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  repeated User users = 2;
-  KeyType type = 3;
-  bool saved = 10;
-}
-
 message SearchRequest {
-  string query = 1;
+  string query = 1;  
   int32 index = 2;
   int32 limit = 3;
 }
 message SearchResponse {
-  repeated SearchResult results = 1;
+  repeated Key keys = 1;  
 }
 
 message WatchRequest {}

@@ -17,7 +17,9 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles, Link, Step} from '../../components'
+import {styles, Link} from '../../components'
+
+import Step from '../../components/step'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
@@ -100,6 +102,7 @@ class UserNameView extends Component<Props, State> {
             placeholder={placeholder}
             onChange={this.onNameChange}
             value={this.state.name}
+            style={{minWidth: 300}}
           />
           <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
         </FormControl>
@@ -118,7 +121,7 @@ class UserNameView extends Component<Props, State> {
       return
     }
 
-    this.setState({loading: true})
+    this.setState({loading: true, error: ''})
     const req: UserSignRequest = {
       kid: '', // Default
       service: this.props.service,
@@ -132,8 +135,7 @@ class UserNameView extends Component<Props, State> {
           this.props.dispatch(push('/profile/user/sign'))
         },
         (err: RPCError) => {
-          this.setState({loading: false})
-          this.setState({error: err.details})
+          this.setState({loading: false, error: err.details})
         }
       )
     )

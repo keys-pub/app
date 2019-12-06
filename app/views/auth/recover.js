@@ -39,7 +39,7 @@ type State = {
   loading: boolean,
   password: string,
   recovery: string,
-  recoveryError: string,
+  error: string,
 }
 
 class AuthRecoverView extends Component<Props, State> {
@@ -47,7 +47,7 @@ class AuthRecoverView extends Component<Props, State> {
     loading: false,
     password: '',
     recovery: '',
-    recoveryError: '',
+    error: '',
 
     // For testing
     // password: 'password123',
@@ -62,17 +62,17 @@ class AuthRecoverView extends Component<Props, State> {
   }
 
   onInputChangePassword = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({password: e.target ? e.target.value : '', recoveryError: ''})
+    this.setState({password: e.target ? e.target.value : '', error: ''})
   }
   onInputChangeRecovery = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({recovery: e.target ? e.target.value : '', recoveryError: ''})
+    this.setState({recovery: e.target ? e.target.value : '', error: ''})
   }
 
   render() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
         <Header loading={this.state.loading} />
-        <FormControl error={this.state.recoveryError !== ''}>
+        <FormControl error={this.state.error !== ''}>
           <Typography style={{paddingTop: 10, paddingBottom: 10, width: 500}}>
             Enter in your password.
           </Typography>
@@ -111,7 +111,7 @@ class AuthRecoverView extends Component<Props, State> {
             inputRef={this.recovery}
           />
 
-          <FormHelperText id="component-error-text">{this.state.recoveryError}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
         </FormControl>
         <Box
           display="flex"
@@ -148,7 +148,7 @@ class AuthRecoverView extends Component<Props, State> {
   }
 
   authSetup = async () => {
-    this.setState({loading: true})
+    this.setState({loading: true, error: ''})
     const req: AuthSetupRequest = {
       password: this.state.password,
       pepper: this.state.recovery,
@@ -162,7 +162,7 @@ class AuthRecoverView extends Component<Props, State> {
     let cl = await client()
     cl.authSetup(req, (err: ?RPCError, resp: ?AuthSetupResponse) => {
       if (err) {
-        this.setState({loading: false, recoveryError: err.message})
+        this.setState({loading: false, error: err.message})
         return
       }
       if (!resp) {
