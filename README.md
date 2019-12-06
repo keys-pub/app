@@ -41,7 +41,7 @@ yarn dev
 To run a second instance that connects to different service:
 
 ```console
-PORT=4343 KEYSD_PORT=10002 KEYSD_APP=Keys2 yarn dev
+PORT=4343 KEYS_PORT=10002 KEYS_APP=Keys2 yarn dev
 
 # Run a service on that port and app
 keysd -port=10002 -app=Keys2

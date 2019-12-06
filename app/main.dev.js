@@ -54,7 +54,7 @@ type Credentials = {
 }
 
 const getAppName = (): string => {
-  return getenv.string('KEYSD_APP', 'Keys.pub')
+  return getenv.string('KEYS_APP', 'Keys.pub')
 }
 
 var creds = {

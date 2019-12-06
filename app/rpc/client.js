@@ -44,7 +44,7 @@ export const initializeClient = (certPath: string, authToken: string, protoPath:
     throw new Error('proto descriptor should have a Keys service')
   }
 
-  const port = getenv.int('KEYSD_PORT', 10001)
+  const port = getenv.int('KEYS_PORT', 10001)
   console.log('Using client on port', port)
 
   rpcClient = {
