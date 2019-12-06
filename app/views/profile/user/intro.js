@@ -1,0 +1,142 @@
+// @flow
+import React, {Component} from 'react'
+
+import {
+  Box,
+  Button,
+  Checkbox,
+  IconButton,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  Snackbar,
+  SnackbarContent,
+  TextField,
+  Typography,
+} from '@material-ui/core'
+
+import {clipboard, shell} from 'electron'
+
+import {styles, Link, Step} from '../../components'
+
+import {connect} from 'react-redux'
+import {goBack, push} from 'connected-react-router'
+
+import {serviceName} from '../../helper'
+
+import {configSet, userService} from '../../../rpc/rpc'
+import type {
+  ConfigSetRequest,
+  ConfigSetResponse,
+  UserServiceRequest,
+  UserServiceResponse,
+  RPCError,
+  RPCState,
+} from '../../../rpc/rpc'
+import type {Key, User} from '../../../rpc/types'
+
+type Props = {
+  dispatch: (action: any) => any,
+}
+
+class UserIntroView extends Component<Props> {
+  select = (service: string) => {
+    // this.setState({loading: true})
+    const req: UserServiceRequest = {
+      kid: '', // Default
+      service: service,
+    }
+    this.props.dispatch(
+      userService(req, (resp: UserServiceResponse) => {
+        // this.setState({loading: false})
+        this.props.dispatch(push('/profile/user/name'))
+      })
+    )
+  }
+
+  nothanks = (skip: boolean) => {
+    this.props.dispatch(
+      configSet({key: 'disablePromptUser', value: skip ? '1' : '0'}, (resp: ConfigSetResponse) => {
+        this.props.dispatch({type: 'PROMPT_USER', payload: false})
+      })
+    )
+  }
+
+  render() {
+    return (
+      <Step title="Link your Key">
+        <Typography variant="body1" style={{paddingBottom: 10}}>
+          Link your key with a Github or Twitter account by generating a signed message and posting it there.
+          This helps others find your key and verify who you are.
+        </Typography>
+        <Typography variant="body1" style={{paddingBottom: 40}}>
+          For more information, see{' '}
+          <Link inline onClick={() => shell.openExternal('https://docs.keys.pub/specs/user')}>
+            docs.keys.pub/specs/user
+          </Link>
+          .
+        </Typography>
+        <Box display="flex" flexDirection="column" style={{marginBottom: 20, alignItems: 'center'}}>
+          <Button
+            color="secondary"
+            style={{
+              color: styles.colors.github,
+              border: '1px solid ' + styles.colors.github,
+              // color: 'white',
+              // backgroundColor: colorGithub,
+              width: 300,
+              height: 60,
+              marginBottom: 20,
+              textTransform: 'none',
+              fontSize: 20,
+              fontWeight: 500,
+            }}
+            onClick={() => this.select('github')}
+          >
+            <i className="fab fa-github" style={{color: styles.colors.github, fontSize: '2rem'}} /> &nbsp;
+            Link to Github
+          </Button>
+          <Button
+            color="primary"
+            style={{
+              color: styles.colors.twitter,
+              border: '1px solid ' + styles.colors.twitter,
+              // color: 'white',
+              // backgroundColor: colorTwitter,
+              width: 300,
+              height: 60,
+              marginBottom: 20,
+              textTransform: 'none',
+              fontSize: 20,
+              fontWeight: 500,
+            }}
+            onClick={() => this.select('twitter')}
+          >
+            <i className="fab fa-twitter" style={{color: styles.colors.twitter, fontSize: '2rem'}} /> &nbsp;
+            Link to Twitter
+          </Button>
+
+          <Typography>
+            <Link
+              inline={true}
+              onClick={() => this.nothanks(false)}
+              style={{width: 300, textAlign: 'center', marginTop: 10}}
+            >
+              Remind me later
+            </Link>
+            &nbsp; &mdash; &nbsp;
+            <Link
+              inline
+              onClick={() => this.nothanks(true)}
+              style={{width: 300, textAlign: 'center', marginTop: 20}}
+            >
+              Don't remind me
+            </Link>
+          </Typography>
+        </Box>
+      </Step>
+    )
+  }
+}
+
+export default connect<Props, {}, _, _, _, _>()(UserIntroView)
