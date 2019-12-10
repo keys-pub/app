@@ -7,10 +7,11 @@ import {Add as AddIcon} from '@material-ui/icons'
 
 import KeyView from './view'
 
-import type {Key} from '../../rpc/types'
+import type {Key, Statement} from '../../rpc/types'
 
 type Props = {
   value: Key,
+  statements: Array<Statement>,
   open: boolean,
   close: () => void,
   add: () => void,
@@ -26,8 +27,8 @@ export default class KeyDialog extends Component<Props> {
         }
         <Box paddingTop={3} paddingLeft={1} paddingBottom={1}>
           <KeyView
-            kid={this.props.value.kid}
             value={this.props.value}
+            statements={this.props.statements}
             add={this.props.add}
             remove={this.props.remove}
           />

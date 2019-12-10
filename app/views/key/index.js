@@ -23,10 +23,10 @@ import {connect} from 'react-redux'
 import queryString from 'query-string'
 import {goBack, push} from 'connected-react-router'
 
-import {key, keyRemove, pull} from '../../rpc/rpc'
+import {key, keyRemove, pull, sigchain} from '../../rpc/rpc'
 import type {AppState, RPCState} from '../../reducers/app'
 
-import type {Key} from '../../rpc/types'
+import type {Key, Statement} from '../../rpc/types'
 import type {
   KeyRemoveRequest,
   KeyRemoveResponse,
@@ -34,6 +34,8 @@ import type {
   KeyResponse,
   PullRequest,
   PullResponse,
+  SigchainRequest,
+  SigchainResponse,
   RPCError,
 } from '../../rpc/rpc'
 
@@ -44,6 +46,7 @@ type Props = {
 
 type State = {
   key: ?Key,
+  statements: ?Array<Statement>,
   loading: boolean,
   error: ?string,
 }
@@ -59,6 +62,7 @@ const cstyles = {
 class KeyIndexView extends Component<Props, State> {
   state = {
     key: null,
+    statements: [],
     loading: false,
     error: null,
   }
@@ -131,20 +135,48 @@ class KeyIndexView extends Component<Props, State> {
     )
   }
 
+  loadSigchain = () => {
+    this.setState({loading: true, error: ''})
+    const req: SigchainRequest = {
+      kid: this.props.kid,
+      check: true,
+      update: true,
+    }
+    this.props.dispatch(
+      sigchain(
+        req,
+        (resp: SigchainResponse) => {
+          if (resp.key) {
+            this.setState({key: resp.key, statements: resp.statements, loading: false})
+          } else {
+            this.setState({error: 'Key not found', loading: false})
+          }
+        },
+        (err: RPCError) => {
+          this.setState({loading: false, error: err.message})
+        }
+      )
+    )
+  }
+
   render() {
     const {loading} = this.state
     return (
       <Box display="flex" flexDirection="column">
-        <Divider style={{marginBottom: 3}} />
-        {/* {!loading && <Divider style={{marginBottom: 3}} />}
-        {loading && <LinearProgress />}*/}
+        {!loading && <Divider style={{marginBottom: 3}} />}
+        {loading && <LinearProgress />}
         <Box marginTop={3}>
           {this.state.error && (
             <Typography style={{color: 'red', marginLeft: 30}}>{this.state.error}</Typography>
           )}
           {this.state.loading && <KeyLoadingView kid={this.props.kid} />}
           {!this.state.error && !this.state.loading && this.state.key && (
-            <KeyView value={this.state.key} add={this.add} remove={this.remove} />
+            <KeyView
+              value={this.state.key}
+              statements={this.state.statements || []}
+              add={this.add}
+              remove={this.remove}
+            />
           )}
         </Box>
       </Box>

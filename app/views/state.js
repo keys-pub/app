@@ -25,10 +25,10 @@ export type State = {
 export {goBack, push}
 
 export const init = () => (dispatch: (action: any) => void, getState: () => State) => {
-  setErrHandler((err: RPCError) => {
+  setErrHandler((err: RPCError, errFn: ?(err: RPCError) => void) => {
     if (err.code === grpc.status.PERMISSION_DENIED) {
       dispatch({type: 'LOCK'})
-    } else {
+    } else if (!errFn) {
       dispatch(errors(new Error(err)))
     }
   })

@@ -107,7 +107,7 @@ class ProfileView extends Component<Props> {
         <Table size="small">
           <TableBody>
             <TableRow>
-              <TableCell style={cstyles.cell}>
+              <TableCell style={{...cstyles.cell, ...cstyles.key}}>
                 <Typography align="right">Public Key</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
@@ -141,7 +141,6 @@ class ProfileView extends Component<Props> {
                 <Box display="flex" flexDirection="column">
                   <Typography align="right">Created</Typography>
                   <Typography align="right">Published</Typography>
-                  <Typography align="right">Added</Typography>
                   <Typography align="right">Updated</Typography>
                 </Box>
               </TableCell>
@@ -149,7 +148,6 @@ class ProfileView extends Component<Props> {
                 <Box display="flex" flexDirection="column">
                   <Typography>{createdAt || '-'}</Typography>
                   <Typography>{publishedAt || '-'}</Typography>
-                  <Typography>{savedAt || '-'}</Typography>
                   <Typography>{updatedAt || '-'}</Typography>
                 </Box>
 
@@ -196,6 +194,9 @@ const cstyles = {
     borderBottom: 0,
     paddingBottom: 20,
     verticalAlign: 'top',
+  },
+  key: {
+    width: 100,
   },
 }
 

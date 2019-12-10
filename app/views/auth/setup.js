@@ -315,6 +315,7 @@ class AuthSetupView extends Component<Props, State> {
       publishPublicKey: false,
       recover: false,
       force: false,
+      client: 'app',
     }
     this.props.dispatch(
       authSetup(

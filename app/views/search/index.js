@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Divider,
+  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -34,42 +35,46 @@ type Props = {
 }
 
 type State = {
+  error?: string,
   input: string,
-  keys: Array<Key>,
-  query: string,
-  dialogOpen: boolean,
   key: Key,
+  keys: Array<Key>,
+  loading: boolean,
+  query: string,
 }
 
 class SearchView extends Component<Props, State> {
   state = {
     input: '',
-    query: '',
-    keys: [],
-    dialogOpen: false,
     key: keyEmpty(),
+    keys: [],
+    loading: false,
+    query: '',
   }
 
   componentDidMount() {
     this.search('')
   }
-  componentDidUpdate() {
-    if (this.state.query != this.state.input) {
-      this.search(this.state.input)
-    }
-  }
 
   search = (query: string) => {
-    const req: SearchRequest = {query: query, index: 0, limit: 100}
+    this.setState({loading: true, error: ''})
+    const req: SearchRequest = {query: query, index: 0, limit: 0}
     this.props.dispatch(
-      search(req, (resp: SearchResponse) => {
-        if (this.state.input === query) {
-          this.setState({
-            query: query,
-            keys: resp.keys || [],
-          })
+      search(
+        req,
+        (resp: SearchResponse) => {
+          if (this.state.input === query) {
+            this.setState({
+              loading: false,
+              query: query,
+              keys: resp.keys || [],
+            })
+          }
+        },
+        (err: RPCError) => {
+          this.setState({loading: false, error: err.message})
         }
-      })
+      )
     )
   }
 
@@ -77,6 +82,7 @@ class SearchView extends Component<Props, State> {
     this.setState({
       input: e.target.value,
     })
+    this.search(e.target.value)
   }
 
   select = (key: Key) => {
@@ -85,6 +91,7 @@ class SearchView extends Component<Props, State> {
   }
 
   render() {
+    const {loading} = this.state
     return (
       <Box display="flex" flex={1} flexDirection="column">
         <Box paddingLeft={1} paddingBottom={2} paddingRight={1}>
@@ -98,7 +105,8 @@ class SearchView extends Component<Props, State> {
             style={{marginTop: 2}}
           />
         </Box>
-        <Divider />
+        {!loading && <Divider style={{marginBottom: 3}} />}
+        {loading && <LinearProgress />}
         <Box display="flex" flexDirection="column">
           <Table size="small" stickyHeader>
             <TableHead>

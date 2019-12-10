@@ -155,6 +155,7 @@ class AuthRecoverView extends Component<Props, State> {
       recover: true,
       publishPublicKey: false,
       force: false,
+      client: 'app',
     }
 
     console.log('Auth setup')

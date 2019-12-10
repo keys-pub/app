@@ -42,8 +42,9 @@ service Keys {
   rpc DecryptArmoredStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}  
 
   rpc Sigchain(SigchainRequest) returns (SigchainResponse) {}
-  rpc SigchainStatementCreate(SigchainStatementCreateRequest) returns (SigchainStatementCreateResponse) {}  
-  rpc SigchainStatementRevoke(SigchainStatementRevokeRequest) returns (SigchainStatementRevokeResponse) {}  
+  rpc Statement(StatementRequest) returns (StatementResponse) {}
+  rpc StatementCreate(StatementCreateRequest) returns (StatementCreateResponse) {}  
+  rpc StatementRevoke(StatementRevokeRequest) returns (StatementRevokeResponse) {}  
 
   rpc UserService(UserServiceRequest) returns (UserServiceResponse) {}
   rpc UserSign(UserSignRequest) returns (UserSignResponse) {}
@@ -137,15 +138,23 @@ message Statement {
 
 message SigchainRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];  
-  // Seq is optional to show specified sigchain entry.
-  int32 seq = 2;
+  bool check = 4;
+  bool update = 5;
 }
-message SigchainResponse{
-  string kid = 1 [(gogoproto.customname) = "KID"];  
+message SigchainResponse {
+  Key key = 1;
   repeated Statement statements = 2;
 }
 
-message SigchainStatementCreateRequest {
+message StatementRequest {
+string kid = 1 [(gogoproto.customname) = "KID"];  
+int32 seq = 2;
+}
+message StatementResponse {
+  Statement statement = 1;
+}
+
+message StatementCreateRequest {
   bytes data = 1;
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
@@ -155,11 +164,11 @@ message SigchainStatementCreateRequest {
   // Local, will not save to remote.
   bool local = 6;
 }
-message SigchainStatementCreateResponse {
+message StatementCreateResponse {
   Statement statement = 1;
 }
 
-message SigchainStatementRevokeRequest {
+message StatementRevokeRequest {
   // Seq to revoke.
   int32 seq = 1;
   // KID to sign with. Optional, if current key is set.
@@ -176,7 +185,7 @@ message SigchainStatementRevokeRequest {
   // SeedPhrase to confirm if revoking all.
   // string seedPhrase = 11;
 }
-message SigchainStatementRevokeResponse {
+message StatementRevokeResponse {
   Statement statement = 1;
 }
 
@@ -279,6 +288,7 @@ message AuthSetupRequest {
   bool recover = 3;
   bool publishPublicKey = 4;
   bool force = 5;
+  string client = 6;
 }
 message AuthSetupResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
@@ -286,9 +296,13 @@ message AuthSetupResponse {
 }
 
 message AuthUnlockRequest {
+  // Password.
   string password = 1;
+  // Client (optional) name.
+  string client = 2;
 }
 message AuthUnlockResponse {
+  // AuthToken to use for requests.
   string authToken = 1;
 }
 
@@ -379,13 +393,26 @@ enum KeyType {
 }
 
 message Key {
+  // KID is key identifier, which is the public key (Base58 encoded).
   string kid = 1 [(gogoproto.customname) = "KID"];
-  repeated User users = 2;
+  // Type of key.
   KeyType type = 3;
+  // SignPublicKey is the sign public key.
+  bytes signPublicKey = 4; 
+  // BoxPublicKey is the current encryption public key.
+  bytes boxPublicKey = 5; 
+  // Users signed into sigchain.
+  repeated User users = 6;  
+  // Saved if saved locally.
   bool saved = 10;
+
+  // CreatedAt is when the key was created.
   int64 createdAt = 20;
+  // PublishedAt is when the key published to the key server.
   int64 publishedAt = 21;
+  // SavedAt is when the key was saved locally.
   int64 savedAt = 22;
+  // UpdatedAt is when the key (sigchain) was last updated.
   int64 updatedAt = 23;
 }
 

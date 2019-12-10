@@ -107,8 +107,8 @@ class AuthUnlockView extends Component<Props, State> {
     this.setState({loading: true, error: ''})
     // TODO: Use app name for client name
     const req: AuthUnlockRequest = {
-      clientName: 'Keys.app',
       password: this.state.password,
+      client: 'app',
     }
     console.log('Auth unlock')
     // Use client directly to prevent logging the request (password)

@@ -11,13 +11,16 @@ import queryString from 'query-string'
 
 import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
 
+import SigchainView from './sigchain'
+
 import {status} from '../../rpc/rpc'
 import type {AppState, RPCState} from '../../reducers/app'
 
-import type {Key, KeyType} from '../../rpc/types'
+import type {Key, KeyType, Statement} from '../../rpc/types'
 
 type Props = {
   value: Key,
+  statements: Array<Statement>,
   add: () => void,
   remove: () => void,
 }
@@ -36,8 +39,10 @@ export const KeyTypeView = (props: {type: KeyType, description: boolean}) => {
 
 export default (props: Props) => {
   const kid = props.value.kid
-  const add = !props.value.saved && props.value.type == 'PUBLIC_KEY_TYPE'
-  const remove = props.value.saved && props.value.type == 'PUBLIC_KEY_TYPE'
+  const isPublic = props.value.type == 'PUBLIC_KEY_TYPE'
+  const isPrivate = props.value.type == 'PRIVATE_KEY_TYPE'
+  const add = !props.value.saved && isPublic
+  const remove = props.value.saved && isPublic
   const users = props.value.users || []
   const type = props.value.type || 'NO_KEY_TYPE'
   const createdAt = dateString(props.value.createdAt)
@@ -45,7 +50,7 @@ export default (props: Props) => {
   const savedAt = dateString(props.value.savedAt)
   const updatedAt = dateString(props.value.updatedAt)
   return (
-    <Box display="flex">
+    <Box display="flex" flex={1} flexDirection="column">
       <Table size="small">
         <TableBody>
           <TableRow>
@@ -89,7 +94,7 @@ export default (props: Props) => {
               <Box display="flex" flexDirection="column">
                 <Typography align="right">Created</Typography>
                 <Typography align="right">Published</Typography>
-                <Typography align="right">Added</Typography>
+                {!isPrivate && <Typography align="right">Added</Typography>}
                 <Typography align="right">Updated</Typography>
               </Box>
             </TableCell>
@@ -97,7 +102,7 @@ export default (props: Props) => {
               <Box display="flex" flexDirection="column">
                 <Typography>{createdAt || '-'}</Typography>
                 <Typography>{publishedAt || '-'}</Typography>
-                <Typography>{savedAt || '-'}</Typography>
+                {!isPrivate && <Typography>{savedAt || '-'}</Typography>}
                 <Typography>{updatedAt || '-'}</Typography>
               </Box>
             </TableCell>
@@ -121,6 +126,7 @@ export default (props: Props) => {
           </TableRow>
         </TableBody>
       </Table>
+      <SigchainView statements={props.statements} />
     </Box>
   )
 }

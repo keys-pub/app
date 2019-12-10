@@ -33,9 +33,18 @@ export const keyTypeSymbol = (type: KeyType): string => {
     case 'PRIVATE_KEY_TYPE':
       return emoji.get('key')
     case 'PUBLIC_KEY_TYPE':
-      return emoji.get('package')
+      return emoji.get('lower_left_fountain_pen')
   }
   return emoji.get('question')
+}
+
+var dateOptions = {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
 }
 
 export const dateString = (ms: number): string => {
@@ -44,5 +53,7 @@ export const dateString = (ms: number): string => {
     return ''
   }
   const d = new Date(n)
-  return d.toJSON()
+  //return d.toJSON()
+
+  return d.toLocaleDateString('en-US', dateOptions)
 }
