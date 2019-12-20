@@ -47,7 +47,7 @@ export const init = () => (dispatch: (action: any) => void, getState: () => Stat
 }
 
 export const errors = (err: Error) => (dispatch: (action: any) => any) => {
-  console.error('Error:', err)
+  console.error('Dispatch', err)
   dispatch({
     type: 'ERROR',
     payload: {error: err},
@@ -120,7 +120,8 @@ export const userEmpty = (): User => ({
   service: '',
   name: '',
   url: '',
-  displayName: '',
+  err: '',
+  verifiedAt: 0,
 })
 
 export const currentStatus = (rpc: RPCState): StatusResponse => {

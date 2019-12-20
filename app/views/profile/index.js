@@ -25,7 +25,8 @@ import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
 
 import {styles, Link} from '../components'
 import {NameView} from './user/views'
-import UserIntroDialog from './user/dialog'
+import UserIntroDialog from './user/intro'
+import UserRevokeDialog from './user/revoke'
 import AuthPublishDialog from '../auth/publish'
 
 import {authLock, status, userService} from '../../rpc/rpc'
@@ -46,7 +47,13 @@ type Props = {
   dispatch: (action: any) => any,
 }
 
-class ProfileView extends Component<Props> {
+type State = {
+  revoke?: number,
+}
+
+class ProfileView extends Component<Props, State> {
+  state = {}
+
   componentDidMount() {
     this.refresh()
   }
@@ -115,9 +122,6 @@ class ProfileView extends Component<Props> {
                   <Typography style={{...styles.mono, paddingRight: 10, wordWrap: 'break-word'}}>
                     {kid}
                   </Typography>
-                  <Typography style={{paddingTop: 2, color: '#666'}}>
-                    You can share this public key with others.
-                  </Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -127,9 +131,20 @@ class ProfileView extends Component<Props> {
               </TableCell>
               <TableCell style={cstyles.cell}>
                 {(users || []).map((user: User) => (
-                  <Box display="flex" flexDirection="column" key={user.kid}>
+                  <Box display="flex" flexDirection="column" key={user.kid + user.seq}>
                     <NameView user={user} />
+                    {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
                     <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
+                    <Box>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => this.setState({revoke: user.seq})}
+                      >
+                        Revoke
+                      </Button>
+                    </Box>
                   </Box>
                 ))}
                 {users.length === 0 && <Link onClick={() => this.select('github')}>Link to Github</Link>}
@@ -183,6 +198,11 @@ class ProfileView extends Component<Props> {
           </TableBody>
         </Table>
         <UserIntroDialog />
+        <UserRevokeDialog
+          open={this.state.revoke || 0 > 0}
+          revoke={this.state.revoke}
+          close={() => this.setState({revoke: 0})}
+        />
         <AuthPublishDialog />
       </Box>
     )

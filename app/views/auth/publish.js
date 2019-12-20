@@ -84,8 +84,7 @@ class AuthPublishDialog extends Component<Props, State> {
         </Box>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            You've created your key. Do you want to publish your public key to the server? This allows others
-            to search for it. For more information, see{' '}
+            Do you want to publish your public key to the server? This allows others to search for it. For more information, see{' '}
             <Link inline onClick={() => shell.openExternal('https://docs.keys.pub/specs/key#publickey')}>
               docs.keys.pub/specs/key
             </Link>

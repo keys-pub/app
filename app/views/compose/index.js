@@ -13,7 +13,7 @@ import {styles} from '../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
 import {search, messageCreate} from '../../rpc/rpc'
-import type {Key} from '../../rpc/types'
+import type {Key, SearchResult} from '../../rpc/types'
 import type {
   MessageCreateRequest,
   MessageCreateResponse,
@@ -27,7 +27,7 @@ export type Props = {
 }
 
 type State = {
-  results: Array<Key>,
+  results: Array<SearchResult>,
   loading: boolean,
 }
 
@@ -37,13 +37,13 @@ class ComposeView extends Component<Props, State> {
     results: [],
   }
 
-  search = (q: string): Promise<Array<Key>> => {
+  search = (q: string): Promise<Array<SearchResult>> => {
     return new Promise((resolve, reject) => {
       this.props.dispatch(
         search(
-          {query: q, index: 0, limit: 30},
+          {query: q, index: 0, limit: 100},
           (resp: SearchResponse) => {
-            resolve(resp.keys || [])
+            resolve(resp.results || [])
           },
           (err: RPCError) => {
             reject(err)
@@ -53,7 +53,7 @@ class ComposeView extends Component<Props, State> {
     })
   }
 
-  select = (results: Array<Key>) => {
+  select = (results: Array<SearchResult>) => {
     this.setState({results})
   }
 
@@ -93,7 +93,7 @@ class ComposeView extends Component<Props, State> {
       <Box display="flex" flex={1} flexDirection="column">
         {!this.state.loading && <Divider style={{marginBottom: 3}} />}
         {this.state.loading && <LinearProgress />}
-        <Recipients search={this.search} select={this.select} />
+        {/*<Recipients search={this.search} select={this.select} />*/}
         <Divider />
         <Editor defaultValue="" send={this.send} loading={this.state.loading} />
       </Box>

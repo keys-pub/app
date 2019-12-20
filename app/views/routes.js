@@ -33,7 +33,6 @@ import StyleGuide from './style-guide'
 import DBView from './db'
 import KeyView from './key'
 import KeysView from './keys'
-import UserIntroView from './profile/user/intro'
 import UserNameView from './profile/user/name'
 import UserSignView from './profile/user/sign'
 
@@ -70,7 +69,6 @@ export const routes: Array<RouteInfo> = [
   {path: '/style-guide', component: () => <StyleGuide />},
 
   {path: '/profile/index', component: () => <ProfileView />},
-  {path: '/profile/user/intro', component: () => <UserIntroView />},
   {path: '/profile/user/name', component: () => <UserNameView />},
   {path: '/profile/user/sign', component: () => <UserSignView />},
 ]

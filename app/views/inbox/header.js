@@ -100,7 +100,7 @@ class Header extends Component<Props, State> {
 const mapStateToProps = (state: {app: AppState, rpc: RPCState}) => {
   // TODO
   return {
-    user: {kid: '', name: '', service: '', seq: 0, url: ''},
+    user: {kid: '', name: '', service: '', seq: 0, url: '', err: '', verifiedAt: 0},
   }
 }
 

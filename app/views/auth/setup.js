@@ -24,6 +24,7 @@ import {styles, Link, Step} from '../components'
 
 import Header from './header'
 
+import {client} from '../../rpc/client'
 import {ipcRenderer} from 'electron'
 
 import {connect} from 'react-redux'
@@ -31,7 +32,12 @@ import {goBack, push} from 'connected-react-router'
 
 import {authSetup, rand} from '../../rpc/rpc'
 
-import type {AuthSetupRequest, AuthSetupResponse, RandRequest, RandResponse} from '../../rpc/types'
+import type {
+  AuthGenerateRequest,
+  AuthGenerateResponse,
+  AuthSetupRequest,
+  AuthSetupResponse,
+} from '../../rpc/types'
 import type {RPCError, RPCState} from '../../rpc/rpc'
 
 type Props = {
@@ -44,8 +50,8 @@ type State = {
   password: string,
   passwordConfirm: string,
   passwordError: string,
-  recovery: string,
-  recoveryConfirm: string,
+  keyBackup: string,
+  keyBackupConfirm: string,
   setupError: string,
   step: number,
   snackOpen: boolean,
@@ -57,8 +63,8 @@ class AuthSetupView extends Component<Props, State> {
     password: '',
     passwordConfirm: '',
     passwordError: '',
-    recovery: '',
-    recoveryConfirm: '',
+    keyBackup: '',
+    keyBackupConfirm: '',
     setupError: '',
     step: 1,
     snackOpen: false,
@@ -66,7 +72,7 @@ class AuthSetupView extends Component<Props, State> {
     // For testing
     // password: 'password123',
     // step: 2,
-    // recovery:
+    // keyBackup:
     //   'shove quiz copper settle harvest victory shell fade soft neck awake churn craft venue pause utility service degree invite inspire swing detect pipe sibling',
   }
   inputConfirm: any
@@ -76,25 +82,21 @@ class AuthSetupView extends Component<Props, State> {
     this.inputConfirm = React.createRef()
   }
 
-  componentDidMount() {
-    this.loadRecovery()
-  }
-
   onInputChangePassword = (e: SyntheticInputEvent<EventTarget>) => {
     this.setState({password: e.target ? e.target.value : '', passwordError: ''})
   }
   onInputChangeConfirm = (e: SyntheticInputEvent<EventTarget>) => {
     this.setState({passwordConfirm: e.target ? e.target.value : '', passwordError: ''})
   }
-  onInputChangeRecoveryConfirm = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({recoveryConfirm: e.target ? e.target.value : '', setupError: ''})
+  onInputChangeKeyBackupConfirm = (e: SyntheticInputEvent<EventTarget>) => {
+    this.setState({keyBackupConfirm: e.target ? e.target.value : '', setupError: ''})
   }
 
   renderPassword() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Header loading={this.state.loading} />
-        <Typography style={{paddingBottom: 20, width: 500, textAlign: 'center'}}>
+        <Typography style={{paddingTop: 10, paddingBottom: 20, width: 500, textAlign: 'center'}}>
           Let's create a password. Your password needs to be at least 10 characters.
         </Typography>
         <FormControl error={this.state.passwordError !== ''}>
@@ -174,11 +176,11 @@ class AuthSetupView extends Component<Props, State> {
       return
     }
 
-    this.setState({step: 2})
+    this.generateKeyBackup()
   }
 
   copyToClipboard = () => {
-    clipboard.writeText(this.state.recovery)
+    clipboard.writeText(this.state.keyBackup)
     this.setState({snackOpen: true})
   }
 
@@ -186,21 +188,21 @@ class AuthSetupView extends Component<Props, State> {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" justifyContent="center" alignItems="center">
         <Header loading={this.state.loading} />
-        <Typography style={{paddingBottom: 20, width: 500}}>
-          Now you'll need to backup a (secret) recovery phrase.
+        <Typography style={{paddingBottom: 10, width: 550}}>
+          Now you'll need to backup your key. This backup is encrypted with your password.
         </Typography>
 
-        <Typography color="primary" style={{...styles.mono, paddingBottom: 10, width: 500}}>
-          {this.state.recovery}
+        <Typography color="primary" style={{...styles.mono, width: 550}}>
+          {this.state.keyBackup}
         </Typography>
 
         <Button size="small" variant="outlined" onClick={this.copyToClipboard}>
           Copy to Clipboard
         </Button>
 
-        <Typography style={{paddingTop: 20, paddingBottom: 20, width: 500}}>
-          A good way to backup this phrase is to email it to yourself or save it in the cloud in a place only
-          you can access. After backing up the recovery phrase, enter it here:
+        <Typography style={{paddingTop: 20, paddingBottom: 20, width: 550}}>
+          You can email this to yourself or save it in the cloud in a place only you can access. This allows
+          you to recover your key if your devices go missing. Enter in your encrypted key backup to confirm:
         </Typography>
 
         <FormControl error={this.state.setupError !== ''}>
@@ -208,15 +210,15 @@ class AuthSetupView extends Component<Props, State> {
             autoFocus
             label="Recovery Confirm"
             variant="outlined"
-            onChange={this.onInputChangeRecoveryConfirm}
+            onChange={this.onInputChangeKeyBackupConfirm}
             inputProps={{
-              onKeyDown: this.onKeyDownRecoveryConfirm,
+              onKeyDown: this.onKeyDownKeyBackupConfirm,
             }}
-            rows={3}
-            rowsMax={3}
+            rows={4}
+            rowsMax={4}
             multiline={true}
-            value={this.state.recoveryConfirm}
-            style={{fontSize: 48, width: 500}}
+            value={this.state.keyBackupConfirm}
+            style={{fontSize: 48, width: 550}}
             disabled={this.state.loading}
           />
 
@@ -231,7 +233,7 @@ class AuthSetupView extends Component<Props, State> {
         >
           <Button
             color="secondary"
-            onClick={() => this.setState({step: 1})}
+            onClick={() => this.setState({step: 1, keyBackup: '', keyBackupConfirm: ''})}
             disabled={this.state.loading}
             style={{marginRight: 20}}
           >
@@ -281,58 +283,63 @@ class AuthSetupView extends Component<Props, State> {
       this.setPassword()
     }
   }
-  onKeyDownRecoveryConfirm = (event: SyntheticKeyboardEvent<*>) => {
+  onKeyDownKeyBackupConfirm = (event: SyntheticKeyboardEvent<*>) => {
     if (event.key === 'Enter') {
       // TODO
     }
   }
 
   authCreate = () => {
-    if (this.state.recovery !== this.state.recoveryConfirm.trim()) {
-      this.setState({setupError: "Recovery phrase doesn't match"})
+    if (this.state.keyBackup !== this.state.keyBackupConfirm.trim()) {
+      this.setState({setupError: "Key backup doesn't match"})
       return
     }
-    this.authSetup(this.state.recovery)
+    this.authSetup(this.state.keyBackup)
   }
 
-  loadRecovery = () => {
-    const req: RandRequest = {
-      length: 32,
-      encoding: 'BIP39',
+  generateKeyBackup = async () => {
+    const req: AuthGenerateRequest = {
+      password: this.state.password,
     }
-    this.props.dispatch(
-      rand(req, (resp: RandResponse) => {
-        this.setState({recovery: resp.data})
-      })
-    )
+    this.setState({loading: true, setupError: ''})
+    // Use client directly to prevent logging the request (password)
+    let cl = await client()
+    cl.authGenerate(req, (err: ?RPCError, resp: ?AuthGenerateResponse) => {
+      if (err) {
+        this.setState({loading: false, setupError: err.details})
+        return
+      }
+      if (!resp) {
+        return
+      }
+      this.setState({loading: false, keyBackup: resp.keyBackup, step: 2})
+    })
   }
 
-  authSetup = (recovery: string) => {
-    this.setState({loading: true, setupError: ''})
+  authSetup = async (keyBackup: string) => {
     const req: AuthSetupRequest = {
       password: this.state.password,
-      pepper: recovery,
-      publishPublicKey: false,
-      recover: false,
-      force: false,
-      client: 'app',
+      keyBackup: keyBackup,
+      clientName: 'app',
     }
-    this.props.dispatch(
-      authSetup(
-        req,
-        (resp: AuthSetupResponse) => {
-          ipcRenderer.send('credentials-set', {authToken: resp.authToken})
-          setTimeout(() => {
-            this.setState({loading: false})
-            this.props.dispatch({type: 'UNLOCK'})
-            this.props.dispatch(push('/profile/index'))
-          }, 100)
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, setupError: err.message})
-        }
-      )
-    )
+    this.setState({loading: true, setupError: ''})
+    // Use client directly to prevent logging the request (password)
+    let cl = await client()
+    cl.authSetup(req, (err: ?RPCError, resp: ?AuthSetupResponse) => {
+      if (err) {
+        this.setState({loading: false, setupError: err.details})
+        return
+      }
+      if (!resp) {
+        return
+      }
+      ipcRenderer.send('credentials-set', {authToken: resp.authToken})
+      setTimeout(() => {
+        this.setState({loading: false})
+        this.props.dispatch({type: 'UNLOCK'})
+        this.props.dispatch(push('/profile/index'))
+      }, 100)
+    })
   }
 }
 

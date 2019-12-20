@@ -115,8 +115,8 @@ class KeyIndexView extends Component<Props, State> {
     const req: KeyRequest = {
       kid: this.props.kid,
       user: '',
-      check: true,
-      update: true,
+      skipCheck: false,
+      update: false,
     }
     this.props.dispatch(
       key(

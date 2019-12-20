@@ -74,6 +74,7 @@ service Keys {
   
   // These requests do not need auth, since they are used to set or check auth.
   // BEGIN NO AUTH
+  rpc AuthGenerate(AuthGenerateRequest) returns (AuthGenerateResponse) {}
   rpc AuthSetup(AuthSetupRequest) returns (AuthSetupResponse) {}
   rpc AuthUnlock(AuthUnlockRequest) returns (AuthUnlockResponse) {}
   rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
@@ -282,13 +283,22 @@ message RuntimeStatusResponse {
   bool authSetupNeeded = 5;
 }
 
+message AuthGenerateRequest {
+  // Password used to create a key.
+  string password = 1;  
+}
+message AuthGenerateResponse {
+  // KeyBackup is an encrypted key backup.
+  string keyBackup = 1;  
+}
+
 message AuthSetupRequest {
+  // Password used to create or recover a key.
   string password = 1;
-  string pepper = 2;
-  bool recover = 3;
-  bool publishPublicKey = 4;
-  bool force = 5;
-  string client = 6;
+  // KeyBackup is an encrypted key backup.
+  string keyBackup = 2;  
+  
+  string clientName = 6;
 }
 message AuthSetupResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
@@ -419,7 +429,7 @@ message Key {
 message KeyRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
   string user = 2;
-  bool check = 4;
+  bool skipCheck = 4;
   bool update = 5;
 }
 
@@ -576,12 +586,29 @@ message DocumentDeleteRequest {
 }
 message DocumentDeleteResponse {}
 
+enum UserStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "UserStatus";
+
+  UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
+  OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
+  RESOURCE_NOT_FOUND = 2 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
+  CONTENT_NOT_FOUND = 3 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
+  CONN_FAILURE = 4 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
+  FAILURE = 5 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
+}
+
 message User {  
   string name = 1;
   string kid = 2 [(gogoproto.customname) = "KID"];
   int32 seq = 3;
   string service = 4;  
   string url = 5 [(gogoproto.customname) = "URL"];
+  
+  // Status of user proof.
+  UserStatus status = 6;
+  int64 verifiedAt = 7;
+  string err = 8;
 }
 
 message Message {
@@ -632,13 +659,18 @@ message MessagesResponse {
   repeated Message messages = 1;
 }
 
+message SearchResult {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  repeated User users = 2;  
+}
+
 message SearchRequest {
   string query = 1;  
   int32 index = 2;
   int32 limit = 3;
 }
 message SearchResponse {
-  repeated Key keys = 1;  
+  repeated SearchResult results = 1;  
 }
 
 message WatchRequest {}

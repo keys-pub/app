@@ -44,9 +44,9 @@ class AuthIntroView extends Component<Props, State> {
     return (
       <Box display="flex" flex={1} flexDirection="column" alignItems="center">
         <Header loading={false} />
-        <Typography style={{paddingBottom: 30, width: 500, textAlign: 'center'}}>
+        <Typography style={{paddingTop: 10, paddingBottom: 30, width: 500, textAlign: 'center'}}>
           Hi! If this is the first time you are here, you'll need to create a key. If you've already done
-          this, you can recover your key. For more information on how this key is generated, see{' '}
+          this, you can import your key. For more information on how this key is generated, see{' '}
           <Link inline onClick={() => shell.openExternal('https://docs.keys.pub/specs/auth')}>
             docs.keys.pub/specs/auth
           </Link>
@@ -71,8 +71,8 @@ class AuthIntroView extends Component<Props, State> {
           </Button>
           <Typography align="center" style={{paddingBottom: 30}}>
             I already have a key &nbsp;
-            <Link inline onClick={() => this.setState({step: 'recover'})}>
-              recover it
+            <Link inline onClick={() => this.setState({step: 'import'})}>
+              import it
             </Link>
             .
           </Typography>
@@ -87,7 +87,7 @@ class AuthIntroView extends Component<Props, State> {
         return this.renderIntro()
       case 'setup':
         return <AuthSetup cancel={() => this.setState({step: 'intro'})} />
-      case 'recover':
+      case 'import':
         return <AuthRecover cancel={() => this.setState({step: 'intro'})} />
     }
     return null

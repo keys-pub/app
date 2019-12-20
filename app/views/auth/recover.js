@@ -38,7 +38,7 @@ type Props = {
 type State = {
   loading: boolean,
   password: string,
-  recovery: string,
+  keyBackup: string,
   error: string,
 }
 
@@ -46,26 +46,21 @@ class AuthRecoverView extends Component<Props, State> {
   state = {
     loading: false,
     password: '',
-    recovery: '',
+    keyBackup: '',
     error: '',
-
-    // For testing
-    // password: 'password123',
-    // recovery:
-    //   'shove quiz copper settle harvest victory shell fade soft neck awake churn craft venue pause utility service degree invite inspire swing detect pipe sibling',
   }
-  recovery: any
+  keyBackupRef: any
 
   constructor(props: Props) {
     super(props)
-    this.recovery = React.createRef()
+    this.keyBackupRef = React.createRef()
   }
 
   onInputChangePassword = (e: SyntheticInputEvent<EventTarget>) => {
     this.setState({password: e.target ? e.target.value : '', error: ''})
   }
-  onInputChangeRecovery = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({recovery: e.target ? e.target.value : '', error: ''})
+  onInputChangeKeyBackup = (e: SyntheticInputEvent<EventTarget>) => {
+    this.setState({keyBackup: e.target ? e.target.value : '', error: ''})
   }
 
   render() {
@@ -98,17 +93,17 @@ class AuthRecoverView extends Component<Props, State> {
           <TextField
             label="Recovery Phrase"
             variant="outlined"
-            onChange={this.onInputChangeRecovery}
+            onChange={this.onInputChangeKeyBackup}
             inputProps={{
-              onKeyDown: this.onKeyDownRecovery,
+              onKeyDown: this.onKeyDownKeyBackup,
             }}
             rows={4}
             rowsMax={4}
             multiline={true}
-            value={this.state.recovery}
+            value={this.state.keyBackup}
             style={{fontSize: 48, width: 500}}
             disabled={this.state.loading}
-            inputRef={this.recovery}
+            inputRef={this.keyBackupRef}
           />
 
           <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
@@ -138,10 +133,10 @@ class AuthRecoverView extends Component<Props, State> {
 
   onKeyDownPassword = (event: SyntheticKeyboardEvent<*>) => {
     if (event.key === 'Enter') {
-      this.recovery.current.focus()
+      this.keyBackupRef.current.focus()
     }
   }
-  onKeyDownRecovery = (event: SyntheticKeyboardEvent<*>) => {
+  onKeyDownKeyBackup = (event: SyntheticKeyboardEvent<*>) => {
     if (event.key === 'Enter') {
       // TODO
     }
@@ -151,11 +146,8 @@ class AuthRecoverView extends Component<Props, State> {
     this.setState({loading: true, error: ''})
     const req: AuthSetupRequest = {
       password: this.state.password,
-      pepper: this.state.recovery,
-      recover: true,
-      publishPublicKey: false,
-      force: false,
-      client: 'app',
+      keyBackup: this.state.keyBackup,
+      clientName: 'app',
     }
 
     console.log('Auth setup')

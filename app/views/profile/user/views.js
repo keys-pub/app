@@ -10,14 +10,19 @@ import type {KeyType, User} from '../../../rpc/types'
 export const NameView = (props: {user: User}) => {
   const {user} = props
 
-  const color = serviceColor(user.service)
+  let textColor = ''
+  let scolor = serviceColor(user.service)
+
+  if (user.status !== 'OK') {
+    textColor = 'red'
+    scolor = 'red'
+  }
 
   return (
     <Box display="flex" flexDirection="row">
       <Box display="flex" flexDirection="row" style={{paddingRight: 8}}>
-        <Typography>{user.name}</Typography>
-        <Typography style={{color: '#9f9f9f'}}>@</Typography>
-        <Typography style={{color}}>{user.service}</Typography>
+        <Typography style={{color: textColor}}>{user.name}@</Typography>
+        <Typography style={{color: scolor}}>{user.service}</Typography>
       </Box>
     </Box>
   )

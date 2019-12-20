@@ -55,7 +55,7 @@ export default (props: Props) => {
         <TableBody>
           <TableRow>
             <TableCell style={{...cstyles.cell, width: 100}}>
-              <Typography align="right">ID</Typography>
+              <Typography align="right">Public Key</Typography>
             </TableCell>
             <TableCell style={cstyles.cell}>
               <Box display="flex" flexDirection="column">

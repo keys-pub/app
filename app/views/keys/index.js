@@ -102,7 +102,7 @@ class KeysView extends Component<Props> {
                   direction={direction}
                   onClick={() => this.sort(sortField, 'kid', sortDirection)}
                 >
-                  <Typography style={{...styles.mono}}>Key ID</Typography>
+                  <Typography style={{...styles.mono}}>Public Key</Typography>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
