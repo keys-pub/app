@@ -99,7 +99,7 @@ class ProfileView extends Component<Props, State> {
   render() {
     const {status} = this.props
     const key = status.key || keyEmpty()
-    const kid = key.kid || ''
+    const kid = key.id || ''
     const users = key.users || []
     const {uri} = status
 

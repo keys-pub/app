@@ -38,7 +38,7 @@ export const KeyTypeView = (props: {type: KeyType, description: boolean}) => {
 }
 
 export default (props: Props) => {
-  const kid = props.value.kid
+  const kid = props.value.id
   const isPublic = props.value.type == 'PUBLIC_KEY_TYPE'
   const isPrivate = props.value.type == 'PRIVATE_KEY_TYPE'
   const add = !props.value.saved && isPublic

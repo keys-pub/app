@@ -128,7 +128,7 @@ const renderInput = inputProps => {
       const user = result.users[0]
       return user.name + '@' + user.service
     } else {
-      return result.kid
+      return result.id
     }
   })
 
@@ -170,7 +170,7 @@ const renderSuggestionsContainer = options => {
 }
 
 const getSuggestionValue = (result: Key) => {
-  return result.kid || ''
+  return result.id || ''
 }
 
 export default Recipients

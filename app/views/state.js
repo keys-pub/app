@@ -104,7 +104,7 @@ export const statusEmpty = (): StatusResponse => ({
 })
 
 export const keyEmpty = (): Key => ({
-  kid: '',
+  id: '',
   users: [],
   type: 'NO_KEY_TYPE',
   saved: false,

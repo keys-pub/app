@@ -53,7 +53,7 @@ class KeyRemoveView extends Component<Props, State> {
   }
 
   componentDidMount() {
-    const action = keyBackup({kid: this.props.key.kid}, (resp: KeyBackupResponse) => {
+    const action = keyBackup({kid: this.props.key.id}, (resp: KeyBackupResponse) => {
       this.setState({seedPhrase: resp.seedPhrase})
     })
     this.props.dispatch(action)
@@ -64,7 +64,7 @@ class KeyRemoveView extends Component<Props, State> {
   }
 
   removeKey = () => {
-    const req: KeyRemoveRequest = {kid: this.props.key.kid, seedPhrase: this.state.confirm}
+    const req: KeyRemoveRequest = {kid: this.props.key.id, seedPhrase: this.state.confirm}
     this.props.dispatch(
       keyRemove(
         req,

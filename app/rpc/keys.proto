@@ -28,7 +28,7 @@ service Keys {
   rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
   rpc Keys(KeysRequest) returns (KeysResponse) {}
   rpc Key(KeyRequest) returns (KeyResponse) {}
-
+  
   rpc Sign(SignRequest) returns (SignResponse) {}
   rpc Verify(VerifyRequest) returns (VerifyResponse) {}
   rpc SignStream(stream SignStreamInput) returns (stream SignStreamOutput) {}
@@ -59,16 +59,7 @@ service Keys {
 
   rpc Pull(PullRequest) returns (PullResponse) {}
   rpc Push(PushRequest) returns (PushResponse) {}
-
-  rpc KeyShare(KeyShareRequest) returns (KeyShareResponse) {}
-  rpc KeyRetrieve(KeyRetrieveRequest) returns (KeyRetrieveResponse) {}
-
-  rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
-  rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
-  rpc Messages(MessagesRequest) returns (MessagesResponse) {}
-
-  rpc Inbox(InboxRequest) returns (InboxResponse) {}
-
+  
   rpc Config(ConfigRequest) returns (ConfigResponse) {}
   rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
   
@@ -87,6 +78,11 @@ service Keys {
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
 
   // Experimental
+  rpc Inbox(InboxRequest) returns (InboxResponse) {}
+  rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
+  rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
+  rpc Messages(MessagesRequest) returns (MessagesResponse) {}
+
   rpc Watch(WatchRequest) returns (stream WatchEvent) {}
 }
 
@@ -273,10 +269,6 @@ message RuntimeStatusRequest {}
 message RuntimeStatusResponse {
   // Version of running service.
   string version = 1;
-  // Runtime for service. For macOS, this might be "launchd".
-  string runtime = 2;
-  // Label is the service (runtime) label. For macOS, this might be "keys.Keys.service".
-  string label = 3;
   // Exe is the service executable path.
   string exe = 4;
   // AuthSetupNeeded if auth needs to be setup.
@@ -319,9 +311,7 @@ message AuthUnlockResponse {
 message AuthLockRequest {}
 message AuthLockResponse {}
 
-message KeyGenerateRequest {
-  bool publishPublicKey = 1;
-}
+message KeyGenerateRequest {}
 message KeyGenerateResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
 }
@@ -361,9 +351,6 @@ message UserAddRequest {
   string name = 3; 
   // URL is location of signed message on the service.
   string url = 4 [(gogoproto.customname) = "URL"];
-
-  // Local if true will not save to the remote (server).
-  bool local = 6;
 }
 message UserAddResponse {
   User user = 1;
@@ -379,7 +366,6 @@ message KeyBackupResponse {
 
 message KeyRecoverRequest {
   string seedPhrase = 1;
-  bool publishPublicKey = 2;
 }
 message KeyRecoverResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
@@ -403,15 +389,11 @@ enum KeyType {
 }
 
 message Key {
-  // KID is key identifier, which is the public key (Base58 encoded).
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  // ID identifier.
+  string id = 1 [(gogoproto.customname) = "ID"];
   // Type of key.
   KeyType type = 3;
-  // SignPublicKey is the sign public key.
-  bytes signPublicKey = 4; 
-  // BoxPublicKey is the current encryption public key.
-  bytes boxPublicKey = 5; 
-  // Users signed into sigchain.
+  // Users associated with this key.
   repeated User users = 6;  
   // Saved if saved locally.
   bool saved = 10;
@@ -429,8 +411,6 @@ message Key {
 message KeyRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
   string user = 2;
-  bool skipCheck = 4;
-  bool update = 5;
 }
 
 message KeyResponse {
@@ -465,8 +445,6 @@ message ItemResponse {
 
 message ItemsRequest {
   string query = 1;
-  // Type, optional, to filter by.
-  string type = 2;
 }
 message ItemsResponse {
   repeated Item items = 1;
@@ -475,7 +453,6 @@ message ItemsResponse {
 message Item {
   string id = 1 [(gogoproto.customname) = "ID"];
   string type = 2;
-  string description = 3;
 }
 
 enum Encoding {
@@ -542,19 +519,6 @@ message KeyRetrieveRequest {
 }
 message KeyRetrieveResponse {}
 
-message Inbox {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string name = 2;
-  int64 createdAt = 3;
-  int32 messageCount = 4;
-  string snippet = 5;
-  string error = 10;
-}
-message InboxRequest {}
-message InboxResponse {
-  repeated Inbox inboxes = 1;
-}
-
 message Collection {
   string path = 1;
 }
@@ -605,10 +569,67 @@ message User {
   string service = 4;  
   string url = 5 [(gogoproto.customname) = "URL"];
   
-  // Status of user proof.
   UserStatus status = 6;
   int64 verifiedAt = 7;
   string err = 8;
+}
+
+message SearchResult {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  repeated User users = 2;  
+}
+
+message SearchRequest {
+  string query = 1;  
+  int32 index = 2;
+  int32 limit = 3;
+}
+message SearchResponse {
+  repeated SearchResult results = 1;  
+}
+
+
+
+message WatchRequest {}
+
+enum WatchStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "WatchStatus";
+
+  NO_STATUS = 0 [(gogoproto.enumvalue_customname) = "WatchStatusNone"];
+  OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
+  DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
+  STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
+  DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
+}
+
+message WatchEvent {  
+  WatchStatus status = 1;  
+  string path = 2;
+}
+
+message ConfigRequest {}
+message ConfigResponse {
+  map<string, string> config = 1;
+}
+
+message ConfigSetRequest {
+  string key = 1;
+  string value = 2;
+}
+message ConfigSetResponse {}
+
+message Inbox {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string name = 2;
+  int64 createdAt = 3;
+  int32 messageCount = 4;
+  string snippet = 5;
+  string error = 10;
+}
+message InboxRequest {}
+message InboxResponse {
+  repeated Inbox inboxes = 1;
 }
 
 message Message {
@@ -658,46 +679,3 @@ message MessagesRequest {
 message MessagesResponse {
   repeated Message messages = 1;
 }
-
-message SearchResult {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  repeated User users = 2;  
-}
-
-message SearchRequest {
-  string query = 1;  
-  int32 index = 2;
-  int32 limit = 3;
-}
-message SearchResponse {
-  repeated SearchResult results = 1;  
-}
-
-message WatchRequest {}
-
-enum WatchStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "WatchStatus";
-
-  NO_STATUS = 0 [(gogoproto.enumvalue_customname) = "WatchStatusNone"];
-  OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
-  DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
-  STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
-  DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
-}
-
-message WatchEvent {  
-  WatchStatus status = 1;  
-  string path = 2;
-}
-
-message ConfigRequest {}
-message ConfigResponse {
-  map<string, string> config = 1;
-}
-
-message ConfigSetRequest {
-  string key = 1;
-  string value = 2;
-}
-message ConfigSetResponse {}

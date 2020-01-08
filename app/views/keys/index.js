@@ -53,7 +53,7 @@ class KeysView extends Component<Props> {
   }
 
   select = (key: Key) => {
-    this.props.dispatch(push('/key?kid=' + key.kid))
+    this.props.dispatch(push('/key?kid=' + key.id))
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {
@@ -109,7 +109,7 @@ class KeysView extends Component<Props> {
           </TableHead>
           <TableBody>
             {this.props.keys.map((key, index) => (
-              <TableRow hover onClick={event => this.select(key)} key={key.kid}>
+              <TableRow hover onClick={event => this.select(key)} key={key.id}>
                 <TableCell component="th" scope="row" style={{width: 1}}>
                   <KeyTypeView type={key.type || 'NO_KEY_TYPE'} description={false} />
                 </TableCell>
@@ -118,7 +118,7 @@ class KeysView extends Component<Props> {
                 </TableCell>
                 <TableCell>
                   <Typography style={{...styles.mono}} noWrap>
-                    {key.kid}
+                    {key.id}
                   </Typography>
                 </TableCell>
               </TableRow>

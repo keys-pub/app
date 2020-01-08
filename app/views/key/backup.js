@@ -30,7 +30,7 @@ class KeyBackupView extends Component<Props, State> {
   }
 
   componentDidMount() {
-    const action = keyBackup({kid: this.props.key.kid}, (resp: KeyBackupResponse) => {
+    const action = keyBackup({kid: this.props.key.id}, (resp: KeyBackupResponse) => {
       this.setState({recoveryPhrase: resp.seedPhrase})
     })
     this.props.dispatch(action)
