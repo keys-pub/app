@@ -110,16 +110,14 @@ class KeysView extends Component<Props> {
           <TableBody>
             {this.props.keys.map((key, index) => (
               <TableRow hover onClick={event => this.select(key)} key={key.id}>
-                <TableCell component="th" scope="row" style={{width: 1}}>
+                <TableCell component="th" scope="row">
                   <KeyTypeView type={key.type || 'NO_KEY_TYPE'} description={false} />
                 </TableCell>
                 <TableCell>
                   <NamesView users={key.users || []} />
                 </TableCell>
                 <TableCell>
-                  <Typography style={{...styles.mono}} noWrap>
-                    {key.id}
-                  </Typography>
+                  <Typography style={{...styles.mono}}>{key.id}</Typography>
                 </TableCell>
               </TableRow>
             ))}
@@ -148,11 +146,6 @@ const flipDirection = (d: SortDirection): SortDirection => {
       return 'ASC'
   }
   return 'ASC'
-}
-
-const textStyles = {
-  wordWrap: 'break-word',
-  // wordBreak: 'break-all',
 }
 
 const cellStyles = {

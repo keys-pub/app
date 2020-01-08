@@ -99,7 +99,6 @@ export const statusEmpty = (): StatusResponse => ({
   uri: '',
   route: 'NO_ROUTE',
   key: keyEmpty(),
-  promptPublish: false,
   promptUser: false,
 })
 

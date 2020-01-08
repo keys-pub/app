@@ -27,7 +27,6 @@ import {styles, Link} from '../components'
 import {NameView} from './user/views'
 import UserIntroDialog from './user/intro'
 import UserRevokeDialog from './user/revoke'
-import AuthPublishDialog from '../auth/publish'
 
 import {authLock, status, userService} from '../../rpc/rpc'
 import type {AppState, RPCState} from '../../reducers/app'
@@ -92,21 +91,12 @@ class ProfileView extends Component<Props, State> {
     )
   }
 
-  promptPublish = () => {
-    this.props.dispatch({type: 'PROMPT_PUBLISH', payload: true})
-  }
-
   render() {
     const {status} = this.props
     const key = status.key || keyEmpty()
     const kid = key.id || ''
     const users = key.users || []
     const {uri} = status
-
-    const createdAt = dateString(key.createdAt)
-    const publishedAt = dateString(key.publishedAt)
-    const savedAt = dateString(key.savedAt)
-    const updatedAt = dateString(key.updatedAt)
 
     return (
       <Box>
@@ -153,24 +143,6 @@ class ProfileView extends Component<Props, State> {
             </TableRow>
             <TableRow>
               <TableCell style={cstyles.cell}>
-                <Box display="flex" flexDirection="column">
-                  <Typography align="right">Created</Typography>
-                  <Typography align="right">Published</Typography>
-                  <Typography align="right">Updated</Typography>
-                </Box>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <Box display="flex" flexDirection="column">
-                  <Typography>{createdAt || '-'}</Typography>
-                  <Typography>{publishedAt || '-'}</Typography>
-                  <Typography>{updatedAt || '-'}</Typography>
-                </Box>
-
-                {!publishedAt && <Link onClick={() => this.promptPublish()}>Publish Key</Link>}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell style={cstyles.cell}>
                 <Typography align="right">Server</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
@@ -197,13 +169,11 @@ class ProfileView extends Component<Props, State> {
             </TableRow>
           </TableBody>
         </Table>
-        <UserIntroDialog />
         <UserRevokeDialog
           open={this.state.revoke || 0 > 0}
           revoke={this.state.revoke}
           close={() => this.setState({revoke: 0})}
         />
-        <AuthPublishDialog />
       </Box>
     )
   }
@@ -215,9 +185,7 @@ const cstyles = {
     paddingBottom: 20,
     verticalAlign: 'top',
   },
-  key: {
-    width: 100,
-  },
+  key: {},
 }
 
 const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {

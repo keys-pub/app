@@ -45,10 +45,6 @@ export default (props: Props) => {
   const remove = props.value.saved && isPublic
   const users = props.value.users || []
   const type = props.value.type || 'NO_KEY_TYPE'
-  const createdAt = dateString(props.value.createdAt)
-  const publishedAt = dateString(props.value.publishedAt)
-  const savedAt = dateString(props.value.savedAt)
-  const updatedAt = dateString(props.value.updatedAt)
   return (
     <Box display="flex" flex={1} flexDirection="column">
       <Table size="small">
@@ -87,24 +83,6 @@ export default (props: Props) => {
             </TableCell>
             <TableCell style={cstyles.cell}>
               <KeyTypeView type={type} description />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell style={cstyles.cell}>
-              <Box display="flex" flexDirection="column">
-                <Typography align="right">Created</Typography>
-                <Typography align="right">Published</Typography>
-                {!isPrivate && <Typography align="right">Added</Typography>}
-                <Typography align="right">Updated</Typography>
-              </Box>
-            </TableCell>
-            <TableCell style={cstyles.cell}>
-              <Box display="flex" flexDirection="column">
-                <Typography>{createdAt || '-'}</Typography>
-                <Typography>{publishedAt || '-'}</Typography>
-                {!isPrivate && <Typography>{savedAt || '-'}</Typography>}
-                <Typography>{updatedAt || '-'}</Typography>
-              </Box>
             </TableCell>
           </TableRow>
           <TableRow>

@@ -42,7 +42,6 @@ class Debug extends Component<Props> {
   }
 
   resetPrompts = () => {
-    this.props.dispatch({type: 'PROMPT_PUBLISH', payload: true})
     this.props.dispatch({type: 'PROMPT_USER', payload: true})
   }
 

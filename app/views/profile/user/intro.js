@@ -174,7 +174,7 @@ class UserIntroDialog extends Component<Props, State> {
 
 const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {
   const status = currentStatus(state.rpc)
-  const open = !status.promptPublish && !!state.app.promptUser && status.promptUser
+  const open = !!state.app.promptUser && status.promptUser
   return {
     open,
   }

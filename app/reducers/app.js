@@ -70,11 +70,6 @@ export default function reducer(state: AppState = initialState, action: actionTy
         ...state,
         unlocked: false,
       }
-    case 'PROMPT_PUBLISH':
-      return {
-        ...state,
-        promptPublish: action.payload,
-      }
     case 'PROMPT_USER':
       return {
         ...state,

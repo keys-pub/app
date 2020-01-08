@@ -396,16 +396,7 @@ message Key {
   // Users associated with this key.
   repeated User users = 6;  
   // Saved if saved locally.
-  bool saved = 10;
-
-  // CreatedAt is when the key was created.
-  int64 createdAt = 20;
-  // PublishedAt is when the key published to the key server.
-  int64 publishedAt = 21;
-  // SavedAt is when the key was saved locally.
-  int64 savedAt = 22;
-  // UpdatedAt is when the key (sigchain) was last updated.
-  int64 updatedAt = 23;
+  bool saved = 10;  
 }
 
 message KeyRequest {
@@ -483,9 +474,6 @@ message StatusResponse {
   string uri = 1 [(gogoproto.customname) = "URI"];
   // Key is current key
   Key key = 2;
-
-  // PromptPublish if we should prompt for key publish.
-  bool promptPublish = 3;
   // AskUser if we should prompt for user setup.
   bool promptUser = 4;
 }
@@ -581,14 +569,11 @@ message SearchResult {
 
 message SearchRequest {
   string query = 1;  
-  int32 index = 2;
   int32 limit = 3;
 }
 message SearchResponse {
   repeated SearchResult results = 1;  
 }
-
-
 
 message WatchRequest {}
 
@@ -637,7 +622,7 @@ message Message {
   string sender = 2;
   MessageContent content = 10;
     
-  User user = 20;
+  repeated User users = 20;
   int64 createdAt = 21;
 
   string timeDisplay = 31;
