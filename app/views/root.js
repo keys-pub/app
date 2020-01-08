@@ -120,19 +120,12 @@ class Root extends Component<Props> {
   }
 
   renderApp() {
-    console.log('Path:', this.props.path, 'Popup:', this.props.popup)
     const route = routesMap.get(this.props.path)
-    const routePopup = routesMap.get(this.props.popup)
     const hideNav = !route || route.hideNav || this.props.path === '/'
 
     return (
       <App>
         <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
-          {routePopup && (
-            <Dialog open={true} onClose={this.back}>
-              <Box marginTop={2}>{routePopup.component()}</Box>
-            </Dialog>
-          )}
           {!hideNav && (
             <Box display="flex" flexGrow={0} flexShrink={0}>
               <Nav />
