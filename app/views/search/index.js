@@ -40,6 +40,7 @@ type State = {
   results: Array<SearchResult>,
   loading: boolean,
   query: string,
+  error: string,
 }
 
 class SearchView extends Component<Props, State> {
@@ -48,6 +49,7 @@ class SearchView extends Component<Props, State> {
     results: [],
     loading: false,
     query: '',
+    error: '',
   }
 
   componentDidMount() {
@@ -103,6 +105,9 @@ class SearchView extends Component<Props, State> {
             style={{marginTop: 2}}
           />
         </Box>
+        {this.state.error && (
+          <Typography style={{color: 'red', marginLeft: 10}}>{this.state.error}</Typography>
+        )}
         {!loading && <Divider style={{marginTop: 3}} />}
         {loading && <LinearProgress />}
         <Box display="flex" flexDirection="column">
