@@ -82,6 +82,13 @@ export const startWatchStream = () => async (dispatch: (action: any) => any) => 
   })
   watchCall.on('error', err => {
     watchCall = null
+
+    if (err.code === grpc.status.PERMISSION_DENIED) {
+      console.error('Watch stream perission denied')
+      dispatch({type: 'LOCK'})
+      return
+    }
+
     console.error('Watch stream error (duration: %sms): %s', new Date().getTime() - syncStarted, err)
     dispatch(errors(err))
   })
