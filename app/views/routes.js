@@ -30,7 +30,7 @@ import SearchView from './search'
 import StyleGuide from './style-guide'
 
 import DBView from './db'
-import KeyView from './key'
+import KeyView from './key/view'
 import KeysView from './keys'
 import UserNameView from './user/name'
 import UserSignView from './user/sign'
