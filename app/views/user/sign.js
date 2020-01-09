@@ -19,15 +19,15 @@ import {CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, CheckBox as CheckBoxIc
 
 import {clipboard, shell} from 'electron'
 
-import {styles, Link, Step} from '../../components'
+import {styles, Link, Step} from '../components'
 
 import {connect} from 'react-redux'
 import {goBack, go} from 'connected-react-router'
 
-import {currentKey} from '../../state'
-import {serviceName} from '../../helper'
+import {selectedKID} from '../state'
+import {serviceName} from '../helper'
 
-import {configSet, status, userAdd, userSign} from '../../../rpc/rpc'
+import {configSet, userAdd, userSign} from '../../rpc/rpc'
 import type {
   ConfigSetRequest,
   ConfigSetResponse,
@@ -37,10 +37,11 @@ import type {
   UserAddResponse,
   RPCError,
   RPCState,
-} from '../../../rpc/rpc'
-import type {Key, User} from '../../../rpc/types'
+} from '../../rpc/rpc'
+import type {Key, User} from '../../rpc/types'
 
 type Props = {
+  kid: string,
   service: string,
   name: string,
   signedMessage: string,
@@ -64,11 +65,11 @@ class UserSignView extends Component<Props, State> {
 
   setUser = () => {
     const req: UserAddRequest = {
-      kid: '', // Default
+      kid: this.props.kid,
       service: this.props.service,
       name: this.props.name,
       url: this.state.url,
-      local: false,
+      localOnly: false,
     }
     this.setState({loading: true, error: ''})
 
@@ -82,7 +83,6 @@ class UserSignView extends Component<Props, State> {
         req,
         (resp: UserAddResponse) => {
           this.props.dispatch(go(-2))
-          this.props.dispatch(status({}))
           this.setState({loading: false})
         },
         (err: RPCError) => {
@@ -104,14 +104,14 @@ class UserSignView extends Component<Props, State> {
   render() {
     const {service, name} = this.props
     const sn = serviceName(service)
-    let title = 'Create a Signed Message'
+    let title = ''
     let intro = ''
     let instructions = ''
     let openLabel = ''
     let openAction = null
     let placeholder = ''
     let urlLabel = ''
-    if (service == 'github') {
+    if (service === 'github') {
       title = 'Link to Github'
       intro = 'Copy the signed message.'
       instructions = 'Create a new gist on your Github account, and paste it there.'
@@ -119,7 +119,7 @@ class UserSignView extends Component<Props, State> {
       openAction = () => shell.openExternal('https://gist.github.com/new')
       placeholder = 'https://gist.github.com/...'
       urlLabel = "What's the location (URL) on github.com where the signed message was saved?"
-    } else if (service == 'twitter') {
+    } else if (service === 'twitter') {
       title = 'Link to Twitter'
       intro = 'Copy the signed message.'
       instructions = 'Save it as a tweet on your Twitter account.'
@@ -138,9 +138,7 @@ class UserSignView extends Component<Props, State> {
         loading={this.state.loading}
       >
         <Box display="flex" flexDirection="row">
-          <Typography variant="subtitle1" style={{marginLeft: -16}}>
-            &bull; &nbsp;
-          </Typography>
+          <Typography variant="subtitle1">&bull; &nbsp;</Typography>
           <Typography variant="subtitle1" style={{paddingBottom: 10}}>
             {intro}
           </Typography>
@@ -149,57 +147,49 @@ class UserSignView extends Component<Props, State> {
           style={{
             ...styles.mono,
             marginBottom: 5,
-            marginLeft: 0,
+            marginLeft: 20,
             backgroundColor: 'black',
             color: 'white',
             paddingLeft: 10,
             paddingRight: 10,
             paddingTop: 10,
             paddingBottom: 10,
-            fontSize: 11,
+            fontSize: 12,
+            width: 500,
           }}
         >
           {this.props.signedMessage}
         </Typography>
-        <Box display="flex" flex={1} flexDirection="row" justifyContent="center" style={{paddingBottom: 10}}>
+        <Box display="flex" flex={1} flexDirection="row" style={{paddingBottom: 10, marginLeft: 20}}>
           <Button size="small" color="primary" onClick={this.copyToClipboard} disabled={this.state.loading}>
             Copy to Clipboard
           </Button>
         </Box>
         <Box style={{paddingBottom: 20}}>
           <Box display="flex" flexDirection="row">
-            <Typography variant="subtitle1" style={{marginLeft: -16}}>
-              &bull; &nbsp;
-            </Typography>
+            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
             <Typography variant="subtitle1" style={{paddingBottom: 10}}>
               {instructions}
             </Typography>
           </Box>
-          <Box
-            display="flex"
-            flex={1}
-            flexDirection="row"
-            justifyContent="center"
-            style={{position: 'relative'}}
-          >
+          <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20}}>
             <Button color="primary" variant="outlined" onClick={openAction} disabled={this.state.loading}>
               {openLabel}
             </Button>
           </Box>
         </Box>
-        <Box display="flex" flexDirection="column" flex={1} style={{paddingBottom: 20}}>
+        <Box display="flex" flexDirection="column" flex={1} style={{paddingBottom: 10}}>
           <Box display="flex" flexDirection="row" flex={1}>
-            <Typography variant="subtitle1" style={{marginLeft: -16}}>
-              &bull; &nbsp;
-            </Typography>
+            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
             <Typography variant="subtitle1">{urlLabel}</Typography>
           </Box>
-          <FormControl error={this.state.error !== ''}>
+          <FormControl error={this.state.error !== ''} style={{marginLeft: 20}}>
             <TextField
               placeholder={placeholder}
               onChange={this.onURLChange}
               value={this.state.url}
               disabled={this.state.loading}
+              style={{width: 500}}
             />
             <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
           </FormControl>
@@ -227,6 +217,7 @@ class UserSignView extends Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
   return {
+    kid: selectedKID(state),
     service: (state.rpc.userService && state.rpc.userService.service) || '',
     name: (state.rpc.userSign && state.rpc.userSign.name) || '',
     signedMessage: (state.rpc.userSign && state.rpc.userSign.message) || '',

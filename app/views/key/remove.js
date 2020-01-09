@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {keyBackup, keyRemove} from '../../rpc/rpc'
-import {currentKey} from '../state'
+import {selectedKID} from '../state'
 
 import {styles, Step} from '../components'
 
@@ -31,40 +31,25 @@ import type {
 } from '../../rpc/rpc'
 
 type Props = {
-  key: Key,
+  kid: string,
   dispatch: (action: any) => any,
 }
 
 type State = {
   error: string,
-  seedPhrase: string,
-  confirm: string,
 }
 
 class KeyRemoveView extends Component<Props, State> {
   state = {
     error: '',
-    seedPhrase: '',
-    confirm: '',
   }
 
   back = () => {
     this.props.dispatch(goBack())
   }
 
-  componentDidMount() {
-    const action = keyBackup({kid: this.props.key.id}, (resp: KeyBackupResponse) => {
-      this.setState({seedPhrase: resp.seedPhrase})
-    })
-    this.props.dispatch(action)
-  }
-
-  onInputChange = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({confirm: e.target.value, error: ''})
-  }
-
   removeKey = () => {
-    const req: KeyRemoveRequest = {kid: this.props.key.id, seedPhrase: this.state.confirm}
+    const req: KeyRemoveRequest = {kid: this.props.kid}
     this.props.dispatch(
       keyRemove(
         req,
@@ -86,40 +71,16 @@ class KeyRemoveView extends Component<Props, State> {
         next={{label: 'Yes, Delete', action: this.removeKey}}
       >
         <Typography style={{paddingBottom: 20}}>
-          Are you really sure you want to delete your user key? If you haven't backed up your user key backup
-          phrase, you won't be able to recover your user key.
+          Are you really sure you want to delete your key? If you haven't backed up your key, you won't be
+          able to recover it.
         </Typography>
-        <Typography style={{paddingBottom: 10}}>To delete, enter the backup phrase:</Typography>
-        <Typography
-          style={{
-            ...styles.mono,
-            padding: 10,
-            backgroundColor: 'black',
-            color: 'white',
-            textAlign: 'center',
-            marginBottom: 30,
-          }}
-        >
-          {this.state.seedPhrase}
-        </Typography>
-        <FormControl error={this.state.error !== ''}>
-          <Input
-            autoFocus
-            multiline
-            rows={3}
-            placeholder={''}
-            onChange={this.onInputChange}
-            value={this.state.confirm}
-          />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
-        </FormControl>
       </Step>
     )
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
-  return {key: currentKey(state.rpc)}
+const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
+  return {kid: selectedKID(state)}
 }
 
 export default connect<Props, {}, _, _, _, _>(mapStateToProps)(KeyRemoveView)

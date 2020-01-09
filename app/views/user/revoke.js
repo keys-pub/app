@@ -16,21 +16,22 @@ import {
 } from '@material-ui/core'
 import {shell} from 'electron'
 
-import {styles, Link} from '../../components'
-
-import {currentStatus, keyEmpty} from '../../state'
+import {styles, Link} from '../components'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
+import queryString from 'query-string'
 
-import {statementRevoke, status} from '../../../rpc/rpc'
+import {selectedKID} from '../state'
+import {statementRevoke} from '../../rpc/rpc'
 
-import type {StatementRevokeRequest, StatementRevokeResponse, StatusRequest} from '../../../rpc/types'
-import type {AppState, RPCState, RPCError} from '../../../reducers/app'
+import type {StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/types'
+import type {AppState, RPCState, RPCError} from '../../reducers/app'
 
 type Props = {
+  kid: string,
   open: boolean,
-  revoke: number,
+  seq: number,
   close: () => any,
   dispatch: (action: any) => any,
 }
@@ -40,7 +41,7 @@ type State = {
   loading: boolean,
 }
 
-class UserRevokeDialog extends Component<Props, State> {
+export default class UserRevokeDialog extends Component<Props, State> {
   state = {
     error: null,
     loading: false,
@@ -88,10 +89,9 @@ class UserRevokeDialog extends Component<Props, State> {
   revoke = (event: any) => {
     this.setState({loading: true, error: ''})
     const req: StatementRevokeRequest = {
-      kid: '', // Default
-      seq: this.props.revoke,
-      dryRun: false,
-      local: false,
+      kid: this.props.kid,
+      seq: this.props.seq,
+      localOnly: false,
     }
     this.props.dispatch(
       statementRevoke(
@@ -107,7 +107,3 @@ class UserRevokeDialog extends Component<Props, State> {
     )
   }
 }
-
-const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {}
-
-export default connect<Props, {}, _, _, _, _>(mapStateToProps)(UserRevokeDialog)

@@ -2,16 +2,18 @@
 import {goBack, push} from 'connected-react-router'
 
 import {client} from '../rpc/client'
-import {status, setErrHandler} from '../rpc/rpc'
+import {setErrHandler} from '../rpc/rpc'
 
 import grpc from 'grpc'
 
 // import emoji from 'node-emoji'
 
+import queryString from 'query-string'
+
+import {runtimeStatus} from '../rpc/rpc'
+
 import type {Key, KeyType, User} from '../rpc/types'
-
-import type {StatusResponse, RPCError, RPCState, WatchEvent} from '../rpc/rpc'
-
+import type {RPCError, RPCState, WatchEvent, RuntimeStatusResponse} from '../rpc/rpc'
 import type {AppState} from '../reducers/app'
 
 export type {AppState, RPCState}
@@ -34,13 +36,13 @@ export const init = () => (dispatch: (action: any) => void, getState: () => Stat
   })
 
   dispatch(
-    status({}, (resp: StatusResponse) => {
+    runtimeStatus({}, (resp: RuntimeStatusResponse) => {
       console.log('Status:', resp)
-      if (!resp.key) {
+      if (!resp.authSetupNeeded) {
         dispatch(push('/key/create'))
       } else {
         dispatch(startWatchStream())
-        dispatch(push('/profile/index'))
+        dispatch(push('/keys/index'))
       }
     })
   )
@@ -95,13 +97,6 @@ export const startWatchStream = () => async (dispatch: (action: any) => any) => 
 // window.addEventListener('online', onlineFn)
 // window.addEventListener('offline', offlineFn)
 
-export const statusEmpty = (): StatusResponse => ({
-  uri: '',
-  route: 'NO_ROUTE',
-  key: keyEmpty(),
-  promptUser: false,
-})
-
 export const keyEmpty = (): Key => ({
   id: '',
   users: [],
@@ -123,12 +118,7 @@ export const userEmpty = (): User => ({
   verifiedAt: 0,
 })
 
-export const currentStatus = (rpc: RPCState): StatusResponse => {
-  const status: StatusResponse = rpc.status ? rpc.status : statusEmpty()
-  return status
-}
-
-export const currentKey = (rpc: RPCState): Key => {
-  const status: StatusResponse = currentStatus(rpc)
-  return status.key || keyEmpty()
+export const selectedKID = (state: {rpc: RPCState, router: any}) => {
+  const values = queryString.parse(state.router.location.search)
+  return (values.kid || '').toString()
 }

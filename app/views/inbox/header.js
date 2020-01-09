@@ -35,9 +35,8 @@ class Header extends Component<Props, State> {
   //   this.setState({menuAnchor: null})
   // }
 
-  profile = () => {
-    this.props.dispatch(push('/profile/index'))
-  }
+  showUser = () => {}
+
   compose = () => {
     this.props.dispatch(push('/compose'))
   }
@@ -57,7 +56,7 @@ class Header extends Component<Props, State> {
         <Box style={{width: 20}} />
 
         <Box display="flex" flex={1} justifyContent="center" alignItems="center">
-          <UserButton style={{maxWidth: 180, width: '100%'}} onClick={this.profile} user={this.props.user} />
+          <UserButton style={{maxWidth: 180, width: '100%'}} onClick={this.showUser} user={this.props.user} />
         </Box>
 
         {/* <Box style={{width: 20}} /> */}

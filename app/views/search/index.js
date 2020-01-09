@@ -23,7 +23,7 @@ import {push} from 'connected-react-router'
 import KeyDialog from '../key/dialog'
 import {IDView, KeyTypeView} from '../key/view'
 
-import {NamesView} from '../profile/user/views'
+import {NamesView} from '../user/views'
 import {styles} from '../components'
 import {keyEmpty} from '../state'
 
@@ -85,7 +85,7 @@ class SearchView extends Component<Props, State> {
 
   select = (result: SearchResult) => {
     // this.setState({dialogOpen: true, key: key})
-    this.props.dispatch(push('/key?kid=' + result.kid))
+    this.props.dispatch(push('/key/index?kid=' + result.kid))
   }
 
   render() {

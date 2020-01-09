@@ -27,26 +27,28 @@ type Props = {
 }
 
 type State = {
-  recoveryPhrase: string,
+  keyBackup: string,
+  password: string,
   error: string,
 }
 
 class KeyRecoverView extends Component<Props, State> {
   state = {
-    recoveryPhrase: '',
+    keyBackup: '',
+    password: '',
     error: '',
   }
 
   recover = () => {
     const req: KeyRecoverRequest = {
-      seedPhrase: this.state.recoveryPhrase,
-      publishPublicKey: false,
+      keyBackup: this.state.keyBackup,
+      password: this.state.password,
     }
     this.props.dispatch(
       keyRecover(
         req,
         (resp: KeyRecoverResponse) => {
-          this.props.dispatch(push('/profile/index'))
+          this.props.dispatch(push('/key/index?kid=' + resp.kid))
         },
         (err: RPCError) => {
           this.setState({error: err.message})
@@ -59,8 +61,12 @@ class KeyRecoverView extends Component<Props, State> {
     this.props.dispatch(goBack())
   }
 
-  onInputChange = (e: SyntheticInputEvent<EventTarget>) => {
-    this.setState({recoveryPhrase: e.target.value, error: ''})
+  onBackupInputChange = (e: SyntheticInputEvent<EventTarget>) => {
+    this.setState({keyBackup: e.target.value, error: ''})
+  }
+
+  onPasswordInputChange = (e: SyntheticInputEvent<EventTarget>) => {
+    this.setState({password: e.target.value, error: ''})
   }
 
   render() {
@@ -71,18 +77,27 @@ class KeyRecoverView extends Component<Props, State> {
         next={{label: 'Recover', action: this.recover}}
       >
         <Box>
-          <Typography variant="subtitle1" style={{paddingBottom: 10}}>
-            Enter your key backup recovery phrase.
-          </Typography>
           <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
             <TextField
               multiline
               autoFocus
+              label="Key Backup"
               rows={5}
               variant="outlined"
               placeholder={''}
-              onChange={this.onInputChange}
-              value={this.state.recoveryPhrase}
+              onChange={this.onBackupInputChange}
+              value={this.state.keyBackup}
+            />
+            <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          </FormControl>
+          <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+            <TextField
+              autoFocus
+              label="Password"
+              variant="outlined"
+              type="password"
+              onChange={this.onPasswordInputChange}
+              value={this.state.password}
             />
             <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
           </FormControl>

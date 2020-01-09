@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core'
 
 import {styles, Link} from '../components'
-import {NamesView} from '../profile/user/views'
+import {NamesView} from '../user/views'
 
 import KeyView from './view'
 import KeyLoadingView from './loading'
@@ -69,45 +69,6 @@ class KeyIndexView extends Component<Props, State> {
 
   componentDidMount() {
     this.loadKey()
-  }
-
-  add = () => {
-    this.setState({loading: true, error: ''})
-    const req: PullRequest = {
-      kid: this.props.kid,
-      user: '',
-      all: false,
-    }
-    this.props.dispatch(
-      pull(
-        req,
-        (resp: PullResponse) => {
-          this.setState({loading: false})
-          this.loadKey()
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
-        }
-      )
-    )
-  }
-
-  remove = () => {
-    const req: KeyRemoveRequest = {
-      kid: this.props.kid,
-      seedPhrase: '',
-    }
-    this.props.dispatch(
-      keyRemove(
-        req,
-        (resp: KeyRemoveResponse) => {
-          this.props.dispatch(goBack())
-        },
-        (err: RPCError) => {
-          this.setState({error: err.message})
-        }
-      )
-    )
   }
 
   loadKey = () => {
@@ -172,10 +133,9 @@ class KeyIndexView extends Component<Props, State> {
           {this.state.loading && <KeyLoadingView kid={this.props.kid} />}
           {!this.state.error && !this.state.loading && this.state.key && (
             <KeyView
-              value={this.state.key}
+              kval={this.state.key}
               statements={this.state.statements || []}
-              add={this.add}
-              remove={this.remove}
+              dispatch={this.props.dispatch}
             />
           )}
         </Box>

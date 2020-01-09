@@ -16,26 +16,27 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles, Link, Step} from '../../components'
+import {styles, Link, Step} from '../components'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {currentStatus, keyEmpty} from '../../state'
-import {serviceName} from '../../helper'
+import {selectedKID} from '../state'
+import {serviceName} from '../helper'
 
-import {configSet, userService} from '../../../rpc/rpc'
+import {configSet, userService} from '../../rpc/rpc'
 import type {
   ConfigSetRequest,
   ConfigSetResponse,
   UserServiceRequest,
   UserServiceResponse,
-} from '../../../rpc/rpc'
-import type {AppState, RPCState, RPCError} from '../../../reducers/app'
-import type {Key, User} from '../../../rpc/types'
+} from '../../rpc/rpc'
+import type {AppState, RPCState, RPCError} from '../../reducers/app'
+import type {Key, User} from '../../rpc/types'
 
 type Props = {
   open: boolean,
+  kid: string,
   dispatch: (action: any) => any,
 }
 
@@ -52,13 +53,13 @@ class UserIntroDialog extends Component<Props, State> {
   select = (service: string) => {
     this.setState({loading: true, error: ''})
     const req: UserServiceRequest = {
-      kid: '', // Default
+      kid: this.props.kid,
       service: service,
     }
     this.props.dispatch(
       userService(req, (resp: UserServiceResponse) => {
         this.setState({loading: false})
-        this.props.dispatch(push('/profile/user/name'))
+        this.props.dispatch(push('/user/name?kid=' + this.props.kid))
         this.close()
       })
     )
@@ -172,11 +173,10 @@ class UserIntroDialog extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {
-  const status = currentStatus(state.rpc)
-  const open = !!state.app.promptUser && status.promptUser
+const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
   return {
-    open,
+    open: false,
+    kid: selectedKID(state),
   }
 }
 

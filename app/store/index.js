@@ -58,7 +58,8 @@ const configureStore = (initialState?: any) => {
   }
 
   ipcRenderer.on('preferences', (event, message) => {
-    store.dispatch(push('/profile/index'))
+    // TODO: Show preferences
+    // store.dispatch(push('/prefs/index'))
   })
 
   ipcRenderer.on('focus', (event, message) => {

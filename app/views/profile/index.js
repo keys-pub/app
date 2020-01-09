@@ -17,62 +17,94 @@ import {connect} from 'react-redux'
 import {shell} from 'electron'
 
 import {push, goBack} from 'connected-react-router'
-import {currentStatus, keyEmpty} from '../state'
+import {keyEmpty} from '../state'
 
 import {routes} from '../routes'
+import {selectedKID} from '../state'
 
 import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
 
 import {styles, Link} from '../components'
-import {NameView} from './user/views'
-import UserIntroDialog from './user/intro'
-import UserRevokeDialog from './user/revoke'
+import {NameView} from '../user/views'
+import UserIntroDialog from '../user/intro'
+import UserRevokeDialog from '../user/revoke'
 
-import {authLock, status, userService} from '../../rpc/rpc'
+import {authLock, key, statementRevoke, userService} from '../../rpc/rpc'
 import type {AppState, RPCState} from '../../reducers/app'
 
 import type {RouteInfo} from '../routes'
 import type {
-  User,
-  StatusRequest,
-  StatusResponse,
+  KeyRequest,
+  KeyResponse,
+  StatementRevokeRequest,
+  StatementRevokeResponse,
   UserServiceRequest,
   UserServiceResponse,
   AuthLockRequest,
-} from '../../rpc/types'
+  RPCError,
+} from '../../rpc/rpc'
+
+import type {Key, User} from '../../rpc/types'
 
 type Props = {
-  status: StatusResponse,
+  kid: string,
   dispatch: (action: any) => any,
 }
 
 type State = {
-  revoke?: number,
+  key: ?Key,
+  revoke: number,
+  loading: boolean,
+  error: string,
 }
 
 class ProfileView extends Component<Props, State> {
-  state = {}
-
-  componentDidMount() {
-    this.refresh()
+  state = {
+    key: null,
+    revoke: 0,
+    loading: false,
+    error: '',
   }
 
-  refresh = () => {
-    const req: StatusRequest = {}
-    this.props.dispatch(status(req))
+  componentDidMount() {
+    this.loadKey()
   }
 
   lock = () => {
     const req: AuthLockRequest = {}
     this.props.dispatch(
       authLock(req, () => {
-        // This triggers permission error, showing lock screen
-        this.refresh()
+        // After lock, this triggers permission error, showing lock screen.
+        this.loadKey()
       })
     )
   }
 
-  select = (service: string) => {
+  loadKey = () => {
+    const req: KeyRequest = {
+      kid: this.props.kid,
+      user: '',
+      skipCheck: false,
+      update: false,
+    }
+    this.props.dispatch(
+      key(
+        req,
+        (resp: KeyResponse) => {
+          if (resp.key) {
+            this.setState({key: resp.key, loading: false})
+          } else {
+            this.setState({error: 'Key not found', loading: false})
+          }
+        },
+        (err: RPCError) => {
+          this.setState({loading: false, error: err.message})
+        }
+      )
+    )
+  }
+
+  selectService = (service: string) => {
     if (service === '') {
       this.props.dispatch({type: 'PROMPT_USER', payload: true})
       return
@@ -80,27 +112,26 @@ class ProfileView extends Component<Props, State> {
 
     // this.setState({loading: true, error: ''})
     const req: UserServiceRequest = {
-      kid: '', // Default
+      kid: this.props.kid,
       service: service,
     }
     this.props.dispatch(
       userService(req, (resp: UserServiceResponse) => {
         // this.setState({loading: false})
-        this.props.dispatch(push('/profile/user/name'))
+        this.props.dispatch(push('/user/name?kid=' + this.props.kid))
       })
     )
   }
 
   render() {
-    const {status} = this.props
-    const key = status.key || keyEmpty()
-    const kid = key.id || ''
+    const kid = this.props.kid
+    const key = this.state.key || keyEmpty()
     const users = key.users || []
-    const {uri} = status
 
     return (
       <Box>
         <Divider style={{marginBottom: 8}} />
+        {this.state.error !== '' && <Typography style={{color: 'red'}}>{this.state.error}</Typography>}
         <Table size="small">
           <TableBody>
             <TableRow>
@@ -137,16 +168,12 @@ class ProfileView extends Component<Props, State> {
                     </Box>
                   </Box>
                 ))}
-                {users.length === 0 && <Link onClick={() => this.select('github')}>Link to Github</Link>}
-                {users.length === 0 && <Link onClick={() => this.select('twitter')}>Link to Twitter</Link>}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell style={cstyles.cell}>
-                <Typography align="right">Server</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <Link onClick={() => shell.openExternal(uri)}>{uri}</Link>
+                {users.length === 0 && (
+                  <Link onClick={() => this.selectService('github')}>Link to Github</Link>
+                )}
+                {users.length === 0 && (
+                  <Link onClick={() => this.selectService('twitter')}>Link to Twitter</Link>
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -170,9 +197,11 @@ class ProfileView extends Component<Props, State> {
           </TableBody>
         </Table>
         <UserRevokeDialog
-          open={this.state.revoke || 0 > 0}
-          revoke={this.state.revoke}
+          kid={this.props.kid}
+          seq={this.state.revoke}
+          open={this.state.revoke > 0}
           close={() => this.setState({revoke: 0})}
+          dispatch={this.props.dispatch}
         />
       </Box>
     )
@@ -188,11 +217,8 @@ const cstyles = {
   key: {},
 }
 
-const mapStateToProps = (state: {app: AppState, rpc: RPCState}, ownProps: any): any => {
-  const status = currentStatus(state.rpc)
-  return {
-    status,
-  }
+const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
+  return {kid: selectedKID(state)}
 }
 
 // $FlowFixMe

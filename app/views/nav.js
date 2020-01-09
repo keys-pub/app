@@ -57,9 +57,8 @@ class Nav extends Component<Props, State> {
     const drawerStyles = open ? {width, border: 0} : {width, border: 0, flexShrink: 0, overflowX: 'hidden'}
 
     const navs = [
-      {name: 'Keys', icon: KeysIcon, route: '/keys', prefix: '/keys'},
-      {name: 'Search', icon: SearchIcon, route: '/search', prefix: '/search'},
-      {name: 'Profile', icon: ProfileIcon, route: '/profile/index', prefix: '/profile'},
+      {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
+      {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
     ]
 
     return (

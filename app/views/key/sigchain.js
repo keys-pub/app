@@ -14,14 +14,13 @@ import {
 } from '@material-ui/core'
 
 import {styles, Link} from '../components'
-import {NamesView} from '../profile/user/views'
+import {NamesView} from '../user/views'
 
 import {connect} from 'react-redux'
 import queryString from 'query-string'
 
 import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
 
-import {status} from '../../rpc/rpc'
 import type {AppState, RPCState} from '../../reducers/app'
 
 import type {Statement} from '../../rpc/types'

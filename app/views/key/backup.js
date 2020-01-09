@@ -1,73 +1,119 @@
 // @flow
 import React, {Component} from 'react'
 
-import {Box, Button, Input, InputLabel, FormControl, Typography} from '@material-ui/core'
+import {
+  Box,
+  Button,
+  Input,
+  InputLabel,
+  FormControl,
+  FormHelperText,
+  TextField,
+  Typography,
+} from '@material-ui/core'
 
 import {styles, Step} from '../components'
 
 import {keyBackup} from '../../rpc/rpc'
 import {goBack, push} from 'connected-react-router'
 
-import {connect} from 'react-redux'
+import {selectedKID} from '../state'
 
-import {currentKey} from '../state'
+import {connect} from 'react-redux'
 
 import type {RPCState} from '../../rpc/rpc'
 import type {Key, KeyBackupResponse} from '../../rpc/types'
 
 type Props = {
-  key: Key,
+  kid: string,
   dispatch: (action: any) => any,
 }
 
 type State = {
-  recoveryPhrase: string,
+  keyBackup: string,
+  password: string,
+  error: string,
 }
 
 class KeyBackupView extends Component<Props, State> {
   state = {
-    recoveryPhrase: '',
+    keyBackup: '',
+    password: '',
+    error: '',
   }
 
-  componentDidMount() {
-    const action = keyBackup({kid: this.props.key.id}, (resp: KeyBackupResponse) => {
-      this.setState({recoveryPhrase: resp.seedPhrase})
-    })
-    this.props.dispatch(action)
+  keyBackup = (password: string) => {
+    this.props.dispatch(
+      keyBackup({kid: this.props.kid, password: password}, (resp: KeyBackupResponse) => {
+        this.setState({keyBackup: resp.keyBackup})
+      })
+    )
   }
 
   back = () => {
     this.props.dispatch(goBack())
   }
 
+  onInputChange = (e: SyntheticInputEvent<EventTarget>) => {
+    this.setState({password: e.target ? e.target.value : '', error: ''})
+  }
+
   render() {
     return (
-      <Step title="Backup Key" next={{label: 'OK', action: this.back}}>
-        <Typography style={{paddingBottom: 20}}>
-          Write this phrase down on a piece of paper and keep it somewhere safe. This phrase will allow you to
-          recover your key.
-        </Typography>
-        <Typography
-          style={{
-            ...styles.mono,
-            marginBottom: 40,
-            backgroundColor: 'black',
-            color: 'white',
-            paddingTop: 20,
-            paddingBottom: 20,
-            paddingLeft: 30,
-            paddingRight: 30,
-          }}
-        >
-          {this.state.recoveryPhrase}
-        </Typography>
+      <Step title="Key Backup">
+        <Typography style={{paddingBottom: 20}}>Enter in a password to encrypt your key:</Typography>
+        <FormControl error={this.state.error !== ''}>
+          <TextField
+            autoFocus
+            label="Password"
+            variant="outlined"
+            type="password"
+            onChange={this.onInputChange}
+            value={this.state.password}
+            style={{width: 400}}
+          />
+          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+        </FormControl>
+        <Box display="flex" flexDirection="row">
+          <Button color="primary" variant="outlined" onClick={this.keyBackup}>
+            Encrypt
+          </Button>
+        </Box>
+        {this.state.keyBackup !== '' && (
+          <Box>
+            <Typography style={{paddingTop: 20, paddingBottom: 20}}>
+              This is your key backup encrypted with your password:
+            </Typography>
+            <Typography
+              style={{
+                ...styles.mono,
+                marginBottom: 20,
+                backgroundColor: 'black',
+                color: 'white',
+                paddingTop: 10,
+                paddingBottom: 10,
+                paddingLeft: 10,
+                paddingRight: 10,
+              }}
+            >
+              {this.state.keyBackup}
+            </Typography>
+            <Box display="flex" flexDirection="row">
+              <Button color="secondary" variant="outlined" onClick={this.back}>
+                Back
+              </Button>
+            </Box>
+          </Box>
+        )}
       </Step>
     )
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState}) => {
-  return {key: currentKey(state.rpc)}
+const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
+  return {
+    kid: selectedKID(state),
+  }
 }
 
 export default connect<Props, {}, _, _, _, _>(mapStateToProps)(KeyBackupView)

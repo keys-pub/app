@@ -17,17 +17,17 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles, Link} from '../../components'
+import {styles, Link} from '../components'
 
-import Step from '../../components/step'
+import Step from '../components/step'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {currentKey} from '../../state'
-import {serviceName} from '../../helper'
+import {selectedKID} from '../state'
+import {serviceName} from '../helper'
 
-import {configSet, keyGenerate, userAdd, userSign} from '../../../rpc/rpc'
+import {configSet, keyGenerate, userAdd, userSign} from '../../rpc/rpc'
 import type {
   ConfigSetRequest,
   ConfigSetResponse,
@@ -37,11 +37,12 @@ import type {
   UserAddResponse,
   RPCError,
   RPCState,
-} from '../../../rpc/rpc'
-import type {AppState} from '../../../reducers/app'
-import type {Key, User} from '../../../rpc/types'
+} from '../../rpc/rpc'
+import type {AppState} from '../../reducers/app'
+import type {Key, User} from '../../rpc/types'
 
 type Props = {
+  kid: string,
   service: string,
   dispatch: (action: any) => any,
 }
@@ -70,7 +71,7 @@ class UserNameView extends Component<Props, State> {
       return <Typography>Unknown service</Typography>
     }
 
-    let title = 'Link'
+    let title = ''
     let placeholder = ''
     let question = "What's your username?"
     let next = "In the next step, we'll create a signed message that you can post to your account."
@@ -106,7 +107,7 @@ class UserNameView extends Component<Props, State> {
           />
           <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
         </FormControl>
-        <Typography variant="body1" style={{paddingTop: 10, paddingBottom: 40}}>
+        <Typography variant="body1" style={{paddingTop: 10, paddingBottom: 20}}>
           {next}
         </Typography>
       </Step>
@@ -123,7 +124,7 @@ class UserNameView extends Component<Props, State> {
 
     this.setState({loading: true, error: ''})
     const req: UserSignRequest = {
-      kid: '', // Default
+      kid: this.props.kid,
       service: this.props.service,
       name: this.state.name,
     }
@@ -132,7 +133,7 @@ class UserNameView extends Component<Props, State> {
         req,
         (resp: UserSignResponse) => {
           this.setState({loading: false})
-          this.props.dispatch(push('/profile/user/sign'))
+          this.props.dispatch(push('/user/sign?kid=' + this.props.kid))
         },
         (err: RPCError) => {
           this.setState({loading: false, error: err.details})
@@ -144,6 +145,7 @@ class UserNameView extends Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => {
   return {
+    kid: selectedKID(state),
     service: (state.rpc.userService && state.rpc.userService.service) || '',
   }
 }

@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core'
 
 import {styles} from '../components'
-import {NamesView} from '../profile/user/views'
+import {NamesView} from '../user/views'
 import {IDView, KeyTypeView} from '../key/view'
 
 import {keys} from '../../rpc/rpc'
@@ -53,7 +53,7 @@ class KeysView extends Component<Props> {
   }
 
   select = (key: Key) => {
-    this.props.dispatch(push('/key?kid=' + key.id))
+    this.props.dispatch(push('/key/index?kid=' + key.id))
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {

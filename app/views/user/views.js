@@ -3,9 +3,9 @@ import React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
-import styles, {serviceColor} from '../../components/styles'
+import styles, {serviceColor} from '../components/styles'
 
-import type {KeyType, User} from '../../../rpc/types'
+import type {KeyType, User} from '../../rpc/types'
 
 export const NameView = (props: {user: User}) => {
   const {user} = props

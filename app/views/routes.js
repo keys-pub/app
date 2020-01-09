@@ -13,14 +13,13 @@ import AuthView from './auth'
 import AuthIntroView from './auth/intro'
 import AuthUnlockView from './auth/unlock'
 
-import ProfileView from './profile'
 import DebugView from './profile/debug'
 
 import ComposeView from './compose'
 
 // import KeyCreateView  from './key/create'
-// import KeyBackupView  from './key/backup'
-// import KeyRecoverView  from './key/recover'
+import KeyBackupView from './key/backup'
+import KeyRecoverView from './key/recover'
 // import KeyRemoveView  from './key/remove'
 
 // import InboxView  from './inbox'
@@ -33,8 +32,8 @@ import StyleGuide from './style-guide'
 import DBView from './db'
 import KeyView from './key'
 import KeysView from './keys'
-import UserNameView from './profile/user/name'
-import UserSignView from './profile/user/sign'
+import UserNameView from './user/name'
+import UserSignView from './user/sign'
 
 // TODO: Make path string RoutePath type
 export type RouteInfo = {
@@ -51,26 +50,25 @@ export const routes: Array<RouteInfo> = [
   {path: '/compose', component: () => <ComposeView />},
   {path: '/db', component: () => <DBView />},
   {path: '/debug', component: () => <DebugView />},
-  {path: '/key', component: () => <KeyView />},
-  // {path: '/key/backup', component: props => <KeyBackup />},
+  {path: '/key/index', component: () => <KeyView />},
+  {path: '/key/backup', component: props => <KeyBackupView />},
   // {path: '/key/create', component: props => <KeyCreate />},
-  // {path: '/key/recover', component: props => <KeyRecover />},
+  {path: '/key/recover', component: props => <KeyRecoverView />},
   // {path: '/key/remove', component: props => <KeyRemove />},
   // {path: '/inbox', nav: true, component: props => <Inbox />},
   // {path: '/inbox/info', component: props => <InboxInfo />},
   // {path: '/inbox/leave', component: props => <InboxLeave />},
   {
-    path: '/keys',
+    path: '/keys/index',
     component: () => <KeysView />,
     // onLocationChange: (dispatch: (action: any) => void) => {},
   },
-  {path: '/search', component: () => <SearchView />},
+  {path: '/search/index', component: () => <SearchView />},
   {path: '/splash', component: () => <Splash />},
   {path: '/style-guide', component: () => <StyleGuide />},
 
-  {path: '/profile/index', component: () => <ProfileView />},
-  {path: '/profile/user/name', component: () => <UserNameView />},
-  {path: '/profile/user/sign', component: () => <UserSignView />},
+  {path: '/user/name', component: () => <UserNameView />},
+  {path: '/user/sign', component: () => <UserSignView />},
 ]
 
 // Map of path to route

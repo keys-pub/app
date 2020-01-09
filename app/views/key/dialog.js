@@ -27,7 +27,7 @@ export default class KeyDialog extends Component<Props> {
         }
         <Box paddingTop={3} paddingLeft={1} paddingBottom={1}>
           <KeyView
-            value={this.props.value}
+            kval={this.props.value}
             statements={this.props.statements}
             add={this.props.add}
             remove={this.props.remove}

@@ -31,9 +31,10 @@ class KeyCreateView extends Component<Props, State> {
     // TODO: push setting
     this.setState({loading: true})
     this.props.dispatch(
-      keyGenerate({publishPublicKey: true}, (resp: KeyGenerateResponse) => {
+      keyGenerate({}, (resp: KeyGenerateResponse) => {
         this.setState({loading: false})
-        this.props.dispatch(push('/profile/index'))
+        // TODO: Show key
+        this.props.dispatch(push('/key/index?kid=' + resp.kid))
       })
     )
   }

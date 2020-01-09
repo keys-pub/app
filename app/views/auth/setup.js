@@ -337,7 +337,7 @@ class AuthSetupView extends Component<Props, State> {
       setTimeout(() => {
         this.setState({loading: false})
         this.props.dispatch({type: 'UNLOCK'})
-        this.props.dispatch(push('/profile/index'))
+        this.props.dispatch(push('/keys/index'))
       }, 100)
     })
   }

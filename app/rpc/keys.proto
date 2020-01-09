@@ -53,8 +53,6 @@ service Keys {
   rpc Item(ItemRequest) returns (ItemResponse) {}
   rpc Items(ItemsRequest) returns (ItemsResponse) {}
 
-  rpc Status(StatusRequest) returns (StatusResponse) {}  
-
   rpc Search(SearchRequest) returns (SearchResponse) {}
 
   rpc Pull(PullRequest) returns (PullResponse) {}
@@ -153,6 +151,9 @@ message StatementCreateRequest {
   bytes data = 1;
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
 }
 message StatementCreateResponse {
   Statement statement = 1;
@@ -163,6 +164,9 @@ message StatementRevokeRequest {
   int32 seq = 1;
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
 }
 message StatementRevokeResponse {
   Statement statement = 1;
@@ -333,6 +337,9 @@ message UserAddRequest {
   string name = 3; 
   // URL is location of signed message on the service.
   string url = 4 [(gogoproto.customname) = "URL"];
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
 }
 message UserAddResponse {
   User user = 1;
@@ -341,13 +348,15 @@ message UserAddResponse {
 
 message KeyBackupRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
+  string password = 2;
 }
 message KeyBackupResponse {
-  string seedPhrase = 1;
+  string keyBackup = 1;
 }
 
 message KeyRecoverRequest {
-  string seedPhrase = 1;
+  string keyBackup = 1;
+  string password = 2;
 }
 message KeyRecoverResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
@@ -356,8 +365,6 @@ message KeyRecoverResponse {
 message KeyRemoveRequest {
   // KID of key to remove.
   string kid = 1 [(gogoproto.customname) = "KID"];
-  // SeedPhrase confirms that you want to remove the key.
-  string seedPhrase = 2;  
 }
 message KeyRemoveResponse {}
 
@@ -448,16 +455,6 @@ message RandRequest {
 }
 message RandResponse {
   string data = 1;
-}
-
-message StatusRequest {}
-message StatusResponse {  
-  // URI is the remote.
-  string uri = 1 [(gogoproto.customname) = "URI"];
-  // Key is current key
-  Key key = 2;
-  // AskUser if we should prompt for user setup.
-  bool promptUser = 4;
 }
 
 message PullRequest {
