@@ -17,7 +17,7 @@ import {
 
 import {styles} from '../components'
 import {NamesView} from '../profile/user/views'
-import {KeyTypeView} from '../key/view'
+import {IDView, KeyTypeView} from '../key/view'
 
 import {keys} from '../../rpc/rpc'
 
@@ -79,16 +79,6 @@ class KeysView extends Component<Props> {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'type'}
-                  direction={direction}
-                  onClick={() => this.sort(sortField, 'type', sortDirection)}
-                >
-                  <Typography style={{...styles.mono}}>Type</Typography>
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell>
-                <TableSortLabel
                   active={sortField === 'user'}
                   direction={direction}
                   onClick={() => this.sort(sortField, 'user', sortDirection)}
@@ -111,13 +101,10 @@ class KeysView extends Component<Props> {
             {this.props.keys.map((key, index) => (
               <TableRow hover onClick={event => this.select(key)} key={key.id}>
                 <TableCell component="th" scope="row">
-                  <KeyTypeView type={key.type || 'NO_KEY_TYPE'} description={false} />
-                </TableCell>
-                <TableCell>
                   <NamesView users={key.users || []} />
                 </TableCell>
-                <TableCell>
-                  <Typography style={{...styles.mono}}>{key.id}</Typography>
+                <TableCell style={{verticalAlign: 'top'}}>
+                  <IDView id={key.id} />
                 </TableCell>
               </TableRow>
             ))}

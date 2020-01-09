@@ -41,10 +41,6 @@ class Debug extends Component<Props> {
     }
   }
 
-  resetPrompts = () => {
-    this.props.dispatch({type: 'PROMPT_USER', payload: true})
-  }
-
   error = () => {
     throw new Error('error!')
   }
@@ -57,8 +53,6 @@ class Debug extends Component<Props> {
           <Link onClick={() => this.props.dispatch(push('/db'))} paragraph>
             Show DB
           </Link>
-          <Link onClick={this.resetPrompts}>Reset Prompts</Link>
-          <Link onClick={this.error}>Error</Link>
         </Box>
       </Box>
     )
@@ -80,12 +74,7 @@ class Debug extends Component<Props> {
   }
 
   render() {
-    return (
-      <Box>
-        {this.renderDebugActions()}
-        {this.renderRoutes()}
-      </Box>
-    )
+    return <Box>{this.renderRoutes()}</Box>
   }
 }
 

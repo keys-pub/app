@@ -17,12 +17,24 @@ export const NameView = (props: {user: User}) => {
     textColor = 'red'
     scolor = 'red'
   }
+  const name = user.name
 
   return (
     <Box display="flex" flexDirection="row">
       <Box display="flex" flexDirection="row" style={{paddingRight: 8}}>
-        <Typography style={{color: textColor}}>{user.name}@</Typography>
-        <Typography style={{color: scolor}}>{user.service}</Typography>
+        <Typography
+          style={{
+            ...styles.mono,
+            maxWidth: 190,
+            color: textColor,
+            wordWrap: 'break-word',
+            wordBreak: 'break-all',
+          }}
+        >
+          {name}
+          <wbr />
+          <span style={{color: scolor}}>@{user.service}</span>
+        </Typography>
       </Box>
     </Box>
   )

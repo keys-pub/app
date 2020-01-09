@@ -133,7 +133,7 @@ app.on('ready', async () => {
     y: ws.y,
     width: ws.width,
     height: ws.height,
-    minWidth: 800,
+    minWidth: 920,
     minHeight: 600,
     titleBarStyle: 'hidden',
     webPreferences: {

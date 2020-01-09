@@ -21,7 +21,7 @@ import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import KeyDialog from '../key/dialog'
-import {KeyTypeView} from '../key/view'
+import {IDView, KeyTypeView} from '../key/view'
 
 import {NamesView} from '../profile/user/views'
 import {styles} from '../components'
@@ -92,7 +92,7 @@ class SearchView extends Component<Props, State> {
     const {loading} = this.state
     return (
       <Box display="flex" flex={1} flexDirection="column">
-        <Box paddingLeft={1} paddingBottom={2} paddingRight={1}>
+        <Box paddingLeft={1} paddingBottom={1} paddingRight={1}>
           <TextField
             placeholder="Search"
             variant="outlined"
@@ -103,7 +103,7 @@ class SearchView extends Component<Props, State> {
             style={{marginTop: 2}}
           />
         </Box>
-        {!loading && <Divider style={{marginBottom: 3}} />}
+        {!loading && <Divider style={{marginTop: 3}} />}
         {loading && <LinearProgress />}
         <Box display="flex" flexDirection="column">
           <Table size="small" stickyHeader>
@@ -120,13 +120,11 @@ class SearchView extends Component<Props, State> {
             <TableBody>
               {this.state.results.map((result: SearchResult, index: number): any => (
                 <TableRow hover onClick={event => this.select(result)} key={result.kid}>
-                  <TableCell component="th" scope="row" style={{width: 1}}>
+                  <TableCell component="th" scope="row">
                     <NamesView users={result.users || []} />
                   </TableCell>
-                  <TableCell>
-                    <Typography style={{...styles.mono}} noWrap>
-                      {result.kid}
-                    </Typography>
+                  <TableCell style={{verticalAlign: 'top'}}>
+                    <IDView id={result.kid} />
                   </TableCell>
                 </TableRow>
               ))}

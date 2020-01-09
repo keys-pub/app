@@ -33,6 +33,14 @@ const cstyles = {
   },
 }
 
+export const IDView = (props: {id: string}) => {
+  return (
+    <Typography style={{...styles.mono, wordWrap: 'break-word', wordBreak: 'break-all'}}>
+      {props.id}
+    </Typography>
+  )
+}
+
 export const KeyTypeView = (props: {type: KeyType, description: boolean}) => {
   return <Typography>{props.description ? keyTypeString(props.type) : keyTypeSymbol(props.type)}</Typography>
 }
@@ -55,9 +63,7 @@ export default (props: Props) => {
             </TableCell>
             <TableCell style={cstyles.cell}>
               <Box display="flex" flexDirection="column">
-                <Typography style={{...styles.mono, paddingRight: 10, wordWrap: 'break-word'}}>
-                  {kid}
-                </Typography>
+                <IDView id={kid} />
               </Box>
             </TableCell>
           </TableRow>

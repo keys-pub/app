@@ -135,8 +135,6 @@ message Statement {
 
 message SigchainRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];  
-  bool check = 4;
-  bool update = 5;
 }
 message SigchainResponse {
   Key key = 1;
@@ -144,8 +142,8 @@ message SigchainResponse {
 }
 
 message StatementRequest {
-string kid = 1 [(gogoproto.customname) = "KID"];  
-int32 seq = 2;
+  string kid = 1 [(gogoproto.customname) = "KID"];  
+  int32 seq = 2;
 }
 message StatementResponse {
   Statement statement = 1;
@@ -155,11 +153,6 @@ message StatementCreateRequest {
   bytes data = 1;
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
-  
-  // DryRun, if true will persist local or remote.
-  bool dryRun = 5;  
-  // Local, will not save to remote.
-  bool local = 6;
 }
 message StatementCreateResponse {
   Statement statement = 1;
@@ -170,17 +163,6 @@ message StatementRevokeRequest {
   int32 seq = 1;
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
-
-  // DryRun, if true will not save.
-  bool dryRun = 5;  
-  // Local, will not save to remote.
-  bool local = 6;
-
-  // TODO: Revoke all
-  // All, if true, revoke all statements.
-  // bool all = 10;
-  // SeedPhrase to confirm if revoking all.
-  // string seedPhrase = 11;
 }
 message StatementRevokeResponse {
   Statement statement = 1;
@@ -396,7 +378,7 @@ message Key {
   // Users associated with this key.
   repeated User users = 6;  
   // Saved if saved locally.
-  bool saved = 10;  
+  bool saved = 10;
 }
 
 message KeyRequest {
@@ -481,7 +463,6 @@ message StatusResponse {
 message PullRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
   string user = 2;
-  bool all = 10;
 }
 message PullResponse {
   repeated string kids = 1 [(gogoproto.customname) = "KIDs"];
