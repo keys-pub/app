@@ -41,9 +41,9 @@ export const NameView = (props: {user: User}) => {
 }
 
 export const NamesView = (props: {users: Array<User>}) => (
-  <Box display="flex" flexDirection="row">
+  <Box display="flex" flexDirection="column">
     {props.users.map((user, index) => (
-      <NameView user={user} key={user.kid} />
+      <NameView user={user} key={'name-' + user.kid + '-' + user.seq} />
     ))}
   </Box>
 )

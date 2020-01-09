@@ -1,7 +1,17 @@
 // @flow
 import React, {Component} from 'react'
 
-import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
+import {
+  Box,
+  Button,
+  Divider,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@material-ui/core'
 
 import {shell} from 'electron'
 
@@ -161,10 +171,17 @@ class KeyView extends Component<Props, State> {
   render() {
     const kid = this.props.kid
 
-    const loading = !this.state.key
+    const loading = this.state.loading
     const type = (this.state.key && this.state.key.type) || 'NO_KEY_TYPE'
     const saved = this.state.key && this.state.key.saved
     const users = (this.state.key && this.state.key.users) || []
+
+    let hasGithub = false
+    let hasTwitter = false
+    users.map(user => {
+      if (user.service === 'twitter') hasTwitter = true
+      if (user.service === 'github') hasGithub = true
+    })
 
     const isPublic = type == 'PUBLIC_KEY_TYPE'
     const isPrivate = type == 'PRIVATE_KEY_TYPE'
@@ -173,6 +190,11 @@ class KeyView extends Component<Props, State> {
 
     return (
       <Box display="flex" flex={1} flexDirection="column">
+        {!loading && <Divider style={{marginBottom: 3}} />}
+        {loading && <LinearProgress />}
+        {this.state.error && (
+          <Typography style={{color: 'red', marginLeft: 30}}>{this.state.error}</Typography>
+        )}
         <Table size="small">
           <TableBody>
             <TableRow>
@@ -191,7 +213,12 @@ class KeyView extends Component<Props, State> {
               </TableCell>
               <TableCell style={cstyles.cell}>
                 {(users || []).map((user: User) => (
-                  <Box display="flex" flexDirection="column" key={user.kid + user.seq}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    key={'user-' + user.kid + '-' + user.seq}
+                    paddingBottom={2}
+                  >
                     <NameView user={user} />
                     {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
                     <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
@@ -208,11 +235,15 @@ class KeyView extends Component<Props, State> {
                   </Box>
                 ))}
                 {isPublic && users.length == 0 && <Typography style={{color: '#9f9f9f'}}>none</Typography>}
-                {isPrivate && users.length === 0 && (
-                  <Link onClick={() => this.selectService('github')}>Link to Github</Link>
+                {isPrivate && !hasGithub && (
+                  <Button size="small" variant="outlined" onClick={() => this.selectService('github')}>
+                    Link to Github
+                  </Button>
                 )}
-                {isPrivate && users.length === 0 && (
-                  <Link onClick={() => this.selectService('twitter')}>Link to Twitter</Link>
+                {isPrivate && !hasTwitter && (
+                  <Button size="small" variant="outlined" onClick={() => this.selectService('twitter')}>
+                    Link to Twitter
+                  </Button>
                 )}
               </TableCell>
             </TableRow>
