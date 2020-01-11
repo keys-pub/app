@@ -70,7 +70,6 @@ class KeysView extends Component<Props> {
   render() {
     const {sortField, sortDirection} = this.props
     const direction = directionString(sortDirection)
-
     return (
       <Box>
         <Divider />
@@ -92,22 +91,25 @@ class KeysView extends Component<Props> {
                   direction={direction}
                   onClick={() => this.sort(sortField, 'kid', sortDirection)}
                 >
-                  <Typography style={{...styles.mono}}>Public Key</Typography>
+                  <Typography style={{...styles.mono}}>ID</Typography>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.props.keys.map((key, index) => (
-              <TableRow hover onClick={event => this.select(key)} key={key.id}>
-                <TableCell component="th" scope="row">
-                  <NamesView users={key.users || []} />
-                </TableCell>
-                <TableCell style={{verticalAlign: 'top'}}>
-                  <IDView id={key.id} />
-                </TableCell>
-              </TableRow>
-            ))}
+            {this.props.keys.map((key, index) => {
+              const isPrivate = key.type === 'PRIVATE_KEY_TYPE'
+              return (
+                <TableRow hover onClick={event => this.select(key)} key={key.id} style={{cursor: 'pointer'}}>
+                  <TableCell component="th" scope="row">
+                    <NamesView users={key.users || []} />
+                  </TableCell>
+                  <TableCell style={{verticalAlign: 'top'}}>
+                    <IDView id={key.id} owner={key.type === 'PRIVATE_KEY_TYPE'} />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </Box>

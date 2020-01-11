@@ -118,7 +118,7 @@ class SearchView extends Component<Props, State> {
                   <Typography style={{...styles.mono}}>User</Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography style={{...styles.mono}}>Public Key</Typography>
+                  <Typography style={{...styles.mono}}>ID</Typography>
                 </TableCell>
               </TableRow>
             </TableHead>

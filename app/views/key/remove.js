@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {keyBackup, keyRemove} from '../../rpc/rpc'
+import {keyRemove} from '../../rpc/rpc'
 import {selectedKID} from '../state'
 
 import {styles, Step} from '../components'
@@ -21,14 +21,7 @@ import {push, goBack} from 'connected-react-router'
 import {connect} from 'react-redux'
 
 import type {Key} from '../../rpc/types'
-import type {
-  KeyBackupRequest,
-  KeyBackupResponse,
-  KeyRemoveRequest,
-  KeyRemoveResponse,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
+import type {KeyRemoveRequest, KeyRemoveResponse, RPCError, RPCState} from '../../rpc/rpc'
 
 type Props = {
   kid: string,

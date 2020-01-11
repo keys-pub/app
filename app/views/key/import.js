@@ -19,8 +19,8 @@ import {Step} from '../components'
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {keyRecover} from '../../rpc/rpc'
-import type {KeyRecoverRequest, KeyRecoverResponse, RPCError} from '../../rpc/rpc'
+import {keyImport} from '../../rpc/rpc'
+import type {KeyImportRequest, KeyImportResponse, RPCError} from '../../rpc/rpc'
 
 type Props = {
   dispatch: (action: any) => any,
@@ -32,22 +32,22 @@ type State = {
   error: string,
 }
 
-class KeyRecoverView extends Component<Props, State> {
+class KeyImportView extends Component<Props, State> {
   state = {
     keyBackup: '',
     password: '',
     error: '',
   }
 
-  recover = () => {
-    const req: KeyRecoverRequest = {
-      keyBackup: this.state.keyBackup,
+  importKey = () => {
+    const req: KeyImportRequest = {
+      in: this.state.keyBackup,
       password: this.state.password,
     }
     this.props.dispatch(
-      keyRecover(
+      keyImport(
         req,
-        (resp: KeyRecoverResponse) => {
+        (resp: KeyImportResponse) => {
           this.props.dispatch(push('/key/index?kid=' + resp.kid))
         },
         (err: RPCError) => {
@@ -72,16 +72,16 @@ class KeyRecoverView extends Component<Props, State> {
   render() {
     return (
       <Step
-        title="Recover your Key"
+        title="Import your Key"
         prev={{label: 'Back', action: this.back}}
-        next={{label: 'Recover', action: this.recover}}
+        next={{label: 'Import', action: this.importKey}}
       >
         <Box>
           <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
             <TextField
               multiline
               autoFocus
-              label="Key Backup"
+              label="Key"
               rows={5}
               variant="outlined"
               placeholder={''}
@@ -107,4 +107,4 @@ class KeyRecoverView extends Component<Props, State> {
   }
 }
 
-export default connect<Props, {}, _, _, _, _>()(KeyRecoverView)
+export default connect<Props, {}, _, _, _, _>()(KeyImportView)

@@ -17,7 +17,8 @@ import Formatter from './formatter'
 type Props = {
   defaultValue: string,
   loading: boolean,
-  send: (value: string) => *,
+  action: (value: string) => *,
+  actionLabel: string,
   onChange?: (value: () => string) => *,
 }
 
@@ -28,7 +29,7 @@ type State = {
 const Markdown = new MarkdownSerializer()
 const plugins = createPlugins({placeholder: '', getLinkComponent: null})
 
-class ComposeEditor extends React.Component<Props, State> {
+class EditorView extends React.Component<Props, State> {
   state = {
     editorValue: Markdown.deserialize(this.props.defaultValue),
   }
@@ -52,8 +53,8 @@ class ComposeEditor extends React.Component<Props, State> {
     return Markdown.serialize(this.state.editorValue)
   }
 
-  send = () => {
-    this.props.send(this.value())
+  action = () => {
+    this.props.action(this.value())
   }
 
   render() {
@@ -80,8 +81,8 @@ class ComposeEditor extends React.Component<Props, State> {
             paddingRight: 20,
           }}
         >
-          <Button color="primary" variant="outlined" onClick={this.send} disabled={this.props.loading}>
-            Send
+          <Button color="primary" variant="outlined" onClick={this.action} disabled={this.props.loading}>
+            {this.props.actionLabel}
           </Button>
           <Box display="flex" flexDirection="row" flex={1} />
           {this.editor && <Formatter editor={this.editor} onCreateLink={this.createLink} />}
@@ -91,4 +92,4 @@ class ComposeEditor extends React.Component<Props, State> {
   }
 }
 
-export default ComposeEditor
+export default EditorView

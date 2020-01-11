@@ -136,7 +136,7 @@ class ProfileView extends Component<Props, State> {
           <TableBody>
             <TableRow>
               <TableCell style={{...cstyles.cell, ...cstyles.key}}>
-                <Typography align="right">Public Key</Typography>
+                <Typography align="right">ID</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="column">

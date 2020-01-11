@@ -23,11 +23,12 @@ option (gogoproto.goproto_enum_stringer_all) = true;
 
 service Keys {  
   rpc KeyGenerate(KeyGenerateRequest) returns (KeyGenerateResponse) {}
-  rpc KeyRecover(KeyRecoverRequest) returns (KeyRecoverResponse) {}
-  rpc KeyBackup(KeyBackupRequest) returns (KeyBackupResponse) {}
-  rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
   rpc Keys(KeysRequest) returns (KeysResponse) {}
   rpc Key(KeyRequest) returns (KeyResponse) {}
+  rpc KeyImport(KeyImportRequest) returns (KeyImportResponse) {}
+  rpc KeyExport(KeyExportRequest) returns (KeyExportResponse) {}
+  rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
+
   
   rpc Sign(SignRequest) returns (SignResponse) {}
   rpc Verify(VerifyRequest) returns (VerifyResponse) {}
@@ -346,19 +347,30 @@ message UserAddResponse {
   Statement statement = 2;
 }
 
-message KeyBackupRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string password = 2;
-}
-message KeyBackupResponse {
-  string keyBackup = 1;
+
+enum ExportType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "ExportType";
+  
+  DEFAULT_EXPORT_TYPE = 0 [(gogoproto.enumvalue_customname) = "DefaultExportType"];
+  SALTPACK_PW_EXPORT_TYPE = 1 [(gogoproto.enumvalue_customname) = "SaltpackPwExportType"];
 }
 
-message KeyRecoverRequest {
-  string keyBackup = 1;
+
+message KeyExportRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
   string password = 2;
+  ExportType type = 3;
 }
-message KeyRecoverResponse {
+message KeyExportResponse {
+  bytes export = 1;
+}
+
+message KeyImportRequest {
+  bytes in = 1;
+  string password = 2;  
+}
+message KeyImportResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
 }
 

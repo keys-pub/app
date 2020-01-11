@@ -55,12 +55,11 @@ const cstyles = {
   },
 }
 
-export const IDView = (props: {id: string}) => {
-  return (
-    <Typography style={{...styles.mono, wordWrap: 'break-word', wordBreak: 'break-all'}}>
-      {props.id}
-    </Typography>
-  )
+export const IDView = (props: {id: string, owner?: boolean}) => {
+  const styl = {}
+  if (props.owner) styl['fontWeight'] = 600
+  // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
+  return <Typography style={{...styles.mono, ...styl}}>{props.id}</Typography>
 }
 
 export const KeyTypeView = (props: {type: KeyType, description: boolean}) => {
@@ -195,11 +194,12 @@ class KeyView extends Component<Props, State> {
         {this.state.error && (
           <Typography style={{color: 'red', marginLeft: 30}}>{this.state.error}</Typography>
         )}
+        <Box paddingBottom={1} />
         <Table size="small">
           <TableBody>
             <TableRow>
               <TableCell style={{...cstyles.cell, width: 100}}>
-                <Typography align="right">Public Key</Typography>
+                <Typography align="right">ID</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="column">
@@ -236,12 +236,22 @@ class KeyView extends Component<Props, State> {
                 ))}
                 {isPublic && users.length == 0 && <Typography style={{color: '#9f9f9f'}}>none</Typography>}
                 {isPrivate && !hasGithub && (
-                  <Button size="small" variant="outlined" onClick={() => this.selectService('github')}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => this.selectService('github')}
+                    style={{marginRight: 10}}
+                  >
                     Link to Github
                   </Button>
                 )}
                 {isPrivate && !hasTwitter && (
-                  <Button size="small" variant="outlined" onClick={() => this.selectService('twitter')}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => this.selectService('twitter')}
+                    style={{marginRight: 10}}
+                  >
                     Link to Twitter
                   </Button>
                 )}

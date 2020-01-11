@@ -18,8 +18,8 @@ import DebugView from './profile/debug'
 import ComposeView from './compose'
 
 // import KeyCreateView  from './key/create'
-import KeyBackupView from './key/backup'
-import KeyRecoverView from './key/recover'
+import KeyExportView from './key/export'
+import KeyImportView from './key/import'
 // import KeyRemoveView  from './key/remove'
 
 // import InboxView  from './inbox'
@@ -34,6 +34,8 @@ import KeyView from './key/view'
 import KeysView from './keys'
 import UserNameView from './user/name'
 import UserSignView from './user/sign'
+
+import EncryptView from './encrypt'
 
 // TODO: Make path string RoutePath type
 export type RouteInfo = {
@@ -51,9 +53,9 @@ export const routes: Array<RouteInfo> = [
   {path: '/db', component: () => <DBView />},
   {path: '/debug', component: () => <DebugView />},
   {path: '/key/index', component: () => <KeyView />},
-  {path: '/key/backup', component: props => <KeyBackupView />},
+  {path: '/key/export', component: props => <KeyExportView />},
   // {path: '/key/create', component: props => <KeyCreate />},
-  {path: '/key/recover', component: props => <KeyRecoverView />},
+  {path: '/key/import', component: props => <KeyImportView />},
   // {path: '/key/remove', component: props => <KeyRemove />},
   // {path: '/inbox', nav: true, component: props => <Inbox />},
   // {path: '/inbox/info', component: props => <InboxInfo />},
@@ -69,6 +71,8 @@ export const routes: Array<RouteInfo> = [
 
   {path: '/user/name', component: () => <UserNameView />},
   {path: '/user/sign', component: () => <UserSignView />},
+
+  {path: '/encrypt/index', component: () => <EncryptView />},
 ]
 
 // Map of path to route

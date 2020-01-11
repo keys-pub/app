@@ -14,7 +14,7 @@ import {
 
 import {styles, Step} from '../components'
 
-import {keyBackup} from '../../rpc/rpc'
+import {keyExport} from '../../rpc/rpc'
 import {goBack, push} from 'connected-react-router'
 
 import {selectedKID} from '../state'
@@ -22,7 +22,7 @@ import {selectedKID} from '../state'
 import {connect} from 'react-redux'
 
 import type {RPCState} from '../../rpc/rpc'
-import type {Key, KeyBackupResponse} from '../../rpc/types'
+import type {Key, KeyExportRequest, KeyExportResponse} from '../../rpc/types'
 
 type Props = {
   kid: string,
@@ -35,7 +35,7 @@ type State = {
   error: string,
 }
 
-class KeyBackupView extends Component<Props, State> {
+class KeyExportView extends Component<Props, State> {
   state = {
     keyBackup: '',
     password: '',
@@ -43,9 +43,10 @@ class KeyBackupView extends Component<Props, State> {
   }
 
   keyBackup = (password: string) => {
+    const req: KeyExportRequest = {kid: this.props.kid, password: password}
     this.props.dispatch(
-      keyBackup({kid: this.props.kid, password: password}, (resp: KeyBackupResponse) => {
-        this.setState({keyBackup: resp.keyBackup})
+      keyExport(req, (resp: KeyExportResponse) => {
+        this.setState({keyBackup: resp.export || ''})
       })
     )
   }
@@ -116,4 +117,4 @@ const mapStateToProps = (state: {rpc: RPCState, router: any}, ownProps: any) => 
   }
 }
 
-export default connect<Props, {}, _, _, _, _>(mapStateToProps)(KeyBackupView)
+export default connect<Props, {}, _, _, _, _>(mapStateToProps)(KeyExportView)

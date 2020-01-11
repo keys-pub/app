@@ -22,6 +22,7 @@ import {
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
+  EnhancedEncryption as EncryptIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -59,6 +60,7 @@ class Nav extends Component<Props, State> {
     const navs = [
       {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
       {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
+      // {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
     ]
 
     return (

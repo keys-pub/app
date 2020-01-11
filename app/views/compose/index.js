@@ -6,8 +6,8 @@ import {goBack, push} from 'connected-react-router'
 
 import {Button, Divider, LinearProgress, MenuItem, Paper, Typography, Box} from '@material-ui/core'
 
-import Recipients from './recipients'
-import Editor from './editor'
+import Recipients from '../recipients'
+import Editor from '../editor'
 
 import {styles} from '../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
@@ -95,7 +95,7 @@ class ComposeView extends Component<Props, State> {
         {this.state.loading && <LinearProgress />}
         {/*<Recipients search={this.search} select={this.select} />*/}
         <Divider />
-        <Editor defaultValue="" send={this.send} loading={this.state.loading} />
+        <Editor defaultValue="" action={this.send} actionLabel="Send" loading={this.state.loading} />
       </Box>
     )
   }

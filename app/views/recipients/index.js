@@ -11,33 +11,45 @@ import {goBack, push} from 'connected-react-router'
 
 import {styles} from '../components'
 
-import type {Key} from '../../rpc/types'
-// import type {SearchResponse} from '../../rpc/rpc'
+import {search} from '../../rpc/rpc'
+
+import type {Key, SearchResult, SearchRequest, SearchResponse} from '../../rpc/types'
+import type {RPCState, RPCError} from '../../rpc/rpc'
 
 export type Props = {
-  search: (q: string) => Promise<Array<Key>>,
-  select: (results: Array<Key>) => *,
+  dispatch: (action: any) => any,
 }
 
 type State = {
-  results: Array<Key>,
-  selected: Array<any>,
+  results: Array<SearchResult>,
+  selected: Array<SearchResult>,
   input: string,
+  error: string,
 }
 
-class Recipients extends Component<Props, State> {
+class RecipientsView extends Component<Props, State> {
   state = {
     results: [],
     selected: [],
     input: '',
+    error: '',
+  }
+
+  search = (q: string) => {
+    const req: SearchRequest = {query: q, index: 0, limit: 100}
+    this.props.dispatch(
+      search(
+        req,
+        (resp: SearchResponse) => {
+          this.setState({results: resp.results || []})
+        },
+        (err: RPCError) => {}
+      )
+    )
   }
 
   requestSuggestions = (req: {value: string}) => {
-    this.props.search(req.value).then((results: Array<Key>) => {
-      this.setState({
-        results: results,
-      })
-    })
+    this.search(req.value)
   }
 
   clearSuggestions = () => {
@@ -52,16 +64,15 @@ class Recipients extends Component<Props, State> {
     })
   }
 
-  add = (result: Key) => {
+  add = (result: SearchResult) => {
     const selected = [...this.state.selected, result]
     this.setState({
       selected,
       input: '',
     })
-    this.props.select(selected)
   }
 
-  delete = (result: Key, index: number) => {
+  delete = (result: SearchResult, index: number) => {
     let temp = this.state.selected
     temp.splice(index, 1)
     this.setState({selected: temp})
@@ -77,7 +88,7 @@ class Recipients extends Component<Props, State> {
         renderSuggestionsContainer={renderSuggestionsContainer}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
-        onSuggestionSelected={(e, value: {suggestion: Key}) => {
+        onSuggestionSelected={(e, value: {suggestion: SearchResult}) => {
           this.add(value.suggestion)
           // e.preventDefault()
         }}
@@ -123,40 +134,34 @@ const autosuggest = {
 const renderInput = inputProps => {
   const {autoFocus, value, onChange, onAdd, onDelete, selected, ref, ...other} = inputProps
 
-  const names = selected.map((result: Key) => {
+  const names = selected.map((result: SearchResult) => {
     if (result.users && result.users.length > 0) {
       const user = result.users[0]
       return user.name + '@' + user.service
     } else {
-      return result.id
+      return result.kid
     }
   })
 
   return (
-    <Box display="flex" flexDirection="row" flex={1} style={{paddingLeft: 10}}>
-      <Box style={{paddingRight: 10, paddingTop: 8}}>
-        <Typography variant="body1">To</Typography>
-      </Box>
-      <Box display="flex" flexDirection="row" flex={1} style={{paddingTop: 2}}>
-        <ChipInput
-          clearInputValueOnChange
-          onUpdateInput={onChange}
-          onAdd={onAdd}
-          onDelete={onDelete}
-          value={names}
-          inputRef={ref}
-          {...other}
-        />
-      </Box>
+    <Box display="flex" flexDirection="row" flex={1} flexGrow={1} style={{paddingLeft: 10}}>
+      <ChipInput
+        placeholder="Recipients"
+        clearInputValueOnChange
+        onUpdateInput={onChange}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        value={names}
+        inputRef={ref}
+        fullWidth
+        {...other}
+      />
     </Box>
   )
 }
 
-const renderSuggestion = (result: Key, opts: {query: string, isHighlighted: boolean}) => {
-  // return (
-  //   <Row value={result.key || {kid: '', users: [], type: 'PUBLIC_KEY_TYPE'}} selected={opts.isHighlighted} />
-  // )
-  return null
+const renderSuggestion = (result: SearchResult, opts: {query: string, isHighlighted: boolean}) => {
+  return <Typography>{result.kid}</Typography>
 }
 
 const renderSuggestionsContainer = options => {
@@ -173,4 +178,8 @@ const getSuggestionValue = (result: Key) => {
   return result.id || ''
 }
 
-export default Recipients
+const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
+  return {}
+}
+
+export default connect<Props, {}, _, _, _, _>(mapStateToProps)(RecipientsView)
