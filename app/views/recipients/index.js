@@ -2,7 +2,9 @@
 import React, {Component} from 'react'
 
 import {Box, Button, Divider, MenuItem, Paper, Typography} from '@material-ui/core'
+
 import ChipInput from './chip-input'
+// import ChipInput from 'material-ui-chip-input'
 
 import Autosuggest from 'react-autosuggest'
 
@@ -144,19 +146,17 @@ const renderInput = inputProps => {
   })
 
   return (
-    <Box display="flex" flexDirection="row" flex={1} flexGrow={1} style={{paddingLeft: 10}}>
-      <ChipInput
-        placeholder="Recipients"
-        clearInputValueOnChange
-        onUpdateInput={onChange}
-        onAdd={onAdd}
-        onDelete={onDelete}
-        value={names}
-        inputRef={ref}
-        fullWidth
-        {...other}
-      />
-    </Box>
+    <ChipInput
+      placeholder="Recipients"
+      clearInputValueOnChange
+      onUpdateInput={onChange}
+      onAdd={onAdd}
+      onDelete={onDelete}
+      value={names}
+      inputRef={ref}
+      fullWidth
+      {...other}
+    />
   )
 }
 

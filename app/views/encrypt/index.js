@@ -87,7 +87,6 @@ class EncryptView extends Component<Props, State> {
         {!this.state.loading && <Divider style={{marginBottom: 3}} />}
         {this.state.loading && <LinearProgress />}
 
-        <Box style={{marginTop: -3}} />
         <RecipientsView />
 
         <Divider />

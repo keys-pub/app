@@ -13,7 +13,6 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import clsx from 'clsx'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 
 import {
@@ -60,7 +59,7 @@ class Nav extends Component<Props, State> {
     const navs = [
       {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
       {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
-      // {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
+      {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
     ]
 
     return (
