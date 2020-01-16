@@ -24,11 +24,10 @@ module.exports = api => {
         require('@babel/preset-env'),
         {
           targets: {electron: require('electron/package.json').version},
-          corejs: '3.1.3',
           useBuiltIns: 'usage',
         },
       ],
-      require('@babel/preset-flow'),
+      require('@babel/preset-typescript'),
       [require('@babel/preset-react'), {development}],
     ],
     plugins: [
@@ -55,8 +54,6 @@ module.exports = api => {
       require('@babel/plugin-syntax-import-meta'),
       [require('@babel/plugin-proposal-class-properties'), {loose: true}],
       require('@babel/plugin-proposal-json-strings'),
-
-      // require('babel-plugin-react-native-web'),
 
       ...(development ? developmentPlugins : productionPlugins),
     ],

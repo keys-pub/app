@@ -50,17 +50,8 @@ keysd -port=10002 -app=Keys2
 ### Debugging Prod Builds
 
 ```shell
-DEBUG_PROD=true yarn build && NODE_ENV=production ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron ./app/main.prod.js
+DEBUG_PROD=true yarn build && NODE_ENV=production ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron ./src/main/main.prod.js
 ```
-
-### Layout
-
-| Directory | Description                               |
-| --------- | ----------------------------------------- |
-| app       | Application code (for desktop & mobile)   |
-| app/views | Views (including their actions, reducers) |
-
-TODO: Directory descriptions
 
 ### Toggle Chrome DevTools
 

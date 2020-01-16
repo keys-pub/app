@@ -4,28 +4,31 @@
 
 import path from 'path'
 import webpack from 'webpack'
-import {dependencies as externals} from '../package.json'
+import {dependencies} from '../package.json'
 
 export default {
-  externals: [...Object.keys(externals || {})],
+  externals: [...Object.keys(dependencies || {})],
 
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.[jt]sx?$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
           },
-        },
+          'ts-loader',
+        ],
       },
     ],
   },
 
   output: {
-    path: path.join(__dirname, '..', 'app'),
+    path: path.join(__dirname, '..', 'src'),
     // https://github.com/webpack/webpack/issues/1114
     libraryTarget: 'commonjs2',
   },
@@ -34,7 +37,7 @@ export default {
    * Determine the array of extensions that should be used to resolve modules.
    */
   resolve: {
-    extensions: ['.js', '.jsx', '.json'],
+    extensions: ['.js', '.ts', '.tsx', '.json'],
   },
 
   plugins: [

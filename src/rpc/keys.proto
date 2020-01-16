@@ -1,0 +1,655 @@
+syntax = "proto3";
+
+package service;
+
+// Proto field names should be snake_case, but some plugins don't convert to 
+// camel like they should, so we use camelCase here.
+
+// gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
+import "gogoproto/gogo.proto";
+
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = true;
+option (gogoproto.goproto_enum_stringer_all) = true;
+
+// option (gogoproto.messagename_all) = true;
+// option (gogoproto.equal_all) = true;
+// option (gogoproto.verbose_equal_all) = true;
+// option (gogoproto.populate_all) = true;
+
+service Keys {  
+  rpc KeyGenerate(KeyGenerateRequest) returns (KeyGenerateResponse) {}
+  rpc Keys(KeysRequest) returns (KeysResponse) {}
+  rpc Key(KeyRequest) returns (KeyResponse) {}
+  rpc KeyImport(KeyImportRequest) returns (KeyImportResponse) {}
+  rpc KeyExport(KeyExportRequest) returns (KeyExportResponse) {}
+  rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
+
+  rpc Sign(SignRequest) returns (SignResponse) {}
+  rpc Verify(VerifyRequest) returns (VerifyResponse) {}
+  rpc SignStream(stream SignStreamInput) returns (stream SignStreamOutput) {}
+  rpc VerifyStream(stream VerifyStreamInput) returns (stream VerifyStreamOutput) {}  
+  rpc VerifyArmoredStream(stream VerifyStreamInput) returns (stream VerifyStreamOutput) {}  
+
+  rpc Encrypt(EncryptRequest) returns (EncryptResponse) {}
+  rpc Decrypt(DecryptRequest) returns (DecryptResponse) {}
+  rpc EncryptStream(stream EncryptStreamInput) returns (stream EncryptStreamOutput) {}
+  rpc DecryptStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}
+  rpc DecryptArmoredStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}  
+
+  rpc Sigchain(SigchainRequest) returns (SigchainResponse) {}
+  rpc Statement(StatementRequest) returns (StatementResponse) {}
+  rpc StatementCreate(StatementCreateRequest) returns (StatementCreateResponse) {}  
+  rpc StatementRevoke(StatementRevokeRequest) returns (StatementRevokeResponse) {}  
+
+  rpc UserService(UserServiceRequest) returns (UserServiceResponse) {}
+  rpc UserSign(UserSignRequest) returns (UserSignResponse) {}
+  rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}  
+  
+  rpc Item(ItemRequest) returns (ItemResponse) {}
+  rpc Items(ItemsRequest) returns (ItemsResponse) {}
+
+  rpc Search(SearchRequest) returns (SearchResponse) {}
+
+  rpc Pull(PullRequest) returns (PullResponse) {}
+  rpc Push(PushRequest) returns (PushResponse) {}
+  
+  rpc Config(ConfigRequest) returns (ConfigResponse) {}
+  rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
+  
+  // These requests do not need auth, since they are used to set or check auth.
+  // BEGIN NO AUTH
+  rpc AuthGenerate(AuthGenerateRequest) returns (AuthGenerateResponse) {}
+  rpc AuthSetup(AuthSetupRequest) returns (AuthSetupResponse) {}
+  rpc AuthUnlock(AuthUnlockRequest) returns (AuthUnlockResponse) {}
+  rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
+  rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
+  rpc Rand(RandRequest) returns (RandResponse) {}
+  // END NO AUTH
+  
+  rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
+  rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
+  rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
+
+  // Experimental
+  rpc Inbox(InboxRequest) returns (InboxResponse) {}
+  rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
+  rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
+  rpc Messages(MessagesRequest) returns (MessagesResponse) {}
+
+  rpc Watch(WatchRequest) returns (stream WatchEvent) {}
+}
+
+message SignRequest {
+  bytes data = 1;
+  // KID to sign with. Optional, if current key is set.
+  string kid = 2 [(gogoproto.customname) = "KID"];
+  // Armored, if true, output will be armored.
+  bool armored = 3;
+  // Detached, if true, output will be just the signature.
+  bool detached = 4;
+}
+message SignResponse {
+  // Data is signed output.
+  bytes data = 1;  
+   // KID to signed with.
+  string kid = 2 [(gogoproto.customname) = "KID"];
+}
+
+message VerifyRequest {
+  // Data is verified output.
+  bytes data = 1; 
+  // Armored, if true, output will be armored.
+  bool armored = 3;
+}
+message VerifyResponse {
+  bytes data = 1;
+  // KID of who signed.
+  string kid = 2 [(gogoproto.customname) = "KID"];  
+}
+
+message Statement {
+  // Sig is the signature bytes.
+  bytes sig = 1;
+  // Data that was signed.
+  bytes data = 2;
+  // KID is the key that signed.
+  string kid = 3 [(gogoproto.customname) = "KID"];
+  // Seq in a sigchain (1 is root).
+  int32 seq = 4;
+  // Prev is a hash of the previous item in the sigchain.
+  bytes prev = 5;
+  // Revoke refers to a previous signed seq to revoke.
+	int32 revoke = 6;
+  // Timestamp ...
+  int64 timestamp = 7;
+	// Type (optional).
+  string type = 8;  
+}
+
+message SigchainRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];  
+}
+message SigchainResponse {
+  Key key = 1;
+  repeated Statement statements = 2;
+}
+
+message StatementRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];  
+  int32 seq = 2;
+}
+message StatementResponse {
+  Statement statement = 1;
+}
+
+message StatementCreateRequest {
+  bytes data = 1;
+  // KID to sign with. Optional, if current key is set.
+  string kid = 2 [(gogoproto.customname) = "KID"];  
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
+}
+message StatementCreateResponse {
+  Statement statement = 1;
+}
+
+message StatementRevokeRequest {
+  // Seq to revoke.
+  int32 seq = 1;
+  // KID to sign with. Optional, if current key is set.
+  string kid = 2 [(gogoproto.customname) = "KID"];  
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
+}
+message StatementRevokeResponse {
+  Statement statement = 1;
+}
+
+message SignStreamInput {
+  bytes data = 1;
+  // KID to sign with. Optional, if current key is set.
+  string kid = 2 [(gogoproto.customname) = "KID"];
+  // Armored, if true, output will be armored.
+  bool armored = 3;
+  // Detached, if true, output will be just the signature.
+  bool detached = 4;
+}
+message SignStreamOutput {
+  // Data, signed.
+  bytes data = 1;
+  // KID of who signed.
+  string kid = 2 [(gogoproto.customname) = "KID"];  
+}
+
+message VerifyStreamInput {
+  // Data to verify.
+  bytes data = 1;  
+}
+message VerifyStreamOutput {
+  // Data, verified. If empty, is EOF.
+  bytes data = 1;
+  // KID, that signed the data.
+  string kid = 2 [(gogoproto.customname) = "KID"];
+}
+
+message EncryptRequest {
+  // Data to encrypt.
+  bytes data = 1; 
+  // Armored, if true will return armored string output.
+  bool armored = 2;
+  // Recipients to encrypt to (comma separated).
+  string recipients = 3;  
+  // Sender to sign as. Optional, if current key is set.
+  string sender = 4;  
+}
+message EncryptResponse {
+  bytes data = 1;
+}
+
+message DecryptRequest {
+  // Data to decrypt.
+  bytes data = 1;
+  // Armored, if true will return armored string output.
+  bool armored = 2;
+  
+}
+message DecryptResponse {
+  bytes data = 1;
+  string sender = 2;
+}
+
+message EncryptStreamInput {
+  // Data to encrypt. Send empty byte slice as last message.
+  bytes data = 1;
+  // Armored, if true will return armored string output.
+  bool armored = 2;
+  // Recipients to encrypt to (comma separated).
+  string recipients = 3;  
+  // Sender to sign as. Optional, if current key is set.
+  string sender = 4;  
+}
+
+message EncryptStreamOutput {
+  // Data, encrypted.
+  bytes data = 1;
+}
+
+message DecryptStreamInput {
+  // Data, encrypted.
+  bytes data = 1;  
+}
+message DecryptStreamOutput {
+  // Data, decrypted. If empty, is EOF.
+  bytes data = 1;
+  string sender = 2;
+}
+
+message RuntimeStatusRequest {}
+message RuntimeStatusResponse {
+  // Version of running service.
+  string version = 1;
+  // Exe is the service executable path.
+  string exe = 4;
+  // AuthSetupNeeded if auth needs to be setup.
+  bool authSetupNeeded = 5;
+}
+
+message AuthGenerateRequest {
+  // Password used to create a key.
+  string password = 1;  
+}
+message AuthGenerateResponse {
+  // KeyImport is an encrypted key backup.
+  string keyBackup = 1;  
+}
+
+message AuthSetupRequest {
+  // Password used to create or recover a key.
+  string password = 1;
+  // KeyImport is an encrypted key backup.
+  string keyBackup = 2;  
+  
+  string clientName = 6;
+}
+message AuthSetupResponse {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string authToken = 2;
+}
+
+message AuthUnlockRequest {
+  // Password.
+  string password = 1;
+  // Client (optional) name.
+  string client = 2;
+}
+message AuthUnlockResponse {
+  // AuthToken to use for requests.
+  string authToken = 1;
+}
+
+message AuthLockRequest {}
+message AuthLockResponse {}
+
+message KeyGenerateRequest {}
+message KeyGenerateResponse {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+}
+
+message UserServiceRequest {
+  // KID to use, or if empty the current key.
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  // Service such as twitter, github.
+  string service = 2;
+}
+message UserServiceResponse {
+  // Service such as twitter, github.
+  string service = 1;
+}
+
+message UserSignRequest {
+  // KID to use, or if empty the current key.
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  // Service such as twitter, github.
+  string service = 2;
+  // Name is username on the service.
+  string name = 3;
+}
+message UserSignResponse {
+  // Message is signed message.
+  string message = 1;
+  // Name in request.
+  string name = 2;
+}
+
+message UserAddRequest {
+  // KID to use, or if empty the current key.
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  // Service such as twitter, github.
+  string service = 2;
+  // Name is username on the service.
+  string name = 3; 
+  // URL is location of signed message on the service.
+  string url = 4 [(gogoproto.customname) = "URL"];
+
+  // LocalOnly, if true, won't save to the current key server.
+  bool localOnly = 5;
+}
+message UserAddResponse {
+  User user = 1;
+  Statement statement = 2;
+}
+
+
+enum ExportType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "ExportType";
+  
+  DEFAULT_EXPORT_TYPE = 0 [(gogoproto.enumvalue_customname) = "DefaultExportType"];
+  SALTPACK_PW_EXPORT_TYPE = 1 [(gogoproto.enumvalue_customname) = "SaltpackPwExportType"];
+}
+
+
+message KeyExportRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string password = 2;
+  ExportType type = 3;
+}
+message KeyExportResponse {
+  bytes export = 1;
+}
+
+message KeyImportRequest {
+  bytes in = 1;
+  string password = 2;  
+}
+message KeyImportResponse {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+}
+
+message KeyRemoveRequest {
+  // KID of key to remove.
+  string kid = 1 [(gogoproto.customname) = "KID"];
+}
+message KeyRemoveResponse {}
+
+enum KeyType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "KeyType";
+  
+  NO_KEY_TYPE = 0 [(gogoproto.enumvalue_customname) = "NoKeyType"];
+  PUBLIC_KEY_TYPE = 1 [(gogoproto.enumvalue_customname) = "PublicKeyType"];
+  PRIVATE_KEY_TYPE = 2 [(gogoproto.enumvalue_customname) = "PrivateKeyType"];  
+}
+
+message Key {
+  // ID identifier.
+  string id = 1 [(gogoproto.customname) = "ID"];
+  // Type of key.
+  KeyType type = 3;
+  // Users associated with this key.
+  repeated User users = 6;  
+  // Saved if saved locally.
+  bool saved = 10;
+}
+
+message KeyRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string user = 2;
+}
+
+message KeyResponse {
+  Key key = 1;
+}
+
+enum SortDirection {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "SortDirection";
+
+  ASC = 0  [(gogoproto.enumvalue_customname) = "SortAsc"];
+  DESC = 1 [(gogoproto.enumvalue_customname) = "SortDesc"];
+}
+
+message KeysRequest {
+  string query = 1;
+  string sortField = 10;
+  SortDirection sortDirection = 11;
+}
+message KeysResponse {
+  repeated Key keys = 1;
+  string sortField = 10;
+  SortDirection sortDirection = 11;
+}
+
+message ItemRequest {
+  string id = 1 [(gogoproto.customname) = "ID"];
+}
+message ItemResponse {
+  Item item = 1;
+}
+
+message ItemsRequest {
+  string query = 1;
+}
+message ItemsResponse {
+  repeated Item items = 1;
+}
+
+message Item {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string type = 2;
+}
+
+enum Encoding {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "Encoding";
+
+  HEX = 0  [(gogoproto.enumvalue_customname) = "Hex"];
+  BASE62 = 1 [(gogoproto.enumvalue_customname) = "Base62"];    
+  BASE58 = 2 [(gogoproto.enumvalue_customname) = "Base58"];    
+  BASE32 = 3 [(gogoproto.enumvalue_customname) = "Base32"];    
+  BASE16 = 4 [(gogoproto.enumvalue_customname) = "Base16"];    
+  BASE64 = 5 [(gogoproto.enumvalue_customname) = "Base64"];    
+  SALTPACK = 6 [(gogoproto.enumvalue_customname) = "Saltpack"];    
+  BIP39 = 7 [(gogoproto.enumvalue_customname) = "BIP39"];    
+}
+
+message RandRequest {
+  int32 length = 1;
+  Encoding encoding = 2;
+}
+message RandResponse {
+  string data = 1;
+}
+
+message PullRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string user = 2;
+}
+message PullResponse {
+  repeated string kids = 1 [(gogoproto.customname) = "KIDs"];
+}
+
+message PushRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+}
+message PushResponse {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  repeated string urls = 2 [(gogoproto.customname) = "URLs"];
+}
+
+message KeyShareRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string recipient = 2;
+}
+message KeyShareResponse {}
+
+message KeyRetrieveRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string recipient = 2;
+}
+message KeyRetrieveResponse {}
+
+message Collection {
+  string path = 1;
+}
+
+message CollectionsRequest {
+  string path = 1;
+}
+message CollectionsResponse {
+  repeated Collection collections = 1;
+}
+
+message Document {
+  string path = 1;
+  string value = 2;
+  int64 createdAt = 10;
+  int64 updatedAt = 11;
+}
+
+message DocumentsRequest {
+  string path = 1;
+  string prefix = 2;
+}
+message DocumentsResponse {
+  repeated Document documents = 1;
+}
+
+message DocumentDeleteRequest {
+  string path = 1;
+}
+message DocumentDeleteResponse {}
+
+enum UserStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "UserStatus";
+
+  UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
+  OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
+  RESOURCE_NOT_FOUND = 2 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
+  CONTENT_NOT_FOUND = 3 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
+  CONN_FAILURE = 4 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
+  FAILURE = 5 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
+}
+
+message User {  
+  string name = 1;
+  string kid = 2 [(gogoproto.customname) = "KID"];
+  int32 seq = 3;
+  string service = 4;  
+  string url = 5 [(gogoproto.customname) = "URL"];
+  
+  UserStatus status = 6;
+  int64 verifiedAt = 7;
+  string err = 8;
+}
+
+message SearchResult {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  repeated User users = 2;  
+}
+
+message SearchRequest {
+  string query = 1;  
+  int32 limit = 3;
+}
+message SearchResponse {
+  repeated SearchResult results = 1;  
+}
+
+message WatchRequest {}
+
+enum WatchStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "WatchStatus";
+
+  NO_STATUS = 0 [(gogoproto.enumvalue_customname) = "WatchStatusNone"];
+  OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
+  DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
+  STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
+  DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
+}
+
+message WatchEvent {  
+  WatchStatus status = 1;  
+  string path = 2;
+}
+
+message ConfigRequest {}
+message ConfigResponse {
+  map<string, string> config = 1;
+}
+
+message ConfigSetRequest {
+  string key = 1;
+  string value = 2;
+}
+message ConfigSetResponse {}
+
+message Inbox {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string name = 2;
+  int64 createdAt = 3;
+  int32 messageCount = 4;
+  string snippet = 5;
+  string error = 10;
+}
+message InboxRequest {}
+message InboxResponse {
+  repeated Inbox inboxes = 1;
+}
+
+message Message {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string sender = 2;
+  MessageContent content = 10;
+    
+  repeated User users = 20;
+  int64 createdAt = 21;
+
+  string timeDisplay = 31;
+  string dateDisplay = 32;  
+  string path = 33;
+}
+
+message MessageContent {
+  string text = 1;
+}
+
+message MessagePrepareRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string sender = 2;
+  string text = 10;
+}
+
+message MessagePrepareResponse {
+  Message message = 1;
+}
+
+message MessageCreateRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  string sender = 2;
+
+  // ID is usually from MessagePrepareResponse.ID, or auto generated if empty
+  string id = 10 [(gogoproto.customname) = "ID"];
+  string text = 11;
+}
+
+message MessageCreateResponse {
+  Message message = 1;
+}
+
+message MessagesRequest {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+}
+
+message MessagesResponse {
+  repeated Message messages = 1;
+}

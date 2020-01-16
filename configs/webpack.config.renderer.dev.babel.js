@@ -51,7 +51,7 @@ export default merge.smart(baseConfig, {
     ...(process.env.PLAIN_HMR ? [] : ['react-hot-loader/patch']),
     `webpack-dev-server/client?http://localhost:${port}/`,
     'webpack/hot/only-dev-server',
-    require.resolve('../app/index'),
+    require.resolve('../src/index.tsx'),
   ],
 
   output: {
@@ -61,16 +61,6 @@ export default merge.smart(baseConfig, {
 
   module: {
     rules: [
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
-        },
-      },
       {
         test: /\.global\.css$/,
         use: [
@@ -216,9 +206,9 @@ export default merge.smart(baseConfig, {
           sourceType: 'var',
         }),
 
-    // new webpack.HotModuleReplacementPlugin({
-    //   multiStep: false,
-    // }),
+    new webpack.HotModuleReplacementPlugin({
+      multiStep: true,
+    }),
 
     new webpack.NoEmitOnErrorsPlugin(),
 

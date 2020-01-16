@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "baseUrl": "./",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "jsx": "react",
+    "module": "es2015",
+    "moduleResolution": "node",
+    // "noUnusedLocals": true,
+    "pretty": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "lib": ["es2015", "dom"]
+  },
+  "exclude": ["node_modules", "**/node_modules/*"]
+}
