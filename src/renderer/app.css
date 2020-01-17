@@ -7,6 +7,11 @@
 @import '~typeface-roboto-mono/index.css';
 @import '~typeface-open-sans/index.css';
 
+body {
+  margin: 0;
+  -webkit-app-region: drag;
+}
+
 #root {
   background-color: white;
   display: 'flex';
