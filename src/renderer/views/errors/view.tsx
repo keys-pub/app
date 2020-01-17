@@ -14,7 +14,12 @@ export default (props: Props) => {
     <Box style={{width: '100%'}}>
       <Typography
         variant="h5"
-        style={{paddingBottom: 10, fontFamily: 'Roboto Mono', textAlign: 'center'}}
+        style={{
+          paddingTop: 40,
+          paddingBottom: 40,
+          fontFamily: 'Roboto Mono',
+          textAlign: 'center',
+        }}
         color="secondary"
       >
         Ah shucks! Something isn't working right.
