@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "baseUrl": "./",
-    "rootDir": "./",
-    "outDir": "./dist",
+    "module": "commonjs",
+    "lib": ["dom", "es2015", "es2016", "es2017"],
+    "allowJs": true,
     "jsx": "react",
-    "module": "es2015",
-    "moduleResolution": "node",
-    // "noUnusedLocals": true,
-    "pretty": true,
     "sourceMap": true,
-    "resolveJsonModule": true,
-    "lib": ["es2015", "dom"]
+    "outDir": "./dist"
+    // "strict": true
   },
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "include": ["./src"]
 }

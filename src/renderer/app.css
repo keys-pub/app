@@ -1,0 +1,19 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+@import '~typeface-roboto/index.css';
+@import '~typeface-roboto-mono/index.css';
+@import '~typeface-open-sans/index.css';
+
+#root {
+  background-color: white;
+  display: 'flex';
+  flex: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
