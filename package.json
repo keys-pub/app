@@ -148,6 +148,7 @@
     "@grpc/proto-loader": "^0.5.2",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
+    "@material-ui/lab": "^4.0.0-alpha.39",
     "@material-ui/styles": "^4.3.0",
     "connected-react-router": "^6.0.0",
     "electron-window-state": "^5.0.3",
