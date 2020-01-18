@@ -9,6 +9,9 @@
 
 body {
   margin: 0;
+}
+
+.header {
   -webkit-app-region: drag;
 }
 

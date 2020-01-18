@@ -52,8 +52,8 @@ class RecipientsView extends React.Component<Props, State> {
     const {open, loading, options} = this.state
     return (
       <Autocomplete
-        style={{width: 300}}
         open={open}
+        multiple
         onOpen={() => {
           this.setState({open: true})
         }}
@@ -68,9 +68,8 @@ class RecipientsView extends React.Component<Props, State> {
         renderInput={params => (
           <TextField
             {...params}
-            label="Asynchronous"
+            label="Recipients"
             fullWidth
-            variant="outlined"
             InputProps={{
               ...params.InputProps,
               // endAdornment: (

@@ -16,15 +16,17 @@ export default (props: Props) => {
   const backgroundColor = dark ? '#2f2f2f' : ''
 
   return (
-    <Box display="flex" flexDirection="column" style={{backgroundColor}}>
-      <Box display="flex" flexDirection="row">
-        <IconButton
-          onClick={props.goBack}
-          style={{marginTop: -6, marginBottom: -2, marginLeft: -4, height: 41, color}}
-        >
-          <ChevronLeft />
-        </IconButton>
+    <div className="header">
+      <Box display="flex" flexDirection="column" style={{backgroundColor}}>
+        <Box display="flex" flexDirection="row">
+          <IconButton
+            onClick={props.goBack}
+            style={{marginTop: -6, marginBottom: -2, marginLeft: -4, height: 41, color}}
+          >
+            <ChevronLeft />
+          </IconButton>
+        </Box>
       </Box>
-    </Box>
+    </div>
   )
 }

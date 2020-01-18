@@ -1,11 +1,15 @@
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import {createHashHistory} from 'history'
-import {push, routerActions, routerMiddleware} from 'connected-react-router'
+import {routerMiddleware} from 'connected-react-router'
 import {createLogger} from 'redux-logger'
 import createRootReducer from '../reducers'
 
-import * as electron from 'electron'
+import {ipcRenderer, remote} from 'electron'
+
+import {initializeClient} from '../rpc/client'
+
+import {init} from '../views/state'
 
 const history = createHashHistory()
 const rootReducer = createRootReducer(history)
@@ -34,48 +38,63 @@ const configureStore = (initialState?: any) => {
   // Create Store
   const store = createStore(rootReducer, initialState, applyMiddleware(...middleware))
 
-  // if (module.hot) {
-  //   module.hot.accept('../reducers', () => store.replaceReducer(require('../reducers').default)) // eslint-disable-line global-require
-  // }
-
-  electron.ipcRenderer.on('preferences', (event, message) => {
-    // TODO: Show preferences
-    // store.dispatch(push('/prefs/index'))
-  })
-
-  electron.ipcRenderer.on('focus', (event, message) => {
-    // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
-  })
-
-  electron.ipcRenderer.on('blur', (event, message) => {
-    // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: false}})
-  })
-
-  electron.ipcRenderer.on('unresponsive', (event, message) => {
-    store.dispatch({
-      type: 'WINDOW_UNRESPONSIVE',
-      payload: {
-        unresponsive: true,
-      },
-    })
-  })
-
-  electron.ipcRenderer.on('responsive', (event, message) => {
-    store.dispatch({
-      type: 'WINDOW_UNRESPONSIVE',
-      payload: {
-        unresponsive: false,
-      },
-    })
-  })
-
-  // ipcRenderer.on('start', (event, message) => {
-  //   console.log('App start')
-  //   store.dispatch(init())
-  // })
-
   return store
 }
 
-export {history}
-export {configureStore}
+const store = configureStore()
+
+if (typeof module.hot !== 'undefined') {
+  module.hot.accept('../reducers', () => store.replaceReducer(require('../reducers').default))
+}
+
+ipcRenderer.on('preferences', (event, message) => {
+  // TODO: Show preferences
+  // store.dispatch(push('/prefs/index'))
+})
+
+ipcRenderer.on('focus', (event, message) => {
+  // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
+})
+
+ipcRenderer.on('blur', (event, message) => {
+  // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: false}})
+})
+
+ipcRenderer.on('unresponsive', (event, message) => {
+  store.dispatch({
+    type: 'WINDOW_UNRESPONSIVE',
+    payload: {
+      unresponsive: true,
+    },
+  })
+})
+
+ipcRenderer.on('responsive', (event, message) => {
+  store.dispatch({
+    type: 'WINDOW_UNRESPONSIVE',
+    payload: {
+      unresponsive: false,
+    },
+  })
+})
+
+// Load credentials
+ipcRenderer.on('credentials-loaded', (event, creds, protoPath) => {
+  try {
+    initializeClient(creds.certPath, creds.authToken, protoPath)
+    setTimeout(() => {
+      store.dispatch(init())
+    }, 0)
+  } catch (err) {
+    alert('Error initializing client ' + err)
+    remote.app.exit(3)
+  }
+})
+ipcRenderer.send('credentials-load')
+
+// ipcRenderer.on('start', (event, message) => {
+//   console.log('App start')
+//   store.dispatch(init())
+// })
+
+export {history, store}

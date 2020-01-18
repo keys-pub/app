@@ -2,9 +2,7 @@ import {WatchStatus} from '../rpc/types'
 
 export type AppState = {
   appFocused: boolean
-  error: Error
-  promptPublish: boolean
-  promptUser: boolean
+  error: Error | void
   selectedInbox: string
   unlocked: boolean
   watchStatus: WatchStatus
@@ -13,8 +11,6 @@ export type AppState = {
 const initialState: AppState = {
   appFocused: false,
   error: null,
-  promptPublish: true,
-  promptUser: true,
   selectedInbox: '',
   unlocked: null,
   watchStatus: WatchStatus.NO_STATUS,
@@ -64,11 +60,6 @@ export default function reducer(state: AppState = initialState, action: actionTy
       return {
         ...state,
         unlocked: false,
-      }
-    case 'PROMPT_USER':
-      return {
-        ...state,
-        promptUser: action.payload,
       }
     case 'SELECT_INBOX':
       return {

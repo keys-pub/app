@@ -6,14 +6,12 @@ import ErrorView from './view'
 
 type Props = {
   error: Error | void
-  children: any
   clearError: () => void
   restart: () => void
 }
 
 export default class ErrorsView extends React.Component<Props> {
   render() {
-    if (!this.props.error) return this.props.children
     return (
       <Box
         display="flex"

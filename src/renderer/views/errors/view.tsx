@@ -15,8 +15,8 @@ export default (props: Props) => {
       <Typography
         variant="h5"
         style={{
-          paddingTop: 40,
-          paddingBottom: 40,
+          marginTop: 40,
+          paddingBottom: 20,
           fontFamily: 'Roboto Mono',
           textAlign: 'center',
         }}
@@ -27,7 +27,7 @@ export default (props: Props) => {
       <Typography
         style={{
           fontFamily: 'Roboto Mono',
-          marginBottom: 20,
+          marginBottom: 40,
           height: 400,
           whiteSpace: 'pre-wrap',
           overflow: 'auto',
