@@ -24,6 +24,7 @@ module.exports = merge.smart(baseConfig, {
             '@babel/preset-typescript',
             '@babel/preset-react',
           ],
+          // 'react-hot-loader/babel'
           plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]],
         },
       },
@@ -106,6 +107,7 @@ module.exports = merge.smart(baseConfig, {
         enforce: 'pre',
         test: /\.js$/,
         loader: 'source-map-loader',
+        exclude: [/node_modules\/@grpc\/proto-loader/],
       },
     ],
   },
