@@ -4,7 +4,7 @@ import * as React from 'react'
 import Root from './views/root'
 
 const Application = () => (
-  <div style={{display: 'flex', flex: 1, height: '100%'}}>
+  <div style={{display: 'flex', flexDirection: 'column', flex: 1, height: '100%'}}>
     <Root />
   </div>
 )
