@@ -9,7 +9,8 @@ type Props = {
 
 export default (props: Props) => {
   return (
-    <Box display="flex" flexDirection="column" style={{paddingBottom: 20, paddingTop: 40, width: '100%'}}>
+    <Box display="flex" flexDirection="column" style={{paddingBottom: 20, width: '100%'}}>
+      <Box className="drag" style={{height: 40}} />
       <Box display="flex" flexDirection="row" style={{alignSelf: 'center'}}>
         <Typography style={{fontSize: 48, fontWeight: 800, color: '#2196f3'}}>keys</Typography>
         {/*<Typography style={{fontSize: 48, fontWeight: 800, color: 'white'}}>.</Typography>
