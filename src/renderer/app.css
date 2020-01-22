@@ -11,14 +11,12 @@ body {
   margin: 0;
 }
 
-.header {
+.drag {
   -webkit-app-region: drag;
 }
 
 #root {
   background-color: white;
-  display: 'flex';
-  flex: 1;
   position: absolute;
   top: 0;
   bottom: 0;
