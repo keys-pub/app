@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '.'
 
 type Action = {
   action: any
@@ -38,30 +38,42 @@ export default class Step extends React.Component<Props> {
     const title = this.props.title || ''
     const style = this.props.style || {}
     return (
-      <Box display="flex" flexGrow={1} flexDirection="column" style={{marginLeft: 10, marginRight: 10}}>
-        <Box style={{marginLeft: -10, marginRight: -10}}>
+      <Box display="flex" flexGrow={1} flexDirection="column" style={{marginLeft: 20, marginRight: 10}}>
+        <Box style={{marginLeft: -20, marginRight: -10}}>
           {!loading && <Divider style={{marginBottom: 3}} />}
           {loading && <LinearProgress />}
         </Box>
+
+        {title !== '' && (
+          <Box
+            display="flex"
+            flexDirection="column"
+            style={{
+              paddingTop: 4,
+              paddingBottom: 8,
+            }}
+          >
+            <Box>
+              <Typography
+                style={{
+                  fontSize: 24,
+                  fontWeight: 500,
+                }}
+              >
+                {title}
+              </Typography>
+            </Box>
+          </Box>
+        )}
 
         <Box
           display="flex"
           flexDirection="column"
           style={{
-            width: '100%',
-            maxWidth: 600,
-            alignSelf: 'center',
             ...style,
           }}
         >
-          <Box style={{paddingTop: 20, paddingLeft: 20, paddingRight: 20}}>
-            {title !== '' && (
-              <Typography variant="h5" style={{paddingBottom: 10, marginTop: 10}}>
-                {title}
-              </Typography>
-            )}
-            {this.props.children}
-          </Box>
+          <Box>{this.props.children}</Box>
         </Box>
 
         {hasButtons && (
@@ -69,10 +81,8 @@ export default class Step extends React.Component<Props> {
             display="flex"
             flexDirection="row"
             style={{
-              height: 50,
               paddingLeft: 20,
               paddingRight: 20,
-              alignSelf: 'center',
               paddingBottom: 20,
             }}
           >

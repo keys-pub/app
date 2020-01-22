@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, Typography} from '@material-ui/core'
-import {styles} from '../components'
+import {styles} from '.'
 
 import {AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List} from 'react-virtualized'
 

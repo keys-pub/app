@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Step} from '../components'
+import {Step} from '../../components'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'

@@ -15,7 +15,7 @@ import {
   Box,
 } from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import RecipientsView from '../recipients'
 

@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 import {NamesView} from '../user/views'
 import {IDView} from '../key/view'
 

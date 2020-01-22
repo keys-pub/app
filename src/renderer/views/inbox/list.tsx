@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Avatar, Box, CircularProgress, Typography} from '@material-ui/core'
 
-import RList from '../components/list'
+import RList from '../../components/list'
 
 import Row from './row'
 import {connect} from 'react-redux'

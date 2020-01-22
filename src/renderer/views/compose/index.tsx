@@ -7,7 +7,7 @@ import {Button, Divider, LinearProgress, MenuItem, Paper, Typography, Box} from 
 
 import Recipients from '../recipients'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
 import {UserSearchResult, UserSearchResponse} from '../../rpc/types'

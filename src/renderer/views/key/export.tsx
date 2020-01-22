@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, Step} from '../components'
+import {styles, Step} from '../../components'
 
 import {keyExport} from '../../rpc/rpc'
 import {goBack, push} from 'connected-react-router'

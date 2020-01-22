@@ -4,7 +4,7 @@ import {Box, CircularProgress} from '@material-ui/core'
 
 import MessageView from './message'
 
-import RList from '../components/list'
+import RList from '../../components/list'
 
 import {messages} from '../../rpc/rpc'
 

@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 import {Statement} from '../../rpc/types'
 
 type Props = {

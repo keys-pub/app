@@ -15,7 +15,7 @@ import {
 import * as electron from 'electron'
 import * as queryString from 'query-string'
 
-import {styles, Link} from '../components'
+import {styles, Link} from '../../components'
 import {NameView} from '../user/views'
 
 import {connect} from 'react-redux'

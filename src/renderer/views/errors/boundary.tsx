@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box} from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import ErrorView from './view'
 

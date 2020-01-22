@@ -20,7 +20,7 @@ import {push} from 'connected-react-router'
 import {IDView, KeyDescriptionView} from '../key/view'
 
 import {NamesView} from '../user/views'
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
 import {userSearch, RPCError, RPCState} from '../../rpc/rpc'

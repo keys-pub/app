@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
-import Step from '../components/step'
+import Step from '../../components/step'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'

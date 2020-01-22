@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Switch, Route} from 'react-router'
 
-import {Splash} from './components'
+import {Splash} from '../components'
 
 import AuthView from './auth'
 import AuthIntroView from './auth/intro'

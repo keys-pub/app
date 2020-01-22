@@ -14,7 +14,7 @@ import {
 import {keyRemove} from '../../rpc/rpc'
 import {selectedKID} from '../state'
 
-import {Step} from '../components'
+import {Step} from '../../components'
 
 import {goBack} from 'connected-react-router'
 import {connect} from 'react-redux'

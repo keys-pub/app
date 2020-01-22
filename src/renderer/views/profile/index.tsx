@@ -19,7 +19,7 @@ import {push} from 'connected-react-router'
 
 import {selectedKID} from '../state'
 
-import {styles, Link} from '../components'
+import {styles, Link} from '../../components'
 import {NameView} from '../user/views'
 import UserRevokeDialog from '../user/revoke'
 

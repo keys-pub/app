@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {selectedInbox} from './actions'
-import {Step} from '../components'
+import {Step} from '../../components'
 
 import {push, goBack} from 'connected-react-router'
 import {connect} from 'react-redux'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import {Box, Button, CircularProgress, Divider, Input} from '@material-ui/core'
 

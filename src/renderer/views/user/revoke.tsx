@@ -16,7 +16,7 @@ import {
 
 import * as electron from 'electron'
 
-import {styles, Link} from '../components'
+import {styles, Link} from '../../components'
 
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'

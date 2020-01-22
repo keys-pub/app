@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import {Avatar, Box, Button, Divider, Typography} from '@material-ui/core'
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import {Message, User} from '../../rpc/types'
 import {MessageRow} from './types'

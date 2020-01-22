@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Button, IconButton, Menu, MenuItem, Typography} from '@material-ui/core'
 import {Add, Settings} from '@material-ui/icons'
 
-import {UserButton} from '../components'
+import {UserButton} from '../../components'
 
 import {connect} from 'react-redux'
 

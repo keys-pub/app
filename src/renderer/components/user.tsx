@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import {Box, Button, Typography} from '@material-ui/core'
 
-import {styles} from '../components'
+import {styles} from '.'
 
-import {User} from '../../rpc/types'
+import {User} from '../rpc/types'
 
 type ButtonProps = {
   user: User

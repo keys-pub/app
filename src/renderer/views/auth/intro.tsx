@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, Link, Step} from '../components'
+import {styles, Link, Step} from '../../components'
 
 import Header from './header'
 import AuthSetup from './setup'

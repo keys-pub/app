@@ -18,7 +18,7 @@ import {CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, CheckBox as CheckBoxIc
 
 import * as electron from 'electron'
 
-import {styles, Link, Step} from '../components'
+import {styles, Link, Step} from '../../components'
 
 import {connect} from 'react-redux'
 import {goBack, go} from 'connected-react-router'

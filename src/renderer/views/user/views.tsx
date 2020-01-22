@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
-import styles, {serviceColor} from '../components/styles'
+import styles, {serviceColor} from '../../components/styles'
 
 import {User} from '../../rpc/types'
 

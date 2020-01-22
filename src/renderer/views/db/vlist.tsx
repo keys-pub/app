@@ -5,7 +5,7 @@ import {Box, Divider, Typography} from '@material-ui/core'
 // $FlowFixMe
 import {AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List} from 'react-virtualized'
 
-import {styles} from '../components'
+import {styles} from '../../components'
 
 import {documents, RPCState} from '../../rpc/rpc'
 import {Document, DocumentsRequest, DocumentsResponse} from '../../rpc/types'

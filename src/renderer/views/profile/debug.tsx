@@ -8,7 +8,7 @@ import {push, goBack} from 'connected-react-router'
 
 import {routes} from '../routes'
 
-import {styles, Link} from '../components'
+import {styles, Link} from '../../components'
 
 import {RPCState} from '../../rpc/rpc'
 

@@ -3,7 +3,7 @@ import * as React from 'react'
 import * as electron from 'electron'
 
 import {Box, Button, Divider, Input, InputLabel, FormControl, Typography} from '@material-ui/core'
-import {Splash, Step, Link} from '../components'
+import {Splash, Step, Link} from '../../components'
 
 import {keyGenerate} from '../../rpc/rpc'
 
