@@ -11,7 +11,8 @@ import {push} from 'connected-react-router'
 
 import {client} from '../../rpc/client'
 
-import {AuthSetupRequest, AuthSetupResponse, RPCError} from '../../rpc/rpc'
+import {RPCError} from '../../rpc/rpc'
+import {AuthSetupRequest, AuthSetupResponse} from '../../rpc/types'
 
 type Props = {
   cancel?: () => any
@@ -132,7 +133,7 @@ class AuthRecoverView extends React.Component<Props, State> {
     const req: AuthSetupRequest = {
       password: this.state.password,
       keyBackup: this.state.keyBackup,
-      clientName: 'app',
+      client: 'app',
     }
 
     console.log('Auth setup')

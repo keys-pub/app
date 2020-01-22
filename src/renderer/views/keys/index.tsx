@@ -16,7 +16,7 @@ import {
 
 import {styles} from '../components'
 import {NamesView} from '../user/views'
-import {IDView, KeyTypeView} from '../key/view'
+import {IDView} from '../key/view'
 
 import {keys} from '../../rpc/rpc'
 
@@ -24,9 +24,9 @@ import {push} from 'connected-react-router'
 
 import {connect} from 'react-redux'
 
-import {Request, Response} from '../components/vlist'
 import {Key, SortDirection} from '../../rpc/types'
-import {KeysRequest, KeysResponse, RPCError, RPCState} from '../../rpc/rpc'
+import {RPCError, RPCState} from '../../rpc/rpc'
+import {KeysRequest, KeysResponse} from '../../rpc/types'
 
 type Props = {
   keys: Array<Key>
@@ -97,14 +97,13 @@ class KeysView extends React.Component<Props> {
           </TableHead>
           <TableBody>
             {this.props.keys.map((key, index) => {
-              const isPrivate = key.type === 'PRIVATE_KEY_TYPE'
               return (
                 <TableRow hover onClick={event => this.select(key)} key={key.id} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">
                     <NamesView users={key.users || []} />
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView id={key.id} owner={key.type === 'PRIVATE_KEY_TYPE'} />
+                    <IDView id={key.id} owner={key.isPrivate} />
                   </TableCell>
                 </TableRow>
               )

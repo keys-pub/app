@@ -14,20 +14,16 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {search} from '../../rpc/rpc'
-
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
-import KeyDialog from '../key/dialog'
-import {IDView, KeyTypeView} from '../key/view'
+import {IDView, KeyDescriptionView} from '../key/view'
 
 import {NamesView} from '../user/views'
 import {styles} from '../components'
-import {keyEmpty} from '../state'
 
-import {Key, SearchResult, User} from '../../rpc/types'
-import {SearchRequest, SearchResponse, RPCError, RPCState} from '../../rpc/rpc'
+import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
+import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
 
 type Props = {
   dispatch: (action: any) => any
@@ -35,7 +31,7 @@ type Props = {
 
 type State = {
   input: string
-  results: Array<SearchResult>
+  results: Array<UserSearchResult>
   loading: boolean
   query: string
   error: string
@@ -56,11 +52,11 @@ class SearchView extends React.Component<Props, State> {
 
   search = (query: string) => {
     this.setState({loading: true, error: ''})
-    const req: SearchRequest = {query: query, limit: 0}
+    const req: UserSearchRequest = {query: query, limit: 0}
     this.props.dispatch(
-      search(
+      userSearch(
         req,
-        (resp: SearchResponse) => {
+        (resp: UserSearchResponse) => {
           if (this.state.input === query) {
             this.setState({
               loading: false,
@@ -84,7 +80,7 @@ class SearchView extends React.Component<Props, State> {
     this.search(target.value)
   }
 
-  select = (result: SearchResult) => {
+  select = (result: UserSearchResult) => {
     // this.setState({dialogOpen: true, key: key})
     this.props.dispatch(push('/key/index?kid=' + result.kid))
   }
@@ -122,7 +118,7 @@ class SearchView extends React.Component<Props, State> {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.results.map((result: SearchResult, index: number): any => (
+              {this.state.results.map((result: UserSearchResult, index: number): any => (
                 <TableRow hover onClick={event => this.select(result)} key={result.kid}>
                   <TableCell component="th" scope="row">
                     <NamesView users={result.users || []} />

@@ -1,31 +1,17 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  IconButton,
-  Input,
-  InputLabel,
-  InputAdornment,
-  FormControl,
-  FormHelperText,
-  Snackbar,
-  SnackbarContent,
-  TextField,
-  Typography,
-} from '@material-ui/core'
-
-import {styles, Link, Step} from '../components'
+import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
 import Header from './header'
 
 import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
+import {push} from 'connected-react-router'
 import {client} from '../../rpc/client'
 
 import * as electron from 'electron'
 
-import {authUnlock, AuthUnlockRequest, AuthUnlockResponse, RPCError} from '../../rpc/rpc'
+import {RPCError} from '../../rpc/rpc'
+import {AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
 
 type Props = {
   dispatch: (action: any) => any

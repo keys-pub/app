@@ -1,22 +1,6 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  IconButton,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  Snackbar,
-  SnackbarContent,
-  TextField,
-  Typography,
-} from '@material-ui/core'
-
-import * as electron from 'electron'
-
-import {styles, Link} from '../components'
+import {FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
 import Step from '../components/step'
 
@@ -24,22 +8,11 @@ import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
 import {selectedKID} from '../state'
-import {serviceName} from '../helper'
 
-import {configSet, keyGenerate, userAdd, userSign} from '../../rpc/rpc'
+import {userSign} from '../../rpc/rpc'
 
-import {
-  ConfigSetRequest,
-  ConfigSetResponse,
-  UserSignRequest,
-  UserSignResponse,
-  UserAddRequest,
-  UserAddResponse,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
-import {AppState} from '../../reducers/app'
-import {Key, User} from '../../rpc/types'
+import {RPCError, RPCState} from '../../rpc/rpc'
+import {UserSignRequest, UserSignResponse} from '../../rpc/types'
 
 type Props = {
   kid: string

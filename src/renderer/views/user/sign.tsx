@@ -26,15 +26,9 @@ import {goBack, go} from 'connected-react-router'
 import {selectedKID} from '../state'
 import {serviceName} from '../helper'
 
-import {
-  configSet,
-  userAdd,
-  userSign,
-  UserAddRequest,
-  UserAddResponse,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
+import {userAdd, RPCError, RPCState} from '../../rpc/rpc'
+
+import {UserAddRequest, UserAddResponse} from '../../rpc/types'
 
 type Props = {
   kid: string

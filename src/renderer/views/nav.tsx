@@ -55,13 +55,13 @@ class Nav extends React.Component<Props, State> {
     console.log('Drawer open:', open)
     const width = open ? 140 : 68
     const drawerStyles: CSSProperties = open
-      ? {width, border: 0}
-      : {width, border: 0, flexShrink: 0, overflowX: 'hidden'}
+      ? {width, border: 0, height: '100%'}
+      : {width, border: 0, height: '100%', flexShrink: 0, overflowX: 'hidden'}
 
     const navs = [
       {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
       {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
-      {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
+      {name: 'EDSV', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
     ]
 
     return (

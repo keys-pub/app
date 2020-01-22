@@ -52,7 +52,7 @@ class Lock extends React.Component<Props> {
             <Nav />
           </Box>
         )}
-        <Box display="flex" flexGrow={1} flexDirection="column">
+        <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
           {!hideNav && <AppHeader goBack={this.back} />}
           <Routes />
         </Box>
@@ -71,9 +71,7 @@ class Lock extends React.Component<Props> {
       return <Auth />
     }
 
-    if (this.props.unlocked) {
-      return this.renderApp()
-    }
+    return this.renderApp()
   }
 }
 

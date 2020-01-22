@@ -14,13 +14,13 @@ import {
 import {keyRemove} from '../../rpc/rpc'
 import {selectedKID} from '../state'
 
-import {styles, Step} from '../components'
+import {Step} from '../components'
 
-import {push, goBack} from 'connected-react-router'
+import {goBack} from 'connected-react-router'
 import {connect} from 'react-redux'
 
-import {Key} from '../../rpc/types'
-import {KeyRemoveRequest, KeyRemoveResponse, RPCError, RPCState} from '../../rpc/rpc'
+import {RPCError, RPCState} from '../../rpc/rpc'
+import {KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
 
 type Props = {
   kid: string

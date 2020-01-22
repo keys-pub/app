@@ -14,15 +14,14 @@ import {connect} from 'react-redux'
 
 import {Inbox, Message} from '../../rpc/types'
 
+import {RPCError} from '../../rpc/rpc'
+
 import {
   MessageCreateRequest,
   MessageCreateResponse,
   MessagePrepareRequest,
   MessagePrepareResponse,
-  RPCError,
-} from '../../rpc/rpc'
-
-import {MessageRow} from './types'
+} from '../../rpc/types'
 
 type Props = {
   inbox: Inbox

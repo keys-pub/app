@@ -1,6 +1,6 @@
 import emoji from 'node-emoji'
 
-import {KeyType} from '../rpc/types'
+import {Key, KeyType} from '../rpc/types'
 
 export const serviceName = (service: string): string => {
   let serviceName = '?'
@@ -15,23 +15,23 @@ export const serviceName = (service: string): string => {
   return serviceName
 }
 
-export const keyTypeString = (type: KeyType): string => {
-  const s = keyTypeSymbol(type)
-  switch (type || '') {
-    case 'PUBLIC_KEY_TYPE':
-      return s + ' Public Key'
-    case 'PRIVATE_KEY_TYPE':
-      return s + 'Private Key'
+export const keyDescription = (key: Key): string => {
+  const s = keySymbol(key)
+  switch (key.type) {
+    case KeyType.CURVE25519:
+      return s + ' Curve25519'
+    case KeyType.ED25519:
+      return s + ' Ed25519'
     default:
-      return ''
+      return s
   }
 }
 
-export const keyTypeSymbol = (type: KeyType): string => {
-  switch (type) {
-    case 'PRIVATE_KEY_TYPE':
+export const keySymbol = (key: Key): string => {
+  switch (key.type) {
+    case KeyType.CURVE25519:
       return emoji.get('key')
-    case 'PUBLIC_KEY_TYPE':
+    case KeyType.ED25519:
       return emoji.get('lower_left_fountain_pen')
   }
   return emoji.get('question')

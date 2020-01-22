@@ -15,35 +15,27 @@ import {
 import {connect} from 'react-redux'
 import * as electron from 'electron'
 
-import {push, goBack} from 'connected-react-router'
-import {keyEmpty} from '../state'
+import {push} from 'connected-react-router'
 
-import {routes} from '../routes'
 import {selectedKID} from '../state'
-
-import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
 
 import {styles, Link} from '../components'
 import {NameView} from '../user/views'
-import UserIntroDialog from '../user/intro'
 import UserRevokeDialog from '../user/revoke'
 
 import {authLock, key, statementRevoke, userService} from '../../rpc/rpc'
 
-import {RouteInfo} from '../routes'
+import {RPCError, RPCState} from '../../rpc/rpc'
+
 import {
+  Key,
+  User,
   KeyRequest,
   KeyResponse,
-  StatementRevokeRequest,
-  StatementRevokeResponse,
   UserServiceRequest,
   UserServiceResponse,
   AuthLockRequest,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
-
-import {Key, User} from '../../rpc/types'
+} from '../../rpc/types'
 
 type Props = {
   kid: string
@@ -122,7 +114,7 @@ class ProfileView extends React.Component<Props, State> {
 
   render() {
     const kid = this.props.kid
-    const key = this.state.key || keyEmpty()
+    const key = this.state.key
     const users = key.users || []
 
     return (

@@ -1,142 +1,62 @@
 import * as React from 'react'
 
-import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
+import {Button, ButtonGroup, Box, Divider} from '@material-ui/core'
 
-import {Button, Divider, LinearProgress, MenuItem, Paper, TextField, Typography, Box} from '@material-ui/core'
+import EncryptView from './encrypt'
+import DecryptView from './decrypt'
 
-import {styles} from '../components'
-
-import RecipientsView from '../recipients'
-
-import {selectedKID} from '../state'
-
-import {
-  search,
-  encrypt,
-  EncryptRequest,
-  EncryptResponse,
-  SearchResponse,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
-
-import {SearchResult} from '../../rpc/types'
-
-export type Props = {
-  kid: string
-  dispatch: (action: any) => any
+enum Action {
+  Encrypt,
+  Decrypt,
+  Sign,
+  Verify,
 }
 
 type State = {
-  error: string
-  results: Array<SearchResult>
-  loading: boolean
-  value: string
+  action: Action
 }
 
-class EncryptView extends React.Component<Props, State> {
+export default class IndexView extends React.Component<{}, State> {
   state = {
-    error: '',
-    loading: false,
-    value: '',
-    results: [],
-  }
-
-  search = (q: string): Promise<Array<SearchResult>> => {
-    return new Promise((resolve, reject) => {
-      this.props.dispatch(
-        search(
-          {query: q, limit: 100},
-          (resp: SearchResponse) => {
-            resolve(resp.results || [])
-          },
-          (err: RPCError) => {
-            reject(err)
-          }
-        )
-      )
-    })
-  }
-
-  select = (results: Array<SearchResult>) => {
-    this.setState({results})
-  }
-
-  encrypt = () => {
-    this.setState({loading: true, error: ''})
-    const data = new TextEncoder().encode(this.state.value)
-    const req: EncryptRequest = {
-      data: data,
-      armored: true,
-      recipients: '',
-      sender: this.props.kid,
-    }
-    this.props.dispatch(
-      encrypt(
-        req,
-        (resp: EncryptResponse) => {
-          this.setState({loading: false, error: ''})
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
-        }
-      )
-    )
-  }
-
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({value: target.value || '', error: ''})
+    action: Action.Encrypt,
   }
 
   render() {
+    const {action} = this.state
     return (
-      <Box display="flex" flex={1} flexDirection="column">
-        {!this.state.loading && <Divider style={{marginBottom: 3}} />}
-        {this.state.loading && <LinearProgress />}
-
-        <RecipientsView />
-
+      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
         <Divider />
-        <TextField
-          multiline
-          autoFocus
-          placeholder={''}
-          onChange={this.onInputChange}
-          value={this.state.value}
-          inputProps={{
-            style: {height: '100%', paddingLeft: 10, paddingTop: 10},
-          }}
-          InputProps={{
-            style: {height: '100%'},
-          }}
-          style={{height: '100%'}}
-        />
-        <Divider />
-        <Box
-          display="flex"
-          flexDirection="row"
-          style={{
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingRight: 20,
-          }}
-        >
-          <Button color="primary" variant="outlined" onClick={this.encrypt} disabled={this.state.loading}>
+        <Box paddingLeft={1} />
+        <ButtonGroup color="primary" variant="text">
+          <Button
+            color={action == Action.Encrypt ? 'default' : 'primary'}
+            onClick={() => this.setState({action: Action.Encrypt})}
+          >
             Encrypt
           </Button>
-          <Box display="flex" flexDirection="row" flex={1} />
-        </Box>
+          <Button
+            color={action == Action.Decrypt ? 'default' : 'primary'}
+            onClick={() => this.setState({action: Action.Decrypt})}
+          >
+            Decrypt
+          </Button>
+          <Button
+            color={action == Action.Sign ? 'default' : 'primary'}
+            onClick={() => this.setState({action: Action.Sign})}
+          >
+            Sign
+          </Button>
+          <Button
+            color={action == Action.Verify ? 'default' : 'primary'}
+            onClick={() => this.setState({action: Action.Verify})}
+          >
+            Verify
+          </Button>
+        </ButtonGroup>
+
+        {action == Action.Encrypt && <EncryptView />}
+        {action == Action.Decrypt && <DecryptView />}
       </Box>
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {
-    kid: selectedKID(state),
-  }
-}
-export default connect(mapStateToProps)(EncryptView)

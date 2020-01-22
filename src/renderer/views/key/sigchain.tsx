@@ -12,17 +12,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, Link} from '../components'
-import {NamesView} from '../user/views'
-
-import {connect} from 'react-redux'
-
-import {keyTypeString, keyTypeSymbol, dateString} from '../helper'
-
-import {AppState} from '../../reducers/app'
-
+import {styles} from '../components'
 import {Statement} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
 
 type Props = {
   statements: Array<Statement>

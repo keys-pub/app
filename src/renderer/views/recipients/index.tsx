@@ -1,40 +1,46 @@
 import * as React from 'react'
 
-import {Box, Paper, TextField, Typography} from '@material-ui/core'
+import {TextField} from '@material-ui/core'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import {connect} from 'react-redux'
+import {store} from '../../store'
 
-import {search, SearchRequest, SearchResponse, RPCError, RPCState} from '../../rpc/rpc'
-import {SearchResult} from '../../rpc/types'
+import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
+import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
 
 export type Props = {
-  dispatch: (action: any) => any
+  onChange?: (value: UserSearchResult[]) => void
 }
 
 type State = {
   open: boolean
   loading: boolean
-  options: Array<SearchResult>
+  options: UserSearchResult[]
+  selected: UserSearchResult[]
   error: string
 }
 
-class RecipientsView extends React.Component<Props, State> {
+export default class RecipientsView extends React.Component<Props, State> {
   state = {
     open: false,
     loading: false,
     options: [],
+    selected: [],
     error: '',
   }
 
+  componentDidMount() {
+    this.search('')
+  }
+
   search = (q: string) => {
-    this.setState({loading: true, options: []})
-    const req: SearchRequest = {query: q, limit: 100}
-    this.props.dispatch(
-      search(
+    this.setState({loading: true}) // , options: []
+    const req: UserSearchRequest = {query: q, limit: 100}
+    store.dispatch(
+      userSearch(
         req,
-        (resp: SearchResponse) => {
+        (resp: UserSearchResponse) => {
           this.setState({options: resp.results || [], loading: false})
         },
         (err: RPCError) => {
@@ -44,8 +50,20 @@ class RecipientsView extends React.Component<Props, State> {
     )
   }
 
-  onInputChange = (event: React.ChangeEvent<{}>, value: any, reason: 'input' | 'reset') => {
+  openAutoComplete = () => {
+    this.search('')
+    this.setState({open: true})
+  }
+
+  onInputChange = (event: React.ChangeEvent<{}>, value: string, reason: 'input' | 'reset') => {
     this.search(value)
+  }
+
+  onChange = (event: React.ChangeEvent<{}>, value: UserSearchResult[]) => {
+    this.setState({selected: value})
+    if (!!this.props.onChange) {
+      this.props.onChange(value)
+    }
   }
 
   render() {
@@ -54,24 +72,31 @@ class RecipientsView extends React.Component<Props, State> {
       <Autocomplete
         open={open}
         multiple
-        onOpen={() => {
-          this.setState({open: true})
-        }}
+        onOpen={this.openAutoComplete}
         onClose={() => {
           this.setState({open: false})
         }}
         onInputChange={this.onInputChange}
-        getOptionSelected={(option: SearchResult, value: SearchResult) => option.kid === value.kid}
-        getOptionLabel={(option: SearchResult) => option.kid}
+        onChange={this.onChange}
+        value={this.state.selected}
+        getOptionSelected={(option: UserSearchResult, value: UserSearchResult) => option.kid === value.kid}
+        getOptionLabel={(option: UserSearchResult) => option.users[0].label}
         options={options}
-        loading={this.state.loading}
+        // loading={this.state.loading}
+        // renderOption={option => (
+        //   <React.Fragment>
+        //     <span>{countryToFlag(option.code)}</span>
+        //     {option.label} ({option.code}) +{option.phone}
+        //   </React.Fragment>
+        // )}
         renderInput={params => (
           <TextField
             {...params}
-            label="Recipients"
+            placeholder="Recipients"
             fullWidth
             InputProps={{
               ...params.InputProps,
+              disableUnderline: true,
               // endAdornment: (
               //   <React.Fragment>
               //     {loading ? <CircularProgress color="inherit" size={20} /> : null}
@@ -85,9 +110,3 @@ class RecipientsView extends React.Component<Props, State> {
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
-  return {}
-}
-
-export default connect(mapStateToProps)(RecipientsView)

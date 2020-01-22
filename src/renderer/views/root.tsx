@@ -4,8 +4,6 @@ import {ConnectedRouter, push} from 'connected-react-router'
 
 import ErrorBoundary from './errors/boundary'
 
-import * as electron from 'electron'
-
 import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade} from '@material-ui/core/styles/colorManipulator'
@@ -13,9 +11,6 @@ import {fade} from '@material-ui/core/styles/colorManipulator'
 import Lock from './lock'
 
 import {store, history} from '../store/index'
-
-import {connect} from 'react-redux'
-import {AppState} from '../reducers/app'
 
 const theme = createMuiTheme({
   typography: {
@@ -49,7 +44,7 @@ const theme = createMuiTheme({
     },
     MuiButton: {
       root: {
-        fontFamily: 'Roboto',
+        // fontFamily: 'Roboto',
         fontSize: 14,
       },
       sizeSmall: {
@@ -61,7 +56,23 @@ const theme = createMuiTheme({
       outlinedPrimary: {
         backgroundColor: fade('#2196f3', 0.05),
       },
+      outlinedSecondary: {
+        backgroundColor: fade('#f50057', 0.05),
+      },
     },
+    // MuiToggleButton: {
+    //   root: {
+    //     fontFamily: 'Roboto',
+    //     fontSize: 14,
+    //     backgroundColor: fade('#2196f3', 0.1),
+    //   },
+    //   sizeSmall: {
+    //     fontSize: 12,
+    //   },
+    //   sizeLarge: {
+    //     fontSize: 16,
+    //   },
+    // },
   },
 })
 

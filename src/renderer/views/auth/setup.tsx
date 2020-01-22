@@ -309,7 +309,7 @@ class AuthSetupView extends React.Component<Props, State> {
     const req: AuthSetupRequest = {
       password: this.state.password,
       keyBackup: keyBackup,
-      clientName: 'app',
+      client: 'app',
     }
     this.setState({loading: true, setupError: ''})
     // Use client directly to prevent logging the request (password)

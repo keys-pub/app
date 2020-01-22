@@ -22,16 +22,18 @@ import {connect} from 'react-redux'
 
 import {goBack, push} from 'connected-react-router'
 
-import {keyTypeString, keyTypeSymbol} from '../helper'
+import {keyDescription, keySymbol} from '../helper'
 
 import SigchainView from './sigchain'
 import UserRevokeDialog from '../user/revoke'
 
+import {key, keyRemove, pull, userService, RPCError, RPCState} from '../../rpc/rpc'
+
 import {
-  key,
-  keyRemove,
-  pull,
-  userService,
+  Key,
+  KeyType,
+  Statement,
+  User,
   KeyRequest,
   KeyResponse,
   KeyRemoveRequest,
@@ -40,11 +42,7 @@ import {
   PullResponse,
   UserServiceRequest,
   UserServiceResponse,
-  RPCError,
-  RPCState,
-} from '../../rpc/rpc'
-
-import {Key, KeyType, Statement, User} from '../../rpc/types'
+} from '../../rpc/types'
 
 const cstyles = {
   cell: {
@@ -61,8 +59,8 @@ export const IDView = (props: {id: string; owner?: boolean}) => {
   return <Typography style={{...styles.mono, ...styl}}>{props.id}</Typography>
 }
 
-export const KeyTypeView = (props: {type: KeyType; description: boolean}) => {
-  return <Typography>{props.description ? keyTypeString(props.type) : keyTypeSymbol(props.type)}</Typography>
+export const KeyDescriptionView = (props: {value: Key; description: boolean}) => {
+  return <Typography>{props.description ? keyDescription(props.value) : keySymbol(props.value)}</Typography>
 }
 
 type Props = {
@@ -260,7 +258,7 @@ class KeyView extends React.Component<Props, State> {
                 <Typography align="right">Type</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
-                <KeyTypeView type={type} description />
+                <KeyDescriptionView value={this.state.key} description />
               </TableCell>
             </TableRow>
             <TableRow>

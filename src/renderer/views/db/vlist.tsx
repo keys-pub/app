@@ -7,8 +7,8 @@ import {AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List} from '
 
 import {styles} from '../components'
 
-import {documents, DocumentsRequest, DocumentsResponse, RPCState} from '../../rpc/rpc'
-import {Document} from '../../rpc/types'
+import {documents, RPCState} from '../../rpc/rpc'
+import {Document, DocumentsRequest, DocumentsResponse} from '../../rpc/types'
 
 import {connect} from 'react-redux'
 

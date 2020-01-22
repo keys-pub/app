@@ -16,7 +16,7 @@ export default (props: Props) => {
   const backgroundColor = dark ? '#2f2f2f' : ''
 
   return (
-    <div className="header">
+    <div className="drag">
       <Box display="flex" flexDirection="column" style={{backgroundColor}}>
         <Box display="flex" flexDirection="row">
           <IconButton

@@ -18,16 +18,15 @@ import {connect} from 'react-redux'
 
 import {styles} from '../components'
 import {dateString} from '../helper'
+import {collections, documents, RPCState} from '../../rpc/rpc'
 import {
-  collections,
-  documents,
+  Collection,
+  Document,
   CollectionsRequest,
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-  RPCState,
-} from '../../rpc/rpc'
-import {Collection, Document} from '../../rpc/types'
+} from '../../rpc/types'
 
 type Props = {
   dispatch: (action: any) => any

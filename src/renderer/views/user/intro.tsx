@@ -6,8 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogContentText,
-  DialogTitle,
-  DialogActions,
   Divider,
   LinearProgress,
   Typography,
@@ -15,26 +13,17 @@ import {
 
 import * as electron from 'electron'
 
-import {styles, Link, Step} from '../components'
+import {styles, Link} from '../components'
 
 import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
+import {push} from 'connected-react-router'
 
 import {selectedKID} from '../state'
-import {serviceName} from '../helper'
 
 import {configSet, userService} from '../../rpc/rpc'
 
-import {
-  ConfigSetRequest,
-  ConfigSetResponse,
-  UserServiceRequest,
-  UserServiceResponse,
-  RPCState,
-  RPCError,
-} from '../../rpc/rpc'
-import {AppState} from '../../reducers/app'
-import {Key, User} from '../../rpc/types'
+import {RPCState, RPCError} from '../../rpc/rpc'
+import {ConfigSetRequest, ConfigSetResponse, UserServiceRequest, UserServiceResponse} from '../../rpc/types'
 
 type Props = {
   open: boolean
@@ -72,8 +61,9 @@ class UserIntroDialog extends React.Component<Props, State> {
   }
 
   nothanks = (skip: boolean) => {
+    const req: ConfigSetRequest = {key: 'disablePromptUser', value: skip ? '1' : '0'}
     this.props.dispatch(
-      configSet({key: 'disablePromptUser', value: skip ? '1' : '0'}, (resp: ConfigSetResponse) => {
+      configSet(req, (resp: ConfigSetResponse) => {
         this.close()
       })
     )

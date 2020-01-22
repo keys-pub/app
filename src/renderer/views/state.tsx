@@ -9,8 +9,8 @@ import * as queryString from 'query-string'
 
 // import emoji from 'node-emoji'
 
-import {runtimeStatus, RuntimeStatusResponse, WatchEvent, RPCError, RPCState, ErrFn} from '../rpc/rpc'
-import {Key, KeyType, User} from '../rpc/types'
+import {runtimeStatus, RPCError, RPCState, ErrFn} from '../rpc/rpc'
+import {RuntimeStatusResponse, WatchEvent} from '../rpc/types'
 
 import {AppState} from '../reducers/app'
 
@@ -99,23 +99,6 @@ export const startWatchStream = () => async (dispatch: (action: any) => any) => 
 // }
 // window.addEventListener('online', onlineFn)
 // window.addEventListener('offline', offlineFn)
-
-export const keyEmpty = (): Key => ({
-  id: '',
-  users: [],
-  type: KeyType.NO_KEY_TYPE,
-  saved: false,
-})
-
-export const userEmpty = (): User => ({
-  kid: '',
-  seq: 0,
-  service: '',
-  name: '',
-  url: '',
-  err: '',
-  verifiedAt: 0,
-})
 
 export const selectedKID = (state: {rpc: RPCState; router: any}) => {
   const values = queryString.parse(state.router.location.search)

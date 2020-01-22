@@ -18,8 +18,8 @@ import {Step} from '../components'
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {keyImport} from '../../rpc/rpc'
-import {KeyImportRequest, KeyImportResponse, RPCError} from '../../rpc/rpc'
+import {keyImport, RPCError} from '../../rpc/rpc'
+import {KeyImportRequest, KeyImportResponse} from '../../rpc/types'
 
 type Props = {
   dispatch: (action: any) => any
