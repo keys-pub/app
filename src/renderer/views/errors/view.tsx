@@ -11,11 +11,10 @@ type Props = {
 
 export default (props: Props) => {
   return (
-    <Box style={{width: '100%'}}>
+    <Box display="flex" flexDirection="column" flex={1}>
       <Typography
         variant="h5"
         style={{
-          marginTop: 40,
           paddingBottom: 20,
           fontFamily: 'Roboto Mono',
           textAlign: 'center',
@@ -27,15 +26,14 @@ export default (props: Props) => {
       <Typography
         style={{
           fontFamily: 'Roboto Mono',
-          marginBottom: 40,
-          height: 400,
           whiteSpace: 'pre-wrap',
           overflow: 'auto',
+          width: 'calc(100% - 40px)',
+          height: '100%',
           backgroundColor: 'black',
           color: 'white',
           paddingLeft: 40,
           paddingTop: 20,
-          paddingBottom: 40,
         }}
       >
         {props.error && props.error.message}
