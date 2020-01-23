@@ -17,7 +17,7 @@ import * as electron from 'electron'
 
 import {push} from 'connected-react-router'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {styles, Link} from '../../components'
 import {NameView} from '../user/views'
@@ -206,7 +206,7 @@ const cstyles = {
 }
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {kid: selectedKID(state)}
+  return {kid: query(state, 'kid')}
 }
 
 // $FlowFixMe

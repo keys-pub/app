@@ -100,7 +100,7 @@ export const startWatchStream = () => async (dispatch: (action: any) => any) => 
 // window.addEventListener('online', onlineFn)
 // window.addEventListener('offline', offlineFn)
 
-export const selectedKID = (state: {rpc: RPCState; router: any}) => {
+export const query = (state: {router: any}, key: string): string => {
   const values = queryString.parse(state.router.location.search)
-  return (values.kid || '').toString()
+  return (values[key] || '').toString()
 }

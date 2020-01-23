@@ -23,7 +23,7 @@ import {styles, Link, Step} from '../../components'
 import {connect} from 'react-redux'
 import {goBack, go} from 'connected-react-router'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 import {serviceName} from '../helper'
 
 import {userAdd, RPCError, RPCState} from '../../rpc/rpc'
@@ -208,7 +208,7 @@ class UserSignView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
     service: (state.rpc.userService && state.rpc.userService.service) || '',
     name: (state.rpc.userSign && state.rpc.userSign.name) || '',
     signedMessage: (state.rpc.userSign && state.rpc.userSign.message) || '',

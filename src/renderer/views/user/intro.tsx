@@ -18,7 +18,7 @@ import {styles, Link} from '../../components'
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {configSet, userService} from '../../rpc/rpc'
 
@@ -168,7 +168,7 @@ class UserIntroDialog extends React.Component<Props, State> {
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
     open: false,
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
   }
 }
 

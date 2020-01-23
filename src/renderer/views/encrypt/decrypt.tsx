@@ -5,7 +5,7 @@ import {goBack, push} from 'connected-react-router'
 
 import {Button, ButtonGroup, Divider, LinearProgress, Input, Box} from '@material-ui/core'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {decrypt, RPCError, RPCState} from '../../rpc/rpc'
 
@@ -95,7 +95,7 @@ class EncryptView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
   }
 }
 export default connect(mapStateToProps)(EncryptView)

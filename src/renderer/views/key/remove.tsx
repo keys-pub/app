@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core'
 
 import {keyRemove} from '../../rpc/rpc'
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {Step} from '../../components'
 
@@ -72,7 +72,7 @@ class KeyRemoveView extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {kid: selectedKID(state)}
+  return {kid: query(state, 'kid')}
 }
 
 export default connect(mapStateToProps)(KeyRemoveView)

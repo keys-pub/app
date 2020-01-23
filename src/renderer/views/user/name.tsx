@@ -7,7 +7,7 @@ import Step from '../../components/step'
 import {connect} from 'react-redux'
 import {goBack, push} from 'connected-react-router'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {userSign} from '../../rpc/rpc'
 
@@ -119,7 +119,7 @@ class UserNameView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
     service: (state.rpc.userService && state.rpc.userService.service) || '',
   }
 }

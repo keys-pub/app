@@ -16,7 +16,7 @@ import {styles, Step} from '../../components'
 import {keyExport} from '../../rpc/rpc'
 import {goBack, push} from 'connected-react-router'
 
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {connect} from 'react-redux'
 
@@ -114,7 +114,7 @@ class KeyExportView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
   }
 }
 

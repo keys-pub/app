@@ -20,7 +20,7 @@ import {styles} from '../../components'
 import RecipientsView from '../user/recipients'
 
 import {store} from '../../store'
-import {selectedKID} from '../state'
+import {query} from '../state'
 
 import {encrypt, RPCError, RPCState} from '../../rpc/rpc'
 
@@ -131,7 +131,7 @@ class EncryptView extends React.Component<Props, State> {
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
-    kid: selectedKID(state),
+    kid: query(state, 'kid'),
   }
 }
 export default connect(mapStateToProps)(EncryptView)
