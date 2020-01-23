@@ -5,11 +5,11 @@ import * as protoLoader from '@grpc/proto-loader'
 
 import * as fs from 'fs'
 
-type Client = {
+type RPC = {
   client: any
 }
 
-let rpcClient: Client = {
+let rpc: RPC = {
   client: null,
 }
 
@@ -42,22 +42,22 @@ export const initializeClient = (certPath: string, authToken: string, protoPath:
   const port = getenv.int('KEYS_PORT', 10001)
   console.log('Using client on port', port)
 
-  rpcClient = {
+  rpc = {
     client: new serviceCls('localhost:' + port, creds),
   }
 }
 
 export const client = (): Promise<any> => {
   return new Promise((resolve, reject) => {
-    if (!rpcClient.client) {
+    if (!rpc.client) {
       // Only happens in hot reload, we need to wait for main process to initializeClient.
       console.warn('Waiting for client init...')
       setTimeout(() => {
-        if (rpcClient.client) resolve(rpcClient.client)
+        if (rpc.client) resolve(rpc.client)
         else reject('No client available')
       }, 1000)
       return
     }
-    return resolve(rpcClient.client)
+    return resolve(rpc.client)
   })
 }
