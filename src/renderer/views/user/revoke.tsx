@@ -7,33 +7,23 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   Divider,
-  IconButton,
   LinearProgress,
   Typography,
 } from '@material-ui/core'
 
-import * as electron from 'electron'
+import {store} from '../../store'
 
-import {styles, Link} from '../../components'
-
-import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
-
-import {selectedKID} from '../state'
 import {statementRevoke} from '../../rpc/rpc'
 
 import {StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/types'
-import {RPCState, RPCError} from '../../rpc/rpc'
-import {AppState} from '../../reducers/app'
+import {RPCError} from '../../rpc/rpc'
 
 type Props = {
   kid: string
   open: boolean
   seq: number
   close: () => any
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -93,7 +83,7 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
       seq: this.props.seq,
       localOnly: false,
     }
-    this.props.dispatch(
+    store.dispatch(
       statementRevoke(
         req,
         (resp: StatementRevokeResponse) => {

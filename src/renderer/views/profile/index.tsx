@@ -190,7 +190,6 @@ class ProfileView extends React.Component<Props, State> {
           seq={this.state.revoke}
           open={this.state.revoke > 0}
           close={() => this.setState({revoke: 0})}
-          dispatch={this.props.dispatch}
         />
       </Box>
     )

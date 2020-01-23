@@ -16,14 +16,19 @@ export const serviceName = (service: string): string => {
 }
 
 export const keyDescription = (key: Key): string => {
-  const s = keySymbol(key)
   switch (key.type) {
     case KeyType.CURVE25519:
-      return s + ' Curve25519'
+      if (key.isPrivate) {
+        return 'Curve25519 Private Key'
+      }
+      return 'Curve25519 Public Key'
     case KeyType.ED25519:
-      return s + ' Ed25519'
+      if (key.isPrivate) {
+        return 'Ed25519 Private Key'
+      }
+      return 'Ed25519 Public Key'
     default:
-      return s
+      return 'Unknown (' + key.type + ')'
   }
 }
 

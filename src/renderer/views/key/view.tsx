@@ -24,6 +24,8 @@ import {goBack, push} from 'connected-react-router'
 
 import {keyDescription, keySymbol} from '../helper'
 
+import {store} from '../../store'
+
 import SigchainView from './sigchain'
 import UserRevokeDialog from '../user/revoke'
 
@@ -31,7 +33,6 @@ import {key, keyRemove, pull, userService, RPCError, RPCState} from '../../rpc/r
 
 import {
   Key,
-  KeyType,
   Statement,
   User,
   KeyRequest,
@@ -42,6 +43,7 @@ import {
   PullResponse,
   UserServiceRequest,
   UserServiceResponse,
+  KeyType,
 } from '../../rpc/types'
 
 const cstyles = {
@@ -59,13 +61,16 @@ export const IDView = (props: {id: string; owner?: boolean}) => {
   return <Typography style={{...styles.mono, ...styl}}>{props.id}</Typography>
 }
 
-export const KeyDescriptionView = (props: {value: Key; description: boolean}) => {
-  return <Typography>{props.description ? keyDescription(props.value) : keySymbol(props.value)}</Typography>
+export const KeyDescriptionView = (props: {value: Key}) => {
+  return <Typography>{keyDescription(props.value)}</Typography>
+}
+
+export const KeySymbolView = (props: {value: Key}) => {
+  return <Typography>{keySymbol(props.value)}</Typography>
 }
 
 type Props = {
   kid: string
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -95,10 +100,10 @@ class KeyView extends React.Component<Props, State> {
       kid: this.props.kid,
       service: service,
     }
-    this.props.dispatch(
+    store.dispatch(
       userService(req, (resp: UserServiceResponse) => {
         // this.setState({loading: false})
-        this.props.dispatch(push('/user/name?kid=' + this.props.kid))
+        store.dispatch(push('/user/name?kid=' + this.props.kid))
       })
     )
   }
@@ -109,7 +114,7 @@ class KeyView extends React.Component<Props, State> {
       kid: this.props.kid,
       user: '',
     }
-    this.props.dispatch(
+    store.dispatch(
       key(
         req,
         (resp: KeyResponse) => {
@@ -132,7 +137,7 @@ class KeyView extends React.Component<Props, State> {
       kid: this.props.kid,
       user: '',
     }
-    this.props.dispatch(
+    store.dispatch(
       pull(
         req,
         (resp: PullResponse) => {
@@ -150,11 +155,11 @@ class KeyView extends React.Component<Props, State> {
     const req: KeyRemoveRequest = {
       kid: this.props.kid,
     }
-    this.props.dispatch(
+    store.dispatch(
       keyRemove(
         req,
         (resp: KeyRemoveResponse) => {
-          this.props.dispatch(goBack())
+          store.dispatch(goBack())
         },
         (err: RPCError) => {
           this.setState({error: err.message})
@@ -167,7 +172,6 @@ class KeyView extends React.Component<Props, State> {
     const kid = this.props.kid
 
     const loading = this.state.loading
-    const type = (this.state.key && this.state.key.type) || 'NO_KEY_TYPE'
     const saved = this.state.key && this.state.key.saved
     const users = (this.state.key && this.state.key.users) || []
 
@@ -178,8 +182,8 @@ class KeyView extends React.Component<Props, State> {
       if (user.service === 'github') hasGithub = true
     })
 
-    const isPublic = type == 'PUBLIC_KEY_TYPE'
-    const isPrivate = type == 'PRIVATE_KEY_TYPE'
+    const isPrivate = this.state.key && this.state.key.isPrivate
+    const isPublic = this.state.key && !this.state.key.isPrivate
     const add = !saved && isPublic
     const remove = saved && isPublic
 
@@ -205,10 +209,19 @@ class KeyView extends React.Component<Props, State> {
             </TableRow>
             <TableRow>
               <TableCell style={cstyles.cell}>
+                <Typography align="right">Type</Typography>
+              </TableCell>
+              <TableCell style={cstyles.cell}>
+                {this.state.key && <KeyDescriptionView value={this.state.key} />}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell style={cstyles.cell}>
                 <Typography align="right">{users.length < 2 ? 'User' : 'Users'}</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
-                {(users || []).map((user: User) => (
+                {users.length == 0 && <Typography style={{color: '#999'}}>none</Typography>}
+                {users.map((user: User) => (
                   <Box
                     display="flex"
                     flexDirection="column"
@@ -254,14 +267,6 @@ class KeyView extends React.Component<Props, State> {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={cstyles.cell}>
-                <Typography align="right">Type</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <KeyDescriptionView value={this.state.key} description />
-              </TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell style={cstyles.cell}></TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="row">
@@ -286,7 +291,6 @@ class KeyView extends React.Component<Props, State> {
           seq={this.state.revoke}
           open={this.state.revoke > 0}
           close={() => this.setState({revoke: 0})}
-          dispatch={this.props.dispatch}
         />
       </Box>
     )
