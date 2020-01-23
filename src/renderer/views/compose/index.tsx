@@ -5,7 +5,7 @@ import {goBack, push} from 'connected-react-router'
 
 import {Button, Divider, LinearProgress, MenuItem, Paper, Typography, Box} from '@material-ui/core'
 
-import Recipients from '../recipients'
+import Recipients from '../user/recipients'
 
 import {styles} from '../../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'

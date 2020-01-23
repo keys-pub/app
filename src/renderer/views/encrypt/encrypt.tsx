@@ -17,7 +17,7 @@ import {
 
 import {styles} from '../../components'
 
-import RecipientsView from '../recipients'
+import RecipientsView from '../user/recipients'
 
 import {store} from '../../store'
 import {selectedKID} from '../state'
