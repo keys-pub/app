@@ -6,7 +6,7 @@ import ErrorView from './view'
 
 type Props = {
   error: Error | void
-  clearError: () => void
+  clearError?: () => void
   restart: () => void
 }
 
@@ -30,9 +30,11 @@ export default class ErrorsView extends React.Component<Props> {
             Restart the App
           </Button>
           <Box style={{width: 10}} />
-          <Button variant="outlined" onClick={this.props.clearError}>
-            Clear Error
-          </Button>
+          {this.props.clearError && (
+            <Button variant="outlined" onClick={this.props.clearError}>
+              Clear Error
+            </Button>
+          )}
         </Box>
       </Box>
     )

@@ -12,7 +12,9 @@ export enum ExportType {
 export enum KeyType {
     UNKNOWN_KEY_TYPE = "UNKNOWN_KEY_TYPE",
     ED25519 = "ED25519",
+    ED25519_PUBLIC = "ED25519_PUBLIC",
     CURVE25519 = "CURVE25519",
+    CURVE25519_PUBLIC = "CURVE25519_PUBLIC",
 }
 export enum SortDirection {
     ASC = "ASC",
@@ -363,8 +365,6 @@ export interface Key {
     id?: string;
     // Type of key.
     type?: KeyType;
-    // IsPrivate is true if key has private material.
-    isPrivate?: boolean;
     // Users associated with this key.
     users?: Array<User>;
     // Saved if saved locally.
@@ -382,6 +382,7 @@ export interface KeyResponse {
 
 export interface KeysRequest {
     query?: string;
+    types?: Array<KeyType>;
     sortField?: string;
     sortDirection?: SortDirection;
 }

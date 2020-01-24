@@ -1,34 +1,32 @@
 import * as React from 'react'
 
 import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
 
-import {Button, ButtonGroup, Divider, LinearProgress, Input, Box} from '@material-ui/core'
+import {Button, Divider, LinearProgress, Input, Box, Typography} from '@material-ui/core'
+
+import {styles} from '../../components'
 
 import {query} from '../state'
+import {store} from '../../store'
+import {push} from 'connected-react-router'
 
-import {decrypt, RPCError, RPCState} from '../../rpc/rpc'
+import {verify, RPCError, RPCState} from '../../rpc/rpc'
 
-import {UserSearchResult, DecryptRequest, DecryptResponse} from '../../rpc/types'
+import {VerifyRequest, VerifyResponse} from '../../rpc/types'
 
-export type Props = {
-  kid: string
-  dispatch: (action: any) => any
-}
+export type Props = {}
 
 type State = {
   error: string
-  results: Array<UserSearchResult>
   loading: boolean
   value: string
 }
 
-class EncryptView extends React.Component<Props, State> {
+class VerifyView extends React.Component<Props, State> {
   state = {
     error: '',
     loading: false,
     value: '',
-    results: [],
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -36,18 +34,19 @@ class EncryptView extends React.Component<Props, State> {
     this.setState({value: target.value || '', error: ''})
   }
 
-  decrypt = () => {
+  verify = () => {
     this.setState({loading: true, error: ''})
     const data = new TextEncoder().encode(this.state.value)
-    const req: DecryptRequest = {
+    const req: VerifyRequest = {
       data: data,
       armored: true,
     }
-    this.props.dispatch(
-      decrypt(
+    store.dispatch(
+      verify(
         req,
-        (resp: DecryptResponse) => {
-          this.setState({loading: false})
+        (resp: VerifyResponse) => {
+          this.setState({loading: false, error: ''})
+          store.dispatch(push('/verify/verified'))
         },
         (err: RPCError) => {
           this.setState({loading: false, error: err.message})
@@ -58,13 +57,20 @@ class EncryptView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%', overflowX: 'hidden'}}>
+      <Box display="flex" flex={1} flexDirection="column">
+        <Divider />
         <Input
           multiline
           autoFocus
           onChange={this.onInputChange}
           value={this.state.value}
           disableUnderline
+          inputProps={{
+            style: {
+              ...styles.mono,
+              height: '100%',
+            },
+          }}
           style={{
             height: '100%',
             paddingLeft: 10,
@@ -84,9 +90,14 @@ class EncryptView extends React.Component<Props, State> {
             paddingRight: 20,
           }}
         >
-          <Button color="primary" variant="outlined" onClick={this.decrypt} disabled={this.state.loading}>
-            Decrypt
+          <Button color="primary" variant="outlined" onClick={this.verify} disabled={this.state.loading}>
+            Verify
           </Button>
+          {this.state.error && (
+            <Typography color="secondary" style={{paddingLeft: 20, alignSelf: 'center'}}>
+              {this.state.error}
+            </Typography>
+          )}
         </Box>
       </Box>
     )
@@ -94,8 +105,6 @@ class EncryptView extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {
-    kid: query(state, 'kid'),
-  }
+  return {}
 }
-export default connect(mapStateToProps)(EncryptView)
+export default connect(mapStateToProps)(VerifyView)

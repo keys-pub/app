@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-// import {RouteInfo} from './routes'
 import {AppState} from '../reducers/app'
 
 import {ipcRenderer} from 'electron'
@@ -15,7 +14,7 @@ import Nav from './nav'
 import * as queryString from 'query-string'
 import {connect} from 'react-redux'
 
-import {Box} from '@material-ui/core'
+import {Box, Typography} from '@material-ui/core'
 import ErrorsView from './errors'
 
 type Props = {
@@ -42,18 +41,13 @@ class Lock extends React.Component<Props> {
   }
 
   renderApp() {
-    const route = routesMap.get(this.props.path)
-    const hideNav = !route || route.hideNav || this.props.path === '/'
-
     return (
       <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
-        {!hideNav && (
-          <Box display="flex" flexGrow={0} flexShrink={0}>
-            <Nav />
-          </Box>
-        )}
+        <Box display="flex" flexGrow={0} flexShrink={0}>
+          <Nav />
+        </Box>
         <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-          {!hideNav && <AppHeader goBack={this.back} />}
+          <AppHeader goBack={this.back} />
           <Routes />
         </Box>
       </Box>
@@ -63,6 +57,13 @@ class Lock extends React.Component<Props> {
   render() {
     if (this.props.error) {
       return <ErrorsView error={this.props.error} restart={this.restart} clearError={this.clearError} />
+    }
+
+    console.log('Path:', this.props.path)
+    const route = routesMap.get(this.props.path)
+    if (!route) {
+      const error = Error('Route not found: ' + this.props.path)
+      return <ErrorsView error={error} restart={this.restart} />
     }
 
     console.log('Unlocked:', this.props.unlocked)

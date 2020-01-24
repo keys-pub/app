@@ -1,30 +1,19 @@
 import * as React from 'react'
 
 import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
 
-import {
-  Button,
-  ButtonGroup,
-  Divider,
-  LinearProgress,
-  MenuItem,
-  Paper,
-  Input,
-  Typography,
-  Box,
-} from '@material-ui/core'
+import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
 
-import {styles} from '../../components'
-
-import RecipientsView from '../user/recipients'
+import {push} from 'connected-react-router'
 
 import {store} from '../../store'
 import {query} from '../state'
 
-import {encrypt, RPCError, RPCState} from '../../rpc/rpc'
+import SignKeySelectView from '../keys/skselect'
 
-import {UserSearchResult, EncryptRequest, EncryptResponse} from '../../rpc/types'
+import {sign, RPCError, RPCState} from '../../rpc/rpc'
+
+import {Key, SignRequest, SignResponse} from '../../rpc/types'
 
 export type Props = {
   kid: string
@@ -32,17 +21,17 @@ export type Props = {
 
 type State = {
   error: string
-  recipients: UserSearchResult[]
   loading: boolean
+  kid: string
   value: string
 }
 
-class EncryptView extends React.Component<Props, State> {
+class SignView extends React.Component<Props, State> {
   state = {
     error: '',
     loading: false,
+    kid: this.props.kid,
     value: '',
-    recipients: [],
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -50,25 +39,21 @@ class EncryptView extends React.Component<Props, State> {
     this.setState({value: target.value || '', error: ''})
   }
 
-  encrypt = () => {
+  sign = () => {
     this.setState({loading: true, error: ''})
 
-    const recs = this.state.recipients.map((r: UserSearchResult) => {
-      return r.kid
-    })
-
     const data = new TextEncoder().encode(this.state.value)
-    const req: EncryptRequest = {
+    const req: SignRequest = {
       data: data,
       armored: true,
-      recipients: recs,
-      sender: this.props.kid,
+      kid: this.state.kid,
     }
     store.dispatch(
-      encrypt(
+      sign(
         req,
-        (resp: EncryptResponse) => {
+        (resp: SignResponse) => {
           this.setState({loading: false, error: ''})
+          store.dispatch(push('/sign/signed'))
         },
         (err: RPCError) => {
           this.setState({loading: false, error: err.message})
@@ -77,19 +62,16 @@ class EncryptView extends React.Component<Props, State> {
     )
   }
 
+  setSigner = (kid: string) => {
+    console.log('Set signer:', kid)
+    this.setState({kid: kid})
+  }
+
   render() {
     return (
       <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
         <Divider />
-        <Box paddingLeft={1} paddingRight={1} paddingTop={1} paddingBottom={1}>
-          <RecipientsView
-            onChange={(recipients: UserSearchResult[]) => {
-              this.setState({recipients: recipients})
-            }}
-          />
-        </Box>
-        <Divider />
-
+        <SignKeySelectView defaultValue={this.props.kid} onChange={this.setSigner} />
         <Input
           multiline
           autoFocus
@@ -120,9 +102,14 @@ class EncryptView extends React.Component<Props, State> {
             paddingRight: 20,
           }}
         >
-          <Button color="primary" variant="outlined" onClick={this.encrypt} disabled={this.state.loading}>
-            Encrypt
+          <Button color="primary" variant="outlined" onClick={this.sign} disabled={this.state.loading}>
+            Sign
           </Button>
+          {this.state.error && (
+            <Typography color="secondary" style={{paddingLeft: 20, alignSelf: 'center'}}>
+              {this.state.error}
+            </Typography>
+          )}
         </Box>
       </Box>
     )
@@ -134,4 +121,4 @@ const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => 
     kid: query(state, 'kid'),
   }
 }
-export default connect(mapStateToProps)(EncryptView)
+export default connect(mapStateToProps)(SignView)

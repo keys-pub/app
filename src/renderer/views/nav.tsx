@@ -20,7 +20,10 @@ import {
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
-  EnhancedEncryption as EncryptIcon,
+  Lock as EncryptIcon, // EnhancedEncryption
+  LockOpen as DecryptIcon,
+  Create as SignIcon,
+  Visibility as VerifyIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -38,6 +41,15 @@ type State = {
   open: boolean
 }
 
+const navs = [
+  {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
+  {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
+  {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
+  {name: 'Decrypt', icon: DecryptIcon, route: '/decrypt/index', prefix: '/decrypt'},
+  {name: 'Sign', icon: SignIcon, route: '/sign/index', prefix: '/sign'},
+  {name: 'Verify', icon: VerifyIcon, route: '/verify/index', prefix: '/verify'},
+]
+
 class Nav extends React.Component<Props, State> {
   state = {
     open: true,
@@ -49,7 +61,7 @@ class Nav extends React.Component<Props, State> {
 
   render() {
     const route = routesMap.get(this.props.path)
-    if (!route || route.hideNav) return null
+    if (!route) return null
 
     const open = this.state.open
     console.log('Drawer open:', open)
@@ -57,12 +69,6 @@ class Nav extends React.Component<Props, State> {
     const drawerStyles: CSSProperties = open
       ? {width, border: 0, height: '100%'}
       : {width, border: 0, height: '100%', flexShrink: 0, overflowX: 'hidden'}
-
-    const navs = [
-      {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
-      {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
-      {name: 'EDSV', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
-    ]
 
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>

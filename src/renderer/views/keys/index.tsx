@@ -24,7 +24,7 @@ import {push} from 'connected-react-router'
 
 import {connect} from 'react-redux'
 
-import {Key, SortDirection} from '../../rpc/types'
+import {Key, KeyType, SortDirection} from '../../rpc/types'
 import {RPCError, RPCState} from '../../rpc/rpc'
 import {KeysRequest, KeysResponse} from '../../rpc/types'
 
@@ -103,7 +103,10 @@ class KeysView extends React.Component<Props> {
                     <NamesView users={key.users || []} />
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView id={key.id} owner={key.isPrivate} />
+                    <IDView
+                      id={key.id}
+                      owner={key.type == KeyType.CURVE25519 || key.type === KeyType.ED25519}
+                    />
                   </TableCell>
                 </TableRow>
               )

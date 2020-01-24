@@ -31,17 +31,8 @@ export const init = () => (dispatch: (action: any) => void, getState: () => Stat
     }
   })
 
-  dispatch(
-    runtimeStatus({}, (resp: RuntimeStatusResponse) => {
-      console.log('Status:', resp)
-      if (!resp.authSetupNeeded) {
-        dispatch(push('/key/create'))
-      } else {
-        dispatch(startWatchStream())
-        dispatch(push('/keys/index'))
-      }
-    })
-  )
+  dispatch(startWatchStream())
+  dispatch(push('/keys/index'))
 }
 
 export const errors = (err: Error) => (dispatch: (action: any) => any) => {

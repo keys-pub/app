@@ -11,7 +11,6 @@ import DebugView from './profile/debug'
 
 import ComposeView from './compose'
 
-// import KeyCreateView  from './key/create'
 import KeyExportView from './key/export'
 import KeyImportView from './key/import'
 // import KeyRemoveView  from './key/remove'
@@ -30,11 +29,17 @@ import UserNameView from './user/name'
 import UserSignView from './user/sign'
 
 import EncryptView from './encrypt'
+import EncryptedView from './encrypt/encrypted'
+import DecryptView from './decrypt'
+import DecryptedView from './decrypt/decrypted'
+import SignView from './sign'
+import SignedView from './sign/signed'
+import VerifyView from './verify'
+import VerifiedView from './verify/verified'
 
 // TODO: Make path string RoutePath type
 export type RouteInfo = {
   path: string
-  hideNav?: boolean
   component: () => any
   onLocationChange?: (dispatch: (action: any) => void) => void
 }
@@ -48,10 +53,9 @@ export const routes: Array<RouteInfo> = [
   {path: '/debug', component: () => <DebugView />},
   {path: '/key/index', component: () => <KeyView />},
   {path: '/key/export', component: () => <KeyExportView />},
-  // {path: '/key/create', component: () => <KeyCreate />},
   {path: '/key/import', component: () => <KeyImportView />},
   // {path: '/key/remove', component: () => <KeyRemove />},
-  // {path: '/inbox', nav: true, component: () => <Inbox />},
+  // {path: '/inbox', component: () => <Inbox />},
   // {path: '/inbox/info', component: () => <InboxInfo />},
   // {path: '/inbox/leave', component: () => <InboxLeave />},
   {
@@ -67,6 +71,13 @@ export const routes: Array<RouteInfo> = [
   {path: '/user/sign', component: () => <UserSignView />},
 
   {path: '/encrypt/index', component: () => <EncryptView />},
+  {path: '/encrypt/encrypted', component: () => <EncryptedView />},
+  {path: '/decrypt/index', component: () => <DecryptView />},
+  {path: '/decrypt/decrypted', component: () => <DecryptedView />},
+  {path: '/sign/index', component: () => <SignView />},
+  {path: '/sign/signed', component: () => <SignedView />},
+  {path: '/verify/index', component: () => <VerifyView />},
+  {path: '/verify/verified', component: () => <VerifiedView />},
 ]
 
 // Map of path to route

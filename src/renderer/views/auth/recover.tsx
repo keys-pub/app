@@ -68,7 +68,7 @@ class AuthRecoverView extends React.Component<Props, State> {
               style: {fontSize: 32, height: 18},
             }}
             value={this.state.password}
-            style={{fontSize: 48, width: 400}}
+            style={{fontSize: 48, width: 600}}
             disabled={this.state.loading}
           />
           <Box padding={1} />
@@ -87,7 +87,7 @@ class AuthRecoverView extends React.Component<Props, State> {
             rowsMax={4}
             multiline={true}
             value={this.state.keyBackup}
-            style={{fontSize: 48, width: 500}}
+            style={{fontSize: 48, width: 600}}
             disabled={this.state.loading}
             inputRef={this.keyBackupRef}
           />

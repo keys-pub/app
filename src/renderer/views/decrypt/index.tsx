@@ -2,18 +2,16 @@ import * as React from 'react'
 
 import {connect} from 'react-redux'
 
-import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
+import {Button, Divider, LinearProgress, Input, Box, Typography} from '@material-ui/core'
 
+import {styles} from '../../components'
 import {push} from 'connected-react-router'
-
-import RecipientsView from '../user/recipients'
-
 import {store} from '../../store'
 import {query} from '../state'
 
-import {encrypt, RPCError, RPCState} from '../../rpc/rpc'
+import {decrypt, RPCError, RPCState} from '../../rpc/rpc'
 
-import {UserSearchResult, EncryptRequest, EncryptResponse} from '../../rpc/types'
+import {UserSearchResult, DecryptRequest, DecryptResponse} from '../../rpc/types'
 
 export type Props = {
   kid: string
@@ -21,9 +19,8 @@ export type Props = {
 
 type State = {
   error: string
+  results: Array<UserSearchResult>
   loading: boolean
-  recipients: UserSearchResult[]
-  sender: string
   value: string
 }
 
@@ -31,9 +28,8 @@ class EncryptView extends React.Component<Props, State> {
   state = {
     error: '',
     loading: false,
-    recipients: [],
-    sender: this.props.kid,
     value: '',
+    results: [],
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -41,30 +37,19 @@ class EncryptView extends React.Component<Props, State> {
     this.setState({value: target.value || '', error: ''})
   }
 
-  setRecipients = (recipients: UserSearchResult[]) => {
-    this.setState({recipients, error: ''})
-  }
-
-  encrypt = () => {
+  decrypt = () => {
     this.setState({loading: true, error: ''})
-
-    const recs = this.state.recipients.map((r: UserSearchResult) => {
-      return r.kid
-    })
-
     const data = new TextEncoder().encode(this.state.value)
-    const req: EncryptRequest = {
+    const req: DecryptRequest = {
       data: data,
       armored: true,
-      recipients: recs,
-      sender: this.props.kid,
     }
     store.dispatch(
-      encrypt(
+      decrypt(
         req,
-        (resp: EncryptResponse) => {
+        (resp: DecryptResponse) => {
           this.setState({loading: false, error: ''})
-          store.dispatch(push('/encrypt/encrypted'))
+          store.dispatch(push('/decrypt/decrypted'))
         },
         (err: RPCError) => {
           this.setState({loading: false, error: err.message})
@@ -75,13 +60,8 @@ class EncryptView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
+      <Box display="flex" flex={1} flexDirection="column">
         <Divider />
-        <Box paddingLeft={1} paddingRight={1} paddingTop={1} paddingBottom={1}>
-          <RecipientsView onChange={this.setRecipients} />
-        </Box>
-        <Divider />
-
         <Input
           multiline
           autoFocus
@@ -90,6 +70,7 @@ class EncryptView extends React.Component<Props, State> {
           disableUnderline
           inputProps={{
             style: {
+              ...styles.mono,
               height: '100%',
             },
           }}
@@ -112,8 +93,8 @@ class EncryptView extends React.Component<Props, State> {
             paddingRight: 20,
           }}
         >
-          <Button color="primary" variant="outlined" onClick={this.encrypt} disabled={this.state.loading}>
-            Encrypt
+          <Button color="primary" variant="outlined" onClick={this.decrypt} disabled={this.state.loading}>
+            Decrypt
           </Button>
           {this.state.error && (
             <Typography color="secondary" style={{paddingLeft: 20, alignSelf: 'center'}}>

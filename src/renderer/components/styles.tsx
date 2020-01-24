@@ -37,6 +37,7 @@ const logo = {
 const mono = {
   fontFamily: 'Roboto Mono',
   whiteSpace: 'pre-wrap',
+  fontSize: 13,
 }
 
 const messageInput = {

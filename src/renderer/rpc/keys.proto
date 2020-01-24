@@ -400,8 +400,12 @@ enum KeyType {
   option (gogoproto.enum_customname) = "KeyType";
   
   UNKNOWN_KEY_TYPE = 0 [(gogoproto.enumvalue_customname) = "UnknownKeyType"];
-  ED25519 = 1 [(gogoproto.enumvalue_customname) = "Ed25519"];
-  CURVE25519 = 2 [(gogoproto.enumvalue_customname) = "Curve25519"];  
+  
+  ED25519 = 10 [(gogoproto.enumvalue_customname) = "Ed25519"];
+  ED25519_PUBLIC = 11 [(gogoproto.enumvalue_customname) = "Ed25519Public"];
+
+  CURVE25519 = 20 [(gogoproto.enumvalue_customname) = "Curve25519"];  
+  CURVE25519_PUBLIC = 21 [(gogoproto.enumvalue_customname) = "Curve25519Public"];  
 }
 
 message Key {
@@ -409,8 +413,6 @@ message Key {
   string id = 1 [(gogoproto.customname) = "ID"];
   // Type of key.
   KeyType type = 3;
-  // IsPrivate is true if key has private material.
-  bool isPrivate = 4;
   // Users associated with this key.
   repeated User users = 6;  
   // Saved if saved locally.
@@ -436,8 +438,10 @@ enum SortDirection {
 
 message KeysRequest {
   string query = 1;
+  repeated KeyType types = 2;
+  
   string sortField = 10;
-  SortDirection sortDirection = 11;
+  SortDirection sortDirection = 11;  
 }
 message KeysResponse {
   repeated Key keys = 1;

@@ -1,6 +1,6 @@
 import emoji from 'node-emoji'
 
-import {Key, KeyType} from '../rpc/types'
+import {Key, KeyType, User} from '../rpc/types'
 
 export const serviceName = (service: string): string => {
   let serviceName = '?'
@@ -15,17 +15,20 @@ export const serviceName = (service: string): string => {
   return serviceName
 }
 
+export const keyUsers = (key: Key): string => {
+  const users = (key.users || []).map((user: User) => user.label)
+  return users.join(',')
+}
+
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
     case KeyType.CURVE25519:
-      if (key.isPrivate) {
-        return 'Curve25519 Private Key'
-      }
+      return 'Curve25519 Private Key'
+    case KeyType.CURVE25519_PUBLIC:
       return 'Curve25519 Public Key'
     case KeyType.ED25519:
-      if (key.isPrivate) {
-        return 'Ed25519 Private Key'
-      }
+      return 'Ed25519 Private Key'
+    case KeyType.ED25519_PUBLIC:
       return 'Ed25519 Public Key'
     default:
       return 'Unknown (' + key.type + ')'

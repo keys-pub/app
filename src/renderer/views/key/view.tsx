@@ -73,9 +73,9 @@ type Props = {
   kid: string
 }
 
-type State = {
-  key: Key | void
-  statements: Array<Statement>
+interface State {
+  key: Key
+  statements: Statement[]
   revoke: number
   loading: boolean
   error: string
@@ -84,7 +84,7 @@ type State = {
 class KeyView extends React.Component<Props, State> {
   state = {
     loading: false,
-    key: null,
+    key: {} as Key,
     revoke: 0,
     statements: [],
     error: '',
@@ -182,8 +182,9 @@ class KeyView extends React.Component<Props, State> {
       if (user.service === 'github') hasGithub = true
     })
 
-    const isPrivate = this.state.key && this.state.key.isPrivate
-    const isPublic = this.state.key && !this.state.key.isPrivate
+    const isPrivate = this.state.key.type == KeyType.CURVE25519 || this.state.key.type == KeyType.ED25519
+    const isPublic =
+      this.state.key.type == KeyType.CURVE25519_PUBLIC || this.state.key.type == KeyType.ED25519_PUBLIC
     const add = !saved && isPublic
     const remove = saved && isPublic
 
@@ -231,16 +232,18 @@ class KeyView extends React.Component<Props, State> {
                     <NameView user={user} />
                     {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
                     <Link onClick={() => electron.shell.openExternal(user.url)}>{user.url}</Link>
-                    <Box>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => this.setState({revoke: user.seq})}
-                      >
-                        Revoke
-                      </Button>
-                    </Box>
+                    {isPrivate && (
+                      <Box>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => this.setState({revoke: user.seq})}
+                        >
+                          Revoke
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
                 ))}
                 {isPublic && users.length == 0 && <Typography style={{color: '#9f9f9f'}}>none</Typography>}

@@ -8,6 +8,8 @@ import ErrorView from './view'
 
 import {Button, Typography} from '@material-ui/core'
 
+import {ipcRenderer} from 'electron'
+
 type Props = {
   children: any
 }
@@ -31,6 +33,10 @@ export default class ErrorBoundaryView extends React.Component<Props, State> {
     })
   }
 
+  restart = () => {
+    ipcRenderer.send('restart-app', {})
+  }
+
   render() {
     if (!this.state.error) {
       return this.props.children
@@ -49,6 +55,11 @@ export default class ErrorBoundaryView extends React.Component<Props, State> {
         }}
       >
         <ErrorView error={this.state.error} errorInfo={this.state.errorInfo} />
+        <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
+          <Button color="secondary" variant="contained" onClick={this.restart}>
+            Restart the App
+          </Button>
+        </Box>
       </Box>
     )
   }
