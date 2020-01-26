@@ -37,7 +37,13 @@ class AuthUnlockView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
+      <Box
+        display="flex"
+        flexGrow={1}
+        flexDirection="column"
+        alignItems="center"
+        style={{height: '100%', paddingTop: 60}}
+      >
         <Header loading={this.state.loading} />
         <Typography style={{paddingTop: 10, paddingBottom: 20}}>
           The keyring is locked. Enter your master password to continue.

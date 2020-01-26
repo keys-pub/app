@@ -19,19 +19,18 @@ export const NameView = (props: {user: User}) => {
   const name = user.name
 
   return (
-    <Box display="flex" flexDirection="row">
-      <Box display="flex" flexDirection="row">
-        <Typography
-          style={{
-            ...styles.mono,
-            color: textColor,
-          }}
-        >
-          <span style={{wordWrap: 'break-word', wordBreak: 'break-all'}}>{name}</span>
-          <wbr />
-          <span style={{color: scolor}}>@{user.service}</span>
-        </Typography>
-      </Box>
+    <Box display="inline">
+      <Typography
+        display="inline"
+        style={{
+          ...styles.mono,
+          color: textColor,
+        }}
+      >
+        <span style={{wordWrap: 'break-word', wordBreak: 'break-all'}}>{name}</span>
+        <wbr />
+        <span style={{color: scolor}}>@{user.service}</span>
+      </Typography>
     </Box>
   )
 }

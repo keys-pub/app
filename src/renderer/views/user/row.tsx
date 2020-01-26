@@ -6,25 +6,26 @@ import {Key, User} from '../../rpc/types'
 
 import {styles} from '../../components'
 
+import {NameView} from './views'
+
 export type Props = {
-  value: Key
+  kid: string
+  users: User[]
 }
 
-export default class KeyRowView extends React.Component<Props> {
+export default class UserView extends React.Component<Props> {
   render() {
-    if (!this.props.value) {
+    const {kid, users} = this.props
+    if (!kid) {
       return null
     }
 
-    const users: User[] = this.props.value.users || []
     if (users.length > 0) {
       return (
         <Box display="inline">
           {users.map((u: User, index: number) => (
             <Box display="inline">
-              <Typography display="inline" style={{...styles.mono}}>
-                {u.label}
-              </Typography>
+              <NameView user={u} />
               {index < users.length - 1 && <Typography display="inline">, </Typography>}
             </Box>
           ))}
@@ -34,7 +35,7 @@ export default class KeyRowView extends React.Component<Props> {
 
     return (
       <Box>
-        <Typography style={{...styles.mono}}>{this.props.value.id}</Typography>
+        <Typography style={{...styles.mono}}>{this.props.kid}</Typography>
       </Box>
     )
   }

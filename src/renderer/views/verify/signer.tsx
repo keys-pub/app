@@ -4,7 +4,7 @@ import {Typography, Box} from '@material-ui/core'
 
 import {Key} from '../../rpc/types'
 
-import KeyRowView from '../key/row'
+import UserRow from '../user/row'
 import {styles} from '../../components'
 
 export type Props = {
@@ -13,7 +13,8 @@ export type Props = {
 
 export default class SignerView extends React.Component<Props> {
   render() {
-    const backgroundColor = this.props.signer ? '#bbeebb' : '#efefef'
+    const {signer} = this.props
+    const backgroundColor = signer ? '#bbeebb' : '#efefef'
     return (
       <Box style={{paddingLeft: 10, paddingTop: 8, paddingBottom: 8, backgroundColor}}>
         {this.props.signer && (
@@ -21,7 +22,7 @@ export default class SignerView extends React.Component<Props> {
             <Typography display="inline" style={{...styles.mono}}>
               Verified&nbsp;
             </Typography>
-            <KeyRowView value={this.props.signer} />
+            <UserRow kid={signer.id} users={signer.users} />
           </Box>
         )}
         {!this.props.signer && <Typography display="inline">&nbsp;</Typography>}

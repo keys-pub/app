@@ -218,10 +218,12 @@ class KeyView extends React.Component<Props, State> {
             </TableRow>
             <TableRow>
               <TableCell style={cstyles.cell}>
-                <Typography align="right">{users.length < 2 ? 'User' : 'Users'}</Typography>
+                <Typography align="right">Users</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
-                {users.length == 0 && <Typography style={{color: '#999'}}>none</Typography>}
+                {this.state.key.id && users.length == 0 && (
+                  <Typography style={{color: '#999'}}>none</Typography>
+                )}
                 {users.map((user: User) => (
                   <Box
                     display="flex"

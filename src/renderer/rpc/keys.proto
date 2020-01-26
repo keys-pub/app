@@ -574,8 +574,7 @@ message User {
 
 message UserSearchResult {
   string kid = 1 [(gogoproto.customname) = "KID"];
-  repeated User users = 2;
-  int32 matchCount = 3;
+  User user = 2;
 }
 
 message UserSearchRequest {

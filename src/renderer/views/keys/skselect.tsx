@@ -3,9 +3,8 @@ import * as React from 'react'
 import {Box, Divider, FormControl, InputLabel, MenuItem, Select} from '@material-ui/core'
 
 import {store} from '../../store'
-import {keyUsers} from '../helper'
 
-import KeyRowView from '../key/row'
+import UserRow from '../user/row'
 
 import {keys, RPCError} from '../../rpc/rpc'
 import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
@@ -90,7 +89,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
-              <KeyRowView value={k} />
+              <UserRow kid={k.id} users={k.users} />
             </MenuItem>
           ))}
         </Select>

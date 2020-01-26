@@ -504,8 +504,7 @@ export interface User {
 
 export interface UserSearchResult {
     kid?: string;
-    users?: Array<User>;
-    matchCount?: number;
+    user?: User;
 }
 
 export interface UserSearchRequest {

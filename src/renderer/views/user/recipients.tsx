@@ -1,10 +1,13 @@
 import * as React from 'react'
 
 import {TextField} from '@material-ui/core'
+import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import {store} from '../../store'
+
+import UserRow from './row'
 
 import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
 import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
@@ -66,6 +69,18 @@ export default class RecipientsView extends React.Component<Props, State> {
     }
   }
 
+  renderOption = (option: UserSearchResult) => {
+    return (
+      <React.Fragment>
+        <UserRow kid={option.kid} users={[option.user]} />
+      </React.Fragment>
+    )
+  }
+
+  optionSelected = (option: UserSearchResult, value: UserSearchResult) => {
+    return option.kid === value.kid && option.user.label === value.user.label
+  }
+
   render() {
     const {open, loading, options} = this.state
     return (
@@ -79,16 +94,11 @@ export default class RecipientsView extends React.Component<Props, State> {
         onInputChange={this.onInputChange}
         onChange={this.onChange}
         value={this.state.selected}
-        getOptionSelected={(option: UserSearchResult, value: UserSearchResult) => option.kid === value.kid}
-        getOptionLabel={(option: UserSearchResult) => option.users[0].label}
+        getOptionSelected={this.optionSelected}
+        getOptionLabel={(option: UserSearchResult) => option.user.label}
         options={options}
-        // loading={this.state.loading}
-        // renderOption={option => (
-        //   <React.Fragment>
-        //     <span>{countryToFlag(option.code)}</span>
-        //     {option.label} ({option.code}) +{option.phone}
-        //   </React.Fragment>
-        // )}
+        ChipProps={{color: 'primary', variant: 'outlined', icon: <FaceIcon />, size: 'medium'}}
+        renderOption={this.renderOption}
         renderInput={params => (
           <TextField
             {...params}

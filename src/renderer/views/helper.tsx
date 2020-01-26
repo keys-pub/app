@@ -31,7 +31,7 @@ export const keyDescription = (key: Key): string => {
     case KeyType.ED25519_PUBLIC:
       return 'Ed25519 Public Key'
     default:
-      return 'Unknown (' + key.type + ')'
+      return ''
   }
 }
 
