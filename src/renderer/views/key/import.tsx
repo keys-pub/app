@@ -51,7 +51,7 @@ class KeyImportView extends React.Component<Props, State> {
           this.props.dispatch(push('/key/index?kid=' + resp.kid))
         },
         (err: RPCError) => {
-          this.setState({error: err.message})
+          this.setState({error: err.details})
         }
       )
     )

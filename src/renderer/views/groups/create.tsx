@@ -45,7 +45,7 @@ class GroupCreateView extends React.Component<Props, State> {
           this.props.dispatch(goBack())
         },
         (err: Error) => {
-          this.setState({error: err.message})
+          this.setState({error: err.details})
         }
       )
     )

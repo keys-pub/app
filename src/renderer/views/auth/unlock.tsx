@@ -40,7 +40,7 @@ class AuthUnlockView extends React.Component<Props, State> {
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
         <Header loading={this.state.loading} />
         <Typography style={{paddingTop: 10, paddingBottom: 20}}>
-          Your keyring is locked. Verify your master password to continue.
+          The keyring is locked. Enter your master password to continue.
         </Typography>
         <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
           <TextField

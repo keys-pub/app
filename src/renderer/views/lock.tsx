@@ -15,7 +15,7 @@ import * as queryString from 'query-string'
 import {connect} from 'react-redux'
 
 import {Box, Typography} from '@material-ui/core'
-import ErrorsView from './errors'
+import ErrorsView from '../errors'
 
 type Props = {
   error: Error | void
@@ -62,13 +62,13 @@ class Lock extends React.Component<Props> {
     console.log('Path:', this.props.path)
     const route = routesMap.get(this.props.path)
     if (!route) {
-      const error = Error('Route not found: ' + this.props.path)
+      const error = new Error('Route not found: ' + this.props.path)
       return <ErrorsView error={error} restart={this.restart} />
     }
 
     console.log('Unlocked:', this.props.unlocked)
 
-    if (!this.props.unlocked || this.props.path == '/') {
+    if (!this.props.unlocked || this.props.path == '/' || this.props.path.startsWith('/auth')) {
       return <Auth />
     }
 

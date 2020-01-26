@@ -3,9 +3,9 @@ import * as React from 'react'
 import {Box, Typography} from '@material-ui/core'
 
 import {Inbox} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
+import {RPCError, RPCState} from '../../rpc/rpc'
 
-export default (err: Error, inbox: Inbox) => {
+export default (err: RPCError, inbox: Inbox) => {
   return (
     <Box
       display="flex"
@@ -25,7 +25,7 @@ export default (err: Error, inbox: Inbox) => {
             Inbox KID: {inbox.kid}
           </Typography>
         )}
-        <Typography style={{color: '#993333'}}>{err.message}</Typography>
+        <Typography style={{color: '#993333'}}>{err.details}</Typography>
       </Box>
     </Box>
   )

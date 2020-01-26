@@ -44,7 +44,7 @@ export default class RecipientsView extends React.Component<Props, State> {
           this.setState({options: resp.results || [], loading: false})
         },
         (err: RPCError) => {
-          this.setState({error: err.message, loading: false})
+          this.setState({error: err.details, loading: false})
         }
       )
     )

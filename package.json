@@ -111,6 +111,7 @@
     "@hot-loader/react-dom": "^16.8.6",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/jest": "^24.9.0",
+    "@types/lodash": "^4.14.149",
     "@types/node": "12.12.6",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",

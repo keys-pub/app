@@ -1,81 +1,88 @@
 import * as React from 'react'
 
-import {connect} from 'react-redux'
-
-import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
+import {Input, Box} from '@material-ui/core'
 
 import {styles} from '../../components'
 
-import {goBack} from 'connected-react-router'
-
-import RecipientsView from '../user/recipients'
-
 import {store} from '../../store'
-import {query} from '../state'
 
-import {encrypt, RPCError, RPCState} from '../../rpc/rpc'
+import {debounce} from 'lodash'
 
-import {UserSearchResult, EncryptRequest, EncryptResponse} from '../../rpc/types'
+import {sign, RPCError} from '../../rpc/rpc'
+
+import {Key, SignRequest, SignResponse} from '../../rpc/types'
 
 export type Props = {
   value: string
+  kid: string
 }
 
-class SignedView extends React.Component<Props> {
-  close() {
-    store.dispatch(goBack())
+type State = {
+  signed: string
+  error: string
+}
+
+export default class SignedView extends React.Component<Props, State> {
+  state = {
+    signed: '',
+    error: '',
+  }
+  // debounceSign = debounce(() => this.sign(), 10)
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps != this.props) {
+      this.sign()
+    }
+  }
+
+  sign = () => {
+    this.setState({error: '', signed: ''})
+
+    if (this.props.kid == '' || this.props.value == '') {
+      return
+    }
+
+    this.setState({error: '', signed: ''})
+    const data = new TextEncoder().encode(this.props.value)
+    const req: SignRequest = {
+      data: data,
+      armored: true,
+      kid: this.props.kid,
+    }
+    store.dispatch(
+      sign(
+        req,
+        (resp: SignResponse) => {
+          const signed = new TextDecoder('ascii').decode(resp.data)
+          this.setState({error: '', signed})
+        },
+        (err: RPCError) => {
+          this.setState({error: err.details})
+        }
+      )
+    )
   }
 
   render() {
     return (
-      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-        <Divider />
-        <Input
-          multiline
-          readOnly
-          value={this.props.value}
-          disableUnderline
-          inputProps={{
-            style: {
-              ...styles.mono,
-              height: '100%',
-            },
-          }}
-          style={{
+      <Input
+        multiline
+        readOnly
+        value={this.state.signed}
+        disableUnderline
+        inputProps={{
+          style: {
+            ...styles.mono,
             height: '100%',
-            paddingLeft: 10,
-            paddingTop: 10,
-            overflowY: 'scroll',
-          }}
-        />
-        <Divider />
-        <Box
-          display="flex"
-          flexDirection="row"
-          style={{
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingRight: 20,
-          }}
-        >
-          <Button color="secondary" variant="outlined" onClick={this.close}>
-            Close
-          </Button>
-        </Box>
-      </Box>
+          },
+        }}
+        style={{
+          height: '100%',
+          paddingLeft: 10,
+          paddingTop: 10,
+          overflowY: 'scroll',
+        }}
+      />
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  let signed = ''
-  if (state.rpc.sign) {
-    signed = new TextDecoder('ascii').decode(state.rpc.sign.data)
-  }
-
-  return {
-    value: signed,
-  }
-}
-export default connect(mapStateToProps)(SignedView)

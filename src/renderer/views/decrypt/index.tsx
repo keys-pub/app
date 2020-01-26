@@ -2,60 +2,29 @@ import * as React from 'react'
 
 import {connect} from 'react-redux'
 
-import {Button, Divider, LinearProgress, Input, Box, Typography} from '@material-ui/core'
+import {Divider, Box, Input} from '@material-ui/core'
+
+import DecryptedView from './decrypted'
 
 import {styles} from '../../components'
-import {push} from 'connected-react-router'
-import {store} from '../../store'
 import {query} from '../state'
 
-import {decrypt, RPCError, RPCState} from '../../rpc/rpc'
+import {RPCState} from '../../rpc/rpc'
 
-import {UserSearchResult, DecryptRequest, DecryptResponse} from '../../rpc/types'
-
-export type Props = {
-  kid: string
-}
+export type Props = {}
 
 type State = {
-  error: string
-  results: Array<UserSearchResult>
-  loading: boolean
   value: string
 }
 
-class EncryptView extends React.Component<Props, State> {
+class DecryptView extends React.Component<Props, State> {
   state = {
-    error: '',
-    loading: false,
     value: '',
-    results: [],
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({value: target.value || '', error: ''})
-  }
-
-  decrypt = () => {
-    this.setState({loading: true, error: ''})
-    const data = new TextEncoder().encode(this.state.value)
-    const req: DecryptRequest = {
-      data: data,
-      armored: true,
-    }
-    store.dispatch(
-      decrypt(
-        req,
-        (resp: DecryptResponse) => {
-          this.setState({loading: false, error: ''})
-          store.dispatch(push('/decrypt/decrypted'))
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
-        }
-      )
-    )
+    this.setState({value: target.value || ''})
   }
 
   render() {
@@ -75,32 +44,20 @@ class EncryptView extends React.Component<Props, State> {
             },
           }}
           style={{
-            height: '100%',
+            height: '50%',
             paddingLeft: 10,
             paddingTop: 10,
             overflowY: 'scroll',
           }}
         />
-        {!this.state.loading && <Divider style={{marginBottom: 3}} />}
-        {this.state.loading && <LinearProgress />}
+        <Divider />
         <Box
-          display="flex"
-          flexDirection="row"
           style={{
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingRight: 20,
+            height: '50%',
+            width: '100%',
           }}
         >
-          <Button color="primary" variant="outlined" onClick={this.decrypt} disabled={this.state.loading}>
-            Decrypt
-          </Button>
-          {this.state.error && (
-            <Typography color="secondary" style={{paddingLeft: 20, alignSelf: 'center'}}>
-              {this.state.error}
-            </Typography>
-          )}
+          <DecryptedView value={this.state.value} />
         </Box>
       </Box>
     )
@@ -112,4 +69,5 @@ const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => 
     kid: query(state, 'kid'),
   }
 }
-export default connect(mapStateToProps)(EncryptView)
+
+export default connect(mapStateToProps)(DecryptView)

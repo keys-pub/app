@@ -6,76 +6,99 @@ import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material
 
 import {styles} from '../../components'
 
-import {goBack} from 'connected-react-router'
-
-import RecipientsView from '../user/recipients'
-
 import {store} from '../../store'
-import {query} from '../state'
 
-import {encrypt, RPCError, RPCState} from '../../rpc/rpc'
+import {encrypt, RPCError} from '../../rpc/rpc'
 
 import {UserSearchResult, EncryptRequest, EncryptResponse} from '../../rpc/types'
+import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   value: string
+  recipients: UserSearchResult[]
+  sender: string
 }
 
-class EncryptedView extends React.Component<Props> {
-  close() {
-    store.dispatch(goBack())
+type State = {
+  encrypted: string
+  error: string
+}
+
+export default class EncryptedView extends React.Component<Props, State> {
+  state = {
+    encrypted: '',
+    error: '',
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps != this.props) {
+      this.encrypt()
+    }
+  }
+
+  encrypt = () => {
+    this.setState({error: '', encrypted: ''})
+
+    const recs = this.props.recipients.map((r: UserSearchResult) => {
+      return r.kid
+    })
+
+    if (recs.length == 0 || this.props.value == '') {
+      return
+    }
+
+    const data = new TextEncoder().encode(this.props.value)
+    const req: EncryptRequest = {
+      data: data,
+      armored: true,
+      recipients: recs,
+      sender: this.props.sender,
+    }
+    store.dispatch(
+      encrypt(
+        req,
+        (resp: EncryptResponse) => {
+          const encrypted = new TextDecoder('ascii').decode(resp.data)
+          this.setState({error: '', encrypted: encrypted})
+        },
+        (err: RPCError) => {
+          this.setState({error: err.details})
+        }
+      )
+    )
   }
 
   render() {
+    let value = ''
+    let stylesInput: CSSProperties = {}
+    if (this.state.error) {
+      value = this.state.error
+      stylesInput.color = 'red'
+    } else {
+      value = this.state.encrypted
+    }
+
     return (
-      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-        <Divider />
-        <Input
-          multiline
-          readOnly
-          value={this.props.value}
-          disableUnderline
-          inputProps={{
-            style: {
-              ...styles.mono,
-              height: '100%',
-            },
-          }}
-          style={{
+      <Input
+        multiline
+        readOnly
+        value={value}
+        disableUnderline
+        inputProps={{
+          style: {
+            ...styles.mono,
+            ...stylesInput,
             height: '100%',
-            paddingLeft: 10,
-            paddingTop: 10,
-            overflowY: 'scroll',
-          }}
-        />
-        <Divider />
-        <Box
-          display="flex"
-          flexDirection="row"
-          style={{
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingRight: 20,
-          }}
-        >
-          <Button color="secondary" variant="outlined" onClick={this.close}>
-            Close
-          </Button>
-        </Box>
-      </Box>
+          },
+        }}
+        style={{
+          height: '100%',
+          width: '100%',
+          paddingLeft: 10,
+          paddingTop: 10,
+          overflowY: 'scroll',
+        }}
+      />
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  let encrypted = ''
-  if (state.rpc.encrypt) {
-    encrypted = new TextDecoder('ascii').decode(state.rpc.encrypt.data)
-  }
-
-  return {
-    value: encrypted,
-  }
-}
-export default connect(mapStateToProps)(EncryptedView)

@@ -141,7 +141,7 @@ class AuthRecoverView extends React.Component<Props, State> {
     let cl = await client()
     cl.authSetup(req, (err: RPCError | void, resp: AuthSetupResponse | void) => {
       if (err) {
-        this.setState({loading: false, error: err.message})
+        this.setState({loading: false, error: err.details})
         return
       }
       if (!resp) {

@@ -87,7 +87,7 @@ class ProfileView extends React.Component<Props, State> {
           }
         },
         (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
+          this.setState({loading: false, error: err.details})
         }
       )
     )

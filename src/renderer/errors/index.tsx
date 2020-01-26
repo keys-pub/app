@@ -20,10 +20,20 @@ export default class ErrorsView extends React.Component<Props> {
         style={{
           backgroundColor: 'white',
           height: '100%',
-          width: '100%',
         }}
       >
         <Box className="drag" style={{width: '100%', height: 40}} />
+        <Typography
+          variant="h5"
+          style={{
+            paddingBottom: 20,
+            fontFamily: 'Roboto Mono',
+            textAlign: 'center',
+          }}
+          color="secondary"
+        >
+          Ah shucks! Something isn't working right.
+        </Typography>
         <ErrorView error={this.props.error} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
           <Button color="secondary" variant="contained" onClick={this.props.restart}>

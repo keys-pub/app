@@ -2,13 +2,16 @@ import * as React from 'react'
 
 import {Box} from '@material-ui/core'
 
-import {styles} from '../../components'
+import {styles} from '../components'
 
 import ErrorView from './view'
 
 import {Button, Typography} from '@material-ui/core'
 
 import {ipcRenderer} from 'electron'
+import {store} from '../store'
+
+import {goBack} from 'connected-react-router'
 
 type Props = {
   children: any
@@ -37,6 +40,10 @@ export default class ErrorBoundaryView extends React.Component<Props, State> {
     ipcRenderer.send('restart-app', {})
   }
 
+  goBack = () => {
+    store.dispatch(goBack())
+  }
+
   render() {
     if (!this.state.error) {
       return this.props.children
@@ -47,17 +54,32 @@ export default class ErrorBoundaryView extends React.Component<Props, State> {
         display="flex"
         flexDirection="column"
         flex={1}
-        justifyContent="center"
-        alignItems="center"
         style={{
           backgroundColor: 'white',
           height: '100%',
+          width: '100%',
         }}
       >
+        <Box className="drag" style={{width: '100%', height: 40}} />
+        <Typography
+          variant="h5"
+          style={{
+            paddingBottom: 20,
+            fontFamily: 'Roboto Mono',
+            textAlign: 'center',
+          }}
+          color="secondary"
+        >
+          Ah shucks! Something isn't working right.
+        </Typography>
         <ErrorView error={this.state.error} errorInfo={this.state.errorInfo} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
-          <Button color="secondary" variant="contained" onClick={this.restart}>
+          <Button color="secondary" variant="contained" onClick={() => this.restart}>
             Restart the App
+          </Button>
+          <Box style={{width: 10}} />
+          <Button color="secondary" variant="outlined" onClick={() => this.goBack}>
+            Go Back
           </Button>
         </Box>
       </Box>

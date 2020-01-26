@@ -1,9 +1,11 @@
 import * as React from 'react'
 
-import {Box, Divider, MenuItem, Select} from '@material-ui/core'
+import {Box, Divider, FormControl, InputLabel, MenuItem, Select} from '@material-ui/core'
 
 import {store} from '../../store'
 import {keyUsers} from '../helper'
+
+import KeyRowView from '../key/row'
 
 import {keys, RPCError} from '../../rpc/rpc'
 import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
@@ -11,6 +13,7 @@ import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
 export type Props = {
   defaultValue?: string
   onChange?: (value: string) => void
+  includeAnon?: boolean
 }
 
 type State = {
@@ -46,7 +49,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           this.setState({options: resp.keys || [], loading: false})
         },
         (err: RPCError) => {
-          this.setState({error: err.message, loading: false})
+          this.setState({error: err.details, loading: false})
         }
       )
     )
@@ -63,16 +66,34 @@ export default class SignKeySelectView extends React.Component<Props, State> {
   render() {
     return (
       <Box>
-        <Box paddingLeft={1}>
-          <Select onChange={this.onChange} value={this.state.selected || ''} disableUnderline fullWidth>
-            {this.state.options.map((k: Key) => (
-              <MenuItem key={k.id} value={k.id}>
-                {keyUsers(k)} {k.id}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-        <Divider />
+        <Select
+          onChange={this.onChange}
+          value={this.state.selected || ''}
+          disableUnderline
+          fullWidth
+          displayEmpty
+          inputProps={{style: {color: 'red'}}}
+          SelectDisplayProps={{
+            style: {
+              paddingLeft: 8,
+              paddingTop: 12,
+              paddingBottom: 12,
+              backgroundColor: 'white',
+              // color: '#666',
+            },
+          }}
+        >
+          {this.props.includeAnon && (
+            <MenuItem key={'sk-none'} value={''}>
+              No Signer
+            </MenuItem>
+          )}
+          {this.state.options.map((k: Key) => (
+            <MenuItem key={k.id} value={k.id}>
+              <KeyRowView value={k} />
+            </MenuItem>
+          ))}
+        </Select>
       </Box>
     )
   }

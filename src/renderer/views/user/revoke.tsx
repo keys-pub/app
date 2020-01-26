@@ -91,7 +91,7 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
           this.setState({loading: false})
         },
         (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
+          this.setState({loading: false, error: err.details})
         }
       )
     )

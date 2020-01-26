@@ -110,8 +110,7 @@ message VerifyRequest {
 }
 message VerifyResponse {
   bytes data = 1;
-  // KID of who signed.
-  string kid = 2 [(gogoproto.customname) = "KID"];  
+  Key signer = 2;
 }
 
 message Statement {
@@ -197,8 +196,7 @@ message VerifyStreamInput {
 message VerifyStreamOutput {
   // Data, verified. If empty, is EOF.
   bytes data = 1;
-  // KID, that signed the data.
-  string kid = 2 [(gogoproto.customname) = "KID"];
+  Key signer = 2;
 }
 
 
@@ -237,7 +235,7 @@ message DecryptRequest {
 }
 message DecryptResponse {
   bytes data = 1;
-  string sender = 2;
+  Key sender = 2;
 }
 
 message EncryptStreamInput {
@@ -265,7 +263,7 @@ message DecryptStreamInput {
 message DecryptStreamOutput {
   // Data, decrypted. If empty, is EOF.
   bytes data = 1;
-  string sender = 2;  
+  Key sender = 2;
 }
 
 message RuntimeStatusRequest {}

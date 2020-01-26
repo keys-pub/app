@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Button, Dialog, Divider, Typography} from '@material-ui/core'
 
 import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
+import {goBack} from 'connected-react-router'
 
 import AuthIntroView from './intro'
 import AuthUnlockView from './unlock'

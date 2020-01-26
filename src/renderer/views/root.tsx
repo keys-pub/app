@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Provider} from 'react-redux'
 import {ConnectedRouter, push} from 'connected-react-router'
 
-import ErrorBoundary from './errors/boundary'
+import ErrorBoundary from '../errors/boundary'
 
 import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'

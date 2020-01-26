@@ -125,7 +125,7 @@ class KeyView extends React.Component<Props, State> {
           }
         },
         (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
+          this.setState({loading: false, error: err.details})
         }
       )
     )
@@ -145,7 +145,7 @@ class KeyView extends React.Component<Props, State> {
           this.loadKey()
         },
         (err: RPCError) => {
-          this.setState({loading: false, error: err.message})
+          this.setState({loading: false, error: err.details})
         }
       )
     )
@@ -162,7 +162,7 @@ class KeyView extends React.Component<Props, State> {
           store.dispatch(goBack())
         },
         (err: RPCError) => {
-          this.setState({error: err.message})
+          this.setState({error: err.details})
         }
       )
     )

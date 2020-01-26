@@ -27,7 +27,7 @@ export const init = () => (dispatch: (action: any) => void, getState: () => Stat
     if (err.code === grpc.status.PERMISSION_DENIED) {
       dispatch({type: 'LOCK'})
     } else if (!errFn) {
-      dispatch(errors(new Error(err.message)))
+      dispatch(errors(new Error(err.details)))
     }
   })
 

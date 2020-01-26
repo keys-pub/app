@@ -71,13 +71,9 @@ export const routes: Array<RouteInfo> = [
   {path: '/user/sign', component: () => <UserSignView />},
 
   {path: '/encrypt/index', component: () => <EncryptView />},
-  {path: '/encrypt/encrypted', component: () => <EncryptedView />},
   {path: '/decrypt/index', component: () => <DecryptView />},
-  {path: '/decrypt/decrypted', component: () => <DecryptedView />},
   {path: '/sign/index', component: () => <SignView />},
-  {path: '/sign/signed', component: () => <SignedView />},
   {path: '/verify/index', component: () => <VerifyView />},
-  {path: '/verify/verified', component: () => <VerifiedView />},
 ]
 
 // Map of path to route

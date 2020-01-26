@@ -45,7 +45,7 @@ class GroupJoinView extends React.Component<Props, State> {
           this.props.dispatch(push('/identity/name', {address: resp.group.id}))
         },
         (err: Error) => {
-          this.setState({error: err.message})
+          this.setState({error: err.details})
         }
       )
     )

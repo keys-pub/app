@@ -71,8 +71,7 @@ export interface VerifyRequest {
 
 export interface VerifyResponse {
     data?: Uint8Array;
-    // KID of who signed.
-    kid?: string;
+    signer?: Key;
 }
 
 export interface Statement {
@@ -162,8 +161,7 @@ export interface VerifyStreamInput {
 export interface VerifyStreamOutput {
     // Data, verified. If empty, is EOF.
     data?: Uint8Array;
-    // KID, that signed the data.
-    kid?: string;
+    signer?: Key;
 }
 
 export interface EncryptRequest {
@@ -194,7 +192,7 @@ export interface DecryptRequest {
 
 export interface DecryptResponse {
     data?: Uint8Array;
-    sender?: string;
+    sender?: Key;
 }
 
 export interface EncryptStreamInput {
@@ -223,7 +221,7 @@ export interface DecryptStreamInput {
 export interface DecryptStreamOutput {
     // Data, decrypted. If empty, is EOF.
     data?: Uint8Array;
-    sender?: string;
+    sender?: Key;
 }
 
 export interface RuntimeStatusRequest {
