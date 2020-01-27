@@ -22,7 +22,7 @@ export default class ErrorsView extends React.Component<Props> {
           height: '100%',
         }}
       >
-        <Box className="drag" style={{width: '100%', height: 40}} />
+        <Box className="drag" style={{width: '100%', height: 40, cursor: 'move'}} />
         <Typography
           variant="h5"
           style={{

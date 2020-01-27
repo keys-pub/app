@@ -7,6 +7,8 @@ import {ipcRenderer} from 'electron'
 import {Routes, routesMap} from './routes'
 import {goBack, push} from 'connected-react-router'
 
+import {store} from '../store'
+
 import Auth from './auth'
 import AppHeader from './header'
 import Nav from './nav'
@@ -21,21 +23,21 @@ type Props = {
   error: Error | void
   unlocked?: boolean
   path: string
-  dispatch: (action: any) => any
+  query: string
 }
 
 class Lock extends React.Component<Props> {
   restart = () => {
-    this.props.dispatch(push('/auth/index'))
+    store.dispatch(push('/auth/index'))
     ipcRenderer.send('restart-app', {})
   }
 
   back = () => {
-    this.props.dispatch(goBack())
+    store.dispatch(goBack())
   }
 
   clearError = () => {
-    this.props.dispatch({
+    store.dispatch({
       type: 'CLEAR_ERROR',
     })
   }
@@ -59,7 +61,7 @@ class Lock extends React.Component<Props> {
       return <ErrorsView error={this.props.error} restart={this.restart} clearError={this.clearError} />
     }
 
-    console.log('Path:', this.props.path)
+    console.log('Path:', this.props.path + this.props.query)
     const route = routesMap.get(this.props.path)
     if (!route) {
       const error = new Error('Route not found: ' + this.props.path)
@@ -77,11 +79,11 @@ class Lock extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => {
-  const values = queryString.parse(state.router.location.search)
   return {
     error: state.app.error,
     unlocked: state.app.unlocked,
     path: state.router.location.pathname,
+    query: state.router.location.search,
   }
 }
 

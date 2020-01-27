@@ -15,11 +15,6 @@ export const serviceName = (service: string): string => {
   return serviceName
 }
 
-export const keyUsers = (key: Key): string => {
-  const users = (key.users || []).map((user: User) => user.label)
-  return users.join(',')
-}
-
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
     case KeyType.CURVE25519:
@@ -33,16 +28,6 @@ export const keyDescription = (key: Key): string => {
     default:
       return ''
   }
-}
-
-export const keySymbol = (key: Key): string => {
-  switch (key.type) {
-    case KeyType.CURVE25519:
-      return emoji.get('key')
-    case KeyType.ED25519:
-      return emoji.get('lower_left_fountain_pen')
-  }
-  return emoji.get('question')
 }
 
 var dateOptions = {

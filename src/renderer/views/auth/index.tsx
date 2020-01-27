@@ -5,7 +5,7 @@ import {Box, Button, Dialog, Divider, Typography} from '@material-ui/core'
 import {connect} from 'react-redux'
 import {goBack} from 'connected-react-router'
 
-import AuthIntroView from './intro'
+import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
 
 import {runtimeStatus} from '../../rpc/rpc'
@@ -32,7 +32,7 @@ class AuthView extends React.Component<Props> {
   render() {
     if (this.props.loading) return null
     if (this.props.authSetupNeeded) {
-      return <AuthIntroView />
+      return <AuthSetupView />
     } else {
       return <AuthUnlockView />
     }

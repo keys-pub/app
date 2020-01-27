@@ -13,16 +13,16 @@ import {
 } from '@material-ui/core'
 
 import * as electron from 'electron'
-import * as queryString from 'query-string'
 
 import {styles, Link} from '../../components'
 import {NameView} from '../user/views'
 
 import {connect} from 'react-redux'
+import {query} from '../state'
 
 import {goBack, push} from 'connected-react-router'
 
-import {keyDescription, keySymbol} from '../helper'
+import {keyDescription} from '../helper'
 
 import {store} from '../../store'
 
@@ -63,10 +63,6 @@ export const IDView = (props: {id: string; owner?: boolean}) => {
 
 export const KeyDescriptionView = (props: {value: Key}) => {
   return <Typography>{keyDescription(props.value)}</Typography>
-}
-
-export const KeySymbolView = (props: {value: Key}) => {
-  return <Typography>{keySymbol(props.value)}</Typography>
 }
 
 type Props = {
@@ -168,25 +164,27 @@ class KeyView extends React.Component<Props, State> {
     )
   }
 
+  delete = () => {
+    store.dispatch(push('/keys/key/remove?kid=' + this.props.kid))
+  }
+
+  export = () => {
+    store.dispatch(push('/keys/key/export?kid=' + this.props.kid))
+  }
+
   render() {
     const kid = this.props.kid
 
     const loading = this.state.loading
     const saved = this.state.key && this.state.key.saved
-    const users = (this.state.key && this.state.key.users) || []
-
-    let hasGithub = false
-    let hasTwitter = false
-    users.map(user => {
-      if (user.service === 'twitter') hasTwitter = true
-      if (user.service === 'github') hasGithub = true
-    })
+    const user = this.state.key && this.state.key.user
 
     const isPrivate = this.state.key.type == KeyType.CURVE25519 || this.state.key.type == KeyType.ED25519
     const isPublic =
       this.state.key.type == KeyType.CURVE25519_PUBLIC || this.state.key.type == KeyType.ED25519_PUBLIC
     const add = !saved && isPublic
     const remove = saved && isPublic
+    const removePrivate = isPrivate
 
     return (
       <Box display="flex" flex={1} flexDirection="column">
@@ -221,10 +219,8 @@ class KeyView extends React.Component<Props, State> {
                 <Typography align="right">Users</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
-                {this.state.key.id && users.length == 0 && (
-                  <Typography style={{color: '#999'}}>none</Typography>
-                )}
-                {users.map((user: User) => (
+                {this.state.key.id && !user && <Typography style={{color: '#999'}}>none</Typography>}
+                {user && (
                   <Box
                     display="flex"
                     flexDirection="column"
@@ -247,9 +243,8 @@ class KeyView extends React.Component<Props, State> {
                       </Box>
                     )}
                   </Box>
-                ))}
-                {isPublic && users.length == 0 && <Typography style={{color: '#9f9f9f'}}>none</Typography>}
-                {isPrivate && !hasGithub && (
+                )}
+                {isPrivate && !user && (
                   <Button
                     size="small"
                     variant="outlined"
@@ -259,7 +254,7 @@ class KeyView extends React.Component<Props, State> {
                     Link to Github
                   </Button>
                 )}
-                {isPrivate && !hasTwitter && (
+                {isPrivate && !user && (
                   <Button
                     size="small"
                     variant="outlined"
@@ -271,6 +266,16 @@ class KeyView extends React.Component<Props, State> {
                 )}
               </TableCell>
             </TableRow>
+            {isPrivate && (
+              <TableRow>
+                <TableCell style={cstyles.cell}></TableCell>
+                <TableCell style={cstyles.cell}>
+                  <Button size="small" color="primary" variant="outlined" onClick={this.export}>
+                    Export
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow>
               <TableCell style={cstyles.cell}></TableCell>
               <TableCell style={cstyles.cell}>
@@ -283,6 +288,11 @@ class KeyView extends React.Component<Props, State> {
                   {remove && (
                     <Button size="small" color="secondary" variant="outlined" onClick={this.remove}>
                       Remove
+                    </Button>
+                  )}
+                  {removePrivate && (
+                    <Button size="small" color="secondary" variant="outlined" onClick={this.delete}>
+                      Delete
                     </Button>
                   )}
                 </Box>
@@ -303,9 +313,8 @@ class KeyView extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  const values = queryString.parse(state.router.location.search)
   return {
-    kid: (values.kid || '').toString(),
+    kid: query(state, 'kid'),
   }
 }
 

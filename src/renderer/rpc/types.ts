@@ -7,7 +7,7 @@ export enum EncryptMode {
 }
 export enum ExportType {
     DEFAULT_EXPORT_TYPE = "DEFAULT_EXPORT_TYPE",
-    SALTPACK_PW_EXPORT_TYPE = "SALTPACK_PW_EXPORT_TYPE",
+    SALTPACK_EXPORT_TYPE = "SALTPACK_EXPORT_TYPE",
 }
 export enum KeyType {
     UNKNOWN_KEY_TYPE = "UNKNOWN_KEY_TYPE",
@@ -236,34 +236,21 @@ export interface RuntimeStatusResponse {
     authSetupNeeded?: boolean;
 }
 
-export interface AuthGenerateRequest {
-    // Password used to encrypt key backup.
-    password?: string;
-}
-
-export interface AuthGenerateResponse {
-    // KeyBackup is an encrypted key backup.
-    keyBackup?: string;
-}
-
 export interface AuthSetupRequest {
     // Password used to encrypt key backup.
     password?: string;
-    // KeyBackup is an encrypted key backup.
-    keyBackup?: string;
-    // Client (optional) name.
+    // Client name.
     client?: string;
 }
 
 export interface AuthSetupResponse {
-    kid?: string;
     authToken?: string;
 }
 
 export interface AuthUnlockRequest {
     // Password.
     password?: string;
-    // Client (optional) name.
+    // Client name.
     client?: string;
 }
 
@@ -279,6 +266,7 @@ export interface AuthLockResponse {
 }
 
 export interface KeyGenerateRequest {
+    type?: KeyType;
 }
 
 export interface KeyGenerateResponse {
@@ -363,8 +351,8 @@ export interface Key {
     id?: string;
     // Type of key.
     type?: KeyType;
-    // Users associated with this key.
-    users?: Array<User>;
+    // User associated with this key.
+    user?: User;
     // Saved if saved locally.
     saved?: boolean;
 }
@@ -565,7 +553,7 @@ export interface Message {
     id?: string;
     sender?: string;
     content?: MessageContent;
-    users?: Array<User>;
+    user?: User;
     createdAt?: number;
     timeDisplay?: string;
     dateDisplay?: string;
@@ -639,7 +627,6 @@ export interface KeysService {
     Push: (r:PushRequest) => PushResponse;
     Config: (r:ConfigRequest) => ConfigResponse;
     ConfigSet: (r:ConfigSetRequest) => ConfigSetResponse;
-    AuthGenerate: (r:AuthGenerateRequest) => AuthGenerateResponse;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;

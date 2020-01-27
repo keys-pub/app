@@ -18,6 +18,8 @@ import {goBack, push} from 'connected-react-router'
 
 import {query} from '../state'
 
+import {store} from '../../store'
+
 import {connect} from 'react-redux'
 
 import {RPCState} from '../../rpc/rpc'
@@ -25,34 +27,37 @@ import {Key, KeyExportRequest, KeyExportResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
-  dispatch: (action: any) => any
 }
 
 type State = {
-  keyBackup: string
+  export: string
   password: string
   error: string
 }
 
 class KeyExportView extends React.Component<Props, State> {
   state = {
-    keyBackup: '',
+    export: '',
     password: '',
     error: '',
   }
 
-  keyBackup = () => {
+  export = () => {
     const req: KeyExportRequest = {kid: this.props.kid, password: this.state.password}
-    this.props.dispatch(
+    store.dispatch(
       keyExport(req, (resp: KeyExportResponse) => {
-        const keyBackup = new TextDecoder('ascii').decode(resp.export)
-        this.setState({keyBackup: keyBackup})
+        const out = new TextDecoder().decode(resp.export)
+        this.setState({export: out})
       })
     )
   }
 
   back = () => {
-    this.props.dispatch(goBack())
+    if (this.state.export === '') {
+      store.dispatch(goBack())
+    } else {
+      this.setState({export: ''})
+    }
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -60,10 +65,11 @@ class KeyExportView extends React.Component<Props, State> {
     this.setState({password: target ? target.value : '', error: ''})
   }
 
-  render() {
+  renderExport() {
     return (
-      <Step title="Key Backup">
-        <Typography style={{paddingBottom: 20}}>Enter in a password to encrypt your key:</Typography>
+      <Box>
+        <Typography style={{paddingBottom: 10}}>Export your key encrypted with your password.</Typography>
+        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <FormControl error={this.state.error !== ''}>
           <TextField
             autoFocus
@@ -77,36 +83,51 @@ class KeyExportView extends React.Component<Props, State> {
           <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
         </FormControl>
         <Box display="flex" flexDirection="row">
-          <Button color="primary" variant="outlined" onClick={this.keyBackup}>
-            Encrypt
+          <Button color="secondary" variant="outlined" onClick={this.back}>
+            Back
+          </Button>
+          <Box style={{width: 20}} />
+          <Button color="primary" variant="outlined" onClick={this.export}>
+            Export
           </Button>
         </Box>
-        {this.state.keyBackup !== '' && (
-          <Box>
-            <Typography style={{paddingTop: 20, paddingBottom: 20}}>
-              This is your key backup encrypted with your password:
-            </Typography>
-            <Typography
-              style={{
-                ...styles.mono,
-                marginBottom: 20,
-                backgroundColor: 'black',
-                color: 'white',
-                paddingTop: 10,
-                paddingBottom: 10,
-                paddingLeft: 10,
-                paddingRight: 10,
-              }}
-            >
-              {this.state.keyBackup}
-            </Typography>
-            <Box display="flex" flexDirection="row">
-              <Button color="secondary" variant="outlined" onClick={this.back}>
-                Back
-              </Button>
-            </Box>
-          </Box>
-        )}
+      </Box>
+    )
+  }
+
+  renderExported() {
+    return (
+      <Box>
+        {/* <Typography style={{paddingBottom: 10}}></Typography> */}
+        <Typography
+          style={{
+            ...styles.mono,
+            marginBottom: 20,
+            backgroundColor: 'black',
+            color: 'white',
+            paddingTop: 10,
+            paddingBottom: 10,
+            paddingLeft: 10,
+            paddingRight: 10,
+            width: 500,
+          }}
+        >
+          {this.state.export}
+        </Typography>
+        <Box display="flex" flexDirection="row">
+          <Button color="secondary" variant="outlined" onClick={this.back}>
+            Back
+          </Button>
+        </Box>
+      </Box>
+    )
+  }
+
+  render() {
+    return (
+      <Step title="Export Key">
+        {this.state.export == '' && this.renderExport()}
+        {this.state.export !== '' && this.renderExported()}
       </Step>
     )
   }

@@ -81,17 +81,21 @@ export default class Step extends React.Component<Props> {
             display="flex"
             flexDirection="row"
             style={{
-              paddingLeft: 20,
               paddingRight: 20,
               paddingBottom: 20,
             }}
           >
             {prev && (
-              <Button color="secondary" onClick={prev.action} disabled={this.props.loading}>
+              <Button
+                color="secondary"
+                variant="outlined"
+                onClick={prev.action}
+                disabled={this.props.loading}
+              >
                 {prev.label}
               </Button>
             )}
-            <Box margin={1} />
+            <Box style={{width: 20}} />
             {next && (
               <Button color="primary" variant="outlined" onClick={next.action} disabled={this.props.loading}>
                 {next.label}

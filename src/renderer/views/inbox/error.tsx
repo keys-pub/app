@@ -5,7 +5,7 @@ import {Box, Typography} from '@material-ui/core'
 import {Inbox} from '../../rpc/types'
 import {RPCError, RPCState} from '../../rpc/rpc'
 
-export default (err: RPCError, inbox: Inbox) => {
+export default (err: Error, inbox: Inbox) => {
   return (
     <Box
       display="flex"
@@ -25,7 +25,7 @@ export default (err: RPCError, inbox: Inbox) => {
             Inbox KID: {inbox.kid}
           </Typography>
         )}
-        <Typography style={{color: '#993333'}}>{err.details}</Typography>
+        <Typography style={{color: '#993333'}}>{err.message}</Typography>
       </Box>
     </Box>
   )

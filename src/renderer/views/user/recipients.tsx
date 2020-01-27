@@ -72,7 +72,7 @@ export default class RecipientsView extends React.Component<Props, State> {
   renderOption = (option: UserSearchResult) => {
     return (
       <React.Fragment>
-        <UserRow kid={option.kid} users={[option.user]} />
+        <UserRow kid={option.kid} user={option.user} />
       </React.Fragment>
     )
   }

@@ -22,7 +22,7 @@ export default class SignerView extends React.Component<Props> {
             <Typography display="inline" style={{...styles.mono}}>
               Verified&nbsp;
             </Typography>
-            <UserRow kid={signer.id} users={signer.users} />
+            <UserRow kid={signer.id} user={signer.user} />
           </Box>
         )}
         {!this.props.signer && <Typography display="inline">&nbsp;</Typography>}

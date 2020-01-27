@@ -71,7 +71,7 @@ export const startWatchStream = () => async (dispatch: (action: any) => any) => 
     watchCall = null
 
     if (err.code === grpc.status.PERMISSION_DENIED) {
-      console.error('Watch stream perission denied')
+      console.error('Watch stream permission denied')
       dispatch({type: 'LOCK'})
       return
     }

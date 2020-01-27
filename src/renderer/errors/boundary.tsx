@@ -60,7 +60,7 @@ export default class ErrorBoundaryView extends React.Component<Props, State> {
           width: '100%',
         }}
       >
-        <Box className="drag" style={{width: '100%', height: 40}} />
+        <Box className="drag" style={{width: '100%', height: 40, cursor: 'move'}} />
         <Typography
           variant="h5"
           style={{

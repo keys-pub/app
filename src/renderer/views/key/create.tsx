@@ -3,20 +3,23 @@ import * as React from 'react'
 import * as electron from 'electron'
 
 import {Box, Button, Divider, Input, InputLabel, FormControl, Typography} from '@material-ui/core'
-import {Splash, Step, Link} from '../../components'
+import {Step, Link} from '../../components'
 
 import {keyGenerate} from '../../rpc/rpc'
 
-import {push} from 'connected-react-router'
+import {replace} from 'connected-react-router'
 
 import {connect} from 'react-redux'
 
+import {query} from '../state'
+import {store} from '../../store'
+
 import {RPCState} from '../../rpc/rpc'
-import {KeyGenerateRequest, KeyGenerateResponse} from '../../rpc/types'
+import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/types'
 import {State as RState} from '../state'
 
 type Props = {
-  dispatch: (action: any) => any
+  type: KeyType
 }
 
 type State = {
@@ -28,75 +31,62 @@ class KeyCreateView extends React.Component<Props, State> {
     loading: false,
   }
 
-  register = () => {
-    // TODO: push setting
+  keyGenerate = () => {
     this.setState({loading: true})
-    this.props.dispatch(
-      keyGenerate({}, (resp: KeyGenerateResponse) => {
+    const req: KeyGenerateRequest = {
+      type: this.props.type,
+    }
+    store.dispatch(
+      keyGenerate(req, (resp: KeyGenerateResponse) => {
         this.setState({loading: false})
-        // TODO: Show key
-        this.props.dispatch(push('/key/index?kid=' + resp.kid))
+        store.dispatch(replace('/keys/key/index?kid=' + resp.kid))
       })
     )
   }
 
-  recover = () => {
-    this.props.dispatch(push('/key/recover'))
-  }
-
   render() {
     return (
-      <Step title="Welcome!">
-        <Box>
-          <Box style={{display: 'inline'}}>
-            <Typography variant="body1">
-              Next we'll need to generate a new key. For more information about how keys are generated and
-              what information is published, see{' '}
-              <Link
-                inline
-                style={{}}
-                onClick={() => electron.shell.openExternal('https://docs.keys.pub/auth')}
-              >
-                docs.keys.pub
-              </Link>
-              .
-            </Typography>
-            {/* <Link onClick={() => console.log('Tell me more')} style={{fpaddingLeft: 4}} inline>
-            Tell me more
-          </Link> */}
+      <Box>
+        <Divider />
+        <Box marginTop={2} marginLeft={2}>
+          <Box marginBottom={2}>
+            <Typography>Generate a {this.props.type} key.</Typography>
           </Box>
 
-          <Box
-            display="flex"
-            flexDirection="row"
-            alignSelf="center"
-            style={{marginTop: 30, marginBottom: 30}}
-          >
+          <Box display="flex" flexDirection="row" alignSelf="center">
             <Button
               color="primary"
               variant="outlined"
               size="large"
-              onClick={this.register}
+              onClick={this.keyGenerate}
               disabled={this.state.loading}
             >
               Generate a Key
             </Button>
           </Box>
-          <Typography variant="body1" paragraph>
-            If you've already done this and have access to your backup recovery phrase, you can{' '}
-            <Link inline onClick={this.recover} style={{}}>
-              recover an existing user key
-            </Link>
-            .
-          </Typography>
         </Box>
-      </Step>
+      </Box>
     )
   }
 }
 
+const keyTypeFromString = (s: string, dflt: KeyType): KeyType => {
+  if (!s) return dflt
+  switch (s) {
+    case KeyType.ED25519:
+      return KeyType.ED25519
+    case KeyType.CURVE25519:
+      return KeyType.CURVE25519
+  }
+  return KeyType.UNKNOWN_KEY_TYPE
+}
+
 const mapStateToProps = (state: RState, ownProps: any) => {
-  return {}
+  let type: KeyType = keyTypeFromString(query(state, 'type'), KeyType.ED25519)
+
+  return {
+    type: type,
+  }
 }
 
 export default connect(mapStateToProps)(KeyCreateView)

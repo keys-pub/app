@@ -14,10 +14,11 @@ import {
 import {keyRemove} from '../../rpc/rpc'
 import {query} from '../state'
 
-import {Step} from '../../components'
+import {Step, styles} from '../../components'
 
-import {goBack} from 'connected-react-router'
+import {go, goBack} from 'connected-react-router'
 import {connect} from 'react-redux'
+import {store} from '../../store'
 
 import {RPCError, RPCState} from '../../rpc/rpc'
 import {KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
@@ -46,7 +47,7 @@ class KeyRemoveView extends React.Component<Props, State> {
       keyRemove(
         req,
         (resp: KeyRemoveResponse) => {
-          // TODO
+          store.dispatch(go(-2))
         },
         (err: RPCError) => {
           this.setState({error: err.details})
@@ -58,13 +59,14 @@ class KeyRemoveView extends React.Component<Props, State> {
   render() {
     return (
       <Step
-        title="Remove a Key"
+        title="Delete Key"
         prev={{label: 'Cancel', action: () => this.props.dispatch(goBack())}}
         next={{label: 'Yes, Delete', action: this.removeKey}}
       >
+        <Typography style={{paddingBottom: 20}}>Are you really sure you want to delete this key?</Typography>
+        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <Typography style={{paddingBottom: 20}}>
-          Are you really sure you want to delete your key? If you haven't backed up your key, you won't be
-          able to recover it.
+          If you haven't backed up your key, you won't be able to recover it.
         </Typography>
       </Step>
     )

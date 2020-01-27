@@ -13,42 +13,38 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Step} from '../../components'
+import {styles, Step} from '../../components'
 
-import {connect} from 'react-redux'
-import {goBack, push} from 'connected-react-router'
+import {store} from '../../store'
+import {goBack, push, replace} from 'connected-react-router'
 
 import {keyImport, RPCError} from '../../rpc/rpc'
 import {KeyImportRequest, KeyImportResponse} from '../../rpc/types'
 
-type Props = {
-  dispatch: (action: any) => any
-}
-
 type State = {
-  keyBackup: string
+  in: string
   password: string
   error: string
 }
 
-class KeyImportView extends React.Component<Props, State> {
+export default class KeyImportView extends React.Component<{}, State> {
   state = {
-    keyBackup: '',
+    in: '',
     password: '',
     error: '',
   }
 
   importKey = () => {
-    const keyBackup = new TextEncoder().encode(this.state.keyBackup)
+    const input = new TextEncoder().encode(this.state.in)
     const req: KeyImportRequest = {
-      in: keyBackup,
+      in: input,
       password: this.state.password,
     }
-    this.props.dispatch(
+    store.dispatch(
       keyImport(
         req,
         (resp: KeyImportResponse) => {
-          this.props.dispatch(push('/key/index?kid=' + resp.kid))
+          store.dispatch(replace('/keys/key/index?kid=' + resp.kid))
         },
         (err: RPCError) => {
           this.setState({error: err.details})
@@ -58,12 +54,12 @@ class KeyImportView extends React.Component<Props, State> {
   }
 
   back = () => {
-    this.props.dispatch(goBack())
+    store.dispatch(goBack())
   }
 
-  onBackupInputChange = (e: React.SyntheticEvent<EventTarget>) => {
+  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({keyBackup: target.value, error: ''})
+    this.setState({in: target.value, error: ''})
   }
 
   onPasswordInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -74,27 +70,31 @@ class KeyImportView extends React.Component<Props, State> {
   render() {
     return (
       <Step
-        title="Import your Key"
-        prev={{label: 'Back', action: this.back}}
+        title="Import Key"
+        prev={{label: 'Cancel', action: this.back}}
         next={{label: 'Import', action: this.importKey}}
       >
-        <Box>
-          <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+        <Box display="flex" flexDirection="column">
+          <Typography style={{paddingBottom: 20}}>
+            You can specify an encrypted key (for a private key) or a key ID (for a public key).
+          </Typography>
+          <FormControl error={this.state.error !== ''} style={{marginBottom: 20, width: 550}}>
             <TextField
               multiline
               autoFocus
-              label="Key"
-              rows={5}
+              label="Import Key"
+              rows={6}
               variant="outlined"
               placeholder={''}
-              onChange={this.onBackupInputChange}
-              value={this.state.keyBackup}
+              onChange={this.onInputChange}
+              value={this.state.in}
+              InputProps={{
+                style: {...styles.mono},
+              }}
             />
-            <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
           </FormControl>
-          <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+          <FormControl error={this.state.error !== ''} style={{marginBottom: 20, width: 550}}>
             <TextField
-              autoFocus
               label="Password"
               variant="outlined"
               type="password"
@@ -108,5 +108,3 @@ class KeyImportView extends React.Component<Props, State> {
     )
   }
 }
-
-export default connect()(KeyImportView)

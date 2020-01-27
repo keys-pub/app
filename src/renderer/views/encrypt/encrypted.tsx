@@ -58,7 +58,7 @@ export default class EncryptedView extends React.Component<Props, State> {
       encrypt(
         req,
         (resp: EncryptResponse) => {
-          const encrypted = new TextDecoder('ascii').decode(resp.data)
+          const encrypted = new TextDecoder().decode(resp.data)
           this.setState({error: '', encrypted: encrypted})
         },
         (err: RPCError) => {

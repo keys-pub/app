@@ -10,25 +10,20 @@ import {NameView} from './views'
 
 export type Props = {
   kid: string
-  users: User[]
+  user: User
 }
 
 export default class UserView extends React.Component<Props> {
   render() {
-    const {kid, users} = this.props
+    const {kid, user} = this.props
     if (!kid) {
       return null
     }
 
-    if (users.length > 0) {
+    if (user) {
       return (
         <Box display="inline">
-          {users.map((u: User, index: number) => (
-            <Box display="inline">
-              <NameView user={u} />
-              {index < users.length - 1 && <Typography display="inline">, </Typography>}
-            </Box>
-          ))}
+          <NameView user={user} />
         </Box>
       )
     }

@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 import * as React from 'react'
-import times from 'lodash/times'
+import {times} from 'lodash'
 
 type RequestIdleCallbackHandle = any
 type RequestIdleCallbackOptions = {

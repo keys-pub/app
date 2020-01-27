@@ -89,7 +89,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
-              <UserRow kid={k.id} users={k.users} />
+              <UserRow kid={k.id} user={k.user} />
             </MenuItem>
           ))}
         </Select>
