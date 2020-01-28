@@ -17,14 +17,14 @@ export const serviceName = (service: string): string => {
 
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
-    case KeyType.CURVE25519:
+    case KeyType.X25519:
       return 'Curve25519 Private Key'
-    case KeyType.CURVE25519_PUBLIC:
+    case KeyType.X25519_PUBLIC:
       return 'Curve25519 Public Key'
-    case KeyType.ED25519:
-      return 'Ed25519 Private Key'
-    case KeyType.ED25519_PUBLIC:
-      return 'Ed25519 Public Key'
+    case KeyType.EDX25519:
+      return 'EdX25519 Private Key'
+    case KeyType.EDX25519_PUBLIC:
+      return 'EdX25519 Public Key'
     default:
       return ''
   }

@@ -179,9 +179,9 @@ class KeyView extends React.Component<Props, State> {
     const saved = this.state.key && this.state.key.saved
     const user = this.state.key && this.state.key.user
 
-    const isPrivate = this.state.key.type == KeyType.CURVE25519 || this.state.key.type == KeyType.ED25519
+    const isPrivate = this.state.key.type == KeyType.X25519 || this.state.key.type == KeyType.EDX25519
     const isPublic =
-      this.state.key.type == KeyType.CURVE25519_PUBLIC || this.state.key.type == KeyType.ED25519_PUBLIC
+      this.state.key.type == KeyType.X25519_PUBLIC || this.state.key.type == KeyType.EDX25519_PUBLIC
     const add = !saved && isPublic
     const remove = saved && isPublic
     const removePrivate = isPrivate
@@ -266,32 +266,51 @@ class KeyView extends React.Component<Props, State> {
                 )}
               </TableCell>
             </TableRow>
-            {isPrivate && (
-              <TableRow>
-                <TableCell style={cstyles.cell}></TableCell>
-                <TableCell style={cstyles.cell}>
-                  <Button size="small" color="primary" variant="outlined" onClick={this.export}>
-                    Export
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )}
             <TableRow>
               <TableCell style={cstyles.cell}></TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="row">
                   {add && (
-                    <Button size="small" color="primary" variant="outlined" onClick={this.add}>
+                    <Button
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      onClick={this.add}
+                      style={{marginRight: 10}}
+                    >
                       Add
                     </Button>
                   )}
                   {remove && (
-                    <Button size="small" color="secondary" variant="outlined" onClick={this.remove}>
+                    <Button
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      onClick={this.remove}
+                      style={{marginRight: 10}}
+                    >
                       Remove
                     </Button>
                   )}
+                  {isPrivate && (
+                    <Button
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      onClick={this.export}
+                      style={{marginRight: 10}}
+                    >
+                      Export
+                    </Button>
+                  )}
                   {removePrivate && (
-                    <Button size="small" color="secondary" variant="outlined" onClick={this.delete}>
+                    <Button
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      onClick={this.delete}
+                      style={{marginRight: 10}}
+                    >
                       Delete
                     </Button>
                   )}

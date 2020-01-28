@@ -387,11 +387,11 @@ enum KeyType {
   
   UNKNOWN_KEY_TYPE = 0 [(gogoproto.enumvalue_customname) = "UnknownKeyType"];
   
-  ED25519 = 10 [(gogoproto.enumvalue_customname) = "Ed25519"];
-  ED25519_PUBLIC = 11 [(gogoproto.enumvalue_customname) = "Ed25519Public"];
+  EDX25519 = 10 [(gogoproto.enumvalue_customname) = "EdX25519"];
+  EDX25519_PUBLIC = 11 [(gogoproto.enumvalue_customname) = "EdX25519Public"];
 
-  CURVE25519 = 20 [(gogoproto.enumvalue_customname) = "Curve25519"];  
-  CURVE25519_PUBLIC = 21 [(gogoproto.enumvalue_customname) = "Curve25519Public"];  
+  X25519 = 20 [(gogoproto.enumvalue_customname) = "X25519"];  
+  X25519_PUBLIC = 21 [(gogoproto.enumvalue_customname) = "X25519Public"];  
 }
 
 message Key {

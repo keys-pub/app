@@ -4,7 +4,7 @@ import {
   Box,
   Button,
   Divider,
-  Paper,
+  IconButton,
   Menu,
   MenuItem,
   Table,
@@ -15,6 +15,8 @@ import {
   TableSortLabel,
   Typography,
 } from '@material-ui/core'
+
+import {Add as AddIcon} from '@material-ui/icons'
 
 import {styles} from '../../components'
 import {NameView} from '../user/views'
@@ -84,9 +86,9 @@ class KeysView extends React.Component<Props, State> {
     this.setState({newKeyMenuEl: null})
   }
 
-  keyGen = (typ: KeyType) => {
+  keyGen = () => {
     this.closeMenu()
-    store.dispatch(push('/keys/key/create?type=' + typ))
+    store.dispatch(push('/keys/key/create'))
   }
 
   importKey = () => {
@@ -104,6 +106,7 @@ class KeysView extends React.Component<Props, State> {
           variant="outlined"
           size="small"
           onClick={this.openMenu}
+          // startIcon={<AddIcon />}
         >
           New Key
         </Button>
@@ -114,20 +117,11 @@ class KeysView extends React.Component<Props, State> {
           open={!!this.state.newKeyMenuEl}
           onClose={this.closeMenu}
         >
-          <MenuItem onClick={() => this.keyGen(KeyType.ED25519)}>
-            <Typography>
-              Signing/Encryption&nbsp;
-              <span style={{color: '#999'}}>&nbsp;(ed25519)</span>
-            </Typography>
-          </MenuItem>
-          <MenuItem onClick={() => this.keyGen(KeyType.CURVE25519)}>
-            <Typography>
-              Encryption
-              <span style={{color: '#999'}}>&nbsp;(curve25519)</span>
-            </Typography>
+          <MenuItem onClick={this.keyGen}>
+            <Typography>Generate Key</Typography>
           </MenuItem>
           <MenuItem onClick={this.importKey}>
-            <Typography>Import</Typography>
+            <Typography>Import Key</Typography>
           </MenuItem>
         </Menu>
       </Box>
@@ -174,10 +168,7 @@ class KeysView extends React.Component<Props, State> {
                     {key.user && <NameView user={key.user} />}
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView
-                      id={key.id}
-                      owner={key.type == KeyType.CURVE25519 || key.type === KeyType.ED25519}
-                    />
+                    <IDView id={key.id} owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519} />
                   </TableCell>
                 </TableRow>
               )

@@ -11,10 +11,10 @@ export enum ExportType {
 }
 export enum KeyType {
     UNKNOWN_KEY_TYPE = "UNKNOWN_KEY_TYPE",
-    ED25519 = "ED25519",
-    ED25519_PUBLIC = "ED25519_PUBLIC",
-    CURVE25519 = "CURVE25519",
-    CURVE25519_PUBLIC = "CURVE25519_PUBLIC",
+    EDX25519 = "EDX25519",
+    EDX25519_PUBLIC = "EDX25519_PUBLIC",
+    X25519 = "X25519",
+    X25519_PUBLIC = "X25519_PUBLIC",
 }
 export enum SortDirection {
     ASC = "ASC",

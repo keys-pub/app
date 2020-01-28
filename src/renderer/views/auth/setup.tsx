@@ -72,9 +72,9 @@ class AuthSetupView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Header loading={this.state.loading} />
-        <Typography style={{paddingTop: 10, paddingBottom: 30, width: 600}}>
-          Hi! Let's create a password. This password will be used to encrypt your keys and is not stored
-          anywhere and is not transmitted anywhere. Your password needs to be at least 10 characters.
+        <Typography style={{paddingTop: 10, paddingBottom: 30, width: 550}}>
+          Hi! Let's create a password. This password will be used to encrypt your keys and is not stored or
+          transmitted anywhere. This password needs to be at least 10 characters.
         </Typography>
         <FormControl error={this.state.passwordError !== ''}>
           <TextField
