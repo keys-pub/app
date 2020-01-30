@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Chip,
   Divider,
   LinearProgress,
   Table,
@@ -15,7 +16,7 @@ import {
 import * as electron from 'electron'
 
 import {styles, Link} from '../../components'
-import {NameView} from '../user/views'
+import UserLabel from '../user/label'
 
 import {connect} from 'react-redux'
 import {query} from '../state'
@@ -27,7 +28,10 @@ import {keyDescription} from '../helper'
 import {store} from '../../store'
 
 import SigchainView from './sigchain'
+import UserSignDialog from '../user/dialog'
 import UserRevokeDialog from '../user/revoke'
+import KeyRemoveDialog from './remove'
+import KeyExportDialog from '../export'
 
 import {key, keyRemove, pull, userService, RPCError, RPCState} from '../../rpc/rpc'
 
@@ -72,16 +76,22 @@ type Props = {
 interface State {
   key: Key
   statements: Statement[]
-  revoke: number
+  openRevoke: number
   loading: boolean
   error: string
+  openRemove: boolean
+  openExport: boolean
+  openUserSign: string // '' | 'twitter' | 'github'
 }
 
 class KeyView extends React.Component<Props, State> {
   state = {
     loading: false,
     key: {} as Key,
-    revoke: 0,
+    openRemove: false,
+    openExport: false,
+    openRevoke: 0,
+    openUserSign: '',
     statements: [],
     error: '',
   }
@@ -91,17 +101,7 @@ class KeyView extends React.Component<Props, State> {
   }
 
   selectService = (service: string) => {
-    // this.setState({loading: true, error: ''})
-    const req: UserServiceRequest = {
-      kid: this.props.kid,
-      service: service,
-    }
-    store.dispatch(
-      userService(req, (resp: UserServiceResponse) => {
-        // this.setState({loading: false})
-        store.dispatch(push('/user/name?kid=' + this.props.kid))
-      })
-    )
+    this.setState({openUserSign: service})
   }
 
   loadKey = () => {
@@ -147,7 +147,11 @@ class KeyView extends React.Component<Props, State> {
     )
   }
 
-  remove = () => {
+  export = () => {
+    this.setState({openExport: true})
+  }
+
+  removePublic = () => {
     const req: KeyRemoveRequest = {
       kid: this.props.kid,
     }
@@ -164,12 +168,19 @@ class KeyView extends React.Component<Props, State> {
     )
   }
 
-  delete = () => {
-    store.dispatch(push('/keys/key/remove?kid=' + this.props.kid))
+  closeRemove = (removed: boolean) => {
+    this.setState({openRemove: false})
+    if (removed) {
+      store.dispatch(goBack())
+    }
   }
 
-  export = () => {
-    store.dispatch(push('/keys/key/export?kid=' + this.props.kid))
+  closeExport = () => {
+    this.setState({openExport: false})
+  }
+
+  closeUserSign = () => {
+    this.setState({openUserSign: ''})
   }
 
   render() {
@@ -179,6 +190,7 @@ class KeyView extends React.Component<Props, State> {
     const saved = this.state.key && this.state.key.saved
     const user = this.state.key && this.state.key.user
 
+    const signable = this.state.key.type == KeyType.EDX25519
     const isPrivate = this.state.key.type == KeyType.X25519 || this.state.key.type == KeyType.EDX25519
     const isPublic =
       this.state.key.type == KeyType.X25519_PUBLIC || this.state.key.type == KeyType.EDX25519_PUBLIC
@@ -216,10 +228,12 @@ class KeyView extends React.Component<Props, State> {
             </TableRow>
             <TableRow>
               <TableCell style={cstyles.cell}>
-                <Typography align="right">Users</Typography>
+                <Typography align="right">User</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
-                {this.state.key.id && !user && <Typography style={{color: '#999'}}>none</Typography>}
+                {this.state.key.id && (!isPrivate || !signable) && !user && (
+                  <Typography style={{color: '#999'}}>none</Typography>
+                )}
                 {user && (
                   <Box
                     display="flex"
@@ -227,16 +241,15 @@ class KeyView extends React.Component<Props, State> {
                     key={'user-' + user.kid + '-' + user.seq}
                     paddingBottom={2}
                   >
-                    <NameView user={user} />
+                    <UserLabel kid={user.kid} user={user} />
                     {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
                     <Link onClick={() => electron.shell.openExternal(user.url)}>{user.url}</Link>
                     {isPrivate && (
                       <Box>
                         <Button
                           size="small"
-                          variant="outlined"
                           color="secondary"
-                          onClick={() => this.setState({revoke: user.seq})}
+                          onClick={() => this.setState({openRevoke: user.seq})}
                         >
                           Revoke
                         </Button>
@@ -244,7 +257,7 @@ class KeyView extends React.Component<Props, State> {
                     )}
                   </Box>
                 )}
-                {isPrivate && !user && (
+                {signable && !user && (
                   <Button
                     size="small"
                     variant="outlined"
@@ -254,7 +267,7 @@ class KeyView extends React.Component<Props, State> {
                     Link to Github
                   </Button>
                 )}
-                {isPrivate && !user && (
+                {signable && !user && (
                   <Button
                     size="small"
                     variant="outlined"
@@ -286,7 +299,7 @@ class KeyView extends React.Component<Props, State> {
                       size="small"
                       color="secondary"
                       variant="outlined"
-                      onClick={this.remove}
+                      onClick={this.removePublic}
                       style={{marginRight: 10}}
                     >
                       Remove
@@ -308,7 +321,7 @@ class KeyView extends React.Component<Props, State> {
                       size="small"
                       color="secondary"
                       variant="outlined"
-                      onClick={this.delete}
+                      onClick={() => this.setState({openRemove: true})}
                       style={{marginRight: 10}}
                     >
                       Delete
@@ -322,9 +335,17 @@ class KeyView extends React.Component<Props, State> {
         <SigchainView statements={this.state.statements} />
         <UserRevokeDialog
           kid={this.props.kid}
-          seq={this.state.revoke}
-          open={this.state.revoke > 0}
-          close={() => this.setState({revoke: 0})}
+          seq={this.state.openRevoke}
+          open={this.state.openRevoke > 0}
+          close={() => this.setState({openRevoke: 0})}
+        />
+        <KeyRemoveDialog open={this.state.openRemove} kid={this.props.kid} close={this.closeRemove} />
+        <KeyExportDialog open={this.state.openExport} kid={this.props.kid} close={this.closeExport} />
+        <UserSignDialog
+          kid={this.props.kid}
+          service={this.state.openUserSign}
+          open={this.state.openUserSign != ''}
+          close={this.closeUserSign}
         />
       </Box>
     )

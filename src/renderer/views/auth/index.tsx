@@ -1,49 +1,46 @@
 import * as React from 'react'
 
-import {Box, Button, Dialog, Divider, Typography} from '@material-ui/core'
-
-import {connect} from 'react-redux'
-import {goBack} from 'connected-react-router'
+import {store} from '../../store'
 
 import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
 
 import {runtimeStatus} from '../../rpc/rpc'
 
-import {RuntimeStatusRequest} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
+import {RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/types'
 
-type Props = {
+type Props = {}
+
+type State = {
   loading: boolean
   authSetupNeeded: boolean
-  dispatch: (action: any) => any
 }
 
-class AuthView extends React.Component<Props> {
+export default class AuthView extends React.Component<Props, State> {
+  state = {
+    loading: true,
+    authSetupNeeded: false,
+  }
+
   componentDidMount() {
     this.refresh()
   }
 
   refresh = () => {
     const req: RuntimeStatusRequest = {}
-    this.props.dispatch(runtimeStatus(req))
+    store.dispatch(
+      runtimeStatus(req, (resp: RuntimeStatusResponse) => {
+        this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
+      })
+    )
   }
 
   render() {
-    if (this.props.loading) return null
-    if (this.props.authSetupNeeded) {
+    if (this.state.loading) return null
+    if (this.state.authSetupNeeded) {
       return <AuthSetupView />
     } else {
       return <AuthUnlockView />
     }
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
-  if (!state.rpc.runtimeStatus) {
-    return {loading: true, authSetupNeeded: true}
-  }
-  return {loading: false, authSetupNeeded: state.rpc.runtimeStatus.authSetupNeeded}
-}
-
-export default connect(mapStateToProps)(AuthView)

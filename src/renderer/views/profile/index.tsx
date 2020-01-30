@@ -20,7 +20,7 @@ import {push} from 'connected-react-router'
 import {query} from '../state'
 
 import {styles, Link} from '../../components'
-import {NameView} from '../user/views'
+import UserLabel from '../user/label'
 import UserRevokeDialog from '../user/revoke'
 
 import {authLock, key, statementRevoke, userService} from '../../rpc/rpc'
@@ -142,7 +142,7 @@ class ProfileView extends React.Component<Props, State> {
               <TableCell style={cstyles.cell}>
                 {(users || []).map((user: User) => (
                   <Box display="flex" flexDirection="column" key={user.kid + user.seq}>
-                    <NameView user={user} />
+                    <UserLabel kid={user.kid} user={user} />
                     {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
                     <Link onClick={() => electron.shell.openExternal(user.url)}>{user.url}</Link>
                     <Box>

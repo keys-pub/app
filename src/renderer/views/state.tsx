@@ -9,8 +9,8 @@ import * as queryString from 'query-string'
 
 // import emoji from 'node-emoji'
 
-import {runtimeStatus, RPCError, RPCState, ErrFn} from '../rpc/rpc'
-import {RuntimeStatusResponse, WatchEvent} from '../rpc/types'
+import {appStatus, RPCError, RPCState, ErrFn} from '../rpc/rpc'
+import {AppStatusResponse, WatchEvent} from '../rpc/types'
 
 import {AppState} from '../reducers/app'
 

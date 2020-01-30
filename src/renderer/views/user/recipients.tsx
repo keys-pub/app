@@ -1,16 +1,17 @@
 import * as React from 'react'
 
-import {TextField} from '@material-ui/core'
+import {TextField, Typography} from '@material-ui/core'
 import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import {store} from '../../store'
 
-import UserRow from './row'
+import UserLabel from './label'
 
 import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
 import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
+import {styles} from '../../components'
 
 export type Props = {
   onChange?: (value: UserSearchResult[]) => void
@@ -72,7 +73,7 @@ export default class RecipientsView extends React.Component<Props, State> {
   renderOption = (option: UserSearchResult) => {
     return (
       <React.Fragment>
-        <UserRow kid={option.kid} user={option.user} />
+        <UserLabel kid={option.kid} user={option.user} />
       </React.Fragment>
     )
   }
@@ -95,9 +96,11 @@ export default class RecipientsView extends React.Component<Props, State> {
         onChange={this.onChange}
         value={this.state.selected}
         getOptionSelected={this.optionSelected}
-        getOptionLabel={(option: UserSearchResult) => option.user.label}
+        getOptionLabel={(option: UserSearchResult) =>
+          ((<UserLabel kid={option.kid} user={option.user} />) as unknown) as string
+        }
         options={options}
-        ChipProps={{color: 'primary', variant: 'outlined', icon: <FaceIcon />, size: 'medium'}}
+        ChipProps={{variant: 'outlined', size: 'small'}} //  icon: <FaceIcon />,
         renderOption={this.renderOption}
         renderInput={params => (
           <TextField
@@ -119,4 +122,9 @@ export default class RecipientsView extends React.Component<Props, State> {
       />
     )
   }
+}
+
+const ChipLabel = (props: {children?: any}) => {
+  console.log('chip props:', props)
+  return <Typography style={{...styles.mono}}>{props.children}</Typography>
 }

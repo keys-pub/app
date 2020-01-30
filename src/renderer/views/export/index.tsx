@@ -3,6 +3,10 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Input,
   InputLabel,
   FormControl,
@@ -27,6 +31,8 @@ import {Key, KeyExportRequest, KeyExportResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
+  open: boolean
+  close: () => void
 }
 
 type State = {
@@ -35,7 +41,7 @@ type State = {
   error: string
 }
 
-class KeyExportView extends React.Component<Props, State> {
+export default class KeyExportDialog extends React.Component<Props, State> {
   state = {
     export: '',
     password: '',
@@ -47,17 +53,14 @@ class KeyExportView extends React.Component<Props, State> {
     store.dispatch(
       keyExport(req, (resp: KeyExportResponse) => {
         const out = new TextDecoder().decode(resp.export)
-        this.setState({export: out})
+        this.setState({password: '', export: out})
       })
     )
   }
 
-  back = () => {
-    if (this.state.export === '') {
-      store.dispatch(goBack())
-    } else {
-      this.setState({export: ''})
-    }
+  close = () => {
+    this.props.close()
+    this.setState({password: '', export: ''})
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -67,7 +70,7 @@ class KeyExportView extends React.Component<Props, State> {
 
   renderExport() {
     return (
-      <Box>
+      <Box display="flex" flexDirection="column" style={{height: 142}}>
         <Typography style={{paddingBottom: 10}}>Export your key encrypted with your password.</Typography>
         <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <FormControl error={this.state.error !== ''}>
@@ -82,61 +85,71 @@ class KeyExportView extends React.Component<Props, State> {
           />
           <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
         </FormControl>
-        <Box display="flex" flexDirection="row">
-          <Button color="secondary" variant="outlined" onClick={this.back}>
-            Back
-          </Button>
-          <Box style={{width: 20}} />
-          <Button color="primary" variant="outlined" onClick={this.export}>
-            Export
-          </Button>
-        </Box>
       </Box>
     )
   }
 
   renderExported() {
     return (
-      <Box>
-        {/* <Typography style={{paddingBottom: 10}}></Typography> */}
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        style={{height: 142}}
+      >
         <Typography
           style={{
             ...styles.mono,
-            marginBottom: 20,
             backgroundColor: 'black',
             color: 'white',
             paddingTop: 10,
             paddingBottom: 10,
             paddingLeft: 10,
             paddingRight: 10,
-            width: 500,
+            width: '100%',
+            height: '100%',
           }}
         >
           {this.state.export}
         </Typography>
-        <Box display="flex" flexDirection="row">
-          <Button color="secondary" variant="outlined" onClick={this.back}>
-            Back
-          </Button>
-        </Box>
       </Box>
     )
   }
 
   render() {
     return (
-      <Step title="Export Key">
-        {this.state.export == '' && this.renderExport()}
-        {this.state.export !== '' && this.renderExported()}
-      </Step>
+      <Dialog
+        onClose={this.props.close}
+        open={this.props.open}
+        maxWidth="sm"
+        fullWidth
+        disableBackdropClick
+        // TransitionComponent={transition}
+        // keepMounted
+      >
+        <DialogTitle>Export Key</DialogTitle>
+        <DialogContent dividers>
+          {this.state.export == '' && this.renderExport()}
+          {this.state.export !== '' && this.renderExported()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.close}>Close</Button>
+          {this.state.export == '' && (
+            <Button color="primary" onClick={this.export}>
+              Export
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     )
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {
-    kid: query(state, 'kid'),
-  }
-}
+// const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+//   return {
+//     kid: query(state, 'kid'),
+//   }
+// }
 
-export default connect(mapStateToProps)(KeyExportView)
+// export default connect(mapStateToProps)(KeyExportView)

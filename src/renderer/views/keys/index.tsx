@@ -19,10 +19,8 @@ import {
 import {Add as AddIcon} from '@material-ui/icons'
 
 import {styles} from '../../components'
-import {NameView} from '../user/views'
+import UserLabel from '../user/label'
 import {IDView} from '../key/view'
-
-import {keys} from '../../rpc/rpc'
 
 import {store} from '../../store'
 
@@ -30,37 +28,55 @@ import {push} from 'connected-react-router'
 
 import {connect} from 'react-redux'
 
+import KeyCreateDialog from '../key/create'
+import KeyImportDialog from '../import'
+
 import {Key, KeyType, SortDirection} from '../../rpc/types'
-import {RPCError, RPCState} from '../../rpc/rpc'
-import {KeysRequest, KeysResponse} from '../../rpc/types'
+import {appStatus, keys, RPCError, RPCState} from '../../rpc/rpc'
+import {AppStatusRequest, AppStatusResponse, KeysRequest, KeysResponse} from '../../rpc/types'
+import {AppState} from '../../reducers/app'
 
 type Props = {
   keys: Array<Key>
   sortField: string
   sortDirection: SortDirection
+  intro: boolean
 }
 
 type State = {
   newKeyMenuEl: HTMLButtonElement
+  openCreate: string // '' | 'NEW' | 'INTRO'
+  openImport: boolean
 }
 
 class KeysView extends React.Component<Props, State> {
   state = {
     newKeyMenuEl: null,
+    openCreate: '',
+    openImport: false,
   }
 
   componentDidMount() {
-    this.refresh(this.props.sortField, this.props.sortDirection)
+    this.promptStatus()
+    this.refresh()
   }
 
-  refresh = (sortField: string, sortDirection: SortDirection) => {
-    console.log('Refresh', sortField, sortDirection)
+  refresh = () => {
+    this.list(this.props.sortField, this.props.sortDirection)
+  }
+
+  list = (sortField: string, sortDirection: SortDirection) => {
+    console.log('List keys', sortField, sortDirection)
     const req: KeysRequest = {
       query: '',
       sortField: sortField,
       sortDirection: sortDirection,
     }
     store.dispatch(keys(req))
+  }
+
+  onChange = () => {
+    this.refresh()
   }
 
   select = (key: Key) => {
@@ -75,7 +91,7 @@ class KeysView extends React.Component<Props, State> {
     } else {
       direction = SortDirection.ASC
     }
-    this.refresh(field, direction)
+    this.list(field, direction)
   }
 
   openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -88,12 +104,26 @@ class KeysView extends React.Component<Props, State> {
 
   keyGen = () => {
     this.closeMenu()
-    store.dispatch(push('/keys/key/create'))
+    this.setState({openCreate: 'NEW'})
+  }
+
+  promptStatus = () => {
+    store.dispatch(
+      appStatus({}, (resp: AppStatusResponse) => {
+        this.setState({openCreate: resp.promptKeygen && this.props.intro ? 'INTRO' : ''})
+      })
+    )
   }
 
   importKey = () => {
     this.closeMenu()
-    store.dispatch(push('/keys/key/import'))
+    this.setState({openImport: true})
+    //store.dispatch(push('/keys/key/import'))
+  }
+
+  closeImport = (imported: boolean) => {
+    this.setState({openImport: false})
+    this.refresh()
   }
 
   renderHeader() {
@@ -108,7 +138,7 @@ class KeysView extends React.Component<Props, State> {
           onClick={this.openMenu}
           // startIcon={<AddIcon />}
         >
-          New Key
+          Add Key
         </Button>
         <Menu
           id="new-key-menu"
@@ -132,6 +162,8 @@ class KeysView extends React.Component<Props, State> {
     const {sortField, sortDirection} = this.props
     const direction = directionString(sortDirection)
 
+    console.log('Open (create):', this.state.openCreate)
+
     return (
       <Box>
         <Divider />
@@ -142,20 +174,20 @@ class KeysView extends React.Component<Props, State> {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'user'}
-                  direction={direction}
-                  onClick={() => this.sort(sortField, 'user', sortDirection)}
-                >
-                  <Typography style={{...styles.mono}}>User</Typography>
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
                   active={sortField === 'kid'}
                   direction={direction}
                   onClick={() => this.sort(sortField, 'kid', sortDirection)}
                 >
                   <Typography style={{...styles.mono}}>ID</Typography>
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'user'}
+                  direction={direction}
+                  onClick={() => this.sort(sortField, 'user', sortDirection)}
+                >
+                  <Typography style={{...styles.mono}}>User</Typography>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
@@ -164,17 +196,25 @@ class KeysView extends React.Component<Props, State> {
             {this.props.keys.map((key, index) => {
               return (
                 <TableRow hover onClick={event => this.select(key)} key={key.id} style={{cursor: 'pointer'}}>
-                  <TableCell component="th" scope="row">
-                    {key.user && <NameView user={key.user} />}
-                  </TableCell>
-                  <TableCell style={{verticalAlign: 'top'}}>
+                  <TableCell style={{verticalAlign: 'top', width: 520}}>
                     <IDView id={key.id} owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519} />
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {key.user && <UserLabel kid={key.id} user={key.user} />}
                   </TableCell>
                 </TableRow>
               )
             })}
           </TableBody>
         </Table>
+
+        <KeyCreateDialog
+          open={this.state.openCreate != ''}
+          close={() => this.setState({openCreate: ''})}
+          intro={this.props.intro && this.state.openCreate == 'INTRO'}
+          onChange={this.onChange}
+        />
+        <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
       </Box>
     )
   }
@@ -207,8 +247,9 @@ const cellStyles = {
   paddingRight: 5,
 }
 
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
+const mapStateToProps = (state: {app: AppState; rpc: RPCState}, ownProps: any) => {
   return {
+    intro: state.app.intro,
     keys: (state.rpc.keys && state.rpc.keys.keys) || [],
     sortField: (state.rpc.keys && state.rpc.keys.sortField) || '',
     sortDirection: (state.rpc.keys && state.rpc.keys.sortDirection) || 'ASC',

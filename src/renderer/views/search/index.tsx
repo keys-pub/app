@@ -19,7 +19,7 @@ import {push} from 'connected-react-router'
 
 import {IDView, KeyDescriptionView} from '../key/view'
 
-import {NameView} from '../user/views'
+import UserLabel from '../user/label'
 import {styles} from '../../components'
 
 import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
@@ -121,7 +121,7 @@ class SearchView extends React.Component<Props, State> {
               {this.state.results.map((result: UserSearchResult, index: number): any => (
                 <TableRow hover onClick={event => this.select(result)} key={result.kid + result.user.label}>
                   <TableCell component="th" scope="row">
-                    <NameView user={result.user} />
+                    <UserLabel kid={result.kid} user={result.user} />
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
                     <IDView id={result.kid} />

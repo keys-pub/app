@@ -9,10 +9,10 @@ import DebugView from './profile/debug'
 
 import ComposeView from './compose'
 
-import KeyCreateView from './key/create'
-import KeyExportView from './export'
-import KeyImportView from './import'
-import KeyRemoveView from './key/remove'
+// import KeyCreateView from './key/create'
+// import KeyExportView from './export'
+// import KeyImportView from './import'
+// import KeyRemoveView from './key/remove'
 
 // import InboxView  from './inbox'
 // import InboxInfoView  from './inbox/info'
@@ -44,10 +44,10 @@ export const routes: Array<RouteInfo> = [
   {path: '/db', component: () => <DBView />},
   {path: '/debug', component: () => <DebugView />},
   {path: '/keys/key/index', component: () => <KeyView />},
-  {path: '/keys/key/create', component: () => <KeyCreateView />},
-  {path: '/keys/key/export', component: () => <KeyExportView />},
-  {path: '/keys/key/import', component: () => <KeyImportView />},
-  {path: '/keys/key/remove', component: () => <KeyRemoveView />},
+  // {path: '/keys/key/create', component: () => <KeyCreateView />},
+  // {path: '/keys/key/export', component: () => <KeyExportView />},
+  // {path: '/keys/key/import', component: () => <KeyImportView />},
+  // {path: '/keys/key/remove', component: () => <KeyRemoveView />},
   {path: '/keys/index', component: () => <KeysView />},
 
   {path: '/search/index', component: () => <SearchView />},

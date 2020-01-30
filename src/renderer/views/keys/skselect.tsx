@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-import {Box, Divider, FormControl, InputLabel, MenuItem, Select} from '@material-ui/core'
+import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} from '@material-ui/core'
 
 import {store} from '../../store'
 
-import UserRow from '../user/row'
+import UserLabel from '../user/label'
 
 import {keys, RPCError} from '../../rpc/rpc'
 import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
@@ -39,7 +39,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
   listKeys = () => {
     this.setState({loading: true}) // , options: []
     const req: KeysRequest = {
-      types: [KeyType.ED25519],
+      types: [KeyType.EDX25519],
     }
     store.dispatch(
       keys(
@@ -75,8 +75,8 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           SelectDisplayProps={{
             style: {
               paddingLeft: 8,
-              paddingTop: 12,
-              paddingBottom: 12,
+              paddingTop: 8,
+              paddingBottom: 8,
               backgroundColor: 'white',
               // color: '#666',
             },
@@ -84,12 +84,17 @@ export default class SignKeySelectView extends React.Component<Props, State> {
         >
           {this.props.includeAnon && (
             <MenuItem key={'sk-none'} value={''}>
-              No Signer
+              <Typography style={{color: '#999999', paddingLeft: 4}}>Anonymous</Typography>
             </MenuItem>
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
-              <UserRow kid={k.id} user={k.user} />
+              <Box>
+                <Typography display="inline" style={{color: '#999999', paddingLeft: 4}}>
+                  Signed by&nbsp;
+                </Typography>
+                <UserLabel kid={k.id} user={k.user} />
+              </Box>
             </MenuItem>
           ))}
         </Select>

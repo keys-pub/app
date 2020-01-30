@@ -3,6 +3,10 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Input,
   InputLabel,
   FormControl,
@@ -25,29 +29,26 @@ import {KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
-  dispatch: (action: any) => any
+  open: boolean
+  close: (removed: boolean) => void
 }
 
 type State = {
   error: string
 }
 
-class KeyRemoveView extends React.Component<Props, State> {
+export default class KeyRemoveDialog extends React.Component<Props, State> {
   state = {
     error: '',
   }
 
-  back = () => {
-    this.props.dispatch(goBack())
-  }
-
   removeKey = () => {
     const req: KeyRemoveRequest = {kid: this.props.kid}
-    this.props.dispatch(
+    store.dispatch(
       keyRemove(
         req,
         (resp: KeyRemoveResponse) => {
-          store.dispatch(go(-2))
+          this.props.close(true)
         },
         (err: RPCError) => {
           this.setState({error: err.details})
@@ -56,25 +57,55 @@ class KeyRemoveView extends React.Component<Props, State> {
     )
   }
 
-  render() {
+  renderDialog(open: boolean) {
     return (
-      <Step
-        title="Delete Key"
-        prev={{label: 'Cancel', action: () => this.props.dispatch(goBack())}}
-        next={{label: 'Yes, Delete', action: this.removeKey}}
+      <Dialog
+        onClose={() => this.props.close(false)}
+        open={open}
+        maxWidth="sm"
+        fullWidth
+        disableBackdropClick
+        // TransitionComponent={transition}
+        // keepMounted
       >
+        <DialogTitle>Delete Key</DialogTitle>
+        <DialogContent dividers>{this.renderContent()}</DialogContent>
+        <DialogActions>
+          <Button onClick={() => this.props.close(false)}>Later</Button>
+          <Button autoFocus onClick={this.removeKey} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+
+  renderContent() {
+    return (
+      <Box>
         <Typography style={{paddingBottom: 20}}>Are you really sure you want to delete this key?</Typography>
         <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <Typography style={{paddingBottom: 20}}>
           If you haven't backed up your key, you won't be able to recover it.
         </Typography>
-      </Step>
+      </Box>
     )
+  }
+
+  render() {
+    return this.renderDialog(this.props.open)
+    /* <Step
+        title="Delete Key"
+        prev={{label: 'Cancel', action: this.props.close}}
+        next={{label: 'Yes, Delete', action: this.removeKey}}
+        >
+        {this.renderContent()}
+        </Step> */
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-  return {kid: query(state, 'kid')}
-}
+// const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+//   return {kid: query(state, 'kid')}
+// }
 
-export default connect(mapStateToProps)(KeyRemoveView)
+// export default connect(mapStateToProps)(KeyRemoveView)
