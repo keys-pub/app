@@ -9,19 +9,19 @@ import {store} from '../../store'
 
 import UserLabel from './label'
 
-import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
-import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
+import {keys, RPCError, RPCState} from '../../rpc/rpc'
+import {Key, KeysRequest, KeysResponse} from '../../rpc/types'
 import {styles} from '../../components'
 
 export type Props = {
-  onChange?: (value: UserSearchResult[]) => void
+  onChange?: (value: Key[]) => void
 }
 
 type State = {
   open: boolean
   loading: boolean
-  options: UserSearchResult[]
-  selected: UserSearchResult[]
+  options: Key[]
+  selected: Key[]
   error: string
 }
 
@@ -40,12 +40,12 @@ export default class RecipientsView extends React.Component<Props, State> {
 
   search = (q: string) => {
     this.setState({loading: true}) // , options: []
-    const req: UserSearchRequest = {query: q, limit: 100}
+    const req: KeysRequest = {query: q}
     store.dispatch(
-      userSearch(
+      keys(
         req,
-        (resp: UserSearchResponse) => {
-          this.setState({options: resp.results || [], loading: false})
+        (resp: KeysResponse) => {
+          this.setState({options: resp.keys || [], loading: false})
         },
         (err: RPCError) => {
           this.setState({error: err.details, loading: false})
@@ -63,23 +63,23 @@ export default class RecipientsView extends React.Component<Props, State> {
     this.search(value)
   }
 
-  onChange = (event: React.ChangeEvent<{}>, value: UserSearchResult[]) => {
+  onChange = (event: React.ChangeEvent<{}>, value: Key[]) => {
     this.setState({selected: value})
     if (!!this.props.onChange) {
       this.props.onChange(value)
     }
   }
 
-  renderOption = (option: UserSearchResult) => {
+  renderOption = (option: Key) => {
     return (
       <React.Fragment>
-        <UserLabel kid={option.kid} user={option.user} />
+        <UserLabel kid={option.id} user={option.user} />
       </React.Fragment>
     )
   }
 
-  optionSelected = (option: UserSearchResult, value: UserSearchResult) => {
-    return option.kid === value.kid && option.user.label === value.user.label
+  optionSelected = (option: Key, value: Key) => {
+    return option.id === value.id && option.user.label === value.user.label
   }
 
   render() {
@@ -96,8 +96,8 @@ export default class RecipientsView extends React.Component<Props, State> {
         onChange={this.onChange}
         value={this.state.selected}
         getOptionSelected={this.optionSelected}
-        getOptionLabel={(option: UserSearchResult) =>
-          ((<UserLabel kid={option.kid} user={option.user} />) as unknown) as string
+        getOptionLabel={(option: Key) =>
+          ((<UserLabel kid={option.id} user={option.user} />) as unknown) as string
         }
         options={options}
         ChipProps={{variant: 'outlined', size: 'small'}} //  icon: <FaceIcon />,
@@ -125,6 +125,5 @@ export default class RecipientsView extends React.Component<Props, State> {
 }
 
 const ChipLabel = (props: {children?: any}) => {
-  console.log('chip props:', props)
   return <Typography style={{...styles.mono}}>{props.children}</Typography>
 }

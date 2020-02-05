@@ -33,20 +33,17 @@ import UserRevokeDialog from '../user/revoke'
 import KeyRemoveDialog from './remove'
 import KeyExportDialog from '../export'
 
-import {key, keyRemove, pull, userService, RPCError, RPCState} from '../../rpc/rpc'
+import {key, keyRemove, pull, RPCError, RPCState} from '../../rpc/rpc'
 
 import {
   Key,
   Statement,
-  User,
   KeyRequest,
   KeyResponse,
   KeyRemoveRequest,
   KeyRemoveResponse,
   PullRequest,
   PullResponse,
-  UserServiceRequest,
-  UserServiceResponse,
   KeyType,
 } from '../../rpc/types'
 
@@ -71,6 +68,7 @@ export const KeyDescriptionView = (props: {value: Key}) => {
 
 type Props = {
   kid: string
+  update: boolean
 }
 
 interface State {
@@ -105,10 +103,11 @@ class KeyView extends React.Component<Props, State> {
   }
 
   loadKey = () => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: this.props.update, error: ''})
     const req: KeyRequest = {
       kid: this.props.kid,
       user: '',
+      update: this.props.update,
     }
     store.dispatch(
       key(
@@ -355,6 +354,7 @@ class KeyView extends React.Component<Props, State> {
 const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
   return {
     kid: query(state, 'kid'),
+    update: query(state, 'update') == '1',
   }
 }
 

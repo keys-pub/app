@@ -99,7 +99,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
       service: this.props.service,
       name: this.state.name,
       url: this.state.url,
-      localOnly: false,
+      local: false,
     }
     this.setState({loading: true, error: ''})
 

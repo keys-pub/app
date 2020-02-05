@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import {Input, Box} from '@material-ui/core'
+import {Button, Input, Box, Snackbar, SnackbarContent} from '@material-ui/core'
 
 import {styles} from '../../components'
 
 import {store} from '../../store'
 
-import {debounce} from 'lodash'
+import {clipboard} from 'electron'
 
 import {sign, RPCError} from '../../rpc/rpc'
 
@@ -18,14 +18,16 @@ export type Props = {
 }
 
 type State = {
-  signed: string
   error: string
+  signed: string
+  snackOpen: boolean
 }
 
 export default class SignedView extends React.Component<Props, State> {
   state = {
     signed: '',
     error: '',
+    snackOpen: false,
   }
   // debounceSign = debounce(() => this.sign(), 10)
 
@@ -63,26 +65,54 @@ export default class SignedView extends React.Component<Props, State> {
     )
   }
 
+  copyToClipboard = () => {
+    clipboard.writeText(this.state.signed)
+    this.setState({snackOpen: true})
+  }
+
   render() {
     return (
-      <Input
-        multiline
-        readOnly
-        value={this.state.signed}
-        disableUnderline
-        inputProps={{
-          style: {
-            ...styles.mono,
+      <Box style={{width: '100%', height: '100%', position: 'relative'}}>
+        <Input
+          multiline
+          readOnly
+          value={this.state.signed}
+          disableUnderline
+          inputProps={{
+            style: {
+              ...styles.mono,
+              height: '100%',
+            },
+          }}
+          style={{
             height: '100%',
-          },
-        }}
-        style={{
-          height: '100%',
-          paddingLeft: 10,
-          paddingTop: 10,
-          overflowY: 'scroll',
-        }}
-      />
+            width: '100%',
+            paddingLeft: 10,
+            paddingTop: 10,
+            overflowY: 'scroll',
+          }}
+        />
+        <Box style={{position: 'absolute', right: 20, bottom: 6}}>
+          <Button size="small" variant="outlined" onClick={this.copyToClipboard}>
+            Copy to Clipboard
+          </Button>
+        </Box>
+        <Snackbar
+          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+          open={this.state.snackOpen}
+          autoHideDuration={2000}
+          onClose={() =>
+            this.setState({
+              snackOpen: false,
+            })
+          }
+        >
+          <SnackbarContent
+            aria-describedby="client-snackbar"
+            message={<span id="client-snackbar">Copied to Clipboard</span>}
+          />
+        </Snackbar>
+      </Box>
     )
   }
 }

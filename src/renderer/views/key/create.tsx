@@ -72,6 +72,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
     if (added) {
       this.props.onChange()
     }
+    this.props.close()
   }
 
   keyGenerate = () => {
@@ -110,9 +111,13 @@ export default class KeyCreateDialog extends React.Component<Props> {
       <FormControl variant="outlined">
         <Select value={this.state.type} onChange={this.setType}>
           <MenuItem value={KeyType.EDX25519}>
-            Signing/Encryption (EdX25519)<span style={{color: '#999999'}}>&nbsp;(recommended)</span>
+            <Typography style={{width: 400}}>
+              Signing/Encryption (EdX25519)<span style={{color: '#999999'}}>&nbsp;(recommended)</span>
+            </Typography>
           </MenuItem>
-          <MenuItem value={KeyType.X25519}>Encryption (X25519)</MenuItem>
+          <MenuItem value={KeyType.X25519}>
+            <Typography style={{width: 400}}>Encryption (X25519)</Typography>
+          </MenuItem>
         </Select>
       </FormControl>
     )
@@ -210,7 +215,6 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   render() {
-    console.log('Step:', this.state.step, this.props.open)
     switch (this.state.step) {
       case 'KEYGEN':
         return this.renderKeygen(this.props.open)
@@ -240,6 +244,6 @@ export const keyDescription = (type: KeyType): string => {
       return `Ed25519 is an elliptic curve signing algorithm using EdDSA and Curve25519. 
         This key can be converted to an X25519 encryption key.`
     case KeyType.X25519:
-      return 'X25519 keys are used for public key authenticated encryption. X25519 is an elliptic curve Diffie-Hellman key exchange using Curve25519.'
+      return 'X25519 is an elliptic curve Diffie-Hellman key exchange using Curve25519. X25519 keys are used for public key authenticated encryption.'
   }
 }

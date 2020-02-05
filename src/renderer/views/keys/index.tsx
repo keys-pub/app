@@ -13,6 +13,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  TextField,
   Typography,
 } from '@material-ui/core'
 
@@ -44,6 +45,7 @@ type Props = {
 }
 
 type State = {
+  input: string
   newKeyMenuEl: HTMLButtonElement
   openCreate: string // '' | 'NEW' | 'INTRO'
   openImport: boolean
@@ -51,6 +53,7 @@ type State = {
 
 class KeysView extends React.Component<Props, State> {
   state = {
+    input: '',
     newKeyMenuEl: null,
     openCreate: '',
     openImport: false,
@@ -62,13 +65,13 @@ class KeysView extends React.Component<Props, State> {
   }
 
   refresh = () => {
-    this.list(this.props.sortField, this.props.sortDirection)
+    this.list(this.state.input, this.props.sortField, this.props.sortDirection)
   }
 
-  list = (sortField: string, sortDirection: SortDirection) => {
-    console.log('List keys', sortField, sortDirection)
+  list = (query: string, sortField: string, sortDirection: SortDirection) => {
+    console.log('List keys', query, sortField, sortDirection)
     const req: KeysRequest = {
-      query: '',
+      query: query,
       sortField: sortField,
       sortDirection: sortDirection,
     }
@@ -91,7 +94,7 @@ class KeysView extends React.Component<Props, State> {
     } else {
       direction = SortDirection.ASC
     }
-    this.list(field, direction)
+    this.list(this.state.input, field, direction)
   }
 
   openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -126,9 +129,22 @@ class KeysView extends React.Component<Props, State> {
     this.refresh()
   }
 
+  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    this.setState({
+      input: target.value,
+    })
+    this.list(target.value, this.props.sortField, this.props.sortDirection)
+  }
+
   renderHeader() {
     return (
-      <Box display="flex" flexDirection="row" style={{paddingLeft: 8, paddingTop: 8, paddingBottom: 8}}>
+      <Box
+        display="flex"
+        flexDirection="row"
+        flex={1}
+        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
+      >
         <Button
           aria-controls="new-key-menu"
           aria-haspopup="true"
@@ -136,6 +152,7 @@ class KeysView extends React.Component<Props, State> {
           variant="outlined"
           size="small"
           onClick={this.openMenu}
+          style={{height: 32, marginTop: 2}}
           // startIcon={<AddIcon />}
         >
           Add Key
@@ -154,6 +171,15 @@ class KeysView extends React.Component<Props, State> {
             <Typography>Import Key</Typography>
           </MenuItem>
         </Menu>
+        <Box paddingLeft={1} />
+        <TextField
+          placeholder="Search"
+          variant="outlined"
+          value={this.state.input}
+          onChange={this.onInputChange}
+          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+          style={{marginTop: 2, width: 500}}
+        />
       </Box>
     )
   }
@@ -161,8 +187,6 @@ class KeysView extends React.Component<Props, State> {
   render() {
     const {sortField, sortDirection} = this.props
     const direction = directionString(sortDirection)
-
-    console.log('Open (create):', this.state.openCreate)
 
     return (
       <Box>

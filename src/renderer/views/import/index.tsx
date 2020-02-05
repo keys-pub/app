@@ -87,7 +87,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography style={{paddingBottom: 20}}>
-              You can specify an key or a key ID and password if encrypted.
+              You can specify an key or a key ID and password (if encrypted).
             </Typography>
             <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
               <TextField

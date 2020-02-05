@@ -16,14 +16,14 @@ import {makeStyles, useTheme} from '@material-ui/core/styles'
 
 import {
   Person as ProfileIcon,
-  VpnKey as KeysIcon,
+  VpnKeyOutlined as KeysIcon,
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
   Lock as EncryptIcon, // EnhancedEncryption
   LockOpen as DecryptIcon,
-  Create as SignIcon,
-  Visibility as VerifyIcon,
+  CreateOutlined as SignIcon,
+  VisibilityOutlined as VerifyIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -105,7 +105,9 @@ const row = (nav: any, index: number, selected: boolean, open: boolean, onClick:
       key={nav.route}
     >
       <ListItemIcon style={{minWidth: 0, marginRight: 10}}>
-        <nav.icon style={{fontSize: open ? 20 : 30, color: selected ? 'white' : '#dfdfdf'}} />
+        <nav.icon
+          style={{fontSize: open ? 20 : 24, marginLeft: open ? 0 : 4, color: selected ? 'white' : '#dfdfdf'}}
+        />
       </ListItemIcon>
       {open && (
         <ListItemText

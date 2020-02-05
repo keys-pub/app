@@ -154,8 +154,8 @@ message StatementCreateRequest {
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 
-  // LocalOnly, if true, won't save to the current key server.
-  bool localOnly = 5;
+  // Local, if true, won't save to the current key server.
+  bool local = 5;
 }
 message StatementCreateResponse {
   Statement statement = 1;
@@ -167,8 +167,8 @@ message StatementRevokeRequest {
   // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 
-  // LocalOnly, if true, won't save to the current key server.
-  bool localOnly = 5;
+  // Local, if true, won't save to the current key server.
+  bool local = 5;
 }
 message StatementRevokeResponse {
   Statement statement = 1;
@@ -344,8 +344,8 @@ message UserAddRequest {
   // URL is location of signed message on the service.
   string url = 4 [(gogoproto.customname) = "URL"];
 
-  // LocalOnly, if true, won't save to the current key server.
-  bool localOnly = 5;
+  // Local, if true, won't save to the current key server.
+  bool local = 5;
 }
 message UserAddResponse {
   User user = 1;
@@ -410,6 +410,7 @@ message Key {
 message KeyRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
   string user = 2;
+  bool update = 5;
 }
 
 message KeyResponse {

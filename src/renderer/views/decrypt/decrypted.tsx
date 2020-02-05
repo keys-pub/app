@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Button, Divider, Input, Box} from '@material-ui/core'
+import {Button, Divider, Input, Box, Snackbar, SnackbarContent} from '@material-ui/core'
 
 import {store} from '../../store'
 
@@ -8,7 +8,9 @@ import {decrypt, RPCError} from '../../rpc/rpc'
 
 import SignerView from '../verify/signer'
 
-import {Key, UserSearchResult, DecryptRequest, DecryptResponse} from '../../rpc/types'
+import {clipboard} from 'electron'
+
+import {Key, DecryptRequest, DecryptResponse} from '../../rpc/types'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
@@ -19,6 +21,7 @@ type State = {
   decrypted: string
   sender: Key
   error: string
+  snackOpen: boolean
 }
 
 export default class DecryptedView extends React.Component<Props, State> {
@@ -26,6 +29,7 @@ export default class DecryptedView extends React.Component<Props, State> {
     decrypted: '',
     error: '',
     sender: null,
+    snackOpen: false,
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -58,9 +62,16 @@ export default class DecryptedView extends React.Component<Props, State> {
     )
   }
 
+  copyToClipboard = () => {
+    clipboard.writeText(this.state.decrypted)
+    this.setState({snackOpen: true})
+  }
+
   render() {
     let value = ''
     let stylesInput: CSSProperties = {}
+    let unsigned
+    const disabled = !this.state.decrypted
     if (this.state.error == 'unexpected EOF') {
       value = ''
     } else if (this.state.error) {
@@ -68,11 +79,12 @@ export default class DecryptedView extends React.Component<Props, State> {
       stylesInput.color = 'red'
     } else {
       value = this.state.decrypted
+      unsigned = !disabled && !this.state.sender
     }
 
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.state.sender} />
+        <SignerView signer={this.state.sender} unsigned={unsigned} />
         <Divider />
         <Input
           multiline
@@ -81,6 +93,7 @@ export default class DecryptedView extends React.Component<Props, State> {
           disableUnderline
           inputProps={{
             style: {
+              ...stylesInput,
               height: '100%',
             },
           }}
@@ -92,6 +105,26 @@ export default class DecryptedView extends React.Component<Props, State> {
             overflowY: 'scroll',
           }}
         />
+        <Box style={{position: 'absolute', right: 20, bottom: 6}}>
+          <Button size="small" variant="outlined" disabled={disabled} onClick={this.copyToClipboard}>
+            Copy to Clipboard
+          </Button>
+        </Box>
+        <Snackbar
+          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+          open={this.state.snackOpen}
+          autoHideDuration={2000}
+          onClose={() =>
+            this.setState({
+              snackOpen: false,
+            })
+          }
+        >
+          <SnackbarContent
+            aria-describedby="client-snackbar"
+            message={<span id="client-snackbar">Copied to Clipboard</span>}
+          />
+        </Snackbar>
       </Box>
     )
   }

@@ -115,8 +115,8 @@ export interface StatementCreateRequest {
     data?: Uint8Array;
     // KID to sign with. Optional, if current key is set.
     kid?: string;
-    // LocalOnly, if true, won't save to the current key server.
-    localOnly?: boolean;
+    // Local, if true, won't save to the current key server.
+    local?: boolean;
 }
 
 export interface StatementCreateResponse {
@@ -128,8 +128,8 @@ export interface StatementRevokeRequest {
     seq?: number;
     // KID to sign with. Optional, if current key is set.
     kid?: string;
-    // LocalOnly, if true, won't save to the current key server.
-    localOnly?: boolean;
+    // Local, if true, won't save to the current key server.
+    local?: boolean;
 }
 
 export interface StatementRevokeResponse {
@@ -310,8 +310,8 @@ export interface UserAddRequest {
     name?: string;
     // URL is location of signed message on the service.
     url?: string;
-    // LocalOnly, if true, won't save to the current key server.
-    localOnly?: boolean;
+    // Local, if true, won't save to the current key server.
+    local?: boolean;
 }
 
 export interface UserAddResponse {
@@ -360,6 +360,7 @@ export interface Key {
 export interface KeyRequest {
     kid?: string;
     user?: string;
+    update?: boolean;
 }
 
 export interface KeyResponse {

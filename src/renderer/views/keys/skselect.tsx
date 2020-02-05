@@ -12,7 +12,9 @@ import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
 export type Props = {
   defaultValue?: string
   onChange?: (value: string) => void
-  includeAnon?: boolean
+  placeholder?: string
+  placeholderDisabled?: boolean
+  itemLabel?: string
 }
 
 type State = {
@@ -82,17 +84,19 @@ export default class SignKeySelectView extends React.Component<Props, State> {
             },
           }}
         >
-          {this.props.includeAnon && (
-            <MenuItem key={'sk-none'} value={''}>
-              <Typography style={{color: '#999999', paddingLeft: 4}}>Anonymous</Typography>
+          {this.props.placeholder && (
+            <MenuItem key="sk-none" value="" disabled={this.props.placeholderDisabled}>
+              <Typography style={{color: '#999999', paddingLeft: 4}}>{this.props.placeholder}</Typography>
             </MenuItem>
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
               <Box>
-                <Typography display="inline" style={{color: '#999999', paddingLeft: 4}}>
-                  Signed by&nbsp;
-                </Typography>
+                {this.props.itemLabel && (
+                  <Typography display="inline" style={{color: '#999999', paddingLeft: 4}}>
+                    {this.props.itemLabel}&nbsp;
+                  </Typography>
+                )}
                 <UserLabel kid={k.id} user={k.user} />
               </Box>
             </MenuItem>

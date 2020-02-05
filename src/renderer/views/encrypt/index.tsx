@@ -14,14 +14,14 @@ import {query} from '../state'
 
 import {RPCState} from '../../rpc/rpc'
 
-import {UserSearchResult} from '../../rpc/types'
+import {Key} from '../../rpc/types'
 
 export type Props = {
   kid: string
 }
 
 type State = {
-  recipients: UserSearchResult[]
+  recipients: Key[]
   sender: string
   value: string
 }
@@ -38,12 +38,11 @@ class EncryptView extends React.Component<Props, State> {
     this.setState({value: target.value || ''})
   }
 
-  setRecipients = (recipients: UserSearchResult[]) => {
+  setRecipients = (recipients: Key[]) => {
     this.setState({recipients})
   }
 
   setSender = (kid: string) => {
-    console.log('Set signer:', kid)
     this.setState({sender: kid})
   }
 
@@ -55,7 +54,12 @@ class EncryptView extends React.Component<Props, State> {
           <RecipientsView onChange={this.setRecipients} />
         </Box>
         <Divider />
-        <SignKeySelectView defaultValue={this.props.kid} onChange={this.setSender} includeAnon />
+        <SignKeySelectView
+          defaultValue={this.props.kid}
+          onChange={this.setSender}
+          placeholder="Anonymous"
+          itemLabel="Signed by"
+        />
         <Divider />
 
         <Input

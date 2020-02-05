@@ -41,7 +41,12 @@ class SignView extends React.Component<Props, State> {
     return (
       <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
         <Divider />
-        <SignKeySelectView defaultValue={this.props.kid} onChange={this.setSigner} />
+        <SignKeySelectView
+          defaultValue={this.props.kid}
+          onChange={this.setSigner}
+          placeholder="Signer"
+          placeholderDisabled
+        />
         <Divider />
         <Input
           multiline

@@ -82,7 +82,7 @@ class SearchView extends React.Component<Props, State> {
 
   select = (result: UserSearchResult) => {
     // this.setState({dialogOpen: true, key: key})
-    this.props.dispatch(push('/keys/key/index?kid=' + result.kid))
+    this.props.dispatch(push('/keys/key/index?kid=' + result.kid + '&update=1'))
   }
 
   render() {
