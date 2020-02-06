@@ -53,7 +53,7 @@ type Credentials = {
 }
 
 const getAppName = (): string => {
-  return getenv.string('KEYS_APP', 'Keys.pub')
+  return getenv.string('KEYS_APP', 'Keys')
 }
 
 var creds: Credentials = {
@@ -94,7 +94,7 @@ const credentialsLoad = event => {
   if (creds) {
     event.sender.send('credentials-loaded', creds, protoPath)
   } else {
-    alert('No credentials')
+    console.error('No credentials')
     app.exit(3)
   }
 }
@@ -222,7 +222,7 @@ app.on('ready', async () => {
 ipcMain.on('run-service', (event, arg) => {
   // Run the service
   runService().catch((err: Error) => {
-    alert(err)
+    console.error(err)
     app.exit(3)
   })
 })

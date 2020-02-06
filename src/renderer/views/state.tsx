@@ -25,6 +25,7 @@ export {goBack, push}
 export const init = () => (dispatch: (action: any) => void, getState: () => State) => {
   setErrHandler((err: RPCError, errFn: ErrFn) => {
     if (err.code === grpc.status.PERMISSION_DENIED) {
+      console.log('Permission denied, locking')
       dispatch({type: 'LOCK'})
     } else if (!errFn) {
       dispatch(errors(new Error(err.details)))

@@ -50,6 +50,10 @@ const runService = (): Promise<any> => {
     return spawnProc(servicePath, true)
   }
 
+  if (process.env.RUN_SERVICE) {
+    return spawnProc(process.env.RUN_SERVICE, true)
+  }
+
   console.warn('No service spawn in dev mode')
   return Promise.resolve()
 }

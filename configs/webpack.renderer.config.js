@@ -107,7 +107,7 @@ module.exports = merge.smart(baseConfig, {
         enforce: 'pre',
         test: /\.js$/,
         loader: 'source-map-loader',
-        exclude: [/node_modules\/@grpc\/proto-loader/],
+        exclude: [/node_modules\/@grpc\/proto-loader/, /node_modules\/@ln-zap\/proto-loader/],
       },
     ],
   },

@@ -11,6 +11,8 @@ import {initializeClient} from '../rpc/client'
 
 import {init} from '../views/state'
 
+import * as fs from 'fs'
+
 const history = createHashHistory()
 const rootReducer = createRootReducer(history)
 
@@ -86,7 +88,7 @@ ipcRenderer.on('credentials-loaded', (event, creds, protoPath) => {
       store.dispatch(init())
     }, 0)
   } catch (err) {
-    alert('Error initializing client ' + err)
+    alert('Error initializing client: ' + err)
     remote.app.exit(3)
   }
 })

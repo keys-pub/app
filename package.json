@@ -1,7 +1,7 @@
 {
   "name": "keys",
   "productName": "Keys",
-  "version": "0.1.0",
+  "version": "0.8.0",
   "description": "",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config configs/webpack.main.prod.config.js",
@@ -20,7 +20,7 @@
     "dist": "yarn run build && electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
-  "main": "./src/main.prod.js",
+  "main": "./dist/main.js",
   "build": {
     "productName": "Keys",
     "appId": "pub.Keys",
@@ -30,7 +30,7 @@
       "package.json"
     ],
     "extraResources": [
-      "src/rpc/keys.proto",
+      "src/renderer/rpc/keys.proto",
       "bin/keysd",
       "bin/keys"
     ],
@@ -146,7 +146,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^0.6.15",
-    "@grpc/proto-loader": "^0.5.2",
+    "@ln-zap/proto-loader": "^0.5.1",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.39",

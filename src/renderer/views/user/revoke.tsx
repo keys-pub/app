@@ -81,7 +81,7 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
     const req: StatementRevokeRequest = {
       kid: this.props.kid,
       seq: this.props.seq,
-      localOnly: false,
+      local: false,
     }
     store.dispatch(
       statementRevoke(
