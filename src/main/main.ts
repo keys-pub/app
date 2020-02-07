@@ -119,8 +119,8 @@ app.on('ready', async () => {
   // }
 
   let ws = windowStateKeeper({
-    defaultWidth: 1024,
-    defaultHeight: 728,
+    defaultWidth: 920,
+    defaultHeight: 600,
   })
 
   // Read about Electron security here:

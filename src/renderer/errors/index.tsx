@@ -4,13 +4,24 @@ import {Box, Button, Typography} from '@material-ui/core'
 
 import ErrorView from './view'
 
+import {ipcRenderer} from 'electron'
+import {store} from '../store'
+
 type Props = {
   error: Error | void
-  clearError?: () => void
-  restart: () => void
 }
 
 export default class ErrorsView extends React.Component<Props> {
+  restart = () => {
+    ipcRenderer.send('restart-app', {})
+  }
+
+  clearError = () => {
+    store.dispatch({
+      type: 'CLEAR_ERROR',
+    })
+  }
+
   render() {
     return (
       <Box
@@ -36,15 +47,13 @@ export default class ErrorsView extends React.Component<Props> {
         </Typography>
         <ErrorView error={this.props.error} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
-          <Button color="secondary" variant="contained" onClick={this.props.restart}>
+          <Button color="secondary" variant="contained" onClick={this.restart}>
             Restart the App
           </Button>
           <Box style={{width: 10}} />
-          {this.props.clearError && (
-            <Button variant="outlined" onClick={this.props.clearError}>
-              Clear Error
-            </Button>
-          )}
+          <Button variant="outlined" onClick={this.clearError}>
+            Clear Error
+          </Button>
         </Box>
       </Box>
     )

@@ -6,8 +6,10 @@
 @import '~typeface-roboto/index.css';
 @import '~typeface-roboto-mono/index.css';
 @import '~typeface-open-sans/index.css';
+@import '../../resources/fonts.css';
 
 body {
+  font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
   margin: 0;
 }
 

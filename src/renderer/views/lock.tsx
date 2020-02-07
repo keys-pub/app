@@ -2,8 +2,6 @@ import * as React from 'react'
 
 import {AppState} from '../reducers/app'
 
-import {ipcRenderer} from 'electron'
-
 import {Routes, routesMap} from './routes'
 import {goBack, push} from 'connected-react-router'
 
@@ -27,21 +25,6 @@ type Props = {
 }
 
 class Lock extends React.Component<Props> {
-  restart = () => {
-    store.dispatch(push('/auth/index'))
-    ipcRenderer.send('restart-app', {})
-  }
-
-  back = () => {
-    store.dispatch(goBack())
-  }
-
-  clearError = () => {
-    store.dispatch({
-      type: 'CLEAR_ERROR',
-    })
-  }
-
   renderApp() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
@@ -49,7 +32,7 @@ class Lock extends React.Component<Props> {
           <Nav />
         </Box>
         <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-          <AppHeader goBack={this.back} />
+          <AppHeader />
           <Routes />
         </Box>
       </Box>
@@ -58,14 +41,14 @@ class Lock extends React.Component<Props> {
 
   render() {
     if (this.props.error) {
-      return <ErrorsView error={this.props.error} restart={this.restart} clearError={this.clearError} />
+      return <ErrorsView error={this.props.error} />
     }
 
     console.log('Path:', this.props.path + this.props.query)
     const route = routesMap.get(this.props.path)
     if (!route) {
       const error = new Error('Route not found: ' + this.props.path)
-      return <ErrorsView error={error} restart={this.restart} />
+      return <ErrorsView error={error} />
     }
 
     console.log('Unlocked:', this.props.unlocked)
