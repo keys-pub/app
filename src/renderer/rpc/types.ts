@@ -45,10 +45,15 @@ export enum WatchStatus {
     STARTING = "STARTING",
     DATA = "DATA",
 }
+export interface RPCError {
+    code?: number;
+    message?: string;
+    details?: string;
+}
+
 export interface SignRequest {
     data?: Uint8Array;
-    // KID to sign with. Optional, if current key is set.
-    kid?: string;
+    signer?: string;
     // Armored, if true, output will be armored.
     armored?: boolean;
     // Detached, if true, output will be just the signature.
@@ -58,7 +63,7 @@ export interface SignRequest {
 export interface SignResponse {
     // Data is signed output.
     data?: Uint8Array;
-    // KID to signed with.
+    // KID we signed with.
     kid?: string;
 }
 
@@ -113,7 +118,6 @@ export interface StatementResponse {
 
 export interface StatementCreateRequest {
     data?: Uint8Array;
-    // KID to sign with. Optional, if current key is set.
     kid?: string;
     // Local, if true, won't save to the current key server.
     local?: boolean;
@@ -126,7 +130,6 @@ export interface StatementCreateResponse {
 export interface StatementRevokeRequest {
     // Seq to revoke.
     seq?: number;
-    // KID to sign with. Optional, if current key is set.
     kid?: string;
     // Local, if true, won't save to the current key server.
     local?: boolean;
@@ -138,8 +141,7 @@ export interface StatementRevokeResponse {
 
 export interface SignStreamInput {
     data?: Uint8Array;
-    // KID to sign with. Optional, if current key is set.
-    kid?: string;
+    signer?: string;
     // Armored, if true, output will be armored.
     armored?: boolean;
     // Detached, if true, output will be just the signature.
@@ -149,7 +151,7 @@ export interface SignStreamInput {
 export interface SignStreamOutput {
     // Data, signed.
     data?: Uint8Array;
-    // KID of who signed.
+    // KID we signed with.
     kid?: string;
 }
 
@@ -171,8 +173,8 @@ export interface EncryptRequest {
     armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Sender to sign as. Or empty, if anonymous.
-    sender?: string;
+    // Signer to sign as. Or empty, if anonymous.
+    signer?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
@@ -192,7 +194,7 @@ export interface DecryptRequest {
 
 export interface DecryptResponse {
     data?: Uint8Array;
-    sender?: Key;
+    signer?: Key;
 }
 
 export interface EncryptStreamInput {
@@ -202,8 +204,8 @@ export interface EncryptStreamInput {
     armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Sender to sign as. Or empty, if anonymous.
-    sender?: string;
+    // Signer to sign as. Or empty, if anonymous.
+    signer?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
@@ -221,7 +223,7 @@ export interface DecryptStreamInput {
 export interface DecryptStreamOutput {
     // Data, decrypted. If empty, is EOF.
     data?: Uint8Array;
-    sender?: Key;
+    signer?: Key;
 }
 
 export interface RuntimeStatusRequest {

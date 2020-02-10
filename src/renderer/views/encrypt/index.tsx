@@ -11,39 +11,46 @@ import SignKeySelectView from '../keys/skselect'
 
 import {store} from '../../store'
 import {query} from '../state'
+import {debounce} from 'lodash'
 
+import {EncryptState} from '../../reducers/encrypt'
 import {RPCState} from '../../rpc/rpc'
 
 import {Key} from '../../rpc/types'
 
 export type Props = {
-  kid: string
+  recipients: Key[]
+  signer: string
+  defaultValue: string
 }
 
 type State = {
-  recipients: Key[]
-  sender: string
   value: string
 }
 
 class EncryptView extends React.Component<Props, State> {
   state = {
-    recipients: [],
-    sender: this.props.kid,
-    value: '',
+    value: this.props.defaultValue,
   }
+
+  debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     this.setState({value: target.value || ''})
+    this.debounceDefaultValue(target.value || '')
   }
 
   setRecipients = (recipients: Key[]) => {
-    this.setState({recipients})
+    store.dispatch({type: 'ENCRYPT_RECIPIENTS', payload: {recipients}})
   }
 
-  setSender = (kid: string) => {
-    this.setState({sender: kid})
+  setSigner = (kid: string) => {
+    store.dispatch({type: 'ENCRYPT_SIGNER', payload: {signer: kid}})
+  }
+
+  setDefaultValue = (v: string) => {
+    store.dispatch({type: 'ENCRYPT_VALUE', payload: {value: v}})
   }
 
   render() {
@@ -51,12 +58,12 @@ class EncryptView extends React.Component<Props, State> {
       <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
         <Divider />
         <Box style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 6, paddingRight: 2}}>
-          <RecipientsView onChange={this.setRecipients} />
+          <RecipientsView recipients={this.props.recipients} onChange={this.setRecipients} />
         </Box>
         <Divider />
         <SignKeySelectView
-          defaultValue={this.props.kid}
-          onChange={this.setSender}
+          defaultValue={this.props.signer}
+          onChange={this.setSigner}
           placeholder="Anonymous"
           itemLabel="Signed by"
         />
@@ -88,9 +95,9 @@ class EncryptView extends React.Component<Props, State> {
           }}
         >
           <EncryptedView
-            recipients={this.state.recipients}
+            recipients={this.props.recipients}
             value={this.state.value}
-            sender={this.state.sender}
+            signer={this.props.signer}
           />
         </Box>
       </Box>
@@ -98,9 +105,11 @@ class EncryptView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {rpc: RPCState; encrypt: EncryptState; router: any}, ownProps: any) => {
   return {
-    kid: query(state, 'kid'),
+    recipients: state.encrypt.recipients || [],
+    signer: state.encrypt.signer || '',
+    defaultValue: state.encrypt.value || '',
   }
 }
 export default connect(mapStateToProps)(EncryptView)

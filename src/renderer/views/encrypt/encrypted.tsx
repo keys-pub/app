@@ -17,9 +17,12 @@ import {styles} from '../../components'
 
 import {store} from '../../store'
 
+import {debounce} from 'lodash'
+
 import {clipboard} from 'electron'
 
-import {encrypt, RPCError} from '../../rpc/rpc'
+import {client} from '../../rpc/client'
+import {RPCError} from '../../rpc/rpc'
 
 import {Key, EncryptRequest, EncryptResponse} from '../../rpc/types'
 import {CSSProperties} from '@material-ui/styles'
@@ -27,7 +30,7 @@ import {CSSProperties} from '@material-ui/styles'
 export type Props = {
   value: string
   recipients: Key[]
-  sender: string
+  signer: string
 }
 
 type State = {
@@ -43,13 +46,23 @@ export default class EncryptedView extends React.Component<Props, State> {
     snackOpen: false,
   }
 
+  debounceEncrypt = debounce(() => this.encrypt(), 10)
+
+  componentDidMount() {
+    this.encrypt()
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps != this.props) {
-      this.encrypt()
+    if (
+      this.props.value != prevProps.value ||
+      this.props.signer != prevProps.signer ||
+      this.props.recipients != prevProps.recipients
+    ) {
+      this.debounceEncrypt()
     }
   }
 
-  encrypt = () => {
+  encrypt = async () => {
     this.setState({error: '', encrypted: ''})
 
     const recs = this.props.recipients.map((r: Key) => {
@@ -65,20 +78,17 @@ export default class EncryptedView extends React.Component<Props, State> {
       data: data,
       armored: true,
       recipients: recs,
-      sender: this.props.sender,
+      signer: this.props.signer,
     }
-    store.dispatch(
-      encrypt(
-        req,
-        (resp: EncryptResponse) => {
-          const encrypted = new TextDecoder().decode(resp.data)
-          this.setState({error: '', encrypted: encrypted})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    const cl = await client()
+    cl.encrypt(req, (err: RPCError, resp: EncryptResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const encrypted = new TextDecoder().decode(resp.data)
+      this.setState({error: '', encrypted: encrypted})
+    })
   }
 
   copyToClipboard = () => {

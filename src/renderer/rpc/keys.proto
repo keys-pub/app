@@ -87,10 +87,15 @@ service Keys {
   rpc Watch(WatchRequest) returns (stream WatchEvent) {}
 }
 
+message RPCError {
+	int32 code = 1;
+	string message = 2;
+	string details = 3;
+}
+
 message SignRequest {
   bytes data = 1;
-  // KID to sign with. Optional, if current key is set.
-  string kid = 2 [(gogoproto.customname) = "KID"];
+  string signer = 2;
   // Armored, if true, output will be armored.
   bool armored = 3;
   // Detached, if true, output will be just the signature.
@@ -99,7 +104,7 @@ message SignRequest {
 message SignResponse {
   // Data is signed output.
   bytes data = 1;  
-   // KID to signed with.
+   // KID we signed with.
   string kid = 2 [(gogoproto.customname) = "KID"];
 }
 
@@ -151,7 +156,6 @@ message StatementResponse {
 
 message StatementCreateRequest {
   bytes data = 1;
-  // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 
   // Local, if true, won't save to the current key server.
@@ -164,7 +168,6 @@ message StatementCreateResponse {
 message StatementRevokeRequest {
   // Seq to revoke.
   int32 seq = 1;
-  // KID to sign with. Optional, if current key is set.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 
   // Local, if true, won't save to the current key server.
@@ -176,8 +179,7 @@ message StatementRevokeResponse {
 
 message SignStreamInput {
   bytes data = 1;
-  // KID to sign with. Optional, if current key is set.
-  string kid = 2 [(gogoproto.customname) = "KID"];
+  string signer = 2;
   // Armored, if true, output will be armored.
   bool armored = 3;
   // Detached, if true, output will be just the signature.
@@ -186,7 +188,7 @@ message SignStreamInput {
 message SignStreamOutput {
   // Data, signed.
   bytes data = 1;
-  // KID of who signed.
+  // KID we signed with.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 }
 
@@ -217,8 +219,8 @@ message EncryptRequest {
   bool armored = 2;
   // Recipients to encrypt to.
   repeated string recipients = 3;  
-  // Sender to sign as. Or empty, if anonymous.
-  string sender = 4;  
+  // Signer to sign as. Or empty, if anonymous.
+  string signer = 4;  
   // Mode is the encryption mode.
   EncryptMode mode = 5;
 }
@@ -236,7 +238,7 @@ message DecryptRequest {
 }
 message DecryptResponse {
   bytes data = 1;
-  Key sender = 2;
+  Key signer = 2;
 }
 
 message EncryptStreamInput {
@@ -246,8 +248,8 @@ message EncryptStreamInput {
   bool armored = 2;
   // Recipients to encrypt to.
   repeated string recipients = 3;  
-  // Sender to sign as. Or empty, if anonymous.
-  string sender = 4;  
+  // Signer to sign as. Or empty, if anonymous.
+  string signer = 4;  
   // Mode is the encryption mode.
   EncryptMode mode = 5;
 }
@@ -264,7 +266,7 @@ message DecryptStreamInput {
 message DecryptStreamOutput {
   // Data, decrypted. If empty, is EOF.
   bytes data = 1;
-  Key sender = 2;
+  Key signer = 2;
 }
 
 message RuntimeStatusRequest {}

@@ -30,7 +30,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
     open: false,
     loading: false,
     options: [],
-    selected: this.props.defaultValue || '',
+    selected: '',
     error: '',
   }
 
@@ -47,7 +47,8 @@ export default class SignKeySelectView extends React.Component<Props, State> {
       keys(
         req,
         (resp: KeysResponse) => {
-          this.setState({options: resp.keys || [], loading: false})
+          // TODO: Check default value exists
+          this.setState({options: resp.keys || [], selected: this.props.defaultValue || '', loading: false})
         },
         (err: RPCError) => {
           this.setState({error: err.details, loading: false})
@@ -66,7 +67,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box>
+      <Box style={{paddingRight: 2}}>
         <Select
           onChange={this.onChange}
           value={this.state.selected || ''}
@@ -77,8 +78,8 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           SelectDisplayProps={{
             style: {
               paddingLeft: 8,
-              paddingTop: 8,
-              paddingBottom: 8,
+              paddingTop: 11,
+              paddingBottom: 10,
               backgroundColor: 'white',
               // color: '#666',
             },
@@ -86,14 +87,14 @@ export default class SignKeySelectView extends React.Component<Props, State> {
         >
           {this.props.placeholder && (
             <MenuItem key="sk-none" value="" disabled={this.props.placeholderDisabled}>
-              <Typography style={{color: '#999999', paddingLeft: 4}}>{this.props.placeholder}</Typography>
+              <Typography style={{color: '#a2a2a2'}}>{this.props.placeholder}</Typography>
             </MenuItem>
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
               <Box>
                 {this.props.itemLabel && (
-                  <Typography display="inline" style={{color: '#999999', paddingLeft: 4}}>
+                  <Typography display="inline" style={{color: '#a2a2a2', paddingLeft: 4}}>
                     {this.props.itemLabel}&nbsp;
                   </Typography>
                 )}

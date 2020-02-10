@@ -8,13 +8,15 @@ import {store} from '../../store'
 
 import {clipboard} from 'electron'
 
+import {debounce} from 'lodash'
+
 import {sign, RPCError} from '../../rpc/rpc'
 
 import {Key, SignRequest, SignResponse} from '../../rpc/types'
 
 export type Props = {
   value: string
-  kid: string
+  signer: string
 }
 
 type State = {
@@ -29,18 +31,22 @@ export default class SignedView extends React.Component<Props, State> {
     error: '',
     snackOpen: false,
   }
-  // debounceSign = debounce(() => this.sign(), 10)
+  debounceSign = debounce(() => this.sign(), 10)
+
+  componentDidMount() {
+    this.sign()
+  }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps != this.props) {
-      this.sign()
+    if (this.props.value != prevProps.value || this.props.signer != prevProps.signer) {
+      this.debounceSign()
     }
   }
 
   sign = () => {
     this.setState({error: '', signed: ''})
 
-    if (this.props.kid == '' || this.props.value == '') {
+    if (this.props.signer == '' || this.props.value == '') {
       return
     }
 
@@ -49,7 +55,7 @@ export default class SignedView extends React.Component<Props, State> {
     const req: SignRequest = {
       data: data,
       armored: true,
-      kid: this.props.kid,
+      signer: this.props.signer,
     }
     store.dispatch(
       sign(

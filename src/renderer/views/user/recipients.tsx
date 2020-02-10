@@ -14,6 +14,7 @@ import {Key, KeysRequest, KeysResponse} from '../../rpc/types'
 import {styles} from '../../components'
 
 export type Props = {
+  recipients?: Key[]
   onChange?: (value: Key[]) => void
 }
 
@@ -30,7 +31,7 @@ export default class RecipientsView extends React.Component<Props, State> {
     open: false,
     loading: false,
     options: [],
-    selected: [],
+    selected: this.props.recipients || [],
     error: '',
   }
 

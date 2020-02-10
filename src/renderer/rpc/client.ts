@@ -9,23 +9,17 @@ import * as fs from 'fs'
 
 import {RPCError} from './rpc'
 
-type RPC = {
-  client: any
-}
-
-let rpc: RPC = {
-  client: null,
-}
+let rpcClient: any = null
 
 const sleep = milliseconds => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 export const initializeClient = async (certPath: string, authToken: string, protoPath: string) => {
-  if (rpc.client) {
+  if (rpcClient) {
     console.log('Closing client...')
-    grpc.closeClient(rpc.client)
-    rpc.client = null
+    grpc.closeClient(rpcClient)
+    rpcClient = null
   }
   console.log('Initializing client')
 
@@ -78,7 +72,7 @@ export const initializeClient = async (certPath: string, authToken: string, prot
     }
   }
 
-  rpc.client = cl
+  rpcClient = cl
 }
 
 const runtimeStatus = (cl: any): Promise<boolean> => {
@@ -99,7 +93,7 @@ const runtimeStatus = (cl: any): Promise<boolean> => {
 
 export const client = async () => {
   let waitCount = 0
-  while (!rpc.client) {
+  while (!rpcClient) {
     if (waitCount % 4 == 0) {
       console.log('Waiting for client init...')
     }
@@ -108,8 +102,8 @@ export const client = async () => {
       break
     }
   }
-  if (!rpc.client) {
+  if (!rpcClient) {
     throw new Error('No client available')
   }
-  return rpc.client
+  return rpcClient
 }

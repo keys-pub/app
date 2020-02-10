@@ -166,7 +166,7 @@ class AuthSetupView extends React.Component<Props, State> {
     }
     this.setState({loading: true, error: ''})
     // Use client directly to prevent logging the request (password)
-    let cl = await client()
+    const cl = await client()
     cl.authSetup(req, (err: RPCError | void, resp: AuthSetupResponse | void) => {
       if (err) {
         this.setState({loading: false, error: err.details})

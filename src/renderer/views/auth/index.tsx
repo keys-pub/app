@@ -7,9 +7,9 @@ import AuthUnlockView from './unlock'
 import {Splash} from '../../components'
 import ErrorsView from '../../errors'
 
-import {runtimeStatus} from '../../rpc/rpc'
+import {client} from '../../rpc/client'
 
-import {RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/types'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/types'
 
 type Props = {}
 
@@ -52,13 +52,12 @@ export default class AuthView extends React.Component<Props, State> {
     }
   }
 
-  refresh = () => {
+  refresh = async () => {
     const req: RuntimeStatusRequest = {}
-    store.dispatch(
-      runtimeStatus(req, (resp: RuntimeStatusResponse) => {
-        this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
-      })
-    )
+    const cl = await client()
+    cl.runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+      this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
+    })
   }
 
   render() {

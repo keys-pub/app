@@ -93,8 +93,8 @@ class AuthUnlockView extends React.Component<Props, State> {
       client: 'app',
     }
     console.log('Auth unlock')
+    const cl = await client()
     // Use client directly to prevent logging the request (password)
-    let cl = await client()
     cl.authUnlock(req, (err: RPCError | void, resp: AuthUnlockResponse | void) => {
       if (err) {
         this.setState({loading: false, error: err.details})

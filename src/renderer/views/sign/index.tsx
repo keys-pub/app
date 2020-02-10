@@ -6,35 +6,42 @@ import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material
 
 import {query} from '../state'
 import {debounce} from 'lodash'
+import {store} from '../../store'
 
 import SignedView from './signed'
 import SignKeySelectView from '../keys/skselect'
 
+import {SignState} from '../../reducers/sign'
 import {RPCState} from '../../rpc/rpc'
 
 export type Props = {
-  kid: string
+  signer: string
+  defaultValue: string
 }
 
 type State = {
-  kid: string
   value: string
 }
 
 class SignView extends React.Component<Props, State> {
   state = {
-    kid: this.props.kid,
-    value: '',
+    value: this.props.defaultValue,
   }
+
+  debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     this.setState({value: target.value || ''})
+    this.debounceDefaultValue(target.value || '')
+  }
+
+  setDefaultValue = (v: string) => {
+    store.dispatch({type: 'SIGN_VALUE', payload: {value: v}})
   }
 
   setSigner = (kid: string) => {
-    console.log('Set signer:', kid)
-    this.setState({kid: kid})
+    store.dispatch({type: 'SIGN_SIGNER', payload: {signer: kid}})
   }
 
   render() {
@@ -42,7 +49,7 @@ class SignView extends React.Component<Props, State> {
       <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
         <Divider />
         <SignKeySelectView
-          defaultValue={this.props.kid}
+          defaultValue={this.props.signer}
           onChange={this.setSigner}
           placeholder="Signer"
           placeholderDisabled
@@ -67,15 +74,16 @@ class SignView extends React.Component<Props, State> {
           }}
         />
         <Divider />
-        <SignedView kid={this.state.kid} value={this.state.value} />
+        <SignedView signer={this.props.signer} value={this.state.value} />
       </Box>
     )
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {rpc: RPCState; sign: SignState; router: any}, ownProps: any) => {
   return {
-    kid: query(state, 'kid'),
+    signer: state.sign.signer || '',
+    defaultValue: state.sign.value || '',
   }
 }
 export default connect(mapStateToProps)(SignView)

@@ -19,7 +19,7 @@ export type Props = {
 
 type State = {
   decrypted: string
-  sender: Key
+  signer: Key
   error: string
   snackOpen: boolean
 }
@@ -28,7 +28,7 @@ export default class DecryptedView extends React.Component<Props, State> {
   state = {
     decrypted: '',
     error: '',
-    sender: null,
+    signer: null,
     snackOpen: false,
   }
 
@@ -39,7 +39,7 @@ export default class DecryptedView extends React.Component<Props, State> {
   }
 
   decrypt = () => {
-    this.setState({error: '', sender: null, decrypted: ''})
+    this.setState({error: '', signer: null, decrypted: ''})
 
     if (this.props.value == '') return
 
@@ -53,7 +53,7 @@ export default class DecryptedView extends React.Component<Props, State> {
         req,
         (resp: DecryptResponse) => {
           const decrypted = new TextDecoder().decode(resp.data)
-          this.setState({error: '', sender: resp.sender, decrypted: decrypted})
+          this.setState({error: '', signer: resp.signer, decrypted: decrypted})
         },
         (err: RPCError) => {
           this.setState({error: err.details})
@@ -79,12 +79,12 @@ export default class DecryptedView extends React.Component<Props, State> {
       stylesInput.color = 'red'
     } else {
       value = this.state.decrypted
-      unsigned = !disabled && !this.state.sender
+      unsigned = !disabled && !this.state.signer
     }
 
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.state.sender} unsigned={unsigned} />
+        <SignerView signer={this.state.signer} unsigned={unsigned} />
         <Divider />
         <Input
           multiline
