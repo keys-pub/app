@@ -11,6 +11,7 @@ import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
 
 export type Props = {
   defaultValue?: string
+  disabled?: boolean
   onChange?: (value: string) => void
   placeholder?: string
   placeholderDisabled?: boolean
@@ -73,6 +74,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           value={this.state.selected || ''}
           disableUnderline
           fullWidth
+          disabled={this.props.disabled}
           displayEmpty
           inputProps={{style: {color: 'red'}}}
           SelectDisplayProps={{

@@ -20,7 +20,7 @@ import {
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
-  Lock as EncryptIcon, // EnhancedEncryption
+  EnhancedEncryption as EncryptIcon,
   LockOpen as DecryptIcon,
   CreateOutlined as SignIcon,
   VisibilityOutlined as VerifyIcon,

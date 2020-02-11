@@ -30,19 +30,24 @@ service Keys {
   rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
 
   rpc Sign(SignRequest) returns (SignResponse) {}
-  rpc Verify(VerifyRequest) returns (VerifyResponse) {}
-  rpc SignStream(stream SignStreamInput) returns (stream SignStreamOutput) {}
-  rpc VerifyStream(stream VerifyStreamInput) returns (stream VerifyStreamOutput) {}  
-  rpc VerifyArmoredStream(stream VerifyStreamInput) returns (stream VerifyStreamOutput) {}  
+  rpc SignFile(stream SignFileInput) returns (stream SignFileOutput) {}
+  rpc SignStream(stream SignInput) returns (stream SignOutput) {}
 
-  rpc Encrypt(EncryptRequest) returns (EncryptResponse) {}
+  rpc Verify(VerifyRequest) returns (VerifyResponse) {}
+  rpc VerifyFile(stream VerifyFileInput) returns (stream VerifyFileOutput) {}
+  rpc VerifyStream(stream VerifyInput) returns (stream VerifyOutput) {}  
+  rpc VerifyArmoredStream(stream VerifyInput) returns (stream VerifyOutput) {}  
+
+  rpc Encrypt(EncryptRequest) returns (EncryptResponse) {}  
+  rpc EncryptStream(stream EncryptInput) returns (stream EncryptOutput) {}  
+  rpc EncryptFile(stream EncryptFileInput) returns (stream EncryptFileOutput) {}
+  
   rpc Decrypt(DecryptRequest) returns (DecryptResponse) {}
-  rpc EncryptStream(stream EncryptStreamInput) returns (stream EncryptStreamOutput) {}  
-  // Decryption streams
-  rpc DecryptStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}
-  rpc DecryptArmoredStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}  
-  rpc SigncryptOpenStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}
-  rpc SigncryptOpenArmoredStream(stream DecryptStreamInput) returns (stream DecryptStreamOutput) {}  
+  rpc DecryptFile(stream DecryptFileInput) returns (stream DecryptFileOutput) {}
+  rpc DecryptStream(stream DecryptInput) returns (stream DecryptOutput) {}
+  rpc DecryptArmoredStream(stream DecryptInput) returns (stream DecryptOutput) {}  
+  rpc SigncryptOpenStream(stream DecryptInput) returns (stream DecryptOutput) {}
+  rpc SigncryptOpenArmoredStream(stream DecryptInput) returns (stream DecryptOutput) {}  
 
   rpc Sigchain(SigchainRequest) returns (SigchainResponse) {}
   rpc Statement(StatementRequest) returns (StatementResponse) {}
@@ -95,28 +100,64 @@ message RPCError {
 
 message SignRequest {
   bytes data = 1;
-  string signer = 2;
+  
+  string signer = 5;
   // Armored, if true, output will be armored.
-  bool armored = 3;
+  bool armored = 10;
   // Detached, if true, output will be just the signature.
-  bool detached = 4;
+  bool detached = 11;
 }
 message SignResponse {
   // Data is signed output.
   bytes data = 1;  
-   // KID we signed with.
-  string kid = 2 [(gogoproto.customname) = "KID"];
+  string kid = 2 [(gogoproto.customname) = "KID"];  
+}
+
+message SignFileInput {
+  // In is input file path. 
+  string in = 1;
+  // Out is output file path.
+  string out = 2;
+
+  string signer = 5;
+  // Armored, if true, output will be armored.
+  bool armored = 10;
+  // Detached, if true, output will be just the signature.
+  bool detached = 11;
+}
+message SignFileOutput {
+  string kid = 1 [(gogoproto.customname) = "KID"];  
+  int32 bytes = 2;
+  int32 total = 3;
 }
 
 message VerifyRequest {
   // Data is verified output.
-  bytes data = 1; 
+  bytes data = 1;
+  
   // Armored, if true, output will be armored.
-  bool armored = 3;
+  bool armored = 10;
 }
 message VerifyResponse {
+  // Data (if out is not specified in request).
   bytes data = 1;
   Key signer = 2;
+}
+
+message VerifyFileInput {
+  // In is input file path.  
+  string in = 1;
+  // Out is output file path.
+  string out = 2;
+  // Armored, if true, output will be armored.
+  bool armored = 10;
+}
+
+message VerifyFileOutput {
+  Key signer = 1;
+  string out = 2;
+  int32 bytes = 3;
+  int32 total = 4;
 }
 
 message Statement {
@@ -177,31 +218,34 @@ message StatementRevokeResponse {
   Statement statement = 1;
 }
 
-message SignStreamInput {
+message SignInput {
   bytes data = 1;
-  string signer = 2;
+  // In is input file path (if data is not specified).  
+  string in = 2;
+  // Out is output file path (required if in specified).
+  string out = 3;
+
+  string signer = 5;
   // Armored, if true, output will be armored.
-  bool armored = 3;
+  bool armored = 10;
   // Detached, if true, output will be just the signature.
-  bool detached = 4;
+  bool detached = 11;
 }
-message SignStreamOutput {
+message SignOutput {
   // Data, signed.
   bytes data = 1;
-  // KID we signed with.
   string kid = 2 [(gogoproto.customname) = "KID"];  
 }
 
-message VerifyStreamInput {
+message VerifyInput {
   // Data to verify.
   bytes data = 1;  
 }
-message VerifyStreamOutput {
+message VerifyOutput {
   // Data, verified. If empty, is EOF.
   bytes data = 1;
   Key signer = 2;
 }
-
 
 enum EncryptMode {
   option (gogoproto.goproto_enum_prefix) = false;
@@ -214,34 +258,41 @@ enum EncryptMode {
 
 message EncryptRequest {
   // Data to encrypt.
-  bytes data = 1; 
+  bytes data = 1;
   // Armored, if true will return armored string output.
-  bool armored = 2;
+  bool armored = 10;
   // Recipients to encrypt to.
-  repeated string recipients = 3;  
+  repeated string recipients = 11;  
   // Signer to sign as. Or empty, if anonymous.
-  string signer = 4;  
+  string signer = 12;  
   // Mode is the encryption mode.
-  EncryptMode mode = 5;
+  EncryptMode mode = 13;
 }
 message EncryptResponse {
   bytes data = 1;
 }
 
-message DecryptRequest {
-  // Data to decrypt.
-  bytes data = 1;
+message EncryptFileInput {
+  // In is input file path. 
+  string in = 1;
+  // Out is output file path.
+  string out = 2;
   // Armored, if true will return armored string output.
-  bool armored = 2;
+  bool armored = 10;
+  // Recipients to encrypt to.
+  repeated string recipients = 11;  
+  // Signer to sign as. Or empty, if anonymous.
+  string signer = 12;  
   // Mode is the encryption mode.
-  EncryptMode mode = 5;
-}
-message DecryptResponse {
-  bytes data = 1;
-  Key signer = 2;
+  EncryptMode mode = 13;
 }
 
-message EncryptStreamInput {
+message EncryptFileOutput {
+  int32 bytes = 1;
+  int32 total = 2;
+}
+
+message EncryptInput {
   // Data to encrypt. Send empty byte slice as last message.
   bytes data = 1;
   // Armored, if true will return armored string output.
@@ -254,16 +305,47 @@ message EncryptStreamInput {
   EncryptMode mode = 5;
 }
 
-message EncryptStreamOutput {
+message EncryptOutput {
   // Data, encrypted.
   bytes data = 1;
 }
 
-message DecryptStreamInput {
+message DecryptRequest {
+  // Data to decrypt.
+  bytes data = 1;
+  // Armored, if true will return armored string output.
+  bool armored = 10;
+  // Mode is the encryption mode.
+  EncryptMode mode = 13;
+}
+message DecryptResponse {
+  // Data (if out is not specified in request).
+  bytes data = 1;
+  Key signer = 2;
+}
+
+message DecryptFileInput {
+  // In is input file path. 
+  string in = 1;
+  // Out is output file path.
+  string out = 2;
+  // Armored, if true will return armored string output.
+  bool armored = 10;
+  // Mode is the encryption mode.
+  EncryptMode mode = 13;
+}
+message DecryptFileOutput {
+  Key signer = 1;
+  string out = 2;
+  int32 bytes = 3;
+  int32 total = 4;
+}
+
+message DecryptInput {
   // Data, encrypted.
   bytes data = 1;  
 }
-message DecryptStreamOutput {
+message DecryptOutput {
   // Data, decrypted. If empty, is EOF.
   bytes data = 1;
   Key signer = 2;

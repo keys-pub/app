@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, IconButton, Typography} from '@material-ui/core'
 
-import {ChevronLeft, Lock} from '@material-ui/icons'
+import {ChevronLeft, DesktopAccessDisabledSharp as ScreenLockIcon} from '@material-ui/icons'
 
 import {goBack} from 'connected-react-router'
 
@@ -32,7 +32,7 @@ export default (props: Props) => {
           </IconButton>
           <Box display="flex" flexGrow={1} />
           <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-            <Lock />
+            <ScreenLockIcon fontSize="small" />
           </IconButton>
         </Box>
       </Box>

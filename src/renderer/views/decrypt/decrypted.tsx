@@ -9,6 +9,7 @@ import {decrypt, RPCError} from '../../rpc/rpc'
 import SignerView from '../verify/signer'
 
 import {clipboard} from 'electron'
+import {debounce} from 'lodash'
 
 import {Key, DecryptRequest, DecryptResponse} from '../../rpc/types'
 import {CSSProperties} from '@material-ui/styles'
@@ -32,9 +33,15 @@ export default class DecryptedView extends React.Component<Props, State> {
     snackOpen: false,
   }
 
+  debounceDecrypt = debounce(() => this.decrypt(), 10)
+
+  componentDidMount() {
+    this.decrypt()
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps != this.props) {
-      this.decrypt()
+    if (this.props.value != prevProps.value) {
+      this.debounceDecrypt()
     }
   }
 

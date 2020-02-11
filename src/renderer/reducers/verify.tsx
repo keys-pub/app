@@ -1,17 +1,17 @@
 import {Key} from '../rpc/types'
 
-export type SignState = {
-  signer: string
+export type VerifyState = {
   value: string
   file: string
   fileOut: string
+  fileSigner: Key | void
 }
 
-const initialState: SignState = {
-  signer: '',
+const initialState: VerifyState = {
   value: '',
   file: '',
   fileOut: '',
+  fileSigner: null,
 }
 
 type actionType = {
@@ -19,35 +19,32 @@ type actionType = {
   payload: any
 }
 
-export default function reducer(state: SignState = initialState, action: actionType): SignState {
+export default function reducer(state: VerifyState = initialState, action: actionType): VerifyState {
   switch (action.type) {
-    case 'SIGN_SIGNER':
-      return {
-        ...state,
-        signer: action.payload.signer,
-      }
-    case 'SIGN_VALUE':
+    case 'VERIFY_VALUE':
       return {
         ...state,
         value: action.payload.value,
       }
-    case 'SIGN_FILE':
+    case 'VERIFY_FILE':
       return {
         ...state,
         file: action.payload.file,
       }
-    case 'SIGN_FILE_OUT':
+    case 'VERIFY_FILE_OUT':
       return {
         ...state,
         fileOut: action.payload.fileOut,
+        fileSigner: action.payload.fileSigner,
       }
-    case 'SIGN_CLEAR':
+    case 'VERIFY_CLEAR':
       return {
         ...state,
-        signer: '',
         value: '',
+        file: '',
+        fileOut: '',
+        fileSigner: null,
       }
-
     default:
       return state
   }

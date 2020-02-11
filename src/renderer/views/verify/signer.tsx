@@ -30,7 +30,7 @@ export default class SignerView extends React.Component<Props> {
           </Box>
         )}
         {!this.props.signer && !unsigned && <Typography display="inline">&nbsp;</Typography>}
-        {!this.props.signer && unsigned && <Typography display="inline">Anonymous</Typography>}
+        {!this.props.signer && unsigned && <Typography display="inline">Unsigned</Typography>}
       </Box>
     )
   }

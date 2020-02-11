@@ -39,6 +39,8 @@ type State = {
   snackOpen: boolean
 }
 
+// TODO: drag and drop file
+
 export default class EncryptedView extends React.Component<Props, State> {
   state = {
     encrypted: '',

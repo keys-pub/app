@@ -4,12 +4,16 @@ export type EncryptState = {
   recipients: Key[]
   signer: string
   value: string
+  file: string
+  fileOut: string
 }
 
 const initialState: EncryptState = {
   recipients: [],
   signer: '',
   value: '',
+  file: '',
+  fileOut: '',
 }
 
 type actionType = {
@@ -34,12 +38,24 @@ export default function reducer(state: EncryptState = initialState, action: acti
         ...state,
         value: action.payload.value,
       }
+    case 'ENCRYPT_FILE':
+      return {
+        ...state,
+        file: action.payload.file,
+      }
+    case 'ENCRYPT_FILE_OUT':
+      return {
+        ...state,
+        fileOut: action.payload.fileOut,
+      }
     case 'ENCRYPT_CLEAR':
       return {
         ...state,
         recipients: [],
         signer: '',
         value: '',
+        file: '',
+        fileOut: '',
       }
 
     default:

@@ -63,8 +63,25 @@ export interface SignRequest {
 export interface SignResponse {
     // Data is signed output.
     data?: Uint8Array;
-    // KID we signed with.
     kid?: string;
+}
+
+export interface SignFileInput {
+    // In is input file path. 
+    in?: string;
+    // Out is output file path.
+    out?: string;
+    signer?: string;
+    // Armored, if true, output will be armored.
+    armored?: boolean;
+    // Detached, if true, output will be just the signature.
+    detached?: boolean;
+}
+
+export interface SignFileOutput {
+    kid?: string;
+    bytes?: number;
+    total?: number;
 }
 
 export interface VerifyRequest {
@@ -75,8 +92,25 @@ export interface VerifyRequest {
 }
 
 export interface VerifyResponse {
+    // Data (if out is not specified in request).
     data?: Uint8Array;
     signer?: Key;
+}
+
+export interface VerifyFileInput {
+    // In is input file path.  
+    in?: string;
+    // Out is output file path.
+    out?: string;
+    // Armored, if true, output will be armored.
+    armored?: boolean;
+}
+
+export interface VerifyFileOutput {
+    signer?: Key;
+    out?: string;
+    bytes?: number;
+    total?: number;
 }
 
 export interface Statement {
@@ -139,8 +173,12 @@ export interface StatementRevokeResponse {
     statement?: Statement;
 }
 
-export interface SignStreamInput {
+export interface SignInput {
     data?: Uint8Array;
+    // In is input file path (if data is not specified).  
+    in?: string;
+    // Out is output file path (required if in specified).
+    out?: string;
     signer?: string;
     // Armored, if true, output will be armored.
     armored?: boolean;
@@ -148,19 +186,18 @@ export interface SignStreamInput {
     detached?: boolean;
 }
 
-export interface SignStreamOutput {
+export interface SignOutput {
     // Data, signed.
     data?: Uint8Array;
-    // KID we signed with.
     kid?: string;
 }
 
-export interface VerifyStreamInput {
+export interface VerifyInput {
     // Data to verify.
     data?: Uint8Array;
 }
 
-export interface VerifyStreamOutput {
+export interface VerifyOutput {
     // Data, verified. If empty, is EOF.
     data?: Uint8Array;
     signer?: Key;
@@ -183,21 +220,27 @@ export interface EncryptResponse {
     data?: Uint8Array;
 }
 
-export interface DecryptRequest {
-    // Data to decrypt.
-    data?: Uint8Array;
+export interface EncryptFileInput {
+    // In is input file path. 
+    in?: string;
+    // Out is output file path.
+    out?: string;
     // Armored, if true will return armored string output.
     armored?: boolean;
+    // Recipients to encrypt to.
+    recipients?: Array<string>;
+    // Signer to sign as. Or empty, if anonymous.
+    signer?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
 
-export interface DecryptResponse {
-    data?: Uint8Array;
-    signer?: Key;
+export interface EncryptFileOutput {
+    bytes?: number;
+    total?: number;
 }
 
-export interface EncryptStreamInput {
+export interface EncryptInput {
     // Data to encrypt. Send empty byte slice as last message.
     data?: Uint8Array;
     // Armored, if true will return armored string output.
@@ -210,17 +253,50 @@ export interface EncryptStreamInput {
     mode?: EncryptMode;
 }
 
-export interface EncryptStreamOutput {
+export interface EncryptOutput {
     // Data, encrypted.
     data?: Uint8Array;
 }
 
-export interface DecryptStreamInput {
+export interface DecryptRequest {
+    // Data to decrypt.
+    data?: Uint8Array;
+    // Armored, if true will return armored string output.
+    armored?: boolean;
+    // Mode is the encryption mode.
+    mode?: EncryptMode;
+}
+
+export interface DecryptResponse {
+    // Data (if out is not specified in request).
+    data?: Uint8Array;
+    signer?: Key;
+}
+
+export interface DecryptFileInput {
+    // In is input file path. 
+    in?: string;
+    // Out is output file path.
+    out?: string;
+    // Armored, if true will return armored string output.
+    armored?: boolean;
+    // Mode is the encryption mode.
+    mode?: EncryptMode;
+}
+
+export interface DecryptFileOutput {
+    signer?: Key;
+    out?: string;
+    bytes?: number;
+    total?: number;
+}
+
+export interface DecryptInput {
     // Data, encrypted.
     data?: Uint8Array;
 }
 
-export interface DecryptStreamOutput {
+export interface DecryptOutput {
     // Data, decrypted. If empty, is EOF.
     data?: Uint8Array;
     signer?: Key;
@@ -613,17 +689,21 @@ export interface KeysService {
     KeyExport: (r:KeyExportRequest) => KeyExportResponse;
     KeyRemove: (r:KeyRemoveRequest) => KeyRemoveResponse;
     Sign: (r:SignRequest) => SignResponse;
+    SignFile: (r:() => {value: SignFileInput, done: boolean}, cb:(a:{value: SignFileOutput, done: boolean}) => void) => void;
+    SignStream: (r:() => {value: SignInput, done: boolean}, cb:(a:{value: SignOutput, done: boolean}) => void) => void;
     Verify: (r:VerifyRequest) => VerifyResponse;
-    SignStream: (r:() => {value: SignStreamInput, done: boolean}, cb:(a:{value: SignStreamOutput, done: boolean}) => void) => void;
-    VerifyStream: (r:() => {value: VerifyStreamInput, done: boolean}, cb:(a:{value: VerifyStreamOutput, done: boolean}) => void) => void;
-    VerifyArmoredStream: (r:() => {value: VerifyStreamInput, done: boolean}, cb:(a:{value: VerifyStreamOutput, done: boolean}) => void) => void;
+    VerifyFile: (r:() => {value: VerifyFileInput, done: boolean}, cb:(a:{value: VerifyFileOutput, done: boolean}) => void) => void;
+    VerifyStream: (r:() => {value: VerifyInput, done: boolean}, cb:(a:{value: VerifyOutput, done: boolean}) => void) => void;
+    VerifyArmoredStream: (r:() => {value: VerifyInput, done: boolean}, cb:(a:{value: VerifyOutput, done: boolean}) => void) => void;
     Encrypt: (r:EncryptRequest) => EncryptResponse;
+    EncryptStream: (r:() => {value: EncryptInput, done: boolean}, cb:(a:{value: EncryptOutput, done: boolean}) => void) => void;
+    EncryptFile: (r:() => {value: EncryptFileInput, done: boolean}, cb:(a:{value: EncryptFileOutput, done: boolean}) => void) => void;
     Decrypt: (r:DecryptRequest) => DecryptResponse;
-    EncryptStream: (r:() => {value: EncryptStreamInput, done: boolean}, cb:(a:{value: EncryptStreamOutput, done: boolean}) => void) => void;
-    DecryptStream: (r:() => {value: DecryptStreamInput, done: boolean}, cb:(a:{value: DecryptStreamOutput, done: boolean}) => void) => void;
-    DecryptArmoredStream: (r:() => {value: DecryptStreamInput, done: boolean}, cb:(a:{value: DecryptStreamOutput, done: boolean}) => void) => void;
-    SigncryptOpenStream: (r:() => {value: DecryptStreamInput, done: boolean}, cb:(a:{value: DecryptStreamOutput, done: boolean}) => void) => void;
-    SigncryptOpenArmoredStream: (r:() => {value: DecryptStreamInput, done: boolean}, cb:(a:{value: DecryptStreamOutput, done: boolean}) => void) => void;
+    DecryptFile: (r:() => {value: DecryptFileInput, done: boolean}, cb:(a:{value: DecryptFileOutput, done: boolean}) => void) => void;
+    DecryptStream: (r:() => {value: DecryptInput, done: boolean}, cb:(a:{value: DecryptOutput, done: boolean}) => void) => void;
+    DecryptArmoredStream: (r:() => {value: DecryptInput, done: boolean}, cb:(a:{value: DecryptOutput, done: boolean}) => void) => void;
+    SigncryptOpenStream: (r:() => {value: DecryptInput, done: boolean}, cb:(a:{value: DecryptOutput, done: boolean}) => void) => void;
+    SigncryptOpenArmoredStream: (r:() => {value: DecryptInput, done: boolean}, cb:(a:{value: DecryptOutput, done: boolean}) => void) => void;
     Sigchain: (r:SigchainRequest) => SigchainResponse;
     Statement: (r:StatementRequest) => StatementResponse;
     StatementCreate: (r:StatementCreateRequest) => StatementCreateResponse;

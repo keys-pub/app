@@ -15,6 +15,7 @@ import {styles} from '../../components'
 
 export type Props = {
   recipients?: Key[]
+  disabled?: boolean
   onChange?: (value: Key[]) => void
 }
 
@@ -89,6 +90,7 @@ export default class RecipientsView extends React.Component<Props, State> {
       <Autocomplete
         open={open}
         multiple
+        disabled={this.props.disabled}
         onOpen={this.openAutoComplete}
         onClose={() => {
           this.setState({open: false})
