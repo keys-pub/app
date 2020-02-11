@@ -8,6 +8,7 @@ export type Props = {
   children: any
   style?: CSSProperties
   inline?: boolean
+  span?: boolean
 }
 
 const styles = {
@@ -27,6 +28,13 @@ const Link = (props: Props) => {
   }
   if (props.inline) {
     style.display = 'inline'
+  }
+  if (props.span) {
+    return (
+      <span onClick={props.onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+        {props.children}
+      </span>
+    )
   }
 
   return (
