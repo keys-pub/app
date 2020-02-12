@@ -16,12 +16,6 @@ export default class ErrorsView extends React.Component<Props> {
     ipcRenderer.send('restart-app', {})
   }
 
-  clearError = () => {
-    store.dispatch({
-      type: 'CLEAR_ERROR',
-    })
-  }
-
   render() {
     return (
       <Box
@@ -40,9 +34,6 @@ export default class ErrorsView extends React.Component<Props> {
             Restart the App
           </Button>
           <Box style={{width: 10}} />
-          <Button variant="outlined" onClick={this.clearError}>
-            Clear Error
-          </Button>
         </Box>
       </Box>
     )
