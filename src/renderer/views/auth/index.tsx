@@ -34,6 +34,14 @@ export default class AuthView extends React.Component<Props, State> {
 
   componentDidMount() {
     this.refresh()
+    this.checkWaiting()
+  }
+
+  checkWaiting = async () => {
+    await sleep(2000)
+    if (this.state.loading) {
+      this.setState({waiting: true})
+    }
   }
 
   refresh = async () => {
