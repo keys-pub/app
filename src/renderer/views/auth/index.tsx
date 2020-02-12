@@ -15,7 +15,7 @@ type Props = {}
 
 type State = {
   authSetupNeeded: boolean
-  error: Error | void
+  error: RPCError | void
   loading: boolean
   waiting: boolean
 }
@@ -34,28 +34,16 @@ export default class AuthView extends React.Component<Props, State> {
 
   componentDidMount() {
     this.refresh()
-    this.checkWaiting()
-    this.checkTimeout()
-  }
-
-  checkWaiting = async () => {
-    await sleep(2000)
-    if (this.state.loading) {
-      this.setState({waiting: true})
-    }
-  }
-
-  checkTimeout = async () => {
-    await sleep(15000)
-    if (this.state.loading) {
-      this.setState({error: new Error('Unable to connect to local service')})
-    }
   }
 
   refresh = async () => {
     const req: RuntimeStatusRequest = {}
     const cl = await client()
     cl.runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+      if (err) {
+        this.setState({error: err})
+        return
+      }
       this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
     })
   }
