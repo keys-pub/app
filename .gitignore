@@ -34,6 +34,7 @@ node_modules
 release
 dist
 bin
+tmp
 
 .idea
 npm-debug.log.*
