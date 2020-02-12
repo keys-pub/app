@@ -65,6 +65,14 @@ For better formatting of immutable objects in console:
 
 - In Dev Tools, press F1 to load the Settings. Scroll down to the Console section and tick "Enable custom formatters".
 
+## Release
+
+```shell
+# update package.json version v0.0.x
+hub create release v0.0.x -m v0.0.x
+./scripts/release.sh
+```
+
 ## TODO
 
 - Investigate sandboxing Electron app can only communicate with service
