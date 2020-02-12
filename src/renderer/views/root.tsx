@@ -2,8 +2,6 @@ import * as React from 'react'
 import {Provider} from 'react-redux'
 import {ConnectedRouter, push} from 'connected-react-router'
 
-import ErrorBoundary from '../errors/boundary'
-
 import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade} from '@material-ui/core/styles/colorManipulator'
@@ -97,13 +95,11 @@ export default class Root extends React.Component {
   render() {
     return (
       <ThemeProvider theme={theme}>
-        <ErrorBoundary>
-          <Provider store={store}>
-            <ConnectedRouter history={history}>
-              <Lock />
-            </ConnectedRouter>
-          </Provider>
-        </ErrorBoundary>
+        <Provider store={store}>
+          <ConnectedRouter history={history}>
+            <Lock />
+          </ConnectedRouter>
+        </Provider>
       </ThemeProvider>
     )
   }
