@@ -24,6 +24,7 @@ import {
   LockOpen as DecryptIcon,
   CreateOutlined as SignIcon,
   VisibilityOutlined as VerifyIcon,
+  Settings as SettingsIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -48,6 +49,7 @@ const navs = [
   {name: 'Decrypt', icon: DecryptIcon, route: '/decrypt/index', prefix: '/decrypt'},
   {name: 'Sign', icon: SignIcon, route: '/sign/index', prefix: '/sign'},
   {name: 'Verify', icon: VerifyIcon, route: '/verify/index', prefix: '/verify'},
+  {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
 ]
 
 class Nav extends React.Component<Props, State> {
@@ -72,17 +74,20 @@ class Nav extends React.Component<Props, State> {
 
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
-        <Box display="flex" flexGrow={1} flexDirection="column">
+        <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
           <Box height={42} style={{backgroundColor: backgroundColor}}></Box>
-          <List style={{backgroundColor: backgroundColor, minWidth: width, height: '100%', padding: 0}}>
+          <List style={{minWidth: width, height: '100%', padding: 0}}>
             {navs.map((nav, index) =>
               row(nav, index, (route && route.path.startsWith(nav.prefix)) || false, open, () =>
                 this.props.dispatch(push(nav.route))
               )
             )}
           </List>
-          <Box display="flex" justifyContent="flex-end" style={{backgroundColor: backgroundColor}}>
-            <IconButton onClick={this.toggleDrawer} style={{color: 'white'}}>
+          <Box display="flex" flexDirection="row">
+            {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
+            </Typography> */}
+            <Box display="flex" flexGrow={1} />
+            <IconButton onClick={this.toggleDrawer} style={{color: 'white', alignSelf: 'flex-end'}}>
               {open && <LeftIcon />}
               {!open && <RightIcon />}
             </IconButton>

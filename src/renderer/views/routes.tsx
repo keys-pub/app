@@ -5,7 +5,7 @@ import {Splash} from '../components'
 
 import AuthView from './auth'
 
-import DebugView from './profile/debug'
+import DebugView from './settings/debug'
 
 import ComposeView from './compose'
 
@@ -20,6 +20,7 @@ import ComposeView from './compose'
 
 import SearchView from './search'
 import StyleGuide from './style-guide'
+import SettingsView from './settings'
 
 import DBView from './db'
 import KeyView from './key/view'
@@ -62,6 +63,8 @@ export const routes: Array<RouteInfo> = [
   {path: '/decrypt/index', component: () => <DecryptView />},
   {path: '/sign/index', component: () => <SignView />},
   {path: '/verify/index', component: () => <VerifyView />},
+
+  {path: '/settings/index', component: () => <SettingsView />},
 ]
 
 // Map of path to route
