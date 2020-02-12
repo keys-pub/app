@@ -1,7 +1,7 @@
 {
   "name": "keys",
   "productName": "Keys",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config configs/webpack.main.prod.config.js",
