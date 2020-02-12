@@ -2,7 +2,7 @@
   "name": "keys",
   "productName": "Keys",
   "version": "0.0.13",
-  "description": "",
+  "description": "Key management, signing and encryption.",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config configs/webpack.main.prod.config.js",
     "build-renderer": "cross-env NODE_ENV=production webpack --config configs/webpack.renderer.prod.config.js",
