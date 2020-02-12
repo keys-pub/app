@@ -44,6 +44,10 @@ class Lock extends React.Component<Props> {
       return <ErrorsView error={this.props.error} />
     }
 
+    if (this.props.path == '/') {
+      return null
+    }
+
     console.log('Path:', this.props.path + this.props.query)
     const route = routesMap.get(this.props.path)
     if (!route) {

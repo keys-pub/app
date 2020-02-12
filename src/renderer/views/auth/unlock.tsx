@@ -10,6 +10,8 @@ import {client} from '../../rpc/client'
 
 import * as electron from 'electron'
 
+import {initializeClient} from '../../rpc/client'
+
 import {RPCError} from '../../rpc/rpc'
 import {AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
 
@@ -105,7 +107,7 @@ class AuthUnlockView extends React.Component<Props, State> {
       }
 
       console.log('Auth unlocking...')
-      electron.ipcRenderer.send('credentials-set', {authToken: resp.authToken})
+      initializeClient(resp.authToken)
       setTimeout(() => {
         this.setState({loading: false})
         this.props.dispatch({type: 'UNLOCK'})

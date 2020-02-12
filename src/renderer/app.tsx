@@ -3,7 +3,12 @@ import * as ReactDOM from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import Application from './hot'
 
-import {ipcRenderer} from 'electron'
+import {ipcRenderer, remote} from 'electron'
+import {initializeClient} from './rpc/client'
+import {store} from './store'
+import {init} from './views/state'
+
+// import * as util from 'util'
 
 import './app.css'
 
@@ -28,5 +33,25 @@ const render = (Component: () => JSX.Element) => {
 
 render(Application)
 
+const start = () => {
+  try {
+    initializeClient('')
+    store.dispatch(init())
+  } catch (err) {
+    alert('Oops, init client error ' + err)
+    remote.app.exit(3)
+  }
+}
+
+ipcRenderer.removeAllListeners('keys-started')
+ipcRenderer.on('keys-started', (event, err) => {
+  if (err) {
+    // console.log(util.inspect(err))
+    alert('Oops, exec error (' + err.code + ') ' + err.cmd)
+    remote.app.exit(2)
+  }
+  start()
+})
+
 // Tell main process to start service
-ipcRenderer.send('run-service')
+ipcRenderer.send('keys-start')

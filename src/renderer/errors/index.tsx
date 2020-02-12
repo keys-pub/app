@@ -34,17 +34,6 @@ export default class ErrorsView extends React.Component<Props> {
         }}
       >
         <Box className="drag" style={{width: '100%', height: 40, cursor: 'move'}} />
-        <Typography
-          variant="h5"
-          style={{
-            paddingBottom: 20,
-            fontFamily: 'Roboto Mono',
-            textAlign: 'center',
-          }}
-          color="secondary"
-        >
-          Ah shucks! Something isn't working right.
-        </Typography>
         <ErrorView error={this.props.error} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
           <Button color="secondary" variant="contained" onClick={this.restart}>

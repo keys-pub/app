@@ -9,8 +9,6 @@ import {ipcRenderer, remote} from 'electron'
 
 import {initializeClient} from '../rpc/client'
 
-import {init} from '../views/state'
-
 import * as fs from 'fs'
 
 const history = createHashHistory()
@@ -79,24 +77,5 @@ ipcRenderer.on('responsive', (event, message) => {
     },
   })
 })
-
-// Load credentials
-ipcRenderer.on('credentials-loaded', (event, creds, protoPath) => {
-  try {
-    initializeClient(creds.certPath, creds.authToken, protoPath)
-    setTimeout(() => {
-      store.dispatch(init())
-    }, 0)
-  } catch (err) {
-    alert('Error initializing client: ' + err)
-    remote.app.exit(3)
-  }
-})
-ipcRenderer.send('credentials-load')
-
-// ipcRenderer.on('start', (event, message) => {
-//   console.log('App start')
-//   store.dispatch(init())
-// })
 
 export {history, store}

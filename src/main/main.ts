@@ -17,8 +17,7 @@ const windowStateKeeper = require('electron-window-state')
 
 import {MenuActionType} from './menu'
 
-import {appResourcesPath} from './paths'
-import {runService} from './run'
+import {keysStart} from './run'
 
 let mainWindow = null
 
@@ -45,65 +44,6 @@ if (process.env.NODE_ENV === 'production') {
 app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
   app.quit()
-})
-
-type Credentials = {
-  authToken: string
-  certPath: string
-}
-
-const getAppName = (): string => {
-  return getenv.string('KEYS_APP', 'Keys')
-}
-
-var creds: Credentials = {
-  authToken: '',
-  certPath: '',
-}
-
-const loadCertPath = (): string => {
-  const appName: string = getAppName()
-  const appSupportPath = app.getPath('appData') + '/' + appName
-  console.log('App support path:', appSupportPath)
-  const userDataDir = app.getPath('userData')
-  if (appSupportPath !== userDataDir) {
-    // This is ok in DEV
-    console.warn("App support path doesn't match userData directory: %s !== %s", appSupportPath, userDataDir)
-  }
-  const certPath = app.getPath('appData') + '/' + appName + '/ca.pem'
-  return certPath
-}
-
-const resolveProtoPath = (): string => {
-  // Check in Resources, otherwise use current path
-  const protoInResources = appResourcesPath() + '/src/renderer/rpc/keys.proto'
-  if (fs.existsSync(protoInResources)) return protoInResources
-  return './src/renderer/rpc/keys.proto'
-}
-
-ipcMain.on('credentials-load', (event, arg) => {
-  credentialsLoad(event)
-})
-
-const credentialsLoad = event => {
-  console.log('Loading credentials...')
-  creds.certPath = loadCertPath()
-  const protoPath = resolveProtoPath()
-  console.log('Using proto path:', protoPath)
-
-  if (creds) {
-    event.sender.send('credentials-loaded', creds, protoPath)
-  } else {
-    console.error('No credentials')
-    app.exit(3)
-  }
-}
-
-ipcMain.on('credentials-set', async (event, arg) => {
-  console.log('Setting auth token')
-  const {authToken} = arg
-  creds.authToken = authToken
-  credentialsLoad(event)
 })
 
 // app.on('web-contents-created', (event, contents) => {
@@ -219,10 +159,12 @@ app.on('ready', async () => {
   menuBuilder.buildMenu()
 })
 
-ipcMain.on('run-service', (event, arg) => {
-  // Run the service
-  runService().catch((err: Error) => {
-    console.error(err)
-    app.exit(3)
-  })
+ipcMain.on('keys-start', (event, arg) => {
+  keysStart()
+    .then(() => {
+      event.sender.send('keys-started')
+    })
+    .catch((err: Error) => {
+      event.sender.send('keys-started', err)
+    })
 })

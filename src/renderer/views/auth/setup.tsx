@@ -22,6 +22,7 @@ import * as electron from 'electron'
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
+import {initializeClient} from '../../rpc/client'
 import {RPCError} from '../../rpc/rpc'
 
 import {AuthSetupRequest, AuthSetupResponse} from '../../rpc/types'
@@ -175,7 +176,7 @@ class AuthSetupView extends React.Component<Props, State> {
       if (!resp) {
         return
       }
-      electron.ipcRenderer.send('credentials-set', {authToken: resp.authToken})
+      initializeClient(resp.authToken)
       setTimeout(() => {
         this.setState({loading: false})
         this.props.dispatch({type: 'UNLOCK'})

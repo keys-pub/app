@@ -6,6 +6,9 @@ import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@ln-zap/proto-loader'
 
 import * as fs from 'fs'
+import * as path from 'path'
+import * as os from 'os'
+import {remote} from 'electron'
 
 import {RPCError} from './rpc'
 
@@ -15,7 +18,42 @@ const sleep = milliseconds => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-export const initializeClient = async (certPath: string, authToken: string, protoPath: string) => {
+const getAppName = (): string => {
+  return getenv.string('KEYS_APP', 'Keys')
+}
+
+const loadCertPath = (): string => {
+  const appName: string = getAppName()
+  const appSupportPath = remote.app.getPath('appData') + '/' + appName
+  console.log('App support path:', appSupportPath)
+  const userDataDir = remote.app.getPath('userData')
+  if (appSupportPath !== userDataDir) {
+    // This is ok in DEV
+    console.warn("App support path doesn't match userData directory: %s !== %s", appSupportPath, userDataDir)
+  }
+  const certPath = remote.app.getPath('appData') + '/' + appName + '/ca.pem'
+  return certPath
+}
+
+// Path to resources directory
+export const appResourcesPath = (): string => {
+  if (os.platform() !== 'darwin') return '.'
+  let resourcesPath = remote.app.getAppPath()
+  if (path.extname(resourcesPath) === '.asar') {
+    resourcesPath = path.dirname(resourcesPath)
+  }
+  console.log('Resources path:', resourcesPath)
+  return resourcesPath
+}
+
+const resolveProtoPath = (): string => {
+  // Check in Resources, otherwise use current path
+  const protoInResources = appResourcesPath() + '/src/renderer/rpc/keys.proto'
+  if (fs.existsSync(protoInResources)) return protoInResources
+  return './src/renderer/rpc/keys.proto'
+}
+
+export const initializeClient = (authToken: string) => {
   if (rpcClient) {
     console.log('Closing client...')
     grpc.closeClient(rpcClient)
@@ -23,16 +61,9 @@ export const initializeClient = async (certPath: string, authToken: string, prot
   }
   console.log('Initializing client')
 
-  let waitCount = 0
-  while (!fs.existsSync(certPath)) {
-    if (waitCount % 4 == 0) {
-      console.log('Waiting for cert path', certPath)
-    }
-    await sleep(250)
-    if (waitCount++ > 30) {
-      break
-    }
-  }
+  const certPath = loadCertPath()
+  const protoPath = resolveProtoPath()
+  console.log('Using proto path:', protoPath)
 
   console.log('Loading cert', certPath)
   const cert = fs.readFileSync(certPath, 'ascii')
@@ -58,19 +89,10 @@ export const initializeClient = async (certPath: string, authToken: string, prot
     throw new Error('proto descriptor should have a Keys service')
   }
 
-  const port = getenv.int('KEYS_PORT', 10001)
+  const port = getenv.int('KEYS_PORT', 22405)
   console.log('Using client on port', port)
 
   const cl = new serviceCls('localhost:' + port, creds)
-
-  let ok = false
-  while (!ok) {
-    ok = await runtimeStatus(cl)
-    if (!ok) {
-      console.log('Waiting for service...')
-      await sleep(1000)
-    }
-  }
 
   rpcClient = cl
 }
