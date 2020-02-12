@@ -120,12 +120,12 @@ export const client = async () => {
       console.log('Waiting for client init...')
     }
     await sleep(250)
-    if (waitCount++ > 30) {
+    if (waitCount++ > 1000) {
       break
     }
   }
   if (!rpcClient) {
-    throw new Error('No client available')
+    throw new Error('No client available (timed out)')
   }
   return rpcClient
 }
