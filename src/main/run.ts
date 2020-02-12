@@ -39,6 +39,7 @@ export const keysStart = (): Promise<any> => {
 
   console.log('Keys bin:', keysPath)
   if (keysPath) {
+    // TODO: Use autostart with restart on version diff
     return execProc(keysPath + ' restart')
   }
 
