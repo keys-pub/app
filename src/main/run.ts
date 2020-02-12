@@ -37,8 +37,9 @@ export const keysStart = (): Promise<any> => {
     keysPath = process.env.KEYS_BIN
   }
 
+  console.log('Keys bin:', keysPath)
   if (keysPath) {
-    return execProc(keysPath + ' start')
+    return execProc(keysPath + ' restart')
   }
 
   return Promise.resolve()
