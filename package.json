@@ -49,6 +49,13 @@
         }
       ]
     },
+    "afterSign": "scripts/notarize.js",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "entitlements": "resources/entitlements.mac.plist",
+      "entitlementsInherit": "resources/entitlements.mac.plist"
+    },
     "win": {
       "target": [
         "nsis",
@@ -127,6 +134,7 @@
     "electron": "^7.1.0",
     "electron-builder": "^22.1.0",
     "electron-devtools-installer": "^2.2.4",
+    "electron-notarize": "^0.2.1",
     "file-loader": "^5.0.2",
     "fork-ts-checker-webpack-plugin": "^4.0.2",
     "html-webpack-plugin": "^3.2.0",
