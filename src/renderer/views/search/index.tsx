@@ -22,7 +22,7 @@ import {IDView, KeyDescriptionView} from '../key/view'
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
-import {UserSearchResult, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
+import {User, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
 import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
 
 type Props = {
@@ -31,7 +31,7 @@ type Props = {
 
 type State = {
   input: string
-  results: Array<UserSearchResult>
+  users: Array<User>
   loading: boolean
   query: string
   error: string
@@ -40,7 +40,7 @@ type State = {
 class SearchView extends React.Component<Props, State> {
   state = {
     input: '',
-    results: [],
+    users: [],
     loading: false,
     query: '',
     error: '',
@@ -61,7 +61,7 @@ class SearchView extends React.Component<Props, State> {
             this.setState({
               loading: false,
               query: query,
-              results: resp.results || [],
+              users: resp.users || [],
             })
           }
         },
@@ -80,9 +80,9 @@ class SearchView extends React.Component<Props, State> {
     this.search(target.value)
   }
 
-  select = (result: UserSearchResult) => {
+  select = (user: User) => {
     // this.setState({dialogOpen: true, key: key})
-    this.props.dispatch(push('/keys/key/index?kid=' + result.kid + '&update=1'))
+    this.props.dispatch(push('/keys/key/index?kid=' + user.kid + '&update=1'))
   }
 
   render() {
@@ -118,13 +118,13 @@ class SearchView extends React.Component<Props, State> {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.results.map((result: UserSearchResult, index: number): any => (
-                <TableRow hover onClick={event => this.select(result)} key={result.kid + result.user.label}>
+              {this.state.users.map((user: User, index: number): any => (
+                <TableRow hover onClick={event => this.select(user)} key={user.kid + user.id}>
                   <TableCell component="th" scope="row">
-                    <UserLabel kid={result.kid} user={result.user} />
+                    <UserLabel kid={user.kid} user={user} />
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView id={result.kid} />
+                    <IDView id={user.kid} />
                   </TableCell>
                 </TableRow>
               ))}

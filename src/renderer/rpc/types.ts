@@ -436,8 +436,7 @@ export interface Key {
 }
 
 export interface KeyRequest {
-    kid?: string;
-    user?: string;
+    identity?: string;
     update?: boolean;
 }
 
@@ -489,8 +488,7 @@ export interface RandResponse {
 }
 
 export interface PullRequest {
-    kid?: string;
-    user?: string;
+    identity?: string;
 }
 
 export interface PullResponse {
@@ -498,28 +496,12 @@ export interface PullResponse {
 }
 
 export interface PushRequest {
-    kid?: string;
+    identity?: string;
 }
 
 export interface PushResponse {
     kid?: string;
     urls?: Array<string>;
-}
-
-export interface KeyShareRequest {
-    kid?: string;
-    recipient?: string;
-}
-
-export interface KeyShareResponse {
-}
-
-export interface KeyRetrieveRequest {
-    kid?: string;
-    recipient?: string;
-}
-
-export interface KeyRetrieveResponse {
 }
 
 export interface Collection {
@@ -558,6 +540,7 @@ export interface DocumentDeleteResponse {
 }
 
 export interface User {
+    id?: string;
     name?: string;
     kid?: string;
     seq?: number;
@@ -566,11 +549,14 @@ export interface User {
     status?: UserStatus;
     verifiedAt?: number;
     err?: string;
-    label?: string;
 }
 
-export interface UserSearchResult {
+export interface UserRequest {
     kid?: string;
+    local?: boolean;
+}
+
+export interface UserResponse {
     user?: User;
 }
 
@@ -581,7 +567,7 @@ export interface UserSearchRequest {
 }
 
 export interface UserSearchResponse {
-    results?: Array<UserSearchResult>;
+    users?: Array<User>;
 }
 
 export interface WatchRequest {
@@ -708,6 +694,7 @@ export interface KeysService {
     Statement: (r:StatementRequest) => StatementResponse;
     StatementCreate: (r:StatementCreateRequest) => StatementCreateResponse;
     StatementRevoke: (r:StatementRevokeRequest) => StatementRevokeResponse;
+    User: (r:UserRequest) => UserResponse;
     UserSearch: (r:UserSearchRequest) => UserSearchResponse;
     UserService: (r:UserServiceRequest) => UserServiceResponse;
     UserSign: (r:UserSignRequest) => UserSignResponse;

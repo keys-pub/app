@@ -10,7 +10,7 @@ import Recipients from '../user/recipients'
 import {styles} from '../../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
-import {UserSearchResult, UserSearchResponse} from '../../rpc/types'
+import {User, UserSearchResponse} from '../../rpc/types'
 import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
 
 export type Props = {
@@ -18,23 +18,23 @@ export type Props = {
 }
 
 type State = {
-  results: Array<UserSearchResult>
+  users: Array<User>
   loading: boolean
 }
 
 class ComposeView extends React.Component<Props, State> {
   state = {
     loading: false,
-    results: [],
+    users: [],
   }
 
-  search = (q: string): Promise<Array<UserSearchResult>> => {
+  search = (q: string): Promise<Array<User>> => {
     return new Promise((resolve, reject) => {
       this.props.dispatch(
         userSearch(
           {query: q, limit: 100},
           (resp: UserSearchResponse) => {
-            resolve(resp.results || [])
+            resolve(resp.users || [])
           },
           (err: RPCError) => {
             reject(err)
@@ -44,8 +44,8 @@ class ComposeView extends React.Component<Props, State> {
     })
   }
 
-  select = (results: Array<UserSearchResult>) => {
-    this.setState({results})
+  select = (users: Array<User>) => {
+    this.setState({users})
   }
 
   send = (text: string) => {}

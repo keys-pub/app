@@ -105,8 +105,7 @@ class KeyView extends React.Component<Props, State> {
   loadKey = () => {
     this.setState({loading: this.props.update, error: ''})
     const req: KeyRequest = {
-      kid: this.props.kid,
-      user: '',
+      identity: this.props.kid,
       update: this.props.update,
     }
     store.dispatch(
@@ -129,8 +128,7 @@ class KeyView extends React.Component<Props, State> {
   add = () => {
     this.setState({loading: true, error: ''})
     const req: PullRequest = {
-      kid: this.props.kid,
-      user: '',
+      identity: this.props.kid,
     }
     store.dispatch(
       pull(

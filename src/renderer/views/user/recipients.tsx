@@ -81,7 +81,7 @@ export default class RecipientsView extends React.Component<Props, State> {
   }
 
   optionSelected = (option: Key, value: Key) => {
-    return option.id === value.id && option.user.label === value.user.label
+    return option.id === value.id && option.user.id === value.user.id
   }
 
   render() {

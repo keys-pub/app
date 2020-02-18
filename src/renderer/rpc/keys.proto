@@ -54,10 +54,11 @@ service Keys {
   rpc StatementCreate(StatementCreateRequest) returns (StatementCreateResponse) {}  
   rpc StatementRevoke(StatementRevokeRequest) returns (StatementRevokeResponse) {}  
 
+  rpc User(UserRequest) returns (UserResponse) {}  
   rpc UserSearch(UserSearchRequest) returns (UserSearchResponse) {}
   rpc UserService(UserServiceRequest) returns (UserServiceResponse) {}
   rpc UserSign(UserSignRequest) returns (UserSignResponse) {}
-  rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}  
+  rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}    
   
   rpc Item(ItemRequest) returns (ItemResponse) {}
   rpc Items(ItemsRequest) returns (ItemsResponse) {}  
@@ -492,8 +493,7 @@ message Key {
 }
 
 message KeyRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string user = 2;
+  string identity = 1;
   bool update = 5;
 }
 
@@ -564,32 +564,19 @@ message RandResponse {
 }
 
 message PullRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string user = 2;
+  string identity = 1;  
 }
 message PullResponse {
   repeated string kids = 1 [(gogoproto.customname) = "KIDs"];
 }
 
 message PushRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string identity = 1;
 }
 message PushResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
   repeated string urls = 2 [(gogoproto.customname) = "URLs"];
 }
-
-message KeyShareRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string recipient = 2;
-}
-message KeyShareResponse {}
-
-message KeyRetrieveRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string recipient = 2;
-}
-message KeyRetrieveResponse {}
 
 message Collection {
   string path = 1;
@@ -635,21 +622,25 @@ enum UserStatus {
 }
 
 message User {  
-  string name = 1;
-  string kid = 2 [(gogoproto.customname) = "KID"];
-  int32 seq = 3;
-  string service = 4;  
-  string url = 5 [(gogoproto.customname) = "URL"];
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string name = 2;
+  string kid = 3 [(gogoproto.customname) = "KID"];
+  int32 seq = 4;
+  string service = 5; 
+  string url = 6 [(gogoproto.customname) = "URL"];
   
-  UserStatus status = 6;
-  int64 verifiedAt = 7;
-  string err = 8;
-  string label = 9;
+  UserStatus status = 10;
+  int64 verifiedAt = 11; 
+  
+  string err = 20;
 }
 
-message UserSearchResult {
+message UserRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
-  User user = 2;
+  bool local = 4;
+}
+message UserResponse {
+  User user = 1;
 }
 
 message UserSearchRequest {
@@ -658,7 +649,7 @@ message UserSearchRequest {
   bool local = 4;
 }
 message UserSearchResponse {
-  repeated UserSearchResult results = 1;  
+  repeated User users = 1;  
 }
 
 message WatchRequest {}
