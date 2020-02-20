@@ -42,4 +42,4 @@ hub release create $tag -m $tag
 yarn install
 yarn dist
 
-hub release edit $tag -m $tag -a release/Keys-$ver.dmg -a release/Keys-$ver-mac.zip
+hub release edit $tag -m $tag -a release/Keys-$ver.dmg
