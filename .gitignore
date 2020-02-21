@@ -34,7 +34,8 @@ node_modules
 release
 dist
 bin
-tmp
+tmp.release
+tmp.cask
 .env
 
 .idea

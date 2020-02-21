@@ -6,15 +6,8 @@ dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 dotenv="$dir/../.env"
 
-tmpdir="$dir/tmp"
-if [ -d $tmpdir ]; then
-  echo "$tmpdir already exists"
-  exit 1
-fi
-# function finish {
-#   rm -rf "$tmpdir"
-# }
-# trap finish EXIT
+tmpdir="$dir/tmp.release"
+rm -rf "$tmpdir"
 mkdir -p "$tmpdir"
 
 echo "$tmpdir"
@@ -42,4 +35,7 @@ hub release create $tag -m $tag
 yarn install
 yarn dist
 
-hub release edit $tag -m $tag -a release/Keys-$ver.dmg
+./scripts/fixzip.sh
+./scripts/fixlatest.sh
+
+hub release edit $tag -m $tag -a release/Keys-$ver.dmg -a release/Keys-$ver-mac.zip
