@@ -25,8 +25,6 @@ import SettingsView from './settings'
 import DBView from './db'
 import KeyView from './key/view'
 import KeysView from './keys'
-import UserNameView from './user/name'
-import UserSignView from './user/sign'
 
 import EncryptView from './encrypt'
 import DecryptView from './decrypt'
@@ -41,7 +39,6 @@ export type RouteInfo = {
 
 export const routes: Array<RouteInfo> = [
   {path: '/auth/index', component: () => <AuthView />},
-  {path: '/compose', component: () => <ComposeView />},
   {path: '/db', component: () => <DBView />},
   {path: '/debug', component: () => <DebugView />},
   {path: '/keys/key/index', component: () => <KeyView />},
@@ -55,9 +52,6 @@ export const routes: Array<RouteInfo> = [
 
   {path: '/splash', component: () => <Splash />},
   {path: '/style-guide', component: () => <StyleGuide />},
-
-  {path: '/user/name', component: () => <UserNameView />},
-  {path: '/user/sign', component: () => <UserSignView />},
 
   {path: '/encrypt/index', component: () => <EncryptView />},
   {path: '/decrypt/index', component: () => <DecryptView />},
