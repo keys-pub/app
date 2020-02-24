@@ -33,8 +33,8 @@ import KeyCreateDialog from '../key/create'
 import KeyImportDialog from '../import'
 
 import {Key, KeyType, SortDirection} from '../../rpc/types'
-import {appStatus, keys, RPCError, RPCState} from '../../rpc/rpc'
-import {AppStatusRequest, AppStatusResponse, KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys, RPCError, RPCState} from '../../rpc/rpc'
+import {KeysRequest, KeysResponse} from '../../rpc/types'
 import {AppState} from '../../reducers/app'
 
 type Props = {
@@ -55,12 +55,11 @@ class KeysView extends React.Component<Props, State> {
   state = {
     input: '',
     newKeyMenuEl: null,
-    openCreate: '',
+    openCreate: this.props.intro ? 'INTRO' : '',
     openImport: false,
   }
 
   componentDidMount() {
-    this.promptStatus()
     this.refresh()
   }
 
@@ -108,14 +107,6 @@ class KeysView extends React.Component<Props, State> {
   keyGen = () => {
     this.closeMenu()
     this.setState({openCreate: 'NEW'})
-  }
-
-  promptStatus = () => {
-    store.dispatch(
-      appStatus({}, (resp: AppStatusResponse) => {
-        this.setState({openCreate: resp.promptKeygen && this.props.intro ? 'INTRO' : ''})
-      })
-    )
   }
 
   importKey = () => {

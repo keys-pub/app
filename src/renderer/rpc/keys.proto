@@ -68,8 +68,6 @@ service Keys {
   
   rpc Config(ConfigRequest) returns (ConfigResponse) {}
   rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
-
-  rpc AppStatus(AppStatusRequest) returns (AppStatusResponse) {}
   
   // These requests do not need auth, since they are used to set or check auth.
   // BEGIN NO AUTH
@@ -680,12 +678,6 @@ message ConfigSetRequest {
   string value = 2;
 }
 message ConfigSetResponse {}
-
-message AppStatusRequest {}
-message AppStatusResponse {
-  bool promptKeygen = 1;
-  bool promptUser = 2;
-}
 
 message Inbox {
   string kid = 1 [(gogoproto.customname) = "KID"];

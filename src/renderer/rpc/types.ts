@@ -598,14 +598,6 @@ export interface ConfigSetRequest {
 export interface ConfigSetResponse {
 }
 
-export interface AppStatusRequest {
-}
-
-export interface AppStatusResponse {
-    promptKeygen?: boolean;
-    promptUser?: boolean;
-}
-
 export interface Inbox {
     kid?: string;
     name?: string;
@@ -705,7 +697,6 @@ export interface KeysService {
     Push: (r:PushRequest) => PushResponse;
     Config: (r:ConfigRequest) => ConfigResponse;
     ConfigSet: (r:ConfigSetRequest) => ConfigSetResponse;
-    AppStatus: (r:AppStatusRequest) => AppStatusResponse;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
