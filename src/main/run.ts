@@ -11,6 +11,7 @@ const execProc = (path: string): Promise<any> => {
       reject('No path to exec')
       return
     }
+    console.log('Exec:', path)
     exec(path, (err, stdout, stderr) => {
       if (err) {
         console.error(`exec error: ${err}`)
@@ -39,8 +40,7 @@ export const keysStart = (): Promise<any> => {
 
   console.log('Keys bin:', keysPath)
   if (keysPath) {
-    // TODO: Use autostart with restart on version diff
-    return execProc(keysPath + ' restart')
+    return execProc(keysPath + ' start --from=app')
   }
 
   return Promise.resolve()
