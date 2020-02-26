@@ -2,19 +2,6 @@ import emoji from 'node-emoji'
 
 import {Key, KeyType, User} from '../rpc/types'
 
-export const serviceName = (service: string): string => {
-  let serviceName = '?'
-  switch (service) {
-    case 'github':
-      serviceName = 'Github'
-      break
-    case 'twitter':
-      serviceName = 'Twitter'
-      break
-  }
-  return serviceName
-}
-
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
     case KeyType.X25519:

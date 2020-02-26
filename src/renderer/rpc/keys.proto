@@ -27,7 +27,7 @@ service Keys {
   rpc Key(KeyRequest) returns (KeyResponse) {}
   rpc KeyImport(KeyImportRequest) returns (KeyImportResponse) {}
   rpc KeyExport(KeyExportRequest) returns (KeyExportResponse) {}
-  rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}    
+  rpc KeyRemove(KeyRemoveRequest) returns (KeyRemoveResponse) {}
 
   rpc Sign(SignRequest) returns (SignResponse) {}
   rpc SignFile(stream SignFileInput) returns (stream SignFileOutput) {}
@@ -570,6 +570,7 @@ message PullResponse {
 
 message PushRequest {
   string identity = 1;
+  bool remoteCheck = 2;
 }
 message PushResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];

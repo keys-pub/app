@@ -6,24 +6,20 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  IconButton,
-  Input,
-  InputLabel,
-  InputAdornment,
+  Divider,
+  LinearProgress,
   FormControl,
   FormHelperText,
   TextField,
   Typography,
 } from '@material-ui/core'
 
-import {styles, Step} from '../../components'
+import {styles, DialogTitle} from '../../components'
 
-import {store} from '../../store'
-import {goBack, push, replace} from 'connected-react-router'
-
-import {keyImport, RPCError} from '../../rpc/rpc'
+import {RPCError} from '../../rpc/rpc'
 import {KeyImportRequest, KeyImportResponse} from '../../rpc/types'
+
+import {client} from '../../rpc/client'
 
 type Props = {
   open: boolean
@@ -31,35 +27,36 @@ type Props = {
 }
 
 type State = {
-  in: string
-  password: string
   error: string
+  in: string
+  loading: boolean
+  password: string
 }
 
 export default class KeyImportDialog extends React.Component<Props, State> {
   state = {
-    in: '',
-    password: '',
     error: '',
+    in: '',
+    loading: false,
+    password: '',
   }
 
-  importKey = () => {
+  importKey = async () => {
+    this.setState({loading: true, error: ''})
     const input = new TextEncoder().encode(this.state.in)
+    const cl = await client()
     const req: KeyImportRequest = {
       in: input,
       password: this.state.password,
     }
-    store.dispatch(
-      keyImport(
-        req,
-        (resp: KeyImportResponse) => {
-          this.props.close(true)
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    cl.keyImport(req, (err: RPCError, resp: KeyImportResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false})
+      this.props.close(true)
+    })
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -83,7 +80,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle>Import Key</DialogTitle>
+        <DialogTitle loading={this.state.loading}>Import Key</DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography style={{paddingBottom: 20}}>

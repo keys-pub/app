@@ -1,24 +1,11 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Input,
-  InputLabel,
-  FormControl,
-  FormHelperText,
-  TextField,
-  Typography,
-} from '@material-ui/core'
+import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
 import {keyRemove} from '../../rpc/rpc'
 import {query} from '../state'
 
-import {Step, styles} from '../../components'
+import {DialogTitle, styles} from '../../components'
 
 import {go, goBack} from 'connected-react-router'
 import {connect} from 'react-redux'

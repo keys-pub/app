@@ -26,13 +26,7 @@ const loadCertPath = (): string => {
   const appName: string = getAppName()
   const appSupportPath = remote.app.getPath('appData') + '/' + appName
   console.log('App support path:', appSupportPath)
-  const userDataDir = remote.app.getPath('userData')
-  if (appSupportPath !== userDataDir) {
-    // This is ok in DEV
-    console.warn("App support path doesn't match userData directory: %s !== %s", appSupportPath, userDataDir)
-  }
-  const certPath = remote.app.getPath('appData') + '/' + appName + '/ca.pem'
-  return certPath
+  return appSupportPath + '/ca.pem'
 }
 
 // Path to resources directory

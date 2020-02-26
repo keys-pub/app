@@ -13,7 +13,7 @@ import {
 
 import * as electron from 'electron'
 
-import {styles, Link} from '../../components'
+import {styles, DialogTitle, Link} from '../../components'
 
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
@@ -77,17 +77,7 @@ class UserIntroDialog extends React.Component<Props, State> {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <Box display="flex" flex={1} flexDirection="column">
-          <Typography
-            id="alert-dialog-title"
-            variant="h5"
-            style={{paddingBottom: 7, paddingLeft: 20, paddingTop: 15, fontWeight: 600}}
-          >
-            Link your Key
-          </Typography>
-          {!this.state.loading && <Divider style={{marginBottom: 3}} />}
-          {this.state.loading && <LinearProgress />}
-        </Box>
+        <DialogTitle loading={this.state.loading}>Link your Key</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Link your key with a Github or Twitter account by generating a signed message and posting it

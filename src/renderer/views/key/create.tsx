@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   FormControl,
   MenuItem,
   Select,
@@ -19,27 +18,18 @@ import {TransitionProps} from '@material-ui/core/transitions'
 
 import {store} from '../../store'
 
-import {styles, Link} from '../../components'
+import {styles, DialogTitle, Link} from '../../components'
 import UserSignDialog from '../user/dialog'
+import ServiceSelect from '../user/service-select'
 
 import {shell} from 'electron'
 
-import {push} from 'connected-react-router'
-import {connect} from 'react-redux'
-
-import {keyGenerate, userService, RPCState} from '../../rpc/rpc'
-import {
-  KeyGenerateRequest,
-  KeyGenerateResponse,
-  UserServiceRequest,
-  UserServiceResponse,
-  KeyType,
-} from '../../rpc/types'
+import {keyGenerate} from '../../rpc/rpc'
+import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/types'
 
 type Props = {
   open: boolean
   close: () => void
-  intro: boolean
   onChange: () => void
 }
 
@@ -79,16 +69,20 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   keyGenerate = () => {
-    const req: KeyGenerateRequest = {
-      type: this.state.type,
-    }
-    store.dispatch(
-      keyGenerate(req, (resp: KeyGenerateResponse) => {
-        this.props.onChange()
-        store.dispatch({type: 'INTRO', payload: false})
-        this.setState({kid: resp.kid, step: 'CREATED'})
-      })
-    )
+    this.setState({loading: true})
+    // Make generate take a second
+    setTimeout(() => {
+      const req: KeyGenerateRequest = {
+        type: this.state.type,
+      }
+      store.dispatch(
+        keyGenerate(req, (resp: KeyGenerateResponse) => {
+          this.props.onChange()
+          store.dispatch({type: 'INTRO', payload: false})
+          this.setState({kid: resp.kid, step: 'CREATED', loading: false})
+        })
+      )
+    }, 500)
   }
 
   selectService = () => {
@@ -100,12 +94,22 @@ export default class KeyCreateDialog extends React.Component<Props> {
     this.setState({type})
   }
 
-  setService = (event: React.ChangeEvent<{value: unknown}>) => {
-    const service = event.target.value as string
+  setService = (service: string) => {
     this.setState({service})
   }
 
   renderKeygen(open: boolean) {
+    let keyDesc = ''
+    switch (this.state.type) {
+      case KeyType.EDX25519:
+        keyDesc = `An EdX25519 key is the default key capable of signing and encryption. Ed25519 is an elliptic curve signing algorithm using EdDSA and Curve25519 and can be converted to an X25519 encryption key.`
+        break
+      case KeyType.X25519:
+        keyDesc =
+          'X25519 is an elliptic curve Diffie-Hellman key exchange using Curve25519. X25519 keys only provide public key authenticated encryption.'
+        break
+    }
+
     return (
       <Dialog
         onClose={this.close}
@@ -116,7 +120,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         TransitionComponent={transition}
         keepMounted
       >
-        <DialogTitle>Generate Key</DialogTitle>
+        <DialogTitle loading={this.state.loading}>Generate Key</DialogTitle>
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <FormControl variant="outlined">
@@ -132,7 +136,12 @@ export default class KeyCreateDialog extends React.Component<Props> {
               </Select>
             </FormControl>
             <Box marginBottom={2} />
-            <Typography style={{height: 60}}>{keyDescription(this.state.type)}</Typography>
+            <Typography style={{display: 'inline'}}>{keyDesc}</Typography>
+            <Typography style={{display: 'inline'}}>&nbsp;For more details, see </Typography>
+            <Link inline onClick={() => shell.openExternal('https://keys.pub/docs/specs/keys.html')}>
+              keys.pub/docs/specs/keys
+            </Link>
+            <Typography style={{display: 'inline'}}>.</Typography>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -166,6 +175,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         TransitionComponent={transition}
         keepMounted
       >
+        {/* TODO: This title? */}
         <DialogTitle>Key Created</DialogTitle>
         <DialogContent dividers>
           <Box style={{minHeight}}>
@@ -175,17 +185,13 @@ export default class KeyCreateDialog extends React.Component<Props> {
             </Typography>
             <Typography>This key identifier is also the public key, you can share with others.</Typography>
             <Typography>
-              In the next step we will ask if you want to publish your key or link it with a 3rd party
-              account.
+              In the next step we will ask if you want to publish your key or link it with a user account
+              (Github, Twitter, Reddit, etc).
             </Typography>
-            {/* <Typography style={{display: 'inline'}}>For more details, see{' '}</Typography>
-              <Link inline onClick={() => shell.openExternal('http://docs.keys.pub/spec/keys')}>
-                docs.keys.pub/spec/keys
-              </Link>
-              <Typography style={{display: 'inline'}}>.</Typography> */}
           </Box>
         </DialogContent>
         <DialogActions>
+          <Button onClick={this.close}>Later</Button>
           <Button autoFocus onClick={buttonAction} color="primary">
             {buttonLabel}
           </Button>
@@ -209,25 +215,16 @@ export default class KeyCreateDialog extends React.Component<Props> {
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <Typography>
-              Do you want to associate this key with a user account (such as Github or Twitter) and publish it
+              Do you want to link this key with a user account (Github, Twitter, Reddit, etc) and publish it
               to the{' '}
-              <Link inline span onClick={() => {}}>
+              <Link inline span onClick={() => shell.openExternal('https://keys.pub/')}>
                 keys.pub
               </Link>{' '}
-              key server? This helps others search for your key and verify your identity.
-              {/* You can
-          revoke this at any time. For more details, see{' '}
-          <Link inline onClick={() => shell.openExternal('http://docs.keys.pub/user')}>
-            docs.keys.pub/user
-          </Link> */}
+              key server? This helps others search for your key and verify your identity. You should only do
+              this if you're ok with your key being public.
             </Typography>
             <Box marginBottom={2} />
-            <FormControl variant="outlined">
-              <Select value={this.state.service} onChange={this.setService} style={{minWidth: 200}}>
-                <MenuItem value={'github'}>Link to Github</MenuItem>
-                <MenuItem value={'twitter'}>Link to Twitter</MenuItem>
-              </Select>
-            </FormControl>
+            <ServiceSelect service={this.state.service} setService={this.setService} />
           </Box>
         </DialogContent>
         <DialogActions>
@@ -270,14 +267,4 @@ const keyTypeFromString = (s: string, dflt: KeyType): KeyType => {
       return KeyType.X25519
   }
   return KeyType.UNKNOWN_KEY_TYPE
-}
-
-export const keyDescription = (type: KeyType): string => {
-  switch (type) {
-    case KeyType.EDX25519:
-      return `Ed25519 is an elliptic curve signing algorithm using EdDSA and Curve25519. 
-        This key can be converted to an X25519 encryption key.`
-    case KeyType.X25519:
-      return 'X25519 is an elliptic curve Diffie-Hellman key exchange using Curve25519. X25519 keys are used for public key authenticated encryption.'
-  }
 }

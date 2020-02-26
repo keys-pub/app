@@ -1,28 +1,11 @@
 import purple from '@material-ui/core/colors/purple'
 
-type Styles = {
-  boxShadow?: string
-  borderRadius?: number
-  color?: string
-  fontSize?: number | string
-  fontFamily?: string
-  fontWeight?: number
-  letterSpacing?: number | string
-  lineHeight?: number
-  marginRight?: number
-  marginLeft?: number
-  marginTop?: number
-  marginBottom?: number
-  paddingLeft?: number
-  paddingRight?: number
-  paddingTop?: number
-  paddingBottom?: number
-  textShadow?: string
-}
+import {CSSProperties} from '@material-ui/styles'
 
 type Colors = {
   github: string
   twitter: string
+  reddit: string
 }
 
 const logo = {
@@ -50,9 +33,9 @@ const messageInput = {
 }
 
 export type AppStyles = {
-  messageInput: Styles
-  logo: Styles
-  mono: Styles
+  messageInput: CSSProperties
+  logo: CSSProperties
+  mono: any
   colors: Colors
   cells: CellStyles
 }
@@ -60,11 +43,12 @@ export type AppStyles = {
 export const colors: Colors = {
   github: 'purple', // rgb(68,68,68)'
   twitter: 'rgb(76,160,235)',
+  reddit: '#FF5700',
 }
 
 type CellStyles = {
-  user: Styles
-  owner: Styles
+  user: CSSProperties
+  owner: CSSProperties
 }
 
 export const cells: CellStyles = {
@@ -109,6 +93,8 @@ export const serviceColor = (service: string): string => {
       return colors.github
     case 'twitter':
       return colors.twitter
+    case 'reddit':
+      return colors.reddit
     default:
       return 'black'
   }

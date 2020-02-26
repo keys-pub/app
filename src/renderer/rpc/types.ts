@@ -497,6 +497,7 @@ export interface PullResponse {
 
 export interface PushRequest {
     identity?: string;
+    remoteCheck?: boolean;
 }
 
 export interface PushResponse {

@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   FormControl,
   FormHelperText,
   Snackbar,
@@ -17,7 +16,7 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles} from '../../components'
+import {styles, DialogTitle} from '../../components'
 import {store} from '../../store'
 
 import {userAdd, userSign, RPCError, RPCState} from '../../rpc/rpc'
@@ -132,18 +131,27 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   renderName() {
     const {service} = this.props
+
     let placeholder = ''
     let question = "What's your username?"
     let next = "In the next step, we'll create a signed message that you can post to your account."
-    if (service === 'github') {
-      placeholder = 'username'
-      question = "What's your Github username?"
-      next =
-        "In the next step, we'll create a signed message that you can post as a gist on your Github account."
-    } else if (service === 'twitter') {
-      placeholder = '@username'
-      question = "What's your Twitter handle?"
-      next = "In the next step, we'll create a signed message that you can post as a tweet."
+    switch (service) {
+      case 'github':
+        placeholder = 'username'
+        question = "What's your Github username?"
+        next =
+          "In the next step, we'll create a signed message that you can post as a gist on your Github account."
+        break
+      case 'twitter':
+        placeholder = '@username'
+        question = "What's your Twitter handle?"
+        next = "In the next step, we'll create a signed message that you can post as a tweet."
+        break
+      case 'reddit':
+        placeholder = 'username'
+        question = "What's your Reddit username?"
+        next = "In the next step, we'll create a signed message that you can post on r/keyspubmsgs."
+        break
     }
 
     return (
@@ -170,27 +178,42 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   renderSign() {
     const {service} = this.props
-    let intro = ''
+    let intro = 'Copy the signed message.'
     let instructions = ''
     let openLabel = ''
     let openAction = null
     let placeholder = ''
     let urlLabel = ''
-    if (service === 'github') {
-      intro = 'Copy the signed message.'
-      instructions = 'Create a new gist on your Github account, and paste it there.'
-      openLabel = 'Open gist.github.com/new'
-      openAction = () => shell.openExternal('https://gist.github.com/new')
-      placeholder = 'https://gist.github.com/...'
-      urlLabel = "What's the location (URL) on github.com where the signed message was saved?"
-    } else if (service === 'twitter') {
-      intro = 'Copy the signed message.'
-      instructions = 'Save it as a tweet on your Twitter account.'
-      openLabel = 'Open twitter.com/intent/tweet'
-      openAction = () =>
-        shell.openExternal('https://twitter.com/intent/tweet?text=' + this.state.signedMessage)
-      placeholder = 'https://twitter.com/...'
-      urlLabel = "What's the location (URL) on twitter.com where the signed message tweet was saved?"
+    switch (service) {
+      case 'github':
+        instructions = 'Create a new gist on your Github account, and paste it there.'
+        openLabel = 'Open gist.github.com/new'
+        openAction = () => shell.openExternal('https://gist.github.com/new')
+        placeholder = 'https://gist.github.com/...'
+        urlLabel = "What's the location (URL) on github.com where the signed message was saved?"
+        break
+      case 'twitter':
+        instructions = 'Save it as a tweet on your Twitter account.'
+        openLabel = 'Open twitter.com/intent/tweet'
+        openAction = () =>
+          shell.openExternal('https://twitter.com/intent/tweet?text=' + this.state.signedMessage)
+        placeholder = 'https://twitter.com/...'
+        urlLabel = "What's the location (URL) on twitter.com where the signed message tweet was saved?"
+        break
+      case 'reddit':
+        instructions = 'Save it as a post on r/keyspubmsgs.'
+        openLabel = 'Open reddit.com/r/keyspubmsgs/submit'
+        const postTitle = this.state.name + ' ' + this.props.kid
+        openAction = () =>
+          shell.openExternal(
+            'https://old.reddit.com/r/keyspubmsgs/submit?title=' +
+              postTitle +
+              '&text=' +
+              this.state.signedMessage
+          )
+        placeholder = 'https://reddit.com/...'
+        urlLabel = "What's the location (URL) on reddit.com where the signed message was posted?"
+        break
     }
     return (
       <Box>
@@ -275,10 +298,16 @@ export default class UserSignDialog extends React.Component<Props, State> {
     const {service} = this.props
 
     let title = ''
-    if (service === 'github') {
-      title = 'Link to Github'
-    } else if (service === 'twitter') {
-      title = 'Link to Twitter'
+    switch (service) {
+      case 'github':
+        title = 'Link to Github'
+        break
+      case 'twitter':
+        title = 'Link to Twitter'
+        break
+      case 'reddit':
+        title = 'Link to Reddit'
+        break
     }
 
     return (
@@ -291,7 +320,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle loading={this.state.loading}>{title}</DialogTitle>
         <DialogContent dividers>
           {this.state.step == 'name' && this.renderName()}
           {this.state.step == 'sign' && this.renderSign()}

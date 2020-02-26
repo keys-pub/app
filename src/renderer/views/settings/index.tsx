@@ -41,9 +41,6 @@ export default class SettingsView extends React.Component<Props, State> {
               <TableCell style={cstyles.cell}></TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="row">
-                  <Button size="small" variant="outlined" onClick={() => store.dispatch(push('/debug'))}>
-                    Debug Routes
-                  </Button>
                   <Button
                     size="small"
                     variant="outlined"

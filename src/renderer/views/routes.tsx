@@ -23,7 +23,7 @@ import StyleGuide from './style-guide'
 import SettingsView from './settings'
 
 import DBView from './db'
-import KeyView from './key/view'
+import KeyView from './key'
 import KeysView from './keys'
 
 import EncryptView from './encrypt'

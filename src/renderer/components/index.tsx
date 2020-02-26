@@ -1,10 +1,6 @@
 import styles from './styles'
-
-import Step from './step'
-import Splash from './splash'
-import {UserButton, UserLabel} from './user'
-import VList from './vlist'
-
 import Link from './link'
+import DialogTitle from './dialog-title'
+import Splash from './splash'
 
-export {styles, Link, Splash, Step, UserButton, UserLabel, VList}
+export {styles, Link, DialogTitle, Splash}

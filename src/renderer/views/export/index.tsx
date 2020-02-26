@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Input,
   InputLabel,
   FormControl,
@@ -15,19 +14,10 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, Step} from '../../components'
+import {styles, DialogTitle} from '../../components'
+import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/types'
 
-import {keyExport} from '../../rpc/rpc'
-import {goBack, push} from 'connected-react-router'
-
-import {query} from '../state'
-
-import {store} from '../../store'
-
-import {connect} from 'react-redux'
-
-import {RPCState} from '../../rpc/rpc'
-import {Key, KeyExportRequest, KeyExportResponse} from '../../rpc/types'
+import {client} from '../../rpc/client'
 
 type Props = {
   kid: string
@@ -48,19 +38,23 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     error: '',
   }
 
-  export = () => {
+  export = async () => {
+    this.setState({error: ''})
+    const cl = await client()
     const req: KeyExportRequest = {kid: this.props.kid, password: this.state.password}
-    store.dispatch(
-      keyExport(req, (resp: KeyExportResponse) => {
-        const out = new TextDecoder().decode(resp.export)
-        this.setState({password: '', export: out})
-      })
-    )
+    cl.keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const out = new TextDecoder().decode(resp.export)
+      this.setState({password: '', export: out})
+    })
   }
 
   close = () => {
     this.props.close()
-    this.setState({password: '', export: ''})
+    this.setState({password: '', export: '', error: ''})
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {

@@ -46,12 +46,6 @@ class AuthSetupView extends React.Component<Props, State> {
     passwordConfirm: '',
     passwordError: '',
     error: '',
-
-    // For testing
-    // password: 'password123',
-    // step: 2,
-    // keyBackup:
-    //   'shove quiz copper settle harvest victory shell fade soft neck awake churn craft venue pause utility service degree invite inspire swing detect pipe sibling',
   }
   inputConfirm: any
 
@@ -74,8 +68,8 @@ class AuthSetupView extends React.Component<Props, State> {
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Header loading={this.state.loading} />
         <Typography style={{paddingTop: 10, paddingBottom: 30, width: 550}}>
-          Hi! Let's create a password. This password will be used to encrypt your keys and is not stored or
-          transmitted anywhere. This password needs to be at least 10 characters.
+          Hi! Let's create a password. This password will be used to unlock your local keyring and secure your
+          keys. This password is not stored or transmitted anywhere.
         </Typography>
         <FormControl error={this.state.passwordError !== ''}>
           <TextField
@@ -139,13 +133,6 @@ class AuthSetupView extends React.Component<Props, State> {
       })
       return
     }
-    if (password.length < 10) {
-      this.setState({
-        passwordError: 'Password is too short',
-      })
-      return
-    }
-
     this.authSetup()
   }
 

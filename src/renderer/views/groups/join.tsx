@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
-import {styles, Step} from '../../components'
+import Step from '../../components/step'
 
 import {push, goBack} from 'connected-react-router'
 

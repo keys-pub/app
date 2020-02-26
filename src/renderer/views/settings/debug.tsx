@@ -1,24 +1,16 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, Typography} from '@material-ui/core'
-
-import {connect} from 'react-redux'
-
-import {push, goBack} from 'connected-react-router'
-
+import {push} from 'connected-react-router'
 import {routes} from '../routes'
-
-import {styles, Link} from '../../components'
-
+import {Link} from '../../components'
 import {store} from '../../store'
-
-import {RPCState} from '../../rpc/rpc'
 
 import {RouteInfo} from '../routes'
 
 type Props = {}
 
-class Debug extends React.Component<Props> {
+export default class Debug extends React.Component<Props> {
   push = (route: string) => {
     const r = route
     return () => {
@@ -50,10 +42,3 @@ class Debug extends React.Component<Props> {
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any): any => {
-  return {}
-}
-
-// $FlowFixMe
-export default connect(mapStateToProps)(Debug)

@@ -17,7 +17,7 @@ import {
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
-import {IDView, KeyDescriptionView} from '../key/view'
+import {IDView} from '../key/content'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'
@@ -91,7 +91,7 @@ class SearchView extends React.Component<Props, State> {
       <Box display="flex" flex={1} flexDirection="column">
         <Box paddingLeft={1} paddingBottom={1} paddingRight={1}>
           <TextField
-            placeholder="Search"
+            placeholder="Search keys.pub"
             variant="outlined"
             value={this.state.input}
             onChange={this.onInputChange}
