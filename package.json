@@ -1,7 +1,7 @@
 {
   "name": "keys",
   "productName": "Keys",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Key management, signing and encryption.",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config configs/webpack.main.prod.config.js",
@@ -19,7 +19,8 @@
     "pack": "yarn run build && electron-builder --dir",
     "dist": "yarn run build && electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "version": "echo $npm_package_version"
+    "version": "echo $npm_package_version",
+    "release": "build"
   },
   "main": "./dist/main.js",
   "build": {
@@ -54,9 +55,15 @@
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
       "entitlements": "resources/entitlements.mac.plist",
-      "entitlementsInherit": "resources/entitlements.mac.plist"
+      "entitlementsInherit": "resources/entitlements.mac.plist",
+      "publish": [
+        "github"
+      ]
     },
     "win": {
+      "publish": [
+        "github"
+      ],
       "target": [
         "nsis",
         "msi"
@@ -160,6 +167,7 @@
     "@material-ui/lab": "^4.0.0-alpha.39",
     "@material-ui/styles": "^4.3.0",
     "connected-react-router": "^6.0.0",
+    "electron-updater": "^4.2.2",
     "electron-window-state": "^5.0.3",
     "getenv": "^1.0.0",
     "google-protobuf": "^3.5.0",
