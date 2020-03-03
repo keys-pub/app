@@ -43,6 +43,11 @@ const start = () => {
   }
 }
 
+ipcRenderer.removeAllListeners('log')
+ipcRenderer.on('log', function(event, text) {
+  console.log('Main process:', text)
+})
+
 ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {

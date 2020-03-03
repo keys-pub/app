@@ -19,7 +19,7 @@ import {MenuActionType} from './menu'
 
 import {keysStart} from './run'
 
-import {autoUpdater} from 'electron-updater'
+// import {autoUpdater} from 'electron-updater'
 
 let mainWindow = null
 
@@ -27,6 +27,10 @@ if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install()
 }
+
+// process.on('uncaughtException', err => {
+//   console.log('uncaughtException:', err)
+// })
 
 // if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
 //   require('electron-debug')
@@ -128,8 +132,6 @@ app.on('ready', async () => {
     mainWindow = null
   })
 
-  autoUpdater.checkForUpdatesAndNotify()
-
   const menuAction = (type: MenuActionType) => {
     if (!mainWindow) return
     switch (type) {
@@ -162,6 +164,37 @@ app.on('ready', async () => {
   const menuBuilder = new MenuBuilder(mainWindow, menuAction)
   menuBuilder.buildMenu()
 })
+
+const logToRenderer = (text: string) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('log', text)
+  }
+}
+
+// autoUpdater.on('checking-for-update', () => {
+//   logToRenderer('Checking for update...')
+// })
+// autoUpdater.on('update-available', info => {
+//   logToRenderer('Update available')
+// })
+// autoUpdater.on('update-not-available', info => {
+//   logToRenderer('Update not available')
+// })
+// autoUpdater.on('error', err => {
+//   logToRenderer('Error in auto-updater:' + err)
+// })
+// autoUpdater.on('download-progress', progressObj => {
+//   let message = 'Download speed: ' + progressObj.bytesPerSecond
+//   message = message + ' - Downloaded ' + progressObj.percent + '%'
+//   message = message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+//   logToRenderer(message)
+// })
+// autoUpdater.on('update-downloaded', info => {
+//   logToRenderer('Update downloaded')
+// })
+// app.on('ready', function() {
+//   autoUpdater.checkForUpdatesAndNotify()
+// })
 
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()

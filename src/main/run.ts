@@ -38,8 +38,8 @@ export const keysStart = (): Promise<any> => {
     keysPath = process.env.KEYS_BIN
   }
 
-  console.log('Keys bin:', keysPath)
   if (keysPath) {
+    console.log('Keys path:', keysPath)
     return execProc(keysPath + ' start --from=app')
   }
 
