@@ -1,5 +1,6 @@
 require('dotenv').config()
 const {notarize} = require('electron-notarize')
+const {exec} = require('child_process')
 
 exports.default = async function notarizing(context) {
   const {electronPlatformName, appOutDir} = context
@@ -7,6 +8,20 @@ exports.default = async function notarizing(context) {
     return
   }
 
+  // Fix the build
+  exec('./scripts/fix.sh', (error, stdout, stderr) => {
+    if (error) {
+      console.log(`error: ${error.message}`)
+      return
+    }
+    if (stderr) {
+      console.log(`${stderr}`)
+      return
+    }
+    console.log(`${stdout}`)
+  })
+
+  console.log('Notarizing...')
   const appName = context.packager.appInfo.productFilename
 
   // In .env, put APPLEID=...

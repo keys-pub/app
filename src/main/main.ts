@@ -19,6 +19,8 @@ import {MenuActionType} from './menu'
 
 import {keysStart} from './run'
 
+import {autoUpdater} from 'electron-updater'
+
 let mainWindow = null
 
 if (process.env.NODE_ENV === 'production') {
@@ -125,6 +127,8 @@ app.on('ready', async () => {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  autoUpdater.checkForUpdatesAndNotify()
 
   const menuAction = (type: MenuActionType) => {
     if (!mainWindow) return
