@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import {store} from '../../store'
-
 import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
 import {Splash} from '../../components'
@@ -62,7 +60,7 @@ export default class AuthView extends React.Component<Props, State> {
     }
     if (this.state.loading && !this.state.waiting) return null
     if (this.state.loading) {
-      return <Splash />
+      return <Splash delay={1000} />
     }
 
     if (this.state.authSetupNeeded) {

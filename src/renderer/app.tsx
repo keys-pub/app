@@ -8,6 +8,8 @@ import {initializeClient} from './rpc/client'
 import {store} from './store'
 import {init} from './views/state'
 
+import {updateCheck} from './views/update'
+
 // import * as util from 'util'
 
 import './app.css'
@@ -48,6 +50,7 @@ ipcRenderer.on('log', function(event, text) {
   console.log('Main process:', text)
 })
 
+// Keys start
 ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {
@@ -57,6 +60,7 @@ ipcRenderer.on('keys-started', (event, err) => {
   }
   start()
 })
-
-// Tell main process to start service
 ipcRenderer.send('keys-start')
+
+// Update check
+updateCheck()

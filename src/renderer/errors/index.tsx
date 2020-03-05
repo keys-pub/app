@@ -13,7 +13,7 @@ type Props = {
 
 export default class ErrorsView extends React.Component<Props> {
   restart = () => {
-    ipcRenderer.send('restart-app', {})
+    ipcRenderer.send('reload-app', {})
   }
 
   render() {

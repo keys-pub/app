@@ -3,25 +3,24 @@ import * as React from 'react'
 import {AppState} from '../reducers/app'
 
 import {Routes, routesMap} from './routes'
-import {goBack, push} from 'connected-react-router'
 
-import {store} from '../store'
+import {Splash} from '../components'
 
 import Auth from './auth'
 import AppHeader from './header'
 import Nav from './nav'
 
-import * as queryString from 'query-string'
 import {connect} from 'react-redux'
 
-import {Box, Typography} from '@material-ui/core'
+import {Box} from '@material-ui/core'
 import ErrorsView from '../errors'
 
 type Props = {
   error: Error | void
-  unlocked?: boolean
   path: string
   query: string
+  unlocked: boolean
+  updating: boolean
 }
 
 class Lock extends React.Component<Props> {
@@ -55,6 +54,11 @@ class Lock extends React.Component<Props> {
       return <ErrorsView error={error} />
     }
 
+    if (this.props.updating) {
+      console.log('Updating...')
+      return <Splash delay={0} />
+    }
+
     console.log('Unlocked:', this.props.unlocked)
 
     if (!this.props.unlocked || this.props.path == '/' || this.props.path.startsWith('/auth')) {
@@ -68,9 +72,10 @@ class Lock extends React.Component<Props> {
 const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => {
   return {
     error: state.app.error,
-    unlocked: state.app.unlocked,
     path: state.router.location.pathname,
     query: state.router.location.search,
+    unlocked: state.app.unlocked,
+    updating: state.app.updating,
   }
 }
 

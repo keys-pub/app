@@ -8,8 +8,6 @@ import {app, BrowserWindow, ipcMain} from 'electron'
 
 import MenuBuilder from './menu'
 
-import * as getenv from 'getenv'
-import * as fs from 'fs'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -17,20 +15,15 @@ const windowStateKeeper = require('electron-window-state')
 
 import {MenuActionType} from './menu'
 
-import {keysStart} from './run'
-
-// import {autoUpdater} from 'electron-updater'
+import {keysStart} from './service'
+import {update, Update} from './updater'
 
 let mainWindow = null
 
-if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support')
-  sourceMapSupport.install()
-}
-
-// process.on('uncaughtException', err => {
-//   console.log('uncaughtException:', err)
-// })
+// if (process.env.NODE_ENV === 'production') {
+//   const sourceMapSupport = require('source-map-support')
+//   sourceMapSupport.install()
+// }
 
 // if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
 //   require('electron-debug')
@@ -102,8 +95,8 @@ app.on('ready', async () => {
     )
   }
 
-  ipcMain.on('restart-app', (event, arg) => {
-    console.log('Restart!')
+  ipcMain.on('reload-app', (event, arg) => {
+    console.log('Reload!')
     if (process.env.NODE_ENV === 'development') {
       if (mainWindow) {
         mainWindow.webContents.reload()
@@ -123,9 +116,6 @@ app.on('ready', async () => {
     if (!mainWindow.isVisible()) {
       mainWindow.show()
     }
-
-    // We start on credentials loaded in renderer process
-    // mainWindow.webContents.send('start')
   })
 
   mainWindow.on('closed', () => {
@@ -165,37 +155,6 @@ app.on('ready', async () => {
   menuBuilder.buildMenu()
 })
 
-const logToRenderer = (text: string) => {
-  if (mainWindow) {
-    mainWindow.webContents.send('log', text)
-  }
-}
-
-// autoUpdater.on('checking-for-update', () => {
-//   logToRenderer('Checking for update...')
-// })
-// autoUpdater.on('update-available', info => {
-//   logToRenderer('Update available')
-// })
-// autoUpdater.on('update-not-available', info => {
-//   logToRenderer('Update not available')
-// })
-// autoUpdater.on('error', err => {
-//   logToRenderer('Error in auto-updater:' + err)
-// })
-// autoUpdater.on('download-progress', progressObj => {
-//   let message = 'Download speed: ' + progressObj.bytesPerSecond
-//   message = message + ' - Downloaded ' + progressObj.percent + '%'
-//   message = message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
-//   logToRenderer(message)
-// })
-// autoUpdater.on('update-downloaded', info => {
-//   logToRenderer('Update downloaded')
-// })
-// app.on('ready', function() {
-//   autoUpdater.checkForUpdatesAndNotify()
-// })
-
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
@@ -203,5 +162,29 @@ ipcMain.on('keys-start', (event, arg) => {
     })
     .catch((err: Error) => {
       event.sender.send('keys-started', err)
+    })
+})
+
+ipcMain.on('update-check', (event, arg) => {
+  update(false)
+    .then((update: Update) => {
+      event.sender.send('update-needed', update)
+    })
+    .catch((err: Error) => {
+      event.sender.send('update-check-err', err)
+    })
+})
+
+ipcMain.on('update-apply', (event, arg) => {
+  update(true)
+    .then((update: Update) => {
+      console.log('Update applied:', update)
+      if (update.applied) {
+        app.relaunch()
+        app.exit(0)
+      }
+    })
+    .catch((err: Error) => {
+      event.sender.send('update-apply-err', err)
     })
 })

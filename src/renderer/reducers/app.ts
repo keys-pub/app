@@ -6,6 +6,7 @@ export type AppState = {
   intro: boolean
   selectedInbox: string
   unlocked: boolean
+  updating: boolean
   watchStatus: WatchStatus
 }
 
@@ -15,6 +16,7 @@ const initialState: AppState = {
   intro: true,
   selectedInbox: '',
   unlocked: null,
+  updating: false,
   watchStatus: WatchStatus.NO_STATUS,
 }
 
@@ -62,6 +64,11 @@ export default function reducer(state: AppState = initialState, action: actionTy
       return {
         ...state,
         unlocked: false,
+      }
+    case 'UPDATING':
+      return {
+        ...state,
+        updating: true,
       }
     case 'INTRO':
       return {

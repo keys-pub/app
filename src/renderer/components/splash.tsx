@@ -2,7 +2,9 @@ import * as React from 'react'
 
 import {Box, CircularProgress} from '@material-ui/core'
 
-type Props = {}
+type Props = {
+  delay: number
+}
 type State = {
   loading: boolean
 }
@@ -16,7 +18,7 @@ export default class Splash extends React.Component<Props, State> {
   componentDidMount() {
     this.tid = setTimeout(() => {
       this.setState({loading: true})
-    }, 1000)
+    }, this.props.delay)
   }
 
   componentWillUnmount() {

@@ -15,7 +15,9 @@ zip=Keys-${ver}-mac.zip
 echo "Fixing $zip"
 
 cd release
-rm $zip
+if [[ -f $zip ]]; then
+    rm $zip
+fi
 
 cd mac
 ditto -c -k --sequesterRsrc --keepParent Keys.app $zip

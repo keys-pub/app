@@ -1,11 +1,12 @@
 import {spawn, exec} from 'child_process'
 import * as fs from 'fs'
-import * as os from 'os'
-import * as getenv from 'getenv'
 
-import {binPath} from './paths'
+export type ExecOut = {
+  stdout: string
+  stderr: string
+}
 
-const execProc = (path: string): Promise<any> => {
+export const execProc = (path: string): Promise<ExecOut> => {
   return new Promise((resolve, reject) => {
     if (path === '') {
       reject('No path to exec')
@@ -14,39 +15,16 @@ const execProc = (path: string): Promise<any> => {
     console.log('Exec:', path)
     exec(path, (err, stdout, stderr) => {
       if (err) {
-        console.error(`exec error: ${err}`)
         reject(err)
         return
       }
-      // console.log(`exec (stdout): ${stdout}`)
-      if (stderr) {
-        console.error(`exec (stderr): ${stderr}`)
-      }
-      resolve()
+      console.log('Exec (done):', path)
+      resolve({stdout, stderr})
     })
   })
 }
 
-export const keysStart = (): Promise<any> => {
-  let keysPath = ''
-
-  if (process.env.NODE_ENV === 'production') {
-    keysPath = binPath('bin/keys')
-  }
-
-  if (process.env.KEYS_BIN) {
-    keysPath = process.env.KEYS_BIN
-  }
-
-  if (keysPath) {
-    console.log('Keys path:', keysPath)
-    return execProc(keysPath + ' start --from=app')
-  }
-
-  return Promise.resolve()
-}
-
-const spawnProc = (path: string, killOnExit: boolean): Promise<any> => {
+export const spawnProc = (path: string, killOnExit: boolean): Promise<any> => {
   return new Promise((resolve, reject) => {
     if (path === '') {
       reject('No path to spawn')
@@ -87,19 +65,4 @@ const spawnProc = (path: string, killOnExit: boolean): Promise<any> => {
       resolve()
     })
   })
-}
-
-export const keysd = (): Promise<any> => {
-  if (process.env.NODE_ENV === 'production') {
-    const servicePath = binPath('bin/keysd')
-    return spawnProc(servicePath, true)
-  }
-
-  console.log('process.env.KEYSD', process.env.KEYSD_BIN)
-  if (process.env.KEYSD_BIN) {
-    return spawnProc(process.env.KEYSD_BIN, true)
-  }
-
-  console.warn('No service spawn in dev mode')
-  return Promise.resolve()
 }

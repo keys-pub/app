@@ -50,7 +50,7 @@ export const routes: Array<RouteInfo> = [
 
   {path: '/search/index', component: () => <SearchView />},
 
-  {path: '/splash', component: () => <Splash />},
+  {path: '/splash', component: () => <Splash delay={0} />},
   {path: '/style-guide', component: () => <StyleGuide />},
 
   {path: '/encrypt/index', component: () => <EncryptView />},
