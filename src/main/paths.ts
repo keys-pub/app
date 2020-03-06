@@ -13,6 +13,15 @@ export const appResourcesPath = (): string => {
   return resourcesPath
 }
 
+// Path to app
+export const appPath = (): string => {
+  if (os.platform() !== 'darwin') return '.'
+  const resourcesPath = appResourcesPath()
+  const appPath = path.resolve(resourcesPath, '..', '..')
+  console.log('App path:', appPath)
+  return appPath
+}
+
 // Path to an executable
 export const binPath = (name: string): string => {
   if (os.platform() !== 'darwin') return name

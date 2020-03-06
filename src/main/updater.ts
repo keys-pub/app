@@ -1,6 +1,7 @@
 import {binPath} from './paths'
 import {execProc, ExecOut} from './run'
 import {app} from 'electron'
+import {appPath} from './paths'
 
 export type Asset = {
   name: string
@@ -54,7 +55,7 @@ export const update = (apply: boolean): Promise<Update> => {
 
     let applyPath = ''
     if (apply) {
-      applyPath = app.getAppPath()
+      applyPath = appPath()
       if (process.env.UPDATER_APPLY) {
         applyPath = process.env.UPDATER_APPLY
       }
