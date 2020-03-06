@@ -24,9 +24,23 @@ const getAppName = (): string => {
 
 const loadCertPath = (): string => {
   const appName: string = getAppName()
-  const appSupportPath = remote.app.getPath('appData') + '/' + appName
-  console.log('App support path:', appSupportPath)
-  return appSupportPath + '/ca.pem'
+
+  let supportDir
+  if (os.platform() == 'linux') {
+    if (process.env.XDG_DATA_HOME) {
+      supportDir = process.env.XDG_DATA_HOME
+    } else {
+      const homeDir = os.homedir()
+      supportDir = path.join(homeDir, '.local', 'share')
+    }
+  } else {
+    supportDir = remote.app.getPath('appData')
+  }
+
+  const appSupportDir = path.join(supportDir, appName)
+
+  console.log('App support path:', appSupportDir)
+  return appSupportDir + '/ca.pem'
 }
 
 // Path to resources directory
