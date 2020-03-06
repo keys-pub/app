@@ -4,7 +4,7 @@ import {AppState} from '../reducers/app'
 
 import {Routes, routesMap} from './routes'
 
-import {Splash} from '../components'
+import UpdateSplash from './update/splash'
 
 import Auth from './auth'
 import AppHeader from './header'
@@ -56,7 +56,7 @@ class Lock extends React.Component<Props> {
 
     if (this.props.updating) {
       console.log('Updating...')
-      return <Splash delay={0} />
+      return <UpdateSplash />
     }
 
     console.log('Unlocked:', this.props.unlocked)

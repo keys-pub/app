@@ -65,9 +65,9 @@ export const update = (apply: boolean): Promise<Update> => {
       console.log('Apply:', applyPath)
     }
 
-    let cmd = path + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version + ' -download'
+    let cmd = path + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version
     if (applyPath != '') {
-      cmd = cmd + ' -apply "' + applyPath + '"'
+      cmd = cmd + ' -download -apply "' + applyPath + '"'
     }
 
     const out = execProc(cmd)

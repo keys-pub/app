@@ -47,7 +47,8 @@ export default class UpdateAlert extends React.Component<Props, State> {
 
   componentWillUnmount() {
     ipcRenderer.removeAllListeners('update-needed')
-    ipcRenderer.removeAllListeners('update-err')
+    ipcRenderer.removeAllListeners('update-check-err')
+    ipcRenderer.removeAllListeners('update-apply-err')
   }
 
   close = () => {
@@ -77,7 +78,7 @@ export default class UpdateAlert extends React.Component<Props, State> {
         <Alert onClose={this.close} severity="info">
           <Box>
             <Typography>There is a an update available ({this.state.version}).</Typography>
-            <Link onClick={this.apply}>Apply &amp; Restart</Link>
+            <Link onClick={this.apply}>Download &amp; Restart</Link>
           </Box>
         </Alert>
       </Snackbar>
