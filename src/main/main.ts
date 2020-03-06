@@ -77,7 +77,7 @@ app.on('ready', async () => {
     },
   }
 
-  if (process.platform !== 'darwin') {
+  if (process.platform == 'darwin') {
     winOpts.titleBarStyle = 'hidden'
   } else {
     winOpts.frame = false
