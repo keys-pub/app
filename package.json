@@ -17,11 +17,12 @@
     "pretest:e2e": "yarn run build",
     "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "yarn run build && electron-builder --dir",
-    "dist": "yarn run build && electron-builder",
+    "dist": "yarn run build && yarn run resources && electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "version": "echo $npm_package_version",
-    "prepare": "./scripts/prepare.sh",
-    "release": "yarn run build && yarn run prepare && electron-builder --publish always"
+    "resources": "./scripts/resources.sh",
+    "release": "yarn run build && yarn run resources && electron-builder --publish always",
+    "publish": "./scripts/publish.sh"
   },
   "main": "./dist/main.js",
   "build": {
