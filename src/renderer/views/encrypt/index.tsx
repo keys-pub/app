@@ -12,19 +12,18 @@ import SignKeySelectView from '../keys/skselect'
 
 import {remote} from 'electron'
 import {store} from '../../store'
-import {query} from '../state'
 import {debounce} from 'lodash'
 import * as grpc from '@grpc/grpc-js'
 
 import {EncryptState} from '../../reducers/encrypt'
-import {encrypt, RPCState} from '../../rpc/rpc'
+import {RPCState} from '../../rpc/rpc'
 import {client} from '../../rpc/client'
 
 import {Key, RPCError, EncryptFileInput, EncryptFileOutput} from '../../rpc/types'
 
 export type Props = {
   recipients: Key[]
-  signer: string
+  sender: string
   defaultValue: string
   file: string
   fileOut: string
@@ -57,8 +56,8 @@ class EncryptView extends React.Component<Props, State> {
     store.dispatch({type: 'ENCRYPT_RECIPIENTS', payload: {recipients}})
   }
 
-  setSigner = (kid: string) => {
-    store.dispatch({type: 'ENCRYPT_SIGNER', payload: {signer: kid}})
+  setSender = (kid: string) => {
+    store.dispatch({type: 'ENCRYPT_SENDER', payload: {sender: kid}})
   }
 
   setDefaultValue = (v: string) => {
@@ -72,7 +71,7 @@ class EncryptView extends React.Component<Props, State> {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       (this.props.file != prevProps.file ||
-        this.props.signer != prevProps.signer ||
+        this.props.sender != prevProps.sender ||
         this.props.recipients != prevProps.recipients) &&
       this.canEncryptFile()
     ) {
@@ -89,7 +88,7 @@ class EncryptView extends React.Component<Props, State> {
 
     const req: EncryptFileInput = {
       recipients: recs,
-      signer: this.props.signer,
+      sender: this.props.sender,
       in: this.props.file,
       out: fileOut,
     }
@@ -164,8 +163,8 @@ class EncryptView extends React.Component<Props, State> {
         </Box>
         <Divider />
         <SignKeySelectView
-          defaultValue={this.props.signer}
-          onChange={this.setSigner}
+          defaultValue={this.props.sender}
+          onChange={this.setSender}
           disabled={this.state.loading}
           placeholder="Anonymous"
           itemLabel="Signed by"
@@ -232,7 +231,7 @@ class EncryptView extends React.Component<Props, State> {
             <EncryptedView
               recipients={this.props.recipients}
               value={this.state.value}
-              signer={this.props.signer}
+              sender={this.props.sender}
             />
           )}
         </Box>
@@ -244,7 +243,7 @@ class EncryptView extends React.Component<Props, State> {
 const mapStateToProps = (state: {rpc: RPCState; encrypt: EncryptState; router: any}, ownProps: any) => {
   return {
     recipients: state.encrypt.recipients || [],
-    signer: state.encrypt.signer || '',
+    sender: state.encrypt.sender || '',
     defaultValue: state.encrypt.value || '',
     file: state.encrypt.file || '',
     fileOut: state.encrypt.fileOut || '',

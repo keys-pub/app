@@ -14,7 +14,7 @@ import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   fileOut: string
-  signer: Key
+  sender: Key
   error: string
 }
 
@@ -35,12 +35,12 @@ export default class DecryptedFileView extends React.Component<Props, State> {
       stylesInput.color = 'red'
     } else {
       value = this.props.fileOut
-      unsigned = !disabled && !this.props.signer
+      unsigned = !disabled && !this.props.sender
     }
 
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.props.signer} unsigned={unsigned} />
+        <SignerView signer={this.props.sender} unsigned={unsigned} />
         <Divider />
         <Box style={{paddingLeft: 10, paddingTop: 10}}>
           <Typography style={{...styles.mono, ...stylesInput, display: 'inline'}}>{value}&nbsp;</Typography>

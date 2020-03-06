@@ -4,14 +4,14 @@ export type DecryptState = {
   value: string
   file: string
   fileOut: string
-  fileSigner: Key | void
+  fileSender: Key | void
 }
 
 const initialState: DecryptState = {
   value: '',
   file: '',
   fileOut: '',
-  fileSigner: null,
+  fileSender: null,
 }
 
 type actionType = {
@@ -35,7 +35,7 @@ export default function reducer(state: DecryptState = initialState, action: acti
       return {
         ...state,
         fileOut: action.payload.fileOut,
-        fileSigner: action.payload.fileSigner,
+        fileSender: action.payload.fileSender,
       }
     case 'DECRYPT_CLEAR':
       return {
@@ -43,7 +43,7 @@ export default function reducer(state: DecryptState = initialState, action: acti
         value: '',
         file: '',
         fileOut: '',
-        fileSigner: null,
+        fileSender: null,
       }
     default:
       return state

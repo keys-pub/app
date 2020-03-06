@@ -2,7 +2,7 @@ import {Key} from '../rpc/types'
 
 export type EncryptState = {
   recipients: Key[]
-  signer: string
+  sender: string
   value: string
   file: string
   fileOut: string
@@ -10,7 +10,7 @@ export type EncryptState = {
 
 const initialState: EncryptState = {
   recipients: [],
-  signer: '',
+  sender: '',
   value: '',
   file: '',
   fileOut: '',
@@ -28,10 +28,10 @@ export default function reducer(state: EncryptState = initialState, action: acti
         ...state,
         recipients: action.payload.recipients,
       }
-    case 'ENCRYPT_SIGNER':
+    case 'ENCRYPT_SENDER':
       return {
         ...state,
-        signer: action.payload.signer,
+        sender: action.payload.sender,
       }
     case 'ENCRYPT_VALUE':
       return {
@@ -52,7 +52,7 @@ export default function reducer(state: EncryptState = initialState, action: acti
       return {
         ...state,
         recipients: [],
-        signer: '',
+        sender: '',
         value: '',
         file: '',
         fileOut: '',

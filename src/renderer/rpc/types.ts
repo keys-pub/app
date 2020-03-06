@@ -210,8 +210,8 @@ export interface EncryptRequest {
     armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Signer to sign as. Or empty, if anonymous.
-    signer?: string;
+    // Sender, or empty, if anonymous.
+    sender?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
@@ -229,8 +229,8 @@ export interface EncryptFileInput {
     armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Signer to sign as. Or empty, if anonymous.
-    signer?: string;
+    // Sender, or empty, if anonymous.
+    sender?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
@@ -247,8 +247,8 @@ export interface EncryptInput {
     armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Signer to sign as. Or empty, if anonymous.
-    signer?: string;
+    // Sender, or empty, if anonymous.
+    sender?: string;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
@@ -270,7 +270,7 @@ export interface DecryptRequest {
 export interface DecryptResponse {
     // Data (if out is not specified in request).
     data?: Uint8Array;
-    signer?: Key;
+    sender?: Key;
 }
 
 export interface DecryptFileInput {
@@ -285,7 +285,7 @@ export interface DecryptFileInput {
 }
 
 export interface DecryptFileOutput {
-    signer?: Key;
+    sender?: Key;
     out?: string;
     bytes?: number;
     total?: number;
@@ -299,7 +299,7 @@ export interface DecryptInput {
 export interface DecryptOutput {
     // Data, decrypted. If empty, is EOF.
     data?: Uint8Array;
-    signer?: Key;
+    sender?: Key;
 }
 
 export interface RuntimeStatusRequest {

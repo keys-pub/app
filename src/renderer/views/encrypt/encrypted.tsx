@@ -30,7 +30,7 @@ import {CSSProperties} from '@material-ui/styles'
 export type Props = {
   value: string
   recipients: Key[]
-  signer: string
+  sender: string
 }
 
 type State = {
@@ -57,7 +57,7 @@ export default class EncryptedView extends React.Component<Props, State> {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       this.props.value != prevProps.value ||
-      this.props.signer != prevProps.signer ||
+      this.props.sender != prevProps.sender ||
       this.props.recipients != prevProps.recipients
     ) {
       this.debounceEncrypt()
@@ -80,7 +80,7 @@ export default class EncryptedView extends React.Component<Props, State> {
       data: data,
       armored: true,
       recipients: recs,
-      signer: this.props.signer,
+      sender: this.props.sender,
     }
     const cl = await client()
     cl.encrypt(req, (err: RPCError, resp: EncryptResponse) => {

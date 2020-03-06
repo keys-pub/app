@@ -24,7 +24,7 @@ export type Props = {
   defaultValue: string
   file: string
   fileOut: string
-  fileSigner: Key
+  fileSender: Key
 }
 
 type State = {
@@ -75,7 +75,7 @@ class DecryptView extends React.Component<Props, State> {
     this.decrypter = cl.decryptFile()
     this.decrypter.on('data', (dec: DecryptFileOutput) => {
       console.log('Decrypt:', dec)
-      store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: dec.out, fileSigner: dec.signer}})
+      store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: dec.out, fileSender: dec.sender}})
       this.setState({loading: false})
     })
     this.decrypter.on('error', (err: RPCError) => {
@@ -119,7 +119,7 @@ class DecryptView extends React.Component<Props, State> {
     this.cancel()
     this.setState({fileError: ''})
     store.dispatch({type: 'DECRYPT_FILE', payload: {file: ''}})
-    store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: '', fileSigner: null}})
+    store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: '', fileSender: null}})
   }
 
   render() {
@@ -184,7 +184,7 @@ class DecryptView extends React.Component<Props, State> {
             (this.props.fileOut && (
               <DecryptedFileView
                 fileOut={this.props.fileOut}
-                signer={this.props.fileSigner}
+                sender={this.props.fileSender}
                 error={this.state.fileError}
               />
             ))}
@@ -200,7 +200,7 @@ const mapStateToProps = (state: {rpc: RPCState; decrypt: DecryptState; router: a
     defaultValue: state.decrypt.value || '',
     file: state.decrypt.file || '',
     fileOut: state.decrypt.fileOut || '',
-    fileSigner: state.decrypt.fileSigner || null,
+    fileSender: state.decrypt.fileSender || null,
   }
 }
 

@@ -262,8 +262,8 @@ message EncryptRequest {
   bool armored = 10;
   // Recipients to encrypt to.
   repeated string recipients = 11;  
-  // Signer to sign as. Or empty, if anonymous.
-  string signer = 12;  
+  // Sender, or empty, if anonymous.
+  string sender = 12;  
   // Mode is the encryption mode.
   EncryptMode mode = 13;
 }
@@ -280,8 +280,8 @@ message EncryptFileInput {
   bool armored = 10;
   // Recipients to encrypt to.
   repeated string recipients = 11;  
-  // Signer to sign as. Or empty, if anonymous.
-  string signer = 12;  
+  // Sender, or empty, if anonymous.
+  string sender = 12;  
   // Mode is the encryption mode.
   EncryptMode mode = 13;
 }
@@ -298,8 +298,8 @@ message EncryptInput {
   bool armored = 2;
   // Recipients to encrypt to.
   repeated string recipients = 3;  
-  // Signer to sign as. Or empty, if anonymous.
-  string signer = 4;  
+  // Sender, or empty, if anonymous.
+  string sender = 4;  
   // Mode is the encryption mode.
   EncryptMode mode = 5;
 }
@@ -320,7 +320,7 @@ message DecryptRequest {
 message DecryptResponse {
   // Data (if out is not specified in request).
   bytes data = 1;
-  Key signer = 2;
+  Key sender = 2;
 }
 
 message DecryptFileInput {
@@ -334,7 +334,7 @@ message DecryptFileInput {
   EncryptMode mode = 13;
 }
 message DecryptFileOutput {
-  Key signer = 1;
+  Key sender = 1;
   string out = 2;
   int32 bytes = 3;
   int32 total = 4;
@@ -347,7 +347,7 @@ message DecryptInput {
 message DecryptOutput {
   // Data, decrypted. If empty, is EOF.
   bytes data = 1;
-  Key signer = 2;
+  Key sender = 2;
 }
 
 message RuntimeStatusRequest {}
