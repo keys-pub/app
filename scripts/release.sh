@@ -7,4 +7,11 @@ dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 if [[ -d release ]]; then
     rm -rf release
 fi
-yarn release
+
+# afterAllArtifactBuild, publish is not working in electron-builder
+#yarn release
+
+yarn dist
+./scripts/publish.sh
+
+echo "Release cask?"
