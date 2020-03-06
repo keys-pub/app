@@ -53,6 +53,7 @@
       ]
     },
     "afterSign": "./scripts/notarize.js",
+    "afterAllArtifactBuild": "./scripts/fix.js",
     "mac": {
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
@@ -60,6 +61,10 @@
       "entitlementsInherit": "resources/entitlements.mac.plist",
       "publish": [
         "github"
+      ],
+      "target": [
+        "dmg",
+        "zip"
       ]
     },
     "win": {
