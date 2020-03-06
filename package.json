@@ -1,7 +1,7 @@
 {
   "name": "keys",
   "productName": "Keys",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Key management, signing and encryption.",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config configs/webpack.main.prod.config.js",
