@@ -4,7 +4,7 @@
  * through IPC.
  */
 
-import {app, BrowserWindow, ipcMain} from 'electron'
+import {app, BrowserWindow, ipcMain, BrowserWindowConstructorOptions} from 'electron'
 
 import MenuBuilder from './menu'
 
@@ -62,10 +62,7 @@ app.on('ready', async () => {
     defaultHeight: 600,
   })
 
-  // Read about Electron security here:
-  // https://github.com/electron/electron/blob/master/docs/tutorial/security.md
-  // TODO: Double check recommendations again
-  mainWindow = new BrowserWindow({
+  let winOpts: BrowserWindowConstructorOptions = {
     show: false,
     x: ws.x,
     y: ws.y,
@@ -73,12 +70,23 @@ app.on('ready', async () => {
     height: ws.height,
     minWidth: 920,
     minHeight: 600,
-    titleBarStyle: 'hidden',
+
     webPreferences: {
       // TODO: Remove this
       nodeIntegration: true,
     },
-  })
+  }
+
+  if (process.platform !== 'darwin') {
+    winOpts.titleBarStyle = 'hidden'
+  } else {
+    winOpts.frame = false
+  }
+
+  // Read about Electron security here:
+  // https://github.com/electron/electron/blob/master/docs/tutorial/security.md
+  // TODO: Double check recommendations again
+  mainWindow = new BrowserWindow(winOpts)
 
   ws.manage(mainWindow)
 
