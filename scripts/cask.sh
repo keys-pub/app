@@ -20,7 +20,6 @@ echo "cask 'keys' do
     sha256 '${sha256}'
   
     url \"https://github.com/keys-pub/app/releases/download/v#{version}/Keys-#{version}-mac.zip\"
-    appcast 'https://github.com/keys-pub/app/releases.atom'
     name 'Keys'
     homepage 'https://keys.pub'
 
@@ -42,3 +41,6 @@ echo "cask 'keys' do
 end" > keys.rb
 
 cp keys.rb ../../../homebrew-tap/Casks
+cd ../../../homebrew-tap
+git commit -a -m "Brew cask update"
+git push
