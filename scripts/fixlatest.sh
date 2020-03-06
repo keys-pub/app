@@ -10,6 +10,8 @@ ver=`yarn run -s version`
 zip=Keys-${ver}-mac.zip
 dmg=Keys-${ver}.dmg
 
+cat release/latest-mac.yml
+
 echo "Re-building latest-mac.yml"
 ./node_modules/app-builder-bin/mac/app-builder blockmap -i release/$zip -o /tmp/tmp.zip > /tmp/bm-zip.json
 
@@ -33,3 +35,6 @@ files:
 path: ${zip}
 sha512: ${zip_sha512}
 releaseDate: '${isodate}'" > release/latest-mac.yml
+
+echo "After:"
+cat release/latest-mac.yml

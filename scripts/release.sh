@@ -9,9 +9,11 @@ if [[ -d release ]]; then
 fi
 
 # afterAllArtifactBuild, publish is not working in electron-builder
+# "afterAllArtifactBuild": "./scripts/fix.js",
 #yarn release
 
 yarn dist
+./scripts/fix.sh
 ./scripts/publish.sh
 
 echo "Release cask?"

@@ -54,7 +54,6 @@
       ]
     },
     "afterSign": "./scripts/notarize.js",
-    "afterAllArtifactBuild": "./scripts/fix.js",
     "mac": {
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
