@@ -4,20 +4,16 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 
 import Header from './header'
 
-import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 import {client} from '../../rpc/client'
 
-import * as electron from 'electron'
-
 import {initializeClient} from '../../rpc/client'
+import {store} from '../../store'
 
 import {RPCError} from '../../rpc/rpc'
 import {AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
 
-type Props = {
-  dispatch: (action: any) => any
-}
+type Props = {}
 
 type State = {
   password: string
@@ -25,7 +21,7 @@ type State = {
   error: string
 }
 
-class AuthUnlockView extends React.Component<Props, State> {
+export default class AuthUnlockView extends React.Component<Props, State> {
   state = {
     password: '',
     loading: false,
@@ -110,11 +106,9 @@ class AuthUnlockView extends React.Component<Props, State> {
       initializeClient(resp.authToken)
       setTimeout(() => {
         this.setState({loading: false})
-        this.props.dispatch({type: 'UNLOCK'})
-        this.props.dispatch(push('/keys/index'))
+        store.dispatch({type: 'UNLOCK'})
+        store.dispatch(push('/keys/index'))
       }, 100)
     })
   }
 }
-
-export default connect()(AuthUnlockView)

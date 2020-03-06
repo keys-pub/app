@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
-import {Splash} from '../../components'
+import AuthSplash from './splash'
 import ErrorsView from '../../errors'
 
 import {client} from '../../rpc/client'
@@ -12,34 +12,20 @@ import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/t
 type Props = {}
 
 type State = {
+  loading: boolean
   authSetupNeeded: boolean
   error: RPCError | void
-  loading: boolean
-  waiting: boolean
-}
-
-const sleep = milliseconds => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 export default class AuthView extends React.Component<Props, State> {
   state = {
+    loading: true,
     authSetupNeeded: false,
     error: null,
-    loading: true,
-    waiting: false,
   }
 
   componentDidMount() {
     this.refresh()
-    this.checkWaiting()
-  }
-
-  checkWaiting = async () => {
-    await sleep(2000)
-    if (this.state.loading) {
-      this.setState({waiting: true})
-    }
   }
 
   refresh = async () => {
@@ -58,9 +44,8 @@ export default class AuthView extends React.Component<Props, State> {
     if (this.state.error) {
       return <ErrorsView error={this.state.error} />
     }
-    if (this.state.loading && !this.state.waiting) return null
     if (this.state.loading) {
-      return <Splash delay={1000} />
+      return <AuthSplash />
     }
 
     if (this.state.authSetupNeeded) {

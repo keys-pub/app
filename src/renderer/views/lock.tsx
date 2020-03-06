@@ -7,6 +7,7 @@ import {Routes, routesMap} from './routes'
 import UpdateSplash from './update/splash'
 
 import Auth from './auth'
+import AuthSplash from './auth/splash'
 import AppHeader from './header'
 import Nav from './nav'
 
@@ -44,7 +45,7 @@ class Lock extends React.Component<Props> {
     }
 
     if (this.props.path == '/') {
-      return null
+      return <AuthSplash />
     }
 
     console.log('Path:', this.props.path + this.props.query)
@@ -61,7 +62,7 @@ class Lock extends React.Component<Props> {
 
     console.log('Unlocked:', this.props.unlocked)
 
-    if (!this.props.unlocked || this.props.path == '/' || this.props.path.startsWith('/auth')) {
+    if (!this.props.unlocked || this.props.path.startsWith('/auth')) {
       return <Auth />
     }
 
