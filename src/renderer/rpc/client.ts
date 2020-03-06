@@ -33,6 +33,13 @@ const loadCertPath = (): string => {
       const homeDir = os.homedir()
       supportDir = path.join(homeDir, '.local', 'share')
     }
+  } else if (os.platform() == 'win32') {
+    if (process.env.LOCALAPPDATA) {
+      supportDir = process.env.LOCALAPPDATA
+    } else {
+      const homeDir = os.homedir()
+      supportDir = path.join(homeDir, 'AppData', 'Roaming')
+    }
   } else {
     supportDir = remote.app.getPath('appData')
   }
@@ -40,7 +47,7 @@ const loadCertPath = (): string => {
   const appSupportDir = path.join(supportDir, appName)
 
   console.log('App support path:', appSupportDir)
-  return appSupportDir + '/ca.pem'
+  return path.join(appSupportDir, 'ca.pem')
 }
 
 // Path to resources directory
