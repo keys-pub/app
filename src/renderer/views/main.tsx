@@ -80,7 +80,7 @@ class Main extends React.Component<Props> {
     }
 
     return (
-      <Box>
+      <Box display="flex" flexDirection="column" flex={1}>
         <Header navMinimize={this.props.navMinimize} lock={!isCover} back={!isCover} />
         {view}
         <UpdateAlert />

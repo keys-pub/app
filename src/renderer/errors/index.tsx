@@ -27,7 +27,6 @@ export default class ErrorsView extends React.Component<Props> {
           height: '100%',
         }}
       >
-        <Box className="drag" style={{width: '100%', height: 40, cursor: 'move'}} />
         <ErrorView error={this.props.error} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
           <Button color="secondary" variant="contained" onClick={this.restart}>

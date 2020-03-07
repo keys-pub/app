@@ -1,9 +1,6 @@
 import * as React from 'react'
 
 import {Box, Divider, LinearProgress, Typography} from '@material-ui/core'
-import {Lock} from '@material-ui/icons'
-
-import {styles} from '../../components'
 
 type Props = {
   loading: boolean

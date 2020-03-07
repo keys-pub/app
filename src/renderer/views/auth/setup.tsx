@@ -13,7 +13,7 @@ import {
 
 import {styles} from '../../components'
 
-import Logo from './logo'
+import Logo from '../logo'
 
 import {client} from '../../rpc/client'
 

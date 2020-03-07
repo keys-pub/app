@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
-import Logo from './logo'
+import Logo from '../logo'
 
 import {push} from 'connected-react-router'
 import {client} from '../../rpc/client'
