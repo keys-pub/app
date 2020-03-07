@@ -13,7 +13,6 @@ type Props = {
 export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" style={{width: '100%', paddingBottom: 20}}>
-      <Box className="drag" style={{height: 40, cursor: 'move'}} />
       <Box style={{height: props.top || 0}} />
       <Box display="flex" flexDirection="row" style={{alignSelf: 'center'}}>
         <Typography

@@ -13,7 +13,7 @@ import {
 
 import {styles} from '../../components'
 
-import Header from './header'
+import Logo from './logo'
 
 import {client} from '../../rpc/client'
 
@@ -66,7 +66,7 @@ class AuthSetupView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
-        <Header loading={this.state.loading} top={60} />
+        <Logo loading={this.state.loading} top={60} />
         <Typography style={{paddingTop: 0, paddingBottom: 20, width: 550}}>
           Hi! Let's create a password. This password will be used to unlock your local keyring and secure your
           keys. This password is not stored or transmitted anywhere.

@@ -6,8 +6,7 @@ import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
-import Lock from './lock'
-import UpdateAlert from './update/alert'
+import Main from './main'
 
 import {store, history} from '../store/index'
 
@@ -98,8 +97,7 @@ export default class Root extends React.Component {
       <ThemeProvider theme={theme}>
         <Provider store={store}>
           <ConnectedRouter history={history}>
-            <Lock />
-            <UpdateAlert />
+            <Main />
           </ConnectedRouter>
         </Provider>
       </ThemeProvider>

@@ -8,38 +8,39 @@ import UpdateSplash from './update/splash'
 
 import Auth from './auth'
 import AuthSplash from './auth/splash'
-import AppHeader from './header'
 import Nav from './nav'
+import Header from './header'
 
 import {connect} from 'react-redux'
 
 import {Box} from '@material-ui/core'
 import ErrorsView from '../errors'
+import UpdateAlert from './update/alert'
 
 type Props = {
   error: Error | void
+  navMinimize: boolean
   path: string
   query: string
   unlocked: boolean
   updating: boolean
 }
 
-class Lock extends React.Component<Props> {
-  renderApp() {
+class Main extends React.Component<Props> {
+  app() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
         <Box display="flex" flexGrow={0} flexShrink={0}>
           <Nav />
         </Box>
         <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-          <AppHeader />
           <Routes />
         </Box>
       </Box>
     )
   }
 
-  render() {
+  cover() {
     if (this.props.error) {
       return <ErrorsView error={this.props.error} />
     }
@@ -66,13 +67,32 @@ class Lock extends React.Component<Props> {
       return <Auth />
     }
 
-    return this.renderApp()
+    return null
+  }
+
+  render() {
+    let view = this.cover()
+    let isCover = true
+
+    if (!view) {
+      view = this.app()
+      isCover = false
+    }
+
+    return (
+      <Box>
+        <Header navMinimize={this.props.navMinimize} lock={!isCover} back={!isCover} />
+        {view}
+        <UpdateAlert />
+      </Box>
+    )
   }
 }
 
 const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => {
   return {
     error: state.app.error,
+    navMinimize: state.app.navMinimize,
     path: state.router.location.pathname,
     query: state.router.location.search,
     unlocked: state.app.unlocked,
@@ -80,4 +100,4 @@ const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => 
   }
 }
 
-export default connect(mapStateToProps)(Lock)
+export default connect(mapStateToProps)(Main)

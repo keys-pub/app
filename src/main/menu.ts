@@ -46,6 +46,12 @@ export default class MenuBuilder {
             this.mainWindow.webContents.inspectElement(x, y)
           },
         },
+        {
+          label: 'Reload',
+          click: () => {
+            this.mainWindow.webContents.reload()
+          },
+        },
       ]).popup({window: this.mainWindow})
     })
   }
@@ -166,7 +172,7 @@ export default class MenuBuilder {
       },
     ]
 
-    const templateDefault = [      
+    const templateDefault = [
       {
         label: '&View',
         submenu: subMenuView,
