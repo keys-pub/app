@@ -95,6 +95,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
     // Use client directly to prevent logging the request (password)
     cl.authUnlock(req, (err: RPCError | void, resp: AuthUnlockResponse | void) => {
       if (err) {
+        console.error('Unlock error:', err)
         this.setState({loading: false, error: err.details})
         return
       }

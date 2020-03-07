@@ -31,11 +31,13 @@ export default class AuthView extends React.Component<Props, State> {
   refresh = async () => {
     const req: RuntimeStatusRequest = {}
     const cl = await client()
+    console.log('Status...')
     cl.runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
       if (err) {
-        this.setState({error: err})
+        this.setState({loading: false, error: err})
         return
       }
+      console.log('Auth setup needed:', resp.authSetupNeeded)
       this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
     })
   }
