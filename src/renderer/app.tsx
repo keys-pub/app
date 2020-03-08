@@ -55,7 +55,7 @@ ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {
     // console.log(util.inspect(err))
-    alert('Oops, exec error (' + err.code + ') ' + err.cmd)
+    alert('Oops, exec error (' + err.code + ') ' + err.cmd + '; ' + err.toString())
     remote.app.exit(2)
   }
   start()
