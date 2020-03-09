@@ -5,7 +5,7 @@ export const keysStart = (): Promise<any> => {
   let path = ''
 
   if (process.env.NODE_ENV === 'production') {
-    path = binPath('bin/keys')
+    path = binPath('keys')
   }
 
   if (process.env.KEYS_BIN) {
@@ -22,7 +22,7 @@ export const keysStart = (): Promise<any> => {
 
 export const keysd = (): Promise<any> => {
   if (process.env.NODE_ENV === 'production') {
-    const servicePath = binPath('bin/keysd')
+    const servicePath = binPath('keysd')
     return spawnProc(servicePath, true)
   }
 

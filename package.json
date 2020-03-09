@@ -19,7 +19,7 @@
     "pack": "yarn run build && electron-builder --dir",
     "dist": "yarn run build && yarn run resources && electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "version": "echo $npm_package_version",
+    "version": "cross-var echo $npm_package_version",
     "resources": "./scripts/resources.sh",
     "release": "yarn run build && yarn run resources && electron-builder --publish always",
     "publish": "./scripts/publish.sh"
@@ -34,10 +34,13 @@
       "package.json"
     ],
     "extraResources": [
-      "src/renderer/rpc/keys.proto",
+      "src/main/rpc/keys.proto",
       "bin/keysd",
       "bin/keys",
-      "bin/updater"
+      "bin/updater",
+      "bin/keysd.exe",
+      "bin/keys.exe",
+      "bin/updater.exe"
     ],
     "dmg": {
       "contents": [
@@ -72,7 +75,6 @@
         "github"
       ],
       "target": [
-        "nsis",
         "msi"
       ]
     },
@@ -144,6 +146,7 @@
     "babel-loader": "^8.0.2",
     "cross-env": "^7.0.0",
     "cross-spawn": "^7.0.0",
+    "cross-var": "^1.1.0",
     "css-loader": "^3.2.0",
     "electron": "^8.0.1",
     "electron-builder": "^22.1.0",

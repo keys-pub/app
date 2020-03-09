@@ -34,7 +34,7 @@ export const update = (apply: boolean): Promise<Update> => {
     let path = ''
 
     if (process.env.NODE_ENV === 'production') {
-      path = binPath('bin/updater')
+      path = binPath('updater')
     }
 
     if (process.env.UPDATER_BIN) {

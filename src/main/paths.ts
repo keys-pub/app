@@ -4,7 +4,6 @@ import * as os from 'os'
 
 // Path to resources directory
 export const appResourcesPath = (): string => {
-  if (os.platform() !== 'darwin') return '.'
   let resourcesPath = app.getAppPath()
   if (path.extname(resourcesPath) === '.asar') {
     resourcesPath = path.dirname(resourcesPath)
@@ -13,18 +12,51 @@ export const appResourcesPath = (): string => {
   return resourcesPath
 }
 
+export const appSupportPath = (appName: string): string => {
+  let supportDir
+  if (os.platform() == 'linux') {
+    if (process.env.XDG_DATA_HOME) {
+      supportDir = process.env.XDG_DATA_HOME
+    } else {
+      const homeDir = os.homedir()
+      supportDir = path.join(homeDir, '.local', 'share')
+    }
+  } else if (os.platform() == 'win32') {
+    if (process.env.LOCALAPPDATA) {
+      supportDir = process.env.LOCALAPPDATA
+    } else {
+      const homeDir = os.homedir()
+      supportDir = path.join(homeDir, 'AppData', 'Roaming')
+    }
+  } else {
+    supportDir = app.getPath('appData')
+  }
+
+  const p = path.join(supportDir, appName)
+  console.log('App support path:', p)
+  return p
+}
+
 // Path to app
 export const appPath = (): string => {
-  if (os.platform() !== 'darwin') return '.'
   const resourcesPath = appResourcesPath()
-  const appPath = path.resolve(resourcesPath, '..', '..')
+  let appPath
+  switch (os.platform()) {
+    case 'darwin': 
+      appPath = path.resolve(resourcesPath, '..', '..')
+      break
+    case 'win32':
+      appPath = path.resolve(resourcesPath, '..')
+      break
+    default:
+      throw new Error('unsupported platform')
+  }
   console.log('App path:', appPath)
   return appPath
 }
 
 // Path to an executable
-export const binPath = (name: string): string => {
-  if (os.platform() !== 'darwin') return name
+export const binPath = (name: string): string => { 
   const resourcesPath = appResourcesPath()
-  return path.resolve(resourcesPath, name)
+  return path.join(resourcesPath, "bin", name)
 }

@@ -9,6 +9,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import {app} from 'electron'
+import {appResourcesPath, appSupportPath} from '../paths'
 
 let rpcClient: any = null
 
@@ -18,46 +19,12 @@ const getAppName = (): string => {
 
 const loadCertPath = (): string => {
   const appName: string = getAppName()
-
-  let supportDir
-  if (os.platform() == 'linux') {
-    if (process.env.XDG_DATA_HOME) {
-      supportDir = process.env.XDG_DATA_HOME
-    } else {
-      const homeDir = os.homedir()
-      supportDir = path.join(homeDir, '.local', 'share')
-    }
-  } else if (os.platform() == 'win32') {
-    if (process.env.LOCALAPPDATA) {
-      supportDir = process.env.LOCALAPPDATA
-    } else {
-      const homeDir = os.homedir()
-      supportDir = path.join(homeDir, 'AppData', 'Roaming')
-    }
-  } else {
-    supportDir = app.getPath('appData')
-  }
-
-  const appSupportDir = path.join(supportDir, appName)
-
-  console.log('App support path:', appSupportDir)
-  return path.join(appSupportDir, 'ca.pem')
-}
-
-// Path to resources directory
-export const appResourcesPath = (): string => {
-  if (os.platform() !== 'darwin') return '.'
-  let resourcesPath = app.getAppPath()
-  if (path.extname(resourcesPath) === '.asar') {
-    resourcesPath = path.dirname(resourcesPath)
-  }
-  console.log('Resources path:', resourcesPath)
-  return resourcesPath
+  return path.join(appSupportPath(appName), 'ca.pem')
 }
 
 const resolveProtoPath = (): string => {
   // Check in resources, otherwise use current path
-  const protoInResources = appResourcesPath() + '/src/main/rpc/keys.proto'
+  const protoInResources = path.join(appResourcesPath(), 'src', 'main', 'rpc', 'keys.proto')
   if (fs.existsSync(protoInResources)) return protoInResources
   return './src/main/rpc/keys.proto'
 }
