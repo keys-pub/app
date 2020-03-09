@@ -213,10 +213,21 @@ type RPCReply = {
   resp: any
 }
 
+const convertErr = (err: any): RPCError => {
+  if (!err) return null
+  // Need to convert err to an object type.
+  // TODO: what if source err is not RPCError?
+  return {
+    code: err.code,
+    message: err.message,
+    details: err.details,
+  }
+}
+
 const rpc = (cl, f): Promise<RPCReply> => {
   return new Promise((resolve, reject) => {
-    cl[f.method](f.args, (err: RPCError, resp: any) => {
-      resolve({err: err, resp: resp})
+    cl[f.method](f.args, (err: any, resp: any) => {
+      resolve({err: convertErr(err), resp: resp})
     })
   })
 }
@@ -225,9 +236,13 @@ ipcMain.on('rpc', async (event, arg) => {
   const f = arg as RPC
   const cl = await client()
   console.log('rpc', f.reply)
-  const out = await rpc(cl, f)
-  console.log('rpc reply', f.reply)
-  event.reply(f.reply, out as RPCReply)
+  const out: RPCReply = await rpc(cl, f)
+  if (out.err) {
+    console.error('rpc err', f.reply, out.err)
+  } else {
+    console.log('rpc reply', f.reply)
+  }
+  event.reply(f.reply, out)
 })
 
 ipcMain.on('authToken', (event, arg) => {
@@ -250,9 +265,9 @@ ipcMain.on('rpc-stream', async (event, arg) => {
     console.log('rpc-stream data', f.reply)
     event.reply(f.reply, {resp: resp} as RPCStreamReply)
   })
-  stream.on('error', (err: RPCError) => {
+  stream.on('error', err => {
     console.log('rpc-stream err', f.reply)
-    event.reply(f.reply, {err: err})
+    event.reply(f.reply, {err: convertErr(err)})
     // TODO: Cleanup stream?
   })
   stream.on('end', () => {

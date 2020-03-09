@@ -108,591 +108,845 @@ const replyID = (): string => {
   return randomBytes(20).toString('hex')
 }
 
-export const keyGenerate = (
-  req: KeyGenerateRequest,
-  cb: (err: RPCError, resp: KeyGenerateResponse) => void
-) => {
+export type ErrHandler = (err: RPCError) => void
+var errHandler: ErrHandler = (err: RPCError) => {}
+export const setErrHandler = (eh: ErrHandler) => {
+  errHandler = eh
+}
+
+export const keyGenerate = (req: KeyGenerateRequest, cb: (err: RPCError, resp: KeyGenerateResponse) => void) => {
   const reply = 'keyGenerate-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (keyGenerate):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (keyGenerate) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (keyGenerate)...')
   ipcRenderer.send('rpc', {method: 'keyGenerate', args: req, reply: reply})
 }
 
-export const keys = (
-  req: KeysRequest,
-  cb: (err: RPCError, resp: KeysResponse) => void
-) => {
+export const keys = (req: KeysRequest, cb: (err: RPCError, resp: KeysResponse) => void) => {
   const reply = 'keys-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (keys):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (keys) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (keys)...')
   ipcRenderer.send('rpc', {method: 'keys', args: req, reply: reply})
 }
 
-export const key = (
-  req: KeyRequest,
-  cb: (err: RPCError, resp: KeyResponse) => void
-) => {
+export const key = (req: KeyRequest, cb: (err: RPCError, resp: KeyResponse) => void) => {
   const reply = 'key-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (key):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (key) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (key)...')
   ipcRenderer.send('rpc', {method: 'key', args: req, reply: reply})
 }
 
-export const keyImport = (
-  req: KeyImportRequest,
-  cb: (err: RPCError, resp: KeyImportResponse) => void
-) => {
+export const keyImport = (req: KeyImportRequest, cb: (err: RPCError, resp: KeyImportResponse) => void) => {
   const reply = 'keyImport-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (keyImport):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (keyImport) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (keyImport)...')
   ipcRenderer.send('rpc', {method: 'keyImport', args: req, reply: reply})
 }
 
-export const keyExport = (
-  req: KeyExportRequest,
-  cb: (err: RPCError, resp: KeyExportResponse) => void
-) => {
+export const keyExport = (req: KeyExportRequest, cb: (err: RPCError, resp: KeyExportResponse) => void) => {
   const reply = 'keyExport-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (keyExport):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (keyExport) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (keyExport)...')
   ipcRenderer.send('rpc', {method: 'keyExport', args: req, reply: reply})
 }
 
-export const keyRemove = (
-  req: KeyRemoveRequest,
-  cb: (err: RPCError, resp: KeyRemoveResponse) => void
-) => {
+export const keyRemove = (req: KeyRemoveRequest, cb: (err: RPCError, resp: KeyRemoveResponse) => void) => {
   const reply = 'keyRemove-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (keyRemove):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (keyRemove) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (keyRemove)...')
   ipcRenderer.send('rpc', {method: 'keyRemove', args: req, reply: reply})
 }
 
-export const sign = (
-  req: SignRequest,
-  cb: (err: RPCError, resp: SignResponse) => void
-) => {
+export const sign = (req: SignRequest, cb: (err: RPCError, resp: SignResponse) => void) => {
   const reply = 'sign-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (sign):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (sign) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (sign)...')
   ipcRenderer.send('rpc', {method: 'sign', args: req, reply: reply})
 }
 
 export const signFile = (req: SignFileInput, cb: (err: RPCError, resp: SignFileOutput, done: boolean) => void) => {
   const reply = 'signFile-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (signFile):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (signFile) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (signFile)...')
   ipcRenderer.send('rpc-stream', {method: 'signFile', args: req, reply: reply})
 }
 
 export const signStream = (req: SignInput, cb: (err: RPCError, resp: SignOutput, done: boolean) => void) => {
   const reply = 'signStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (signStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (signStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (signStream)...')
   ipcRenderer.send('rpc-stream', {method: 'signStream', args: req, reply: reply})
 }
 
-export const verify = (
-  req: VerifyRequest,
-  cb: (err: RPCError, resp: VerifyResponse) => void
-) => {
+export const verify = (req: VerifyRequest, cb: (err: RPCError, resp: VerifyResponse) => void) => {
   const reply = 'verify-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (verify):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (verify) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (verify)...')
   ipcRenderer.send('rpc', {method: 'verify', args: req, reply: reply})
 }
 
 export const verifyFile = (req: VerifyFileInput, cb: (err: RPCError, resp: VerifyFileOutput, done: boolean) => void) => {
   const reply = 'verifyFile-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (verifyFile):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (verifyFile) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (verifyFile)...')
   ipcRenderer.send('rpc-stream', {method: 'verifyFile', args: req, reply: reply})
 }
 
 export const verifyStream = (req: VerifyInput, cb: (err: RPCError, resp: VerifyOutput, done: boolean) => void) => {
   const reply = 'verifyStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (verifyStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (verifyStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (verifyStream)...')
   ipcRenderer.send('rpc-stream', {method: 'verifyStream', args: req, reply: reply})
 }
 
 export const verifyArmoredStream = (req: VerifyInput, cb: (err: RPCError, resp: VerifyOutput, done: boolean) => void) => {
   const reply = 'verifyArmoredStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (verifyArmoredStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (verifyArmoredStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (verifyArmoredStream)...')
   ipcRenderer.send('rpc-stream', {method: 'verifyArmoredStream', args: req, reply: reply})
 }
 
-export const encrypt = (
-  req: EncryptRequest,
-  cb: (err: RPCError, resp: EncryptResponse) => void
-) => {
+export const encrypt = (req: EncryptRequest, cb: (err: RPCError, resp: EncryptResponse) => void) => {
   const reply = 'encrypt-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (encrypt):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (encrypt) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (encrypt)...')
   ipcRenderer.send('rpc', {method: 'encrypt', args: req, reply: reply})
 }
 
 export const encryptStream = (req: EncryptInput, cb: (err: RPCError, resp: EncryptOutput, done: boolean) => void) => {
   const reply = 'encryptStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (encryptStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (encryptStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (encryptStream)...')
   ipcRenderer.send('rpc-stream', {method: 'encryptStream', args: req, reply: reply})
 }
 
 export const encryptFile = (req: EncryptFileInput, cb: (err: RPCError, resp: EncryptFileOutput, done: boolean) => void) => {
   const reply = 'encryptFile-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (encryptFile):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (encryptFile) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (encryptFile)...')
   ipcRenderer.send('rpc-stream', {method: 'encryptFile', args: req, reply: reply})
 }
 
-export const decrypt = (
-  req: DecryptRequest,
-  cb: (err: RPCError, resp: DecryptResponse) => void
-) => {
+export const decrypt = (req: DecryptRequest, cb: (err: RPCError, resp: DecryptResponse) => void) => {
   const reply = 'decrypt-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (decrypt):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (decrypt) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (decrypt)...')
   ipcRenderer.send('rpc', {method: 'decrypt', args: req, reply: reply})
 }
 
 export const decryptFile = (req: DecryptFileInput, cb: (err: RPCError, resp: DecryptFileOutput, done: boolean) => void) => {
   const reply = 'decryptFile-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (decryptFile):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (decryptFile) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (decryptFile)...')
   ipcRenderer.send('rpc-stream', {method: 'decryptFile', args: req, reply: reply})
 }
 
 export const decryptStream = (req: DecryptInput, cb: (err: RPCError, resp: DecryptOutput, done: boolean) => void) => {
   const reply = 'decryptStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (decryptStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (decryptStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (decryptStream)...')
   ipcRenderer.send('rpc-stream', {method: 'decryptStream', args: req, reply: reply})
 }
 
 export const decryptArmoredStream = (req: DecryptInput, cb: (err: RPCError, resp: DecryptOutput, done: boolean) => void) => {
   const reply = 'decryptArmoredStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (decryptArmoredStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (decryptArmoredStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (decryptArmoredStream)...')
   ipcRenderer.send('rpc-stream', {method: 'decryptArmoredStream', args: req, reply: reply})
 }
 
 export const signcryptOpenStream = (req: DecryptInput, cb: (err: RPCError, resp: DecryptOutput, done: boolean) => void) => {
   const reply = 'signcryptOpenStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (signcryptOpenStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (signcryptOpenStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (signcryptOpenStream)...')
   ipcRenderer.send('rpc-stream', {method: 'signcryptOpenStream', args: req, reply: reply})
 }
 
 export const signcryptOpenArmoredStream = (req: DecryptInput, cb: (err: RPCError, resp: DecryptOutput, done: boolean) => void) => {
   const reply = 'signcryptOpenArmoredStream-' + replyID()
-  ipcRenderer.on(reply, (event, arg) => {
+  ipcRenderer.on(reply, (event, arg) => {	
     if (!!arg.done || arg.err) {
       ipcRenderer.removeAllListeners(reply)
     }
+    if (arg.err) {
+      console.error('RPC-stream error (signcryptOpenArmoredStream):', arg.err)
+      errHandler(arg.err)
+    }
+    if (!!arg.done) {
+      console.log('RPC-stream (signcryptOpenArmoredStream) done')
+    }
     cb(arg.err, arg.resp, !!arg.done) 
   })
+  console.log('RPC-stream (signcryptOpenArmoredStream)...')
   ipcRenderer.send('rpc-stream', {method: 'signcryptOpenArmoredStream', args: req, reply: reply})
 }
 
-export const sigchain = (
-  req: SigchainRequest,
-  cb: (err: RPCError, resp: SigchainResponse) => void
-) => {
+export const sigchain = (req: SigchainRequest, cb: (err: RPCError, resp: SigchainResponse) => void) => {
   const reply = 'sigchain-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (sigchain):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (sigchain) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (sigchain)...')
   ipcRenderer.send('rpc', {method: 'sigchain', args: req, reply: reply})
 }
 
-export const statement = (
-  req: StatementRequest,
-  cb: (err: RPCError, resp: StatementResponse) => void
-) => {
+export const statement = (req: StatementRequest, cb: (err: RPCError, resp: StatementResponse) => void) => {
   const reply = 'statement-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (statement):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (statement) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (statement)...')
   ipcRenderer.send('rpc', {method: 'statement', args: req, reply: reply})
 }
 
-export const statementCreate = (
-  req: StatementCreateRequest,
-  cb: (err: RPCError, resp: StatementCreateResponse) => void
-) => {
+export const statementCreate = (req: StatementCreateRequest, cb: (err: RPCError, resp: StatementCreateResponse) => void) => {
   const reply = 'statementCreate-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (statementCreate):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (statementCreate) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (statementCreate)...')
   ipcRenderer.send('rpc', {method: 'statementCreate', args: req, reply: reply})
 }
 
-export const statementRevoke = (
-  req: StatementRevokeRequest,
-  cb: (err: RPCError, resp: StatementRevokeResponse) => void
-) => {
+export const statementRevoke = (req: StatementRevokeRequest, cb: (err: RPCError, resp: StatementRevokeResponse) => void) => {
   const reply = 'statementRevoke-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (statementRevoke):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (statementRevoke) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (statementRevoke)...')
   ipcRenderer.send('rpc', {method: 'statementRevoke', args: req, reply: reply})
 }
 
-export const user = (
-  req: UserRequest,
-  cb: (err: RPCError, resp: UserResponse) => void
-) => {
+export const user = (req: UserRequest, cb: (err: RPCError, resp: UserResponse) => void) => {
   const reply = 'user-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (user):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (user) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (user)...')
   ipcRenderer.send('rpc', {method: 'user', args: req, reply: reply})
 }
 
-export const userSearch = (
-  req: UserSearchRequest,
-  cb: (err: RPCError, resp: UserSearchResponse) => void
-) => {
+export const userSearch = (req: UserSearchRequest, cb: (err: RPCError, resp: UserSearchResponse) => void) => {
   const reply = 'userSearch-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (userSearch):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (userSearch) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (userSearch)...')
   ipcRenderer.send('rpc', {method: 'userSearch', args: req, reply: reply})
 }
 
-export const userService = (
-  req: UserServiceRequest,
-  cb: (err: RPCError, resp: UserServiceResponse) => void
-) => {
+export const userService = (req: UserServiceRequest, cb: (err: RPCError, resp: UserServiceResponse) => void) => {
   const reply = 'userService-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (userService):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (userService) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (userService)...')
   ipcRenderer.send('rpc', {method: 'userService', args: req, reply: reply})
 }
 
-export const userSign = (
-  req: UserSignRequest,
-  cb: (err: RPCError, resp: UserSignResponse) => void
-) => {
+export const userSign = (req: UserSignRequest, cb: (err: RPCError, resp: UserSignResponse) => void) => {
   const reply = 'userSign-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (userSign):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (userSign) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (userSign)...')
   ipcRenderer.send('rpc', {method: 'userSign', args: req, reply: reply})
 }
 
-export const userAdd = (
-  req: UserAddRequest,
-  cb: (err: RPCError, resp: UserAddResponse) => void
-) => {
+export const userAdd = (req: UserAddRequest, cb: (err: RPCError, resp: UserAddResponse) => void) => {
   const reply = 'userAdd-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (userAdd):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (userAdd) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (userAdd)...')
   ipcRenderer.send('rpc', {method: 'userAdd', args: req, reply: reply})
 }
 
-export const item = (
-  req: ItemRequest,
-  cb: (err: RPCError, resp: ItemResponse) => void
-) => {
+export const item = (req: ItemRequest, cb: (err: RPCError, resp: ItemResponse) => void) => {
   const reply = 'item-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (item):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (item) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (item)...')
   ipcRenderer.send('rpc', {method: 'item', args: req, reply: reply})
 }
 
-export const items = (
-  req: ItemsRequest,
-  cb: (err: RPCError, resp: ItemsResponse) => void
-) => {
+export const items = (req: ItemsRequest, cb: (err: RPCError, resp: ItemsResponse) => void) => {
   const reply = 'items-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (items):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (items) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (items)...')
   ipcRenderer.send('rpc', {method: 'items', args: req, reply: reply})
 }
 
-export const pull = (
-  req: PullRequest,
-  cb: (err: RPCError, resp: PullResponse) => void
-) => {
+export const pull = (req: PullRequest, cb: (err: RPCError, resp: PullResponse) => void) => {
   const reply = 'pull-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (pull):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (pull) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (pull)...')
   ipcRenderer.send('rpc', {method: 'pull', args: req, reply: reply})
 }
 
-export const push = (
-  req: PushRequest,
-  cb: (err: RPCError, resp: PushResponse) => void
-) => {
+export const push = (req: PushRequest, cb: (err: RPCError, resp: PushResponse) => void) => {
   const reply = 'push-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (push):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (push) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (push)...')
   ipcRenderer.send('rpc', {method: 'push', args: req, reply: reply})
 }
 
-export const config = (
-  req: ConfigRequest,
-  cb: (err: RPCError, resp: ConfigResponse) => void
-) => {
+export const config = (req: ConfigRequest, cb: (err: RPCError, resp: ConfigResponse) => void) => {
   const reply = 'config-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (config):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (config) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (config)...')
   ipcRenderer.send('rpc', {method: 'config', args: req, reply: reply})
 }
 
-export const configSet = (
-  req: ConfigSetRequest,
-  cb: (err: RPCError, resp: ConfigSetResponse) => void
-) => {
+export const configSet = (req: ConfigSetRequest, cb: (err: RPCError, resp: ConfigSetResponse) => void) => {
   const reply = 'configSet-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (configSet):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (configSet) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (configSet)...')
   ipcRenderer.send('rpc', {method: 'configSet', args: req, reply: reply})
 }
 
-export const authSetup = (
-  req: AuthSetupRequest,
-  cb: (err: RPCError, resp: AuthSetupResponse) => void
-) => {
+export const authSetup = (req: AuthSetupRequest, cb: (err: RPCError, resp: AuthSetupResponse) => void) => {
   const reply = 'authSetup-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (authSetup):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (authSetup) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (authSetup)...')
   ipcRenderer.send('rpc', {method: 'authSetup', args: req, reply: reply})
 }
 
-export const authUnlock = (
-  req: AuthUnlockRequest,
-  cb: (err: RPCError, resp: AuthUnlockResponse) => void
-) => {
+export const authUnlock = (req: AuthUnlockRequest, cb: (err: RPCError, resp: AuthUnlockResponse) => void) => {
   const reply = 'authUnlock-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (authUnlock):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (authUnlock) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (authUnlock)...')
   ipcRenderer.send('rpc', {method: 'authUnlock', args: req, reply: reply})
 }
 
-export const authLock = (
-  req: AuthLockRequest,
-  cb: (err: RPCError, resp: AuthLockResponse) => void
-) => {
+export const authLock = (req: AuthLockRequest, cb: (err: RPCError, resp: AuthLockResponse) => void) => {
   const reply = 'authLock-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (authLock):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (authLock) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (authLock)...')
   ipcRenderer.send('rpc', {method: 'authLock', args: req, reply: reply})
 }
 
-export const runtimeStatus = (
-  req: RuntimeStatusRequest,
-  cb: (err: RPCError, resp: RuntimeStatusResponse) => void
-) => {
+export const runtimeStatus = (req: RuntimeStatusRequest, cb: (err: RPCError, resp: RuntimeStatusResponse) => void) => {
   const reply = 'runtimeStatus-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (runtimeStatus):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (runtimeStatus) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (runtimeStatus)...')
   ipcRenderer.send('rpc', {method: 'runtimeStatus', args: req, reply: reply})
 }
 
-export const rand = (
-  req: RandRequest,
-  cb: (err: RPCError, resp: RandResponse) => void
-) => {
+export const rand = (req: RandRequest, cb: (err: RPCError, resp: RandResponse) => void) => {
   const reply = 'rand-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (rand):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (rand) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (rand)...')
   ipcRenderer.send('rpc', {method: 'rand', args: req, reply: reply})
 }
 
-export const collections = (
-  req: CollectionsRequest,
-  cb: (err: RPCError, resp: CollectionsResponse) => void
-) => {
+export const collections = (req: CollectionsRequest, cb: (err: RPCError, resp: CollectionsResponse) => void) => {
   const reply = 'collections-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (collections):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (collections) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (collections)...')
   ipcRenderer.send('rpc', {method: 'collections', args: req, reply: reply})
 }
 
-export const documents = (
-  req: DocumentsRequest,
-  cb: (err: RPCError, resp: DocumentsResponse) => void
-) => {
+export const documents = (req: DocumentsRequest, cb: (err: RPCError, resp: DocumentsResponse) => void) => {
   const reply = 'documents-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (documents):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (documents) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (documents)...')
   ipcRenderer.send('rpc', {method: 'documents', args: req, reply: reply})
 }
 
-export const documentDelete = (
-  req: DocumentDeleteRequest,
-  cb: (err: RPCError, resp: DocumentDeleteResponse) => void
-) => {
+export const documentDelete = (req: DocumentDeleteRequest, cb: (err: RPCError, resp: DocumentDeleteResponse) => void) => {
   const reply = 'documentDelete-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (documentDelete):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (documentDelete) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (documentDelete)...')
   ipcRenderer.send('rpc', {method: 'documentDelete', args: req, reply: reply})
 }
 
-export const inbox = (
-  req: InboxRequest,
-  cb: (err: RPCError, resp: InboxResponse) => void
-) => {
+export const inbox = (req: InboxRequest, cb: (err: RPCError, resp: InboxResponse) => void) => {
   const reply = 'inbox-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (inbox):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (inbox) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (inbox)...')
   ipcRenderer.send('rpc', {method: 'inbox', args: req, reply: reply})
 }
 
-export const messagePrepare = (
-  req: MessagePrepareRequest,
-  cb: (err: RPCError, resp: MessagePrepareResponse) => void
-) => {
+export const messagePrepare = (req: MessagePrepareRequest, cb: (err: RPCError, resp: MessagePrepareResponse) => void) => {
   const reply = 'messagePrepare-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (messagePrepare):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (messagePrepare) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (messagePrepare)...')
   ipcRenderer.send('rpc', {method: 'messagePrepare', args: req, reply: reply})
 }
 
-export const messageCreate = (
-  req: MessageCreateRequest,
-  cb: (err: RPCError, resp: MessageCreateResponse) => void
-) => {
+export const messageCreate = (req: MessageCreateRequest, cb: (err: RPCError, resp: MessageCreateResponse) => void) => {
   const reply = 'messageCreate-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (messageCreate):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (messageCreate) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (messageCreate)...')
   ipcRenderer.send('rpc', {method: 'messageCreate', args: req, reply: reply})
 }
 
-export const messages = (
-  req: MessagesRequest,
-  cb: (err: RPCError, resp: MessagesResponse) => void
-) => {
+export const messages = (req: MessagesRequest, cb: (err: RPCError, resp: MessagesResponse) => void) => {
   const reply = 'messages-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (messages):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (messages) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (messages)...')
   ipcRenderer.send('rpc', {method: 'messages', args: req, reply: reply})
 }
 
-export const watch = (
-  req: WatchRequest,
-  cb: (err: RPCError, resp: WatchEvent) => void
-) => {
+export const watch = (req: WatchRequest, cb: (err: RPCError, resp: WatchEvent) => void) => {
   const reply = 'watch-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
-    ipcRenderer.removeAllListeners(reply)
+	ipcRenderer.removeAllListeners(reply)
+    if (arg.err) {
+      console.error('RPC error (watch):', arg.err)
+      errHandler(arg.err)
+    } else {
+      console.log('RPC (watch) done')
+    }
     cb(arg.err, arg.resp)
   })
+  console.log('RPC (watch)...')
   ipcRenderer.send('rpc', {method: 'watch', args: req, reply: reply})
 }
 

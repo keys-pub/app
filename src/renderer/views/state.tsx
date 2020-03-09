@@ -4,15 +4,27 @@ import * as grpc from '@grpc/grpc-js'
 
 import * as queryString from 'query-string'
 
-// import emoji from 'node-emoji'
-
-import {WatchEvent} from '../rpc/types'
+import {ipcRenderer} from 'electron'
+import {setErrHandler} from '../rpc/rpc'
+import {RPCError, WatchEvent} from '../rpc/types'
+import {store} from '../store'
 
 export {goBack, push}
 
-export const init = () => (dispatch: (action: any) => void) => {
+export const init = () => {
+  setErrHandler((err: RPCError) => {
+    if (err.code === grpc.status.PERMISSION_DENIED) {
+      console.log('Permission denied, locking')
+      store.dispatch({type: 'LOCK'})
+    }
+  })
   // dispatch(startWatchStream())
-  dispatch(push('/keys/index'))
+  store.dispatch(push('/keys/index'))
+}
+
+export const lock = () => {
+  ipcRenderer.send('authToken', {authToken: ''})
+  store.dispatch({type: 'LOCK'})
 }
 
 // export const errors = (err: Error) => (dispatch: (action: any) => any) => {
@@ -22,12 +34,6 @@ export const init = () => (dispatch: (action: any) => void) => {
 //     payload: {error: err},
 //   })
 // }
-
-// setErrHandler((err: RPCError, errFn: ErrFn) => {
-//   if (err.code === status.PERMISSION_DENIED) {
-//     console.log('Permission denied, locking')
-//   }
-// })
 
 // let watchCall
 // export const startWatchStream = () => async (dispatch: (action: any) => any) => {

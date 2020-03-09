@@ -15,10 +15,9 @@ import Step from '../../components/step'
 
 import {connect} from 'react-redux'
 import {goBack} from 'connected-react-router'
+import {store} from '../../store'
 
-type Props = {
-  dispatch: (action: any) => any
-}
+type Props = {}
 
 type State = {
   name: string
@@ -26,7 +25,7 @@ type State = {
   error: string
 }
 
-class GroupCreateView extends React.Component<Props, State> {
+export default class GroupCreateView extends React.Component<Props, State> {
   state = {
     name: '',
     loading: false,
@@ -58,7 +57,7 @@ class GroupCreateView extends React.Component<Props, State> {
       <Step
         title="Create a Group"
         next={{label: 'Create', action: this.create}}
-        prev={{label: 'Cancel', action: () => this.props.dispatch(goBack())}}
+        prev={{label: 'Cancel', action: () => store.dispatch(goBack())}}
       >
         <Box style={{marginBottom: 20}}>
           <Typography variant="subtitle1" style={{paddingBottom: 20}}>
@@ -81,5 +80,3 @@ class GroupCreateView extends React.Component<Props, State> {
     )
   }
 }
-
-export default connect()(GroupCreateView)

@@ -19,6 +19,7 @@ import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import {query} from '../state'
+import {store} from '../../store'
 
 import {configSet, userService} from '../../rpc/rpc'
 
@@ -33,7 +34,6 @@ import {
 type Props = {
   open: boolean
   kid: string
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -58,18 +58,18 @@ class UserIntroDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.props.dispatch(push('/user/name?kid=' + this.props.kid))
+      store.dispatch(push('/user/name?kid=' + this.props.kid))
       this.close()
     })
   }
 
   close = () => {
-    this.props.dispatch({type: 'PROMPT_USER', payload: false})
+    store.dispatch({type: 'PROMPT_USER', payload: false})
   }
 
   nothanks = (skip: boolean) => {
     const req: ConfigSetRequest = {key: 'disablePromptUser', value: skip ? '1' : '0'}
-    this.props.dispatch(
+    store.dispatch(
       configSet(req, (resp: ConfigSetResponse) => {
         this.close()
       })

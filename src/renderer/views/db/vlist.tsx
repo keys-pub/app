@@ -36,10 +36,9 @@ type Range = {
 type Props = {
   path: string
   total: number
-  dispatch: (action: any) => any
 }
 
-class DBVListView extends React.Component<Props> {
+export default class DBVListView extends React.Component<Props> {
   list: Array<Row> = []
   cellCache: any
 
@@ -177,12 +176,3 @@ class DBVListView extends React.Component<Props> {
     )
   }
 }
-
-const mapStateToProps = (state: any, ownProps: any) => {
-  return {
-    path: '',
-    total: 0,
-  }
-}
-
-export default connect(mapStateToProps)(DBVListView)

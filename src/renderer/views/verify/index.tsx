@@ -127,6 +127,7 @@ class VerifyView extends React.Component<Props, State> {
               value={this.state.value}
               disableUnderline
               inputProps={{
+                ref: this.inputRef,
                 style: {
                   ...styles.mono,
                   height: '100%',
