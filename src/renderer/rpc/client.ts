@@ -1,6 +1,8 @@
 import * as getenv from 'getenv'
 
 import * as grpc from '@grpc/grpc-js'
+// import * as grpc from '/Users/gabe/projects/grpc-node/packages/grpc-js/build/src'
+
 // import * as protoLoader from '@grpc/proto-loader'
 // @ln-zap/proto-loader works in electron, see https://github.com/grpc/grpc-node/issues/969
 import * as protoLoader from '@ln-zap/proto-loader'
