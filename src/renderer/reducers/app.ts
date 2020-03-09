@@ -4,6 +4,7 @@ export type AppState = {
   appFocused: boolean
   error: Error | void
   intro: boolean
+  navMinimize: boolean
   selectedInbox: string
   unlocked: boolean
   updating: boolean
@@ -14,6 +15,7 @@ const initialState: AppState = {
   appFocused: false,
   error: null,
   intro: true,
+  navMinimize: false,
   selectedInbox: '',
   unlocked: null,
   updating: false,
@@ -64,6 +66,11 @@ export default function reducer(state: AppState = initialState, action: actionTy
       return {
         ...state,
         unlocked: false,
+      }
+    case 'NAV_MINIMIZE':
+      return {
+        ...state,
+        navMinimize: action.payload.navMinimize,
       }
     case 'UPDATING':
       return {

@@ -46,6 +46,12 @@ export default class MenuBuilder {
             this.mainWindow.webContents.inspectElement(x, y)
           },
         },
+        {
+          label: 'Reload',
+          click: () => {
+            this.mainWindow.webContents.reload()
+          },
+        },
       ]).popup({window: this.mainWindow})
     })
   }
@@ -91,33 +97,7 @@ export default class MenuBuilder {
         {label: 'Select All', accelerator: 'Command+A', selector: 'selectAll:'},
       ],
     }
-    const subMenuViewDev = {
-      label: 'View',
-      submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'Command+R',
-          click: () => {
-            this.mainWindow.webContents.reload()
-          },
-        },
-        {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
-          click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen())
-          },
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: 'Alt+Command+I',
-          click: () => {
-            this.mainWindow.webContents.toggleDevTools()
-          },
-        },
-      ],
-    }
-    const subMenuViewProd = {
+    const subMenuView = {
       label: 'View',
       submenu: [
         {
@@ -164,13 +144,11 @@ export default class MenuBuilder {
       ],
     }
 
-    const subMenuView = process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd
-
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp]
   }
 
   buildDefaultTemplate() {
-    const devView = [
+    const subMenuView = [
       {
         label: '&Reload',
         accelerator: 'Ctrl+R',
@@ -194,36 +172,10 @@ export default class MenuBuilder {
       },
     ]
 
-    const prodView = [
-      {
-        label: 'Toggle &Full Screen',
-        accelerator: 'F11',
-        click: () => {
-          this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen())
-        },
-      },
-    ]
-
     const templateDefault = [
       {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              this.mainWindow.close()
-            },
-          },
-        ],
-      },
-      {
         label: '&View',
-        submenu: process.env.NODE_ENV === 'development' ? devView : prodView,
+        submenu: subMenuView,
       },
       {
         label: 'Help',

@@ -14,6 +14,9 @@ import {
 
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 
+import {AppState} from '../reducers/app'
+import {store} from '../store'
+
 import {
   Person as ProfileIcon,
   VpnKeyOutlined as KeysIcon,
@@ -35,11 +38,7 @@ import {CSSProperties} from '@material-ui/styles'
 
 type Props = {
   path: string
-  dispatch: (action: any) => any
-}
-
-type State = {
-  open: boolean
+  navMinimize: boolean
 }
 
 const navs = [
@@ -52,20 +51,16 @@ const navs = [
   {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
 ]
 
-class Nav extends React.Component<Props, State> {
-  state = {
-    open: true,
-  }
-
+class Nav extends React.Component<Props> {
   toggleDrawer = () => {
-    this.setState({open: !this.state.open})
+    store.dispatch({type: 'NAV_MINIMIZE', payload: {navMinimize: !this.props.navMinimize}})
   }
 
   render() {
     const route = routesMap.get(this.props.path)
     if (!route) return null
 
-    const open = this.state.open
+    const open = !this.props.navMinimize
     console.log('Drawer open:', open)
     const width = open ? 140 : 68
     const drawerStyles: CSSProperties = open
@@ -75,11 +70,11 @@ class Nav extends React.Component<Props, State> {
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
         <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
-          <Box height={42} style={{backgroundColor: backgroundColor}}></Box>
+          <Box height={38} style={{backgroundColor: backgroundColor}}></Box>
           <List style={{minWidth: width, height: '100%', padding: 0}}>
             {navs.map((nav, index) =>
               row(nav, index, (route && route.path.startsWith(nav.prefix)) || false, open, () =>
-                this.props.dispatch(push(nav.route))
+                store.dispatch(push(nav.route))
               )
             )}
           </List>
@@ -124,9 +119,10 @@ const row = (nav: any, index: number, selected: boolean, open: boolean, onClick:
   )
 }
 
-const mapStateToProps = (state: {router: any}, ownProps: any) => {
+const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => {
   return {
     path: state.router.location.pathname,
+    navMinimize: state.app.navMinimize,
   }
 }
 

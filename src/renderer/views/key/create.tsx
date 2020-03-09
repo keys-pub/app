@@ -215,13 +215,12 @@ export default class KeyCreateDialog extends React.Component<Props> {
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <Typography>
-              Do you want to link this key with a user account (Github, Twitter, Reddit, etc) and publish it
-              to the{' '}
+              Do you want to link this key with a user account (Github, Twitter, Reddit, etc) and publish your
+              public key to the{' '}
               <Link inline span onClick={() => shell.openExternal('https://keys.pub/')}>
                 keys.pub
               </Link>{' '}
-              key server? This helps others search for your key and verify your identity. You should only do
-              this if you're ok with your key being public.
+              key server? This helps others search for your key and verify your identity.
             </Typography>
             <Box marginBottom={2} />
             <ServiceSelect service={this.state.service} setService={this.setService} />

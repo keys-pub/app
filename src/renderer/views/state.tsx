@@ -32,7 +32,7 @@ export const init = () => (dispatch: (action: any) => void, getState: () => Stat
     }
   })
 
-  dispatch(startWatchStream())
+  // dispatch(startWatchStream())
   dispatch(push('/keys/index'))
 }
 
