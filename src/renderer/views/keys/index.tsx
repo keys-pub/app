@@ -32,9 +32,8 @@ import {connect} from 'react-redux'
 import KeyCreateDialog from '../key/create'
 import KeyImportDialog from '../import'
 
-import {Key, KeyType, SortDirection} from '../../rpc/types'
-import {keys, RPCError, RPCState} from '../../rpc/rpc'
-import {KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys} from '../../rpc/rpc'
+import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/types'
 import {AppState} from '../../reducers/app'
 
 type Props = {
@@ -77,19 +76,21 @@ class KeysView extends React.Component<Props, State> {
       sortField: sortField,
       sortDirection: sortDirection,
     }
-    store.dispatch(
-      keys(req, (resp: KeysResponse) => {
-        this.setState({
-          keys: resp.keys,
-          sortField: resp.sortField,
-          sortDirection: resp.sortDirection,
-        })
-        // If we don't have keys and intro, then show create dialog
-        if (resp.keys.length == 0 && this.props.intro) {
-          this.setState({openCreate: 'INTRO'})
-        }
+    keys(req, (err: RPCError, resp: KeysResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      this.setState({
+        keys: resp.keys,
+        sortField: resp.sortField,
+        sortDirection: resp.sortDirection,
       })
-    )
+      // If we don't have keys and intro, then show create dialog
+      if (resp.keys.length == 0 && this.props.intro) {
+        this.setState({openCreate: 'INTRO'})
+      }
+    })
   }
 
   onChange = () => {
@@ -276,7 +277,7 @@ const cellStyles = {
   paddingRight: 5,
 }
 
-const mapStateToProps = (state: {app: AppState; rpc: RPCState}, ownProps: any) => {
+const mapStateToProps = (state: {app: AppState}, ownProps: any) => {
   return {
     intro: state.app.intro,
   }

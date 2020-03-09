@@ -19,16 +19,21 @@ import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import {query} from '../state'
+import {store} from '../../store'
 
 import {configSet, userService} from '../../rpc/rpc'
 
-import {RPCState, RPCError} from '../../rpc/rpc'
-import {ConfigSetRequest, ConfigSetResponse, UserServiceRequest, UserServiceResponse} from '../../rpc/types'
+import {
+  RPCError,
+  ConfigSetRequest,
+  ConfigSetResponse,
+  UserServiceRequest,
+  UserServiceResponse,
+} from '../../rpc/types'
 
 type Props = {
   open: boolean
   kid: string
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -47,22 +52,24 @@ class UserIntroDialog extends React.Component<Props, State> {
       kid: this.props.kid,
       service: service,
     }
-    this.props.dispatch(
-      userService(req, (resp: UserServiceResponse) => {
-        this.setState({loading: false})
-        this.props.dispatch(push('/user/name?kid=' + this.props.kid))
-        this.close()
-      })
-    )
+    userService(req, (err: RPCError, resp: UserServiceResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      this.setState({loading: false})
+      store.dispatch(push('/user/name?kid=' + this.props.kid))
+      this.close()
+    })
   }
 
   close = () => {
-    this.props.dispatch({type: 'PROMPT_USER', payload: false})
+    store.dispatch({type: 'PROMPT_USER', payload: false})
   }
 
   nothanks = (skip: boolean) => {
     const req: ConfigSetRequest = {key: 'disablePromptUser', value: skip ? '1' : '0'}
-    this.props.dispatch(
+    store.dispatch(
       configSet(req, (resp: ConfigSetResponse) => {
         this.close()
       })
@@ -155,7 +162,7 @@ class UserIntroDialog extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   return {
     open: false,
     kid: query(state, 'kid'),

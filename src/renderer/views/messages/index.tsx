@@ -12,9 +12,7 @@ import {messagePrepare, messageCreate} from '../../rpc/rpc'
 
 import {connect} from 'react-redux'
 
-import {Inbox, Message} from '../../rpc/types'
-
-import {RPCError} from '../../rpc/rpc'
+import {RPCError, Inbox, Message} from '../../rpc/types'
 
 import {
   MessageCreateRequest,
@@ -25,7 +23,6 @@ import {
 
 type Props = {
   inbox: Inbox
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -35,7 +32,7 @@ type State = {
   error: string
 }
 
-class MessagesView extends React.Component<Props, State> {
+export default class MessagesView extends React.Component<Props, State> {
   listRef: any
   state = {
     selectedMessage: null,
@@ -63,34 +60,32 @@ class MessagesView extends React.Component<Props, State> {
       sender: this.props.inbox.kid,
       text,
     }
-    this.props.dispatch(
-      messagePrepare(
-        prep,
-        (resp: MessagePrepareResponse) => {
-          if (!resp.message) {
-            console.error('No message in response')
-            return
-          }
-          const message: Message = resp.message
-          this.setState({pendingMessage: resp.message})
-          const req: MessageCreateRequest = {
-            ...prep,
-            id: message.id,
-          }
+    messagePrepare(prep, (err: RPCError, resp: MessagePrepareResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+      }
+      if (!resp.message) {
+        console.error('No message in response')
+        return
+      }
+      const message: Message = resp.message
+      this.setState({pendingMessage: resp.message})
+      const req: MessageCreateRequest = {
+        ...prep,
+        id: message.id,
+      }
 
-          this.listRef.setPending(resp.message)
+      this.listRef.setPending(resp.message)
 
-          this.props.dispatch(
-            messageCreate(req, (resp: MessageCreateResponse) => {
-              this.setState({pendingMessage: null})
-            })
-          )
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
+      messageCreate(req, (err: RPCError, resp: MessageCreateResponse) => {
+        if (err) {
+          // TODO: error
+          return
         }
-      )
-    )
+        this.setState({pendingMessage: null})
+      })
+    })
+
     return true
   }
 
@@ -105,7 +100,6 @@ class MessagesView extends React.Component<Props, State> {
           ref={this.setListRef}
           kid={this.props.inbox.kid}
           rowCount={this.props.inbox.messageCount}
-          dispatch={this.props.dispatch}
         />
         <MessageInputView
           defaultValue=""
@@ -117,6 +111,3 @@ class MessagesView extends React.Component<Props, State> {
     )
   }
 }
-
-// $FlowFixMe
-export default connect()(MessagesView)

@@ -25,7 +25,7 @@ import ServiceSelect from '../user/service-select'
 import {shell} from 'electron'
 
 import {keyGenerate} from '../../rpc/rpc'
-import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/types'
+import {RPCError, KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/types'
 
 type Props = {
   open: boolean
@@ -75,13 +75,16 @@ export default class KeyCreateDialog extends React.Component<Props> {
       const req: KeyGenerateRequest = {
         type: this.state.type,
       }
-      store.dispatch(
-        keyGenerate(req, (resp: KeyGenerateResponse) => {
-          this.props.onChange()
-          store.dispatch({type: 'INTRO', payload: false})
-          this.setState({kid: resp.kid, step: 'CREATED', loading: false})
-        })
-      )
+      keyGenerate(req, (err: RPCError, resp: KeyGenerateResponse) => {
+        if (err) {
+          // TODO: error
+          this.setState({loading: false})
+          return
+        }
+        this.props.onChange()
+        store.dispatch({type: 'INTRO', payload: false})
+        this.setState({kid: resp.kid, step: 'CREATED', loading: false})
+      })
     }, 500)
   }
 

@@ -4,7 +4,6 @@ import {AppContainer} from 'react-hot-loader'
 import Application from './hot'
 
 import {ipcRenderer, remote} from 'electron'
-import {initializeClient} from './rpc/client'
 import {store} from './store'
 import {init} from './views/state'
 
@@ -35,16 +34,6 @@ const render = (Component: () => JSX.Element) => {
 
 render(Application)
 
-const start = () => {
-  try {
-    initializeClient('')
-    store.dispatch(init())
-  } catch (err) {
-    alert('Oops, init client error ' + err)
-    remote.app.exit(3)
-  }
-}
-
 ipcRenderer.removeAllListeners('log')
 ipcRenderer.on('log', function(event, text) {
   console.log('Main process:', text)
@@ -58,7 +47,7 @@ ipcRenderer.on('keys-started', (event, err) => {
     alert('Oops, exec error (' + err.code + ') ' + err.cmd + '; ' + err.toString())
     remote.app.exit(2)
   }
-  start()
+  init()
 })
 ipcRenderer.send('keys-start')
 

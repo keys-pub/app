@@ -16,9 +16,7 @@ import {debounce} from 'lodash'
 import * as grpc from '@grpc/grpc-js'
 
 import {EncryptState} from '../../reducers/encrypt'
-import {RPCState} from '../../rpc/rpc'
-import {client} from '../../rpc/client'
-
+import {encryptFile} from '../../rpc/rpc'
 import {Key, RPCError, EncryptFileInput, EncryptFileOutput} from '../../rpc/types'
 
 export type Props = {
@@ -41,7 +39,6 @@ class EncryptView extends React.Component<Props, State> {
     loading: false,
     value: this.props.defaultValue,
   }
-  encrypter: any
   inputRef: any = React.createRef()
 
   debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
@@ -92,42 +89,29 @@ class EncryptView extends React.Component<Props, State> {
       in: this.props.file,
       out: fileOut,
     }
-    if (this.encrypter) {
-      console.error('already have encrypt client')
-      return
-    }
 
     console.log('Encrypting...')
     this.setState({loading: true, fileError: ''})
-    const cl = await client()
-    this.encrypter = cl.encryptFile()
-    this.encrypter.on('data', (out: EncryptFileOutput) => {
-      console.log('Encrypt:', out)
-      store.dispatch({type: 'ENCRYPT_FILE_OUT', payload: {fileOut}})
-      this.setState({loading: false})
-    })
-    this.encrypter.on('error', (err: RPCError) => {
-      this.encrypter = null
-      console.error(err)
-      if (err.code == grpc.status.CANCELLED) {
+    encryptFile(req, (err: RPCError, resp: EncryptFileOutput, done: boolean) => {
+      if (err) {
+        if (err.code == grpc.status.CANCELLED) {
+          this.setState({loading: false})
+        } else {
+          this.setState({loading: false, fileError: err.details})
+        }
+        return
+      }
+      if (resp) {
+        store.dispatch({type: 'ENCRYPT_FILE_OUT', payload: {fileOut}})
+      }
+      if (done) {
         this.setState({loading: false})
-      } else {
-        this.setState({loading: false, fileError: err.details})
       }
     })
-    this.encrypter.on('end', () => {
-      console.log('Encrypt end')
-      this.encrypter = null
-    })
-    this.encrypter.write(req)
-    this.encrypter.end()
   }
 
   cancel = () => {
-    if (this.encrypter) {
-      console.log('Cancel')
-      this.encrypter.cancel()
-    }
+    // TODO: stream cancel
   }
 
   openFile = async () => {
@@ -240,7 +224,7 @@ class EncryptView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; encrypt: EncryptState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {encrypt: EncryptState; router: any}, ownProps: any) => {
   return {
     recipients: state.encrypt.recipients || [],
     sender: state.encrypt.sender || '',

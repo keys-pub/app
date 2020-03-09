@@ -5,11 +5,7 @@ import {routerMiddleware} from 'connected-react-router'
 import {createLogger} from 'redux-logger'
 import createRootReducer from '../reducers'
 
-import {ipcRenderer, remote} from 'electron'
-
-import {initializeClient} from '../rpc/client'
-
-import * as fs from 'fs'
+import {ipcRenderer} from 'electron'
 
 const history = createHashHistory()
 const rootReducer = createRootReducer(history)

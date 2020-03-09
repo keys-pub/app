@@ -12,8 +12,9 @@ import {goBack, push} from 'connected-react-router'
 
 import {store} from '../../store'
 
-import {key, keyRemove, pull, RPCError, RPCState} from '../../rpc/rpc'
+import {key, keyRemove, pull} from '../../rpc/rpc'
 import {
+  RPCError,
   Key,
   KeyRequest,
   KeyResponse,
@@ -69,21 +70,17 @@ export default class KeyView extends React.Component<Props, State> {
     const req: KeyRequest = {
       identity: this.state.key.id,
     }
-    store.dispatch(
-      key(
-        req,
-        (resp: KeyResponse) => {
-          if (resp.key) {
-            this.setState({key: resp.key, loading: false})
-          } else {
-            this.setState({error: 'Key not found', loading: false})
-          }
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    key(req, (err: RPCError, resp: KeyResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      if (resp.key) {
+        this.setState({key: resp.key, loading: false})
+      } else {
+        this.setState({error: 'Key not found', loading: false})
+      }
+    })
   }
 
   add = () => {
@@ -91,35 +88,27 @@ export default class KeyView extends React.Component<Props, State> {
     const req: PullRequest = {
       identity: this.state.key.id,
     }
-    store.dispatch(
-      pull(
-        req,
-        (resp: PullResponse) => {
-          this.setState({loading: false})
-          this.refresh()
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    pull(req, (err: RPCError, resp: PullResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false})
+      this.refresh()
+    })
   }
 
   removePublic = () => {
     const req: KeyRemoveRequest = {
       kid: this.state.key.id,
     }
-    store.dispatch(
-      keyRemove(
-        req,
-        (resp: KeyRemoveResponse) => {
-          store.dispatch(goBack())
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      store.dispatch(goBack())
+    })
   }
 
   export = () => {

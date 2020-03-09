@@ -13,7 +13,6 @@ import {inbox} from '../../rpc/rpc'
 
 import {Inbox, InboxRequest} from '../../rpc/types'
 import {InboxRow} from './types'
-import {State} from '../state'
 
 type Props = {
   rows: Array<InboxRow>
@@ -66,7 +65,7 @@ class InboxList extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: State, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   const rows: Array<InboxRow> = inboxRows(state.rpc, state.app.selectedInbox)
   return {
     rows,

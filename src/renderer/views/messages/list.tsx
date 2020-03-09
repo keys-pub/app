@@ -7,15 +7,13 @@ import MessageView from './message'
 import RList from '../../components/list'
 
 import {messages} from '../../rpc/rpc'
-
-import {Message, MessagesRequest, MessagesResponse} from '../../rpc/types'
+import {RPCError, Message, MessagesRequest, MessagesResponse} from '../../rpc/types'
 import {MessageRow} from './types'
 
 type Props = {
   kid: string
   rowCount: number
   // select: (r: MessageRow) => void,
-  dispatch: (action: any) => any
 }
 
 type State = {
@@ -126,57 +124,59 @@ export default class MessagesListView extends React.Component<Props, State> {
       kid: this.props.kid,
     }
     console.log('Load rows, RPC messages:', req)
-    this.props.dispatch(
-      messages(req, (resp: MessagesResponse) => {
-        if (this.listRef === null) {
-          // console.error('No list ref')
-          return
-        }
-        if (!resp.messages) {
-          this.setState({loaded: true, rowCount: this.props.rowCount})
-          return
-        }
+    messages(req, (err: RPCError, resp: MessagesResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      if (this.listRef === null) {
+        // console.error('No list ref')
+        return
+      }
+      if (!resp.messages) {
+        this.setState({loaded: true, rowCount: this.props.rowCount})
+        return
+      }
 
-        const last = this.list[this.list.length - 1]
-        let pending = false
-        let pendingInResponse = false
-        if (last && last.pending) {
-          pending = true
-          for (const m of resp.messages) {
-            if (m.id === last.message.id) {
-              pendingInResponse = true
-              break
-            }
+      const last = this.list[this.list.length - 1]
+      let pending = false
+      let pendingInResponse = false
+      if (last && last.pending) {
+        pending = true
+        for (const m of resp.messages) {
+          if (m.id === last.message.id) {
+            pendingInResponse = true
+            break
           }
         }
-        if (pending && !pendingInResponse) {
-          console.error('Pending message, but failed to get pending in response', pending)
-          return
-        }
+      }
+      if (pending && !pendingInResponse) {
+        console.error('Pending message, but failed to get pending in response', pending)
+        return
+      }
 
-        let i: number = index
-        for (const m of resp.messages) {
-          this.list[i++] = {message: m}
-        }
+      let i: number = index
+      for (const m of resp.messages) {
+        this.list[i++] = {message: m}
+      }
 
-        this.nextIndex = this.props.rowCount
-        this.setState({
-          loaded: true,
-          rowCount: this.props.rowCount,
-        })
-
-        this.listRef.forceUpdate()
-
-        const sp: ScrollPosition | void = this.scrollPositions.get(this.props.kid)
-        console.log('Scroll position:', sp)
-
-        if (!sp || sp.lockToBottom) {
-          this.listRef.scrollToBottom()
-        } else {
-          this.listRef.scrollTop(sp.scrollTop)
-        }
+      this.nextIndex = this.props.rowCount
+      this.setState({
+        loaded: true,
+        rowCount: this.props.rowCount,
       })
-    )
+
+      this.listRef.forceUpdate()
+
+      const sp: ScrollPosition | void = this.scrollPositions.get(this.props.kid)
+      console.log('Scroll position:', sp)
+
+      if (!sp || sp.lockToBottom) {
+        this.listRef.scrollToBottom()
+      } else {
+        this.listRef.scrollTop(sp.scrollTop)
+      }
+    })
   }
 
   onScroll = (e: any) => {

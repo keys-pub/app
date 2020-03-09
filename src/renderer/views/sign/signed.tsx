@@ -10,9 +10,9 @@ import {clipboard} from 'electron'
 
 import {debounce} from 'lodash'
 
-import {sign, RPCError} from '../../rpc/rpc'
+import {sign} from '../../rpc/rpc'
 
-import {Key, SignRequest, SignResponse} from '../../rpc/types'
+import {RPCError, SignRequest, SignResponse} from '../../rpc/types'
 
 export type Props = {
   value: string
@@ -57,18 +57,14 @@ export default class SignedView extends React.Component<Props, State> {
       armored: true,
       signer: this.props.signer,
     }
-    store.dispatch(
-      sign(
-        req,
-        (resp: SignResponse) => {
-          const signed = new TextDecoder('ascii').decode(resp.data)
-          this.setState({error: '', signed})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    sign(req, (err: RPCError, resp: SignResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const signed = new TextDecoder('ascii').decode(resp.data)
+      this.setState({error: '', signed})
+    })
   }
 
   copyToClipboard = () => {

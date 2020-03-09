@@ -4,15 +4,13 @@ import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
 import {connect} from 'react-redux'
 
-type Props = {
-  dispatch: (action: any) => any
-}
+type Props = {}
 
 type State = {
   query: string
 }
 
-class DBHeaderView extends React.Component<Props, State> {
+export default class DBHeaderView extends React.Component<Props, State> {
   state = {
     query: '',
   }
@@ -55,6 +53,3 @@ class DBHeaderView extends React.Component<Props, State> {
     )
   }
 }
-
-// $FlowFixMe
-export default connect()(DBHeaderView)

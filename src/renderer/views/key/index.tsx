@@ -9,9 +9,8 @@ import {store} from '../../store'
 
 import KeyView from './view'
 
-import {key, RPCError, RPCState} from '../../rpc/rpc'
-
-import {Key, KeyRequest, KeyResponse} from '../../rpc/types'
+import {key} from '../../rpc/rpc'
+import {RPCError, Key, KeyRequest, KeyResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
@@ -41,21 +40,17 @@ class KeyIndexView extends React.Component<Props, State> {
       identity: this.props.kid,
       update: this.props.update,
     }
-    store.dispatch(
-      key(
-        req,
-        (resp: KeyResponse) => {
-          if (resp.key) {
-            this.setState({key: resp.key, loading: false})
-          } else {
-            this.setState({error: 'Key not found', loading: false})
-          }
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    key(req, (err: RPCError, resp: KeyResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      if (resp.key) {
+        this.setState({key: resp.key, loading: false})
+      } else {
+        this.setState({error: 'Key not found', loading: false})
+      }
+    })
   }
 
   render() {
@@ -74,7 +69,7 @@ class KeyIndexView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {router: any}, ownProps: any) => {
   return {
     kid: query(state, 'kid'),
     update: query(state, 'update') == '1',

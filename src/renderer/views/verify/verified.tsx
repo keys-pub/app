@@ -6,9 +6,8 @@ import {store} from '../../store'
 
 import SignerView from './signer'
 
-import {verify, RPCError, RPCState} from '../../rpc/rpc'
-
-import {Key, VerifyRequest, VerifyResponse} from '../../rpc/types'
+import {verify} from '../../rpc/rpc'
+import {RPCError, Key, VerifyRequest, VerifyResponse} from '../../rpc/types'
 
 export type Props = {
   value: string
@@ -43,18 +42,14 @@ export default class VerifiedView extends React.Component<Props, State> {
       data: data,
       armored: true,
     }
-    store.dispatch(
-      verify(
-        req,
-        (resp: VerifyResponse) => {
-          const verified = new TextDecoder().decode(resp.data)
-          this.setState({error: '', signer: resp.signer, verified})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    verify(req, (err: RPCError, resp: VerifyResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const verified = new TextDecoder().decode(resp.data)
+      this.setState({error: '', signer: resp.signer, verified})
+    })
   }
 
   render() {

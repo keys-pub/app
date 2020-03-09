@@ -11,26 +11,16 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../../components'
-
 import Logo from '../logo'
 
-import {client} from '../../rpc/client'
-
-import * as electron from 'electron'
-
-import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
+import {store} from '../../store'
 
-import {initializeClient} from '../../rpc/client'
-import {RPCError} from '../../rpc/rpc'
+import {authSetup} from '../../rpc/rpc'
+import {RPCError, AuthSetupRequest, AuthSetupResponse} from '../../rpc/types'
+import {ipcRenderer} from 'electron'
 
-import {AuthSetupRequest, AuthSetupResponse} from '../../rpc/types'
-
-type Props = {
-  dispatch: (action: any) => any
-}
-
+type Props = {}
 type State = {
   loading: boolean
   password: string
@@ -39,7 +29,7 @@ type State = {
   error: string
 }
 
-class AuthSetupView extends React.Component<Props, State> {
+export default class AuthSetupView extends React.Component<Props, State> {
   state = {
     loading: false,
     password: '',
@@ -153,9 +143,7 @@ class AuthSetupView extends React.Component<Props, State> {
       client: 'app',
     }
     this.setState({loading: true, error: ''})
-    // Use client directly to prevent logging the request (password)
-    const cl = await client()
-    cl.authSetup(req, (err: RPCError | void, resp: AuthSetupResponse | void) => {
+    authSetup(req, (err: RPCError, resp: AuthSetupResponse) => {
       if (err) {
         this.setState({loading: false, error: err.details})
         return
@@ -163,14 +151,12 @@ class AuthSetupView extends React.Component<Props, State> {
       if (!resp) {
         return
       }
-      initializeClient(resp.authToken)
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
       setTimeout(() => {
         this.setState({loading: false})
-        this.props.dispatch({type: 'UNLOCK'})
-        this.props.dispatch(push('/keys/index'))
+        store.dispatch({type: 'UNLOCK'})
+        store.dispatch(push('/keys/index'))
       }, 100)
     })
   }
 }
-
-export default connect()(AuthSetupView)

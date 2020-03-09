@@ -17,9 +17,8 @@ import SignFileView from './signedfile'
 import SignKeySelectView from '../keys/skselect'
 
 import {SignState} from '../../reducers/sign'
-import {sign, RPCState} from '../../rpc/rpc'
-import {client} from '../../rpc/client'
-import {Key, RPCError, SignFileInput, SignFileOutput} from '../../rpc/types'
+import {signFile} from '../../rpc/rpc'
+import {RPCError, SignFileInput, SignFileOutput} from '../../rpc/types'
 
 export type Props = {
   signer: string
@@ -40,7 +39,6 @@ class SignView extends React.Component<Props, State> {
     loading: false,
     value: this.props.defaultValue,
   }
-  signer: any
   inputRef: any = React.createRef()
 
   debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
@@ -77,42 +75,29 @@ class SignView extends React.Component<Props, State> {
       in: this.props.file,
       out: fileOut,
     }
-    if (this.signer) {
-      console.error('already have sign client')
-      return
-    }
 
     console.log('Signing...')
     this.setState({loading: true, fileError: ''})
-    const cl = await client()
-    this.signer = cl.signFile()
-    this.signer.on('data', (out: SignFileOutput) => {
-      console.log('Sign:', out)
-      store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut}})
-      this.setState({loading: false})
-    })
-    this.signer.on('error', (err: RPCError) => {
-      this.signer = null
-      console.error(err)
-      if (err.code == grpc.status.CANCELLED) {
+    signFile(req, (err: RPCError, resp: SignFileOutput, done: boolean) => {
+      if (err) {
+        if (err.code == grpc.status.CANCELLED) {
+          this.setState({loading: false})
+        } else {
+          this.setState({loading: false, fileError: err.details})
+        }
+        return
+      }
+      if (resp) {
+        store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut}})
+      }
+      if (done) {
         this.setState({loading: false})
-      } else {
-        this.setState({loading: false, fileError: err.details})
       }
     })
-    this.signer.on('end', () => {
-      console.log('Sign end')
-      this.signer = null
-    })
-    this.signer.write(req)
-    this.signer.end()
   }
 
   cancel = () => {
-    if (this.signer) {
-      console.log('Cancel')
-      this.signer.cancel()
-    }
+    // TODO: Stream cancel?
   }
 
   openFile = async () => {
@@ -211,7 +196,7 @@ class SignView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; sign: SignState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {sign: SignState; router: any}, ownProps: any) => {
   return {
     signer: state.sign.signer || '',
     defaultValue: state.sign.value || '',

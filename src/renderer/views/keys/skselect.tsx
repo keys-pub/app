@@ -6,8 +6,8 @@ import {store} from '../../store'
 
 import UserLabel from '../user/label'
 
-import {keys, RPCError} from '../../rpc/rpc'
-import {KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
+import {keys} from '../../rpc/rpc'
+import {RPCError, KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
 
 export type Props = {
   defaultValue?: string
@@ -44,18 +44,14 @@ export default class SignKeySelectView extends React.Component<Props, State> {
     const req: KeysRequest = {
       types: [KeyType.EDX25519],
     }
-    store.dispatch(
-      keys(
-        req,
-        (resp: KeysResponse) => {
-          // TODO: Check default value exists
-          this.setState({options: resp.keys || [], selected: this.props.defaultValue || '', loading: false})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details, loading: false})
-        }
-      )
-    )
+    keys(req, (err: RPCError, resp: KeysResponse) => {
+      if (err) {
+        this.setState({error: err.details, loading: false})
+        return
+      }
+      // TODO: Check default value exists
+      this.setState({options: resp.keys || [], selected: this.props.defaultValue || '', loading: false})
+    })
   }
 
   onChange = (event: React.ChangeEvent<{value: unknown}>) => {

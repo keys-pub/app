@@ -18,6 +18,7 @@ import {goBack} from 'connected-react-router'
 import {store} from '../store'
 
 import {remote} from 'electron'
+import {lock} from './state'
 
 type Props = {
   lock?: boolean
@@ -34,7 +35,6 @@ export default (props: Props) => {
   const backgroundColor = dark ? '#2f2f2f' : ''
 
   const back = () => store.dispatch(goBack())
-  const lock = () => store.dispatch({type: 'LOCK'})
 
   let showSystemButtons = true
   if (process.platform == 'darwin') {

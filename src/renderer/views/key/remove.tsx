@@ -2,17 +2,10 @@ import * as React from 'react'
 
 import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
-import {keyRemove} from '../../rpc/rpc'
-import {query} from '../state'
-
 import {DialogTitle, styles} from '../../components'
 
-import {go, goBack} from 'connected-react-router'
-import {connect} from 'react-redux'
-import {store} from '../../store'
-
-import {RPCError, RPCState} from '../../rpc/rpc'
-import {KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
+import {keyRemove} from '../../rpc/rpc'
+import {RPCError, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
@@ -31,17 +24,13 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
 
   removeKey = () => {
     const req: KeyRemoveRequest = {kid: this.props.kid}
-    store.dispatch(
-      keyRemove(
-        req,
-        (resp: KeyRemoveResponse) => {
-          this.props.close(true)
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      this.props.close(true)
+    })
   }
 
   renderDialog(open: boolean) {
@@ -58,7 +47,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
         <DialogTitle>Delete Key</DialogTitle>
         <DialogContent dividers>{this.renderContent()}</DialogContent>
         <DialogActions>
-          <Button onClick={() => this.props.close(false)}>Later</Button>
+          <Button onClick={() => this.props.close(false)}>Cancel</Button>
           <Button autoFocus onClick={this.removeKey} color="secondary">
             Delete
           </Button>

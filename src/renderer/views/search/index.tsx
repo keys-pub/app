@@ -14,20 +14,18 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import {IDView} from '../key/content'
+import {store} from '../../store'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
-import {User, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
-import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
+import {RPCError, User, UserSearchRequest, UserSearchResponse} from '../../rpc/types'
+import {userSearch} from '../../rpc/rpc'
 
-type Props = {
-  dispatch: (action: any) => any
-}
+type Props = {}
 
 type State = {
   input: string
@@ -37,7 +35,7 @@ type State = {
   error: string
 }
 
-class SearchView extends React.Component<Props, State> {
+export default class SearchView extends React.Component<Props, State> {
   state = {
     input: '',
     users: [],
@@ -53,23 +51,19 @@ class SearchView extends React.Component<Props, State> {
   search = (query: string) => {
     this.setState({loading: true, error: ''})
     const req: UserSearchRequest = {query: query, limit: 0}
-    this.props.dispatch(
-      userSearch(
-        req,
-        (resp: UserSearchResponse) => {
-          if (this.state.input === query) {
-            this.setState({
-              loading: false,
-              query: query,
-              users: resp.users || [],
-            })
-          }
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    userSearch(req, (err: RPCError, resp: UserSearchResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      if (this.state.input === query) {
+        this.setState({
+          loading: false,
+          query: query,
+          users: resp.users || [],
+        })
+      }
+    })
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -82,7 +76,7 @@ class SearchView extends React.Component<Props, State> {
 
   select = (user: User) => {
     // this.setState({dialogOpen: true, key: key})
-    this.props.dispatch(push('/keys/key/index?kid=' + user.kid + '&update=1'))
+    store.dispatch(push('/keys/key/index?kid=' + user.kid + '&update=1'))
   }
 
   render() {
@@ -142,9 +136,3 @@ class SearchView extends React.Component<Props, State> {
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
-  return {}
-}
-
-export default connect(mapStateToProps)(SearchView)

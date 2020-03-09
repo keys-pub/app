@@ -5,8 +5,7 @@ import AuthUnlockView from './unlock'
 import AuthSplash from './splash'
 import ErrorsView from '../../errors'
 
-import {client} from '../../rpc/client'
-
+import {runtimeStatus} from '../../rpc/rpc'
 import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/types'
 
 type Props = {}
@@ -28,11 +27,9 @@ export default class AuthView extends React.Component<Props, State> {
     this.refresh()
   }
 
-  refresh = async () => {
+  refresh = () => {
     const req: RuntimeStatusRequest = {}
-    const cl = await client()
-    console.log('Status...')
-    cl.runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
       if (err) {
         this.setState({loading: false, error: err})
         return

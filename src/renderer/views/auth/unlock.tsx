@@ -5,13 +5,12 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 import Logo from '../logo'
 
 import {push} from 'connected-react-router'
-import {client} from '../../rpc/client'
 
-import {initializeClient} from '../../rpc/client'
+import {ipcRenderer} from 'electron'
 import {store} from '../../store'
 
-import {RPCError} from '../../rpc/rpc'
-import {AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
+import {authUnlock} from '../../rpc/rpc'
+import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
 
 type Props = {}
 
@@ -40,7 +39,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
         <Typography style={{paddingTop: 10, paddingBottom: 20}}>
           The keyring is locked. Enter your password to continue.
         </Typography>
-        <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+        <FormControl error={this.state.error !== ''} style={{marginBottom: 10}}>
           <TextField
             autoFocus
             label="Password"
@@ -52,7 +51,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
             style={{fontSize: 48, width: 400}}
             disabled={this.state.loading}
           />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
           <Button
@@ -77,7 +76,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
 
   unlock = async () => {
     const password = this.state.password
-    if (password === '') {
+    if (!password) {
       this.setState({
         error: 'Oops, password is empty',
       })
@@ -91,20 +90,14 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       client: 'app',
     }
     console.log('Auth unlock')
-    const cl = await client()
-    // Use client directly to prevent logging the request (password)
-    cl.authUnlock(req, (err: RPCError | void, resp: AuthUnlockResponse | void) => {
+    authUnlock(req, (err: RPCError, resp: AuthUnlockResponse) => {
       if (err) {
-        console.error('Unlock error:', err)
         this.setState({loading: false, error: err.details})
-        return
-      }
-      if (!resp) {
         return
       }
 
       console.log('Auth unlocking...')
-      initializeClient(resp.authToken)
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
       setTimeout(() => {
         this.setState({loading: false})
         store.dispatch({type: 'UNLOCK'})

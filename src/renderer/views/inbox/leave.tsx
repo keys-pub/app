@@ -19,7 +19,6 @@ import {push, goBack} from 'connected-react-router'
 import {connect} from 'react-redux'
 
 import {Inbox} from '../../rpc/types'
-import {State as RState} from '../state'
 
 type Props = {
   inbox: Inbox
@@ -54,7 +53,7 @@ class InboxLeave extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: RState, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   let inbox: Inbox | void = selectedInbox(state.rpc, state.app.selectedInbox)
   if (!inbox) inbox = {name: '', kid: '', createdAt: 0, error: '', messageCount: 0, snippet: ''}
   return {

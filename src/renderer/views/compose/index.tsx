@@ -10,19 +10,17 @@ import Recipients from '../user/recipients'
 import {styles} from '../../components'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
-import {User, UserSearchResponse} from '../../rpc/types'
-import {userSearch, RPCError, RPCState} from '../../rpc/rpc'
+import {RPCError, User, UserSearchResponse} from '../../rpc/types'
+import {userSearch} from '../../rpc/rpc'
 
-export type Props = {
-  dispatch: (action: any) => any
-}
+export type Props = {}
 
 type State = {
   users: Array<User>
   loading: boolean
 }
 
-class ComposeView extends React.Component<Props, State> {
+export default class ComposeView extends React.Component<Props, State> {
   state = {
     loading: false,
     users: [],
@@ -30,17 +28,13 @@ class ComposeView extends React.Component<Props, State> {
 
   search = (q: string): Promise<Array<User>> => {
     return new Promise((resolve, reject) => {
-      this.props.dispatch(
-        userSearch(
-          {query: q, limit: 100},
-          (resp: UserSearchResponse) => {
-            resolve(resp.users || [])
-          },
-          (err: RPCError) => {
-            reject(err)
-          }
-        )
-      )
+      userSearch({query: q, limit: 100}, (err: RPCError, resp: UserSearchResponse) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve(resp.users || [])
+      })
     })
   }
 
@@ -90,9 +84,3 @@ class ComposeView extends React.Component<Props, State> {
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}) => {
-  return {}
-}
-
-export default connect(mapStateToProps)(ComposeView)
