@@ -12,12 +12,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {store} from '../../store'
-
 import {statementRevoke} from '../../rpc/rpc'
-
-import {StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/types'
-import {RPCError} from '../../rpc/rpc'
+import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
@@ -83,17 +79,13 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
       seq: this.props.seq,
       local: false,
     }
-    store.dispatch(
-      statementRevoke(
-        req,
-        (resp: StatementRevokeResponse) => {
-          this.props.close()
-          this.setState({loading: false})
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    statementRevoke(req, (err: RPCError, resp: StatementRevokeResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.props.close()
+      this.setState({loading: false})
+    })
   }
 }

@@ -1,21 +1,6 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Chip,
-  Divider,
-  FormControl,
-  LinearProgress,
-  InputLabel,
-  MenuItem,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@material-ui/core'
+import {FormControl, MenuItem, Select, Typography} from '@material-ui/core'
 
 import {CSSProperties} from '@material-ui/styles'
 

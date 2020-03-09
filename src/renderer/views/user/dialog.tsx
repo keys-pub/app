@@ -17,10 +17,9 @@ import {
 import {clipboard, shell} from 'electron'
 
 import {styles, DialogTitle} from '../../components'
-import {store} from '../../store'
 
-import {userAdd, userSign, RPCError, RPCState} from '../../rpc/rpc'
-import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/types'
+import {userAdd, userSign} from '../../rpc/rpc'
+import {RPCError, UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/types'
 
 type Props = {
   kid: string
@@ -79,17 +78,13 @@ export default class UserSignDialog extends React.Component<Props, State> {
       service: this.props.service,
       name: this.state.name,
     }
-    store.dispatch(
-      userSign(
-        req,
-        (resp: UserSignResponse) => {
-          this.setState({loading: false, name: resp.name, signedMessage: resp.message, step: 'sign'})
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    userSign(req, (err: RPCError, resp: UserSignResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false, name: resp.name, signedMessage: resp.message, step: 'sign'})
+    })
   }
 
   userAdd = () => {
@@ -107,18 +102,14 @@ export default class UserSignDialog extends React.Component<Props, State> {
     //   this.setState({loading: false})
     // }, 2000)
 
-    store.dispatch(
-      userAdd(
-        req,
-        (resp: UserAddResponse) => {
-          this.setState({loading: false})
-          this.props.close(true)
-        },
-        (err: RPCError) => {
-          this.setState({loading: false, error: err.details})
-        }
-      )
-    )
+    userAdd(req, (err: RPCError, resp: UserAddResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false})
+      this.props.close(true)
+    })
   }
 
   back = () => {

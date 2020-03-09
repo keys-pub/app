@@ -15,8 +15,7 @@ import * as grpc from '@grpc/grpc-js'
 import {remote} from 'electron'
 
 import {VerifyState} from '../../reducers/verify'
-import {client} from '../../rpc/client'
-import {RPCState} from '../../rpc/rpc'
+import {verifyFile} from '../../rpc/rpc'
 import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/types'
 
 export type Props = {
@@ -38,7 +37,6 @@ class VerifyView extends React.Component<Props, State> {
     loading: false,
     value: this.props.defaultValue,
   }
-  verifier: any
   inputRef: any = React.createRef()
 
   debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
@@ -63,42 +61,29 @@ class VerifyView extends React.Component<Props, State> {
     const req: VerifyFileInput = {
       in: this.props.file,
     }
-    if (this.verifier) {
-      console.error('already have verify client')
-      return
-    }
-
     console.log('Verifying...')
     this.setState({loading: true, fileError: ''})
-    const cl = await client()
-    this.verifier = cl.verifyFile()
-    this.verifier.on('data', (ver: VerifyFileOutput) => {
-      console.log('Verify:', ver)
-      store.dispatch({type: 'VERIFY_FILE_OUT', payload: {fileOut: ver.out, fileSigner: ver.signer}})
-      this.setState({loading: false})
-    })
-    this.verifier.on('error', (err: RPCError) => {
-      this.verifier = null
-      console.error(err)
-      if (err.code == grpc.status.CANCELLED) {
+
+    verifyFile(req, (err: RPCError, resp: VerifyFileOutput, done: boolean) => {
+      if (err) {
+        if (err.code == grpc.status.CANCELLED) {
+          this.setState({loading: false})
+        } else {
+          this.setState({loading: false, fileError: err.details})
+        }
+        return
+      }
+      if (resp) {
+        store.dispatch({type: 'VERIFY_FILE_OUT', payload: {fileOut: resp.out, fileSigner: resp.signer}})
+      }
+      if (done) {
         this.setState({loading: false})
-      } else {
-        this.setState({loading: false, fileError: err.details})
       }
     })
-    this.verifier.on('end', () => {
-      console.log('Verify end')
-      this.verifier = null
-    })
-    this.verifier.write(req)
-    this.verifier.end()
   }
 
   cancel = () => {
-    if (this.verifier) {
-      console.log('Cancel')
-      this.verifier.cancel()
-    }
+    // TODO: stream cancel
   }
 
   openFile = async () => {
@@ -192,7 +177,7 @@ class VerifyView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; verify: VerifyState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {verify: VerifyState; router: any}, ownProps: any) => {
   return {
     defaultValue: state.verify.value || '',
     file: state.verify.file || '',

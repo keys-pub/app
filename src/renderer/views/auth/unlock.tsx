@@ -5,13 +5,12 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 import Logo from '../logo'
 
 import {push} from 'connected-react-router'
-import {client} from '../../rpc/client'
 
-import {initializeClient} from '../../rpc/client'
+import {ipcRenderer} from 'electron'
 import {store} from '../../store'
 
-import {RPCError} from '../../rpc/rpc'
-import {AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
+import {authUnlock} from '../../rpc/rpc'
+import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
 
 type Props = {}
 
@@ -91,9 +90,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       client: 'app',
     }
     console.log('Auth unlock')
-    const cl = await client()
-    // Use client directly to prevent logging the request (password)
-    cl.authUnlock(req, (err: RPCError | void, resp: AuthUnlockResponse | void) => {
+    authUnlock(req, (err: RPCError, resp: AuthUnlockResponse) => {
       if (err) {
         console.error('Unlock error:', err)
         this.setState({loading: false, error: err.details})
@@ -104,7 +101,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       }
 
       console.log('Auth unlocking...')
-      initializeClient(resp.authToken)
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
       setTimeout(() => {
         this.setState({loading: false})
         store.dispatch({type: 'UNLOCK'})

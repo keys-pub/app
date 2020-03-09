@@ -8,7 +8,6 @@ import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
 import {WatchStatus} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
 import {AppState} from '../../reducers/app'
 
 type Props = {
@@ -51,7 +50,7 @@ class Footer extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: {app: AppState; rpc: RPCState}) => {
+const mapStateToProps = (state: {app: AppState}) => {
   return {
     watchStatus: state.app.watchStatus,
   }

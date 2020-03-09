@@ -22,8 +22,13 @@ import {query} from '../state'
 
 import {configSet, userService} from '../../rpc/rpc'
 
-import {RPCState, RPCError} from '../../rpc/rpc'
-import {ConfigSetRequest, ConfigSetResponse, UserServiceRequest, UserServiceResponse} from '../../rpc/types'
+import {
+  RPCError,
+  ConfigSetRequest,
+  ConfigSetResponse,
+  UserServiceRequest,
+  UserServiceResponse,
+} from '../../rpc/types'
 
 type Props = {
   open: boolean
@@ -47,13 +52,15 @@ class UserIntroDialog extends React.Component<Props, State> {
       kid: this.props.kid,
       service: service,
     }
-    this.props.dispatch(
-      userService(req, (resp: UserServiceResponse) => {
-        this.setState({loading: false})
-        this.props.dispatch(push('/user/name?kid=' + this.props.kid))
-        this.close()
-      })
-    )
+    userService(req, (err: RPCError, resp: UserServiceResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      this.setState({loading: false})
+      this.props.dispatch(push('/user/name?kid=' + this.props.kid))
+      this.close()
+    })
   }
 
   close = () => {
@@ -155,7 +162,7 @@ class UserIntroDialog extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   return {
     open: false,
     kid: query(state, 'kid'),

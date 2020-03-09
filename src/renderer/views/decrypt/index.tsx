@@ -16,8 +16,7 @@ import * as grpc from '@grpc/grpc-js'
 import {remote} from 'electron'
 
 import {DecryptState} from '../../reducers/decrypt'
-import {client} from '../../rpc/client'
-import {RPCState} from '../../rpc/rpc'
+import {decryptFile} from '../../rpc/rpc'
 import {Key, RPCError, DecryptFileInput, DecryptFileOutput} from '../../rpc/types'
 
 export type Props = {
@@ -39,7 +38,6 @@ class DecryptView extends React.Component<Props, State> {
     loading: false,
     value: this.props.defaultValue,
   }
-  decrypter: any
   inputRef: any = React.createRef()
 
   debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
@@ -64,42 +62,29 @@ class DecryptView extends React.Component<Props, State> {
     const req: DecryptFileInput = {
       in: this.props.file,
     }
-    if (this.decrypter) {
-      console.error('already have decrypt client')
-      return
-    }
 
     console.log('Decrypting...')
     this.setState({loading: true, fileError: ''})
-    const cl = await client()
-    this.decrypter = cl.decryptFile()
-    this.decrypter.on('data', (dec: DecryptFileOutput) => {
-      console.log('Decrypt:', dec)
-      store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: dec.out, fileSender: dec.sender}})
-      this.setState({loading: false})
-    })
-    this.decrypter.on('error', (err: RPCError) => {
-      this.decrypter = null
-      console.error(err)
-      if (err.code == grpc.status.CANCELLED) {
+    decryptFile(req, (err: RPCError, resp: DecryptFileOutput, done: boolean) => {
+      if (err) {
+        if (err.code == grpc.status.CANCELLED) {
+          this.setState({loading: false})
+        } else {
+          this.setState({loading: false, fileError: err.details})
+        }
+        return
+      }
+      if (resp) {
+        store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: resp.out, fileSender: resp.sender}})
+      }
+      if (done) {
         this.setState({loading: false})
-      } else {
-        this.setState({loading: false, fileError: err.details})
       }
     })
-    this.decrypter.on('end', () => {
-      console.log('Decrypt end')
-      this.decrypter = null
-    })
-    this.decrypter.write(req)
-    this.decrypter.end()
   }
 
   cancel = () => {
-    if (this.decrypter) {
-      console.log('Cancel')
-      this.decrypter.cancel()
-    }
+    // TODO: stream cancel
   }
 
   openFile = async () => {
@@ -195,7 +180,7 @@ class DecryptView extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState; decrypt: DecryptState; router: any}, ownProps: any) => {
+const mapStateToProps = (state: {decrypt: DecryptState; router: any}, ownProps: any) => {
   return {
     defaultValue: state.decrypt.value || '',
     file: state.decrypt.file || '',

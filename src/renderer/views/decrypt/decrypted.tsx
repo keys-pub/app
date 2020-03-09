@@ -2,8 +2,6 @@ import * as React from 'react'
 
 import {Button, Divider, Input, Box, Snackbar, SnackbarContent} from '@material-ui/core'
 
-import {store} from '../../store'
-
 import {decrypt, RPCError} from '../../rpc/rpc'
 
 import SignerView from '../verify/signer'
@@ -55,18 +53,14 @@ export default class DecryptedView extends React.Component<Props, State> {
       data: data,
       armored: true,
     }
-    store.dispatch(
-      decrypt(
-        req,
-        (resp: DecryptResponse) => {
-          const decrypted = new TextDecoder().decode(resp.data)
-          this.setState({error: '', sender: resp.sender, decrypted: decrypted})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details})
-        }
-      )
-    )
+    decrypt(req, (err: RPCError, resp: DecryptResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const decrypted = new TextDecoder().decode(resp.data)
+      this.setState({error: '', sender: resp.sender, decrypted: decrypted})
+    })
   }
 
   copyToClipboard = () => {

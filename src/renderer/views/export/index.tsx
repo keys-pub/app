@@ -17,7 +17,7 @@ import {
 import {styles, DialogTitle} from '../../components'
 import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/types'
 
-import {client} from '../../rpc/client'
+import {keyExport} from '../../rpc/rpc'
 
 type Props = {
   kid: string
@@ -40,9 +40,8 @@ export default class KeyExportDialog extends React.Component<Props, State> {
 
   export = async () => {
     this.setState({error: ''})
-    const cl = await client()
     const req: KeyExportRequest = {kid: this.props.kid, password: this.state.password}
-    cl.keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
+    keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
       if (err) {
         this.setState({error: err.details})
         return

@@ -5,12 +5,10 @@ import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import {store} from '../../store'
-
 import UserLabel from './label'
 
-import {keys, RPCError, RPCState} from '../../rpc/rpc'
-import {Key, KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys} from '../../rpc/rpc'
+import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/types'
 import {styles} from '../../components'
 
 export type Props = {
@@ -43,17 +41,13 @@ export default class RecipientsView extends React.Component<Props, State> {
   search = (q: string) => {
     this.setState({loading: true}) // , options: []
     const req: KeysRequest = {query: q}
-    store.dispatch(
-      keys(
-        req,
-        (resp: KeysResponse) => {
-          this.setState({options: resp.keys || [], loading: false})
-        },
-        (err: RPCError) => {
-          this.setState({error: err.details, loading: false})
-        }
-      )
-    )
+    keys(req, (err: RPCError, resp: KeysResponse) => {
+      if (err) {
+        this.setState({error: err.details, loading: false})
+        return
+      }
+      this.setState({options: resp.keys || [], loading: false})
+    })
   }
 
   openAutoComplete = () => {

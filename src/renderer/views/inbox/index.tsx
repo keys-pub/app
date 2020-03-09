@@ -20,9 +20,6 @@ import {List} from 'immutable'
 import {inbox} from '../../rpc/rpc'
 
 import {Inbox, InboxRequest} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
-import {InboxRow} from './types'
-import {State} from '../state'
 
 type Props = {
   inbox: Inbox | void
@@ -37,7 +34,7 @@ class InboxRoot extends React.Component<Props & DispatchProp> {
   refresh = () => {
     if (!this.props.inbox) return
     const req: InboxRequest = {kid: this.props.inbox.kid, index: 0}
-    this.props.dispatch(inbox(req))
+    // inbox(req)
   }
 
   render() {
@@ -55,7 +52,7 @@ class InboxRoot extends React.Component<Props & DispatchProp> {
   }
 }
 
-const mapStateToProps = (state: State, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   const inbox: Inbox | void = selectedInbox(state.rpc, state.app.selectedInbox)
   const error: Error = inbox && inbox.error ? new Error(inbox.error) : null
 

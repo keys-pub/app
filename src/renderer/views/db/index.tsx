@@ -18,8 +18,9 @@ import {connect} from 'react-redux'
 
 import {styles} from '../../components'
 import {dateString} from '../helper'
-import {collections, documents, RPCState} from '../../rpc/rpc'
+import {collections, documents} from '../../rpc/rpc'
 import {
+  RPCError,
   Collection,
   Document,
   CollectionsRequest,
@@ -28,16 +29,14 @@ import {
   DocumentsResponse,
 } from '../../rpc/types'
 
-type Props = {
-  dispatch: (action: any) => any
-}
+type Props = {}
 
 type State = {
   collections: Array<Collection>
   documents: Array<Document>
 }
 
-class DBView extends React.Component<Props, State> {
+export default class DBView extends React.Component<Props, State> {
   state = {
     collections: [],
     documents: [],
@@ -45,14 +44,16 @@ class DBView extends React.Component<Props, State> {
 
   componentDidMount() {
     const req: CollectionsRequest = {}
-    this.props.dispatch(
-      collections(req, (resp: CollectionsResponse) => {
-        this.setState({
-          collections: resp.collections || [],
-          documents: [],
-        })
+    collections(req, (err: RPCError, resp: CollectionsResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      this.setState({
+        collections: resp.collections || [],
+        documents: [],
       })
-    )
+    })
   }
 
   selectCollection = (col: Collection) => {
@@ -63,13 +64,15 @@ class DBView extends React.Component<Props, State> {
       path: col.path,
       prefix: '',
     }
-    this.props.dispatch(
-      documents(req, (resp: DocumentsResponse) => {
-        this.setState({
-          documents: resp.documents || [],
-        })
+    documents(req, (err: RPCError, resp: DocumentsResponse) => {
+      if (err) {
+        // TODO: error
+        return
+      }
+      this.setState({
+        documents: resp.documents || [],
       })
-    )
+    })
   }
 
   selectDocument = (doc: Document) => {}
@@ -138,9 +141,3 @@ class DBView extends React.Component<Props, State> {
     )
   }
 }
-
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
-  return {}
-}
-
-export default connect(mapStateToProps)(DBView)

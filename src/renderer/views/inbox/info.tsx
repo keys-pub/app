@@ -12,7 +12,6 @@ import {RowHoriz, RowHorizComp} from './details'
 import {selectedInbox} from './actions'
 
 import {Inbox} from '../../rpc/types'
-import {State} from '../state'
 
 type Props = {
   inbox: Inbox | void
@@ -55,7 +54,7 @@ class InboxInfo extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: State, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   const inbox = selectedInbox(state.rpc, state.app.selectedInbox)
   return {inbox}
 }

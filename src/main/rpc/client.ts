@@ -1,8 +1,6 @@
 import * as getenv from 'getenv'
 
 import * as grpc from '@grpc/grpc-js'
-// import * as grpc from '/Users/gabe/projects/grpc-node/packages/grpc-js/build/src'
-
 // import * as protoLoader from '@grpc/proto-loader'
 // @ln-zap/proto-loader works in electron, see https://github.com/grpc/grpc-node/issues/969
 import * as protoLoader from '@ln-zap/proto-loader'
@@ -10,15 +8,9 @@ import * as protoLoader from '@ln-zap/proto-loader'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {remote} from 'electron'
-
-import {RPCError} from './rpc'
+import {app} from 'electron'
 
 let rpcClient: any = null
-
-const sleep = milliseconds => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
 
 const getAppName = (): string => {
   return getenv.string('KEYS_APP', 'Keys')
@@ -43,7 +35,7 @@ const loadCertPath = (): string => {
       supportDir = path.join(homeDir, 'AppData', 'Roaming')
     }
   } else {
-    supportDir = remote.app.getPath('appData')
+    supportDir = app.getPath('appData')
   }
 
   const appSupportDir = path.join(supportDir, appName)
@@ -55,7 +47,7 @@ const loadCertPath = (): string => {
 // Path to resources directory
 export const appResourcesPath = (): string => {
   if (os.platform() !== 'darwin') return '.'
-  let resourcesPath = remote.app.getAppPath()
+  let resourcesPath = app.getAppPath()
   if (path.extname(resourcesPath) === '.asar') {
     resourcesPath = path.dirname(resourcesPath)
   }
@@ -64,10 +56,10 @@ export const appResourcesPath = (): string => {
 }
 
 const resolveProtoPath = (): string => {
-  // Check in Resources, otherwise use current path
-  const protoInResources = appResourcesPath() + '/src/renderer/rpc/keys.proto'
+  // Check in resources, otherwise use current path
+  const protoInResources = appResourcesPath() + '/src/main/rpc/keys.proto'
   if (fs.existsSync(protoInResources)) return protoInResources
-  return './src/renderer/rpc/keys.proto'
+  return './src/main/rpc/keys.proto'
 }
 
 export const initializeClient = (authToken: string) => {
@@ -114,20 +106,8 @@ export const initializeClient = (authToken: string) => {
   rpcClient = cl
 }
 
-const runtimeStatus = (cl: any): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    cl.runtimeStatus({}, (err: RPCError | void) => {
-      if (err) {
-        if (err.code == grpc.status.UNAVAILABLE) {
-          resolve(false)
-          return
-        }
-        reject(err)
-        return
-      }
-      resolve(true)
-    })
-  })
+const sleep = milliseconds => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 export const client = async () => {

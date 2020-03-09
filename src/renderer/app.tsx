@@ -4,7 +4,6 @@ import {AppContainer} from 'react-hot-loader'
 import Application from './hot'
 
 import {ipcRenderer, remote} from 'electron'
-import {initializeClient} from './rpc/client'
 import {store} from './store'
 import {init} from './views/state'
 
@@ -37,7 +36,6 @@ render(Application)
 
 const start = () => {
   try {
-    initializeClient('')
     store.dispatch(init())
   } catch (err) {
     alert('Oops, init client error ' + err)

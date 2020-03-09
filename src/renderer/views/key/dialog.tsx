@@ -16,16 +16,7 @@ import {
 
 import {TransitionProps} from '@material-ui/core/transitions'
 
-import {store} from '../../store'
-
-import {styles, DialogTitle, Link} from '../../components'
-import UserSignDialog from '../user/dialog'
-import ServiceSelect from '../user/service-select'
-
-import {shell} from 'electron'
-
-import {keyGenerate} from '../../rpc/rpc'
-import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/types'
+import {DialogTitle} from '../../components'
 
 type Props = {
   open: boolean

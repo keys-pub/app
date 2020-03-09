@@ -11,7 +11,6 @@ import {push} from 'connected-react-router'
 // import {currentKey} from '../state'
 
 import {User} from '../../rpc/types'
-import {RPCState} from '../../rpc/rpc'
 import {AppState} from '../../reducers/app'
 
 type Props = {
@@ -95,7 +94,7 @@ class Header extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: {app: AppState; rpc: RPCState}) => {
+const mapStateToProps = (state: {app: AppState}) => {
   // TODO
   return {
     user: {kid: '', name: '', service: '', seq: 0, url: '', err: '', verifiedAt: 0},

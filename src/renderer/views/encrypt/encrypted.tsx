@@ -21,10 +21,8 @@ import {debounce} from 'lodash'
 
 import {clipboard} from 'electron'
 
-import {client} from '../../rpc/client'
-import {RPCError} from '../../rpc/rpc'
-
-import {Key, EncryptRequest, EncryptResponse} from '../../rpc/types'
+import {encrypt} from '../../rpc/rpc'
+import {RPCError, Key, EncryptRequest, EncryptResponse} from '../../rpc/types'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
@@ -82,8 +80,7 @@ export default class EncryptedView extends React.Component<Props, State> {
       recipients: recs,
       sender: this.props.sender,
     }
-    const cl = await client()
-    cl.encrypt(req, (err: RPCError, resp: EncryptResponse) => {
+    encrypt(req, (err: RPCError, resp: EncryptResponse) => {
       if (err) {
         this.setState({error: err.details})
         return

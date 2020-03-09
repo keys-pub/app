@@ -16,10 +16,8 @@ import {
 
 import {styles, DialogTitle} from '../../components'
 
-import {RPCError} from '../../rpc/rpc'
-import {KeyImportRequest, KeyImportResponse} from '../../rpc/types'
-
-import {client} from '../../rpc/client'
+import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/types'
+import {keyImport} from '../../rpc/rpc'
 
 type Props = {
   open: boolean
@@ -44,12 +42,11 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   importKey = async () => {
     this.setState({loading: true, error: ''})
     const input = new TextEncoder().encode(this.state.in)
-    const cl = await client()
     const req: KeyImportRequest = {
       in: input,
       password: this.state.password,
     }
-    cl.keyImport(req, (err: RPCError, resp: KeyImportResponse) => {
+    keyImport(req, (err: RPCError, resp: KeyImportResponse) => {
       if (err) {
         this.setState({loading: false, error: err.details})
         return

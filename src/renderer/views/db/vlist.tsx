@@ -7,8 +7,8 @@ import {AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List} from '
 
 import {styles} from '../../components'
 
-import {documents, RPCState} from '../../rpc/rpc'
-import {Document, DocumentsRequest, DocumentsResponse} from '../../rpc/types'
+import {documents} from '../../rpc/rpc'
+import {RPCError, Document, DocumentsRequest, DocumentsResponse} from '../../rpc/types'
 
 import {connect} from 'react-redux'
 
@@ -132,17 +132,19 @@ class DBVListView extends React.Component<Props> {
         // length: r.stopIndex - r.startIndex + 1,
         // pretty: true,
       }
-      this.props.dispatch(
-        documents(req, (resp: DocumentsResponse) => {
-          // TODO: Check if component was unmounted, cancel in componentWillUnmount
-          let i = r.startIndex
-          // $FlowFixMe
-          for (const doc of resp.documents) {
-            this.list[i++] = {doc}
-          }
-          resolve()
-        })
-      )
+      documents(req, (err: RPCError, resp: DocumentsResponse) => {
+        if (err) {
+          // TODO: error
+          return
+        }
+        // TODO: Check if component was unmounted, cancel in componentWillUnmount
+        let i = r.startIndex
+        // $FlowFixMe
+        for (const doc of resp.documents) {
+          this.list[i++] = {doc}
+        }
+        resolve()
+      })
     })
   }
 
@@ -176,7 +178,7 @@ class DBVListView extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: {rpc: RPCState}, ownProps: any) => {
+const mapStateToProps = (state: any, ownProps: any) => {
   return {
     path: '',
     total: 0,
