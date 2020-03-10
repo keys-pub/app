@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
+import {Link} from '../../components'
 import {remote} from 'electron'
 
 import {store} from '../../store'
@@ -17,12 +18,13 @@ const cstyles = {
 
 type Props = {}
 
-interface State {}
-
 const version = remote.app.getVersion()
 
-export default class SettingsView extends React.Component<Props, State> {
-  state = {}
+export default class SettingsView extends React.Component<Props> {
+  devTools = () => {
+    const win = remote.getCurrentWindow()
+    win.webContents.toggleDevTools()
+  }
 
   render() {
     return (
@@ -35,20 +37,18 @@ export default class SettingsView extends React.Component<Props, State> {
               <TableCell style={{...cstyles.cell, width: 100}}>
                 <Typography align="right">Version</Typography>
               </TableCell>
-              <TableCell style={cstyles.cell}>{version}</TableCell>
+              <TableCell style={cstyles.cell}>
+                <Typography>{version}</Typography>
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={cstyles.cell}></TableCell>
               <TableCell style={cstyles.cell}>
-                <Box display="flex" flexDirection="row">
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    style={{marginLeft: 10}}
-                    onClick={() => store.dispatch(push('/db'))}
-                  >
-                    Debug DB
-                  </Button>
+                <Typography align="right">Debug</Typography>
+              </TableCell>
+              <TableCell style={cstyles.cell}>
+                <Box display="flex" flexDirection="column">
+                  <Link onClick={() => store.dispatch(push('/db'))}>DB</Link>
+                  <Link onClick={this.devTools}>Toggle Dev Tools</Link>
                 </Box>
               </TableCell>
             </TableRow>
