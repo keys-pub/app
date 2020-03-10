@@ -3,13 +3,9 @@
 set -e -u -o pipefail # Fail on error
 
 dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $dir/..
 
 ver=`yarn run -s version`
+sh scripts/install-release.sh
 
-hub release create -d \
--a release/Keys-${ver}.dmg \
--a release/Keys-${ver}-mac.zip \
--a release/latest-mac.yml \
--m "${ver}" \
-v${ver}
- 
+release download-extra -version $ver -out bin
