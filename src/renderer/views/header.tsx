@@ -30,10 +30,6 @@ export default (props: Props) => {
   const win = remote.getCurrentWindow()
   const [maximized, setMaximized] = React.useState(win.isMaximized())
 
-  const dark = false
-  const color = dark ? 'white' : ''
-  const backgroundColor = dark ? '#2f2f2f' : ''
-
   const back = () => store.dispatch(goBack())
 
   let showSystemButtons = true
@@ -61,17 +57,17 @@ export default (props: Props) => {
   }
 
   return (
-    <Box display="flex" className="drag" flexDirection="column" style={{backgroundColor}}>
+    <Box display="flex" flexDirection="column">
       <Box display="flex" flexDirection="row">
         {props.back && (
           <Box display="flex" flexDirection="row">
-            <Box style={{width: props.navMinimize ? 68 : 140}} />
-            <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41, color}}>
+            <Box style={{width: props.navMinimize ? 68 : 140}} className="drag" />
+            <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
               <ChevronLeft />
             </IconButton>
           </Box>
         )}
-        <Box display="flex" flexGrow={1} />
+        <Box display="flex" flexGrow={1} className="drag" />
         {props.lock && (
           <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
             <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
