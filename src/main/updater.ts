@@ -41,27 +41,27 @@ export type UpdateResult = {
   relaunch: boolean
 }
 
-export const update = async (apply: boolean): Promise<UpdateResult> => {
+export const update = async (version: string, apply: boolean): Promise<UpdateResult> => {
   return new Promise((resolve, reject) => {
-    let updaterPath = ''
+    if (version == '') {
+      version = app.getVersion()
+      if (process.env.VERSION) {
+        version = process.env.VERSION
+      }
+    }
 
+    let updaterPath = ''
     if (process.env.NODE_ENV === 'production') {
       updaterPath = binPath('updater')
     }
-
     if (process.env.UPDATER_BIN) {
       updaterPath = process.env.UPDATER_BIN
     }
-
     if (!updaterPath) {
       resolve(emptyUpdateResult())
       return
     }
 
-    let version = app.getVersion()
-    if (process.env.VERSION) {
-      version = process.env.VERSION
-    }
     const repo = 'keys-pub/app'
     const appName = 'Keys'
 
@@ -79,6 +79,7 @@ export const update = async (apply: boolean): Promise<UpdateResult> => {
       relaunch = true
 
       if (os.platform() == 'win32') {
+        // Copy updater to support path, so we can update over the installed version.
         const updaterDest = path.join(appSupportPath(), 'updater.exe')
         console.log('Copying updater to', updaterDest)
         fs.copyFileSync(updaterPath, updaterDest)
@@ -87,6 +88,7 @@ export const update = async (apply: boolean): Promise<UpdateResult> => {
         console.log('Stopping keys...')
         keysStopSync()
 
+        // Installer will relaunch on windows.
         relaunch = false
       }
     }
@@ -97,7 +99,7 @@ export const update = async (apply: boolean): Promise<UpdateResult> => {
       cmd = cmd + ' -download -apply "' + applyPath + '"'
     }
 
-    const out = execProc(cmd)
+    execProc(cmd)
       .then((out: ExecOut) => {
         const update = JSON.parse(out.stdout) as Update
         resolve({update, relaunch})

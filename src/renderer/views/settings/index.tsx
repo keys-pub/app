@@ -7,6 +7,7 @@ import {remote} from 'electron'
 
 import {store} from '../../store'
 import {push} from 'connected-react-router'
+import {ipcRenderer} from 'electron'
 
 const cstyles = {
   cell: {
@@ -24,6 +25,11 @@ export default class SettingsView extends React.Component<Props> {
   devTools = () => {
     const win = remote.getCurrentWindow()
     win.webContents.toggleDevTools()
+  }
+
+  forceUpdate = () => {
+    ipcRenderer.send('update-force')
+    store.dispatch({type: 'UPDATING'})
   }
 
   render() {
@@ -49,6 +55,7 @@ export default class SettingsView extends React.Component<Props> {
                 <Box display="flex" flexDirection="column">
                   <Link onClick={() => store.dispatch(push('/db'))}>DB</Link>
                   <Link onClick={this.devTools}>Toggle Dev Tools</Link>
+                  <Link onClick={this.forceUpdate}>Force Update</Link>
                 </Box>
               </TableCell>
             </TableRow>

@@ -167,6 +167,8 @@ app.on('ready', async () => {
   menuBuilder.buildMenu()
 })
 
+// TODO: stop keysd on app exit?
+
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
@@ -179,7 +181,7 @@ ipcMain.on('keys-start', (event, arg) => {
 })
 
 ipcMain.on('update-check', (event, arg) => {
-  update(false)
+  update('', false)
     .then((res: UpdateResult) => {
       event.sender.send('update-needed', res.update)
     })
@@ -189,7 +191,21 @@ ipcMain.on('update-check', (event, arg) => {
 })
 
 ipcMain.on('update-apply', (event, arg) => {
-  update(true)
+  update('', true)
+    .then((res: UpdateResult) => {
+      console.log('Update (apply):', res)
+      if (res.relaunch) {
+        app.relaunch()
+      }
+      app.exit(0)
+    })
+    .catch((err: Error) => {
+      event.sender.send('update-apply-err', err)
+    })
+})
+
+ipcMain.on('update-force', (event, arg) => {
+  update('0.0.1', true)
     .then((res: UpdateResult) => {
       console.log('Update (apply):', res)
       if (res.relaunch) {
