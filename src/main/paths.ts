@@ -64,5 +64,8 @@ export const appPath = (): string => {
 // Path to an executable
 export const binPath = (name: string): string => {
   const resourcesPath = appResourcesPath()
+  if (os.platform() == "win32") {
+    name = name + ".exe"
+  }
   return path.join(resourcesPath, 'bin', name)
 }

@@ -5,7 +5,7 @@ import {appPath, appSupportPath} from './paths'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {keysStop} from './service'
+import { keysStopSync} from './service'
 
 export type Asset = {
   name: string
@@ -85,7 +85,7 @@ export const update = async (apply: boolean): Promise<UpdateResult> => {
         updaterPath = updaterDest
 
         console.log('Stopping keys...')
-        keysStop()
+        keysStopSync()
 
         relaunch = false
       }

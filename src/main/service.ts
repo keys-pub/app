@@ -21,6 +21,10 @@ export const keysStart = (): Promise<any> => {
   return Promise.resolve()
 }
 
+export const keysStopSync = async () => {
+  await keysStop()
+}
+
 export const keysStop = (): Promise<any> => {
   const path = keysPath()
   if (path) {
