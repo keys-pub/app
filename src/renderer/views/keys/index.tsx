@@ -341,6 +341,7 @@ class KeysView extends React.Component<Props, State> {
           close={() => this.setState({openKey: '', selected: ''})}
           kid={this.state.openKey}
           source="keys"
+          refresh={this.refresh}
         />
       </Box>
     )

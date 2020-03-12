@@ -27,63 +27,52 @@ import {
 
 type Props = {
   value: Key
+  refresh: (update: boolean) => void
 }
 
 type State = {
-  key: Key
   openRevoke: number
   openUserSign: string
 }
 
 export default class KeyView extends React.Component<Props, State> {
   state = {
-    key: this.props.value,
     openRevoke: 0,
     openUserSign: '',
   }
 
-  refresh = (update: boolean) => {
-    const req: KeyRequest = {
-      identity: this.props.value.id,
-      update,
-    }
-    key(req, (err: RPCError, resp: KeyResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
-      if (resp.key) {
-        this.setState({key: resp.key})
-      } else {
-        // TODO: error
-      }
-    })
+  revoke = () => {
+    this.setState({openRevoke: this.props.value.user.seq})
   }
 
-  revoke = () => {
-    this.setState({openRevoke: this.state.key.user.seq})
+  closeRevoke = () => {
+    this.setState({openRevoke: 0})
+    console.log('Closing revoke')
+    this.props.refresh(true)
   }
 
   userSign = (service: string) => {
     this.setState({openUserSign: service})
   }
 
-  closeUserSign = () => {
+  closeUserSign = (added: boolean) => {
     this.setState({openUserSign: ''})
+    console.log('Closing user sign, added:', added)
+    this.props.refresh(added)
   }
 
   render() {
-    const key: Key = this.state.key
+    const key: Key = this.props.value
     const kid = key.id
 
     return (
       <Box>
-        <KeyContentView value={this.state.key} revoke={this.revoke} userSign={this.userSign} />
+        <KeyContentView value={key} revoke={this.revoke} userSign={this.userSign} />
         <UserRevokeDialog
           kid={kid}
           seq={this.state.openRevoke}
           open={this.state.openRevoke > 0}
-          close={() => this.setState({openRevoke: 0})}
+          close={this.closeRevoke}
         />
         <UserSignDialog
           kid={kid}

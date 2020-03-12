@@ -31,6 +31,7 @@ type Props = {
   kid: string
   update?: boolean
   source: 'search' | 'keys'
+  refresh: () => void
 }
 
 type State = {
@@ -61,20 +62,20 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
     if (this.props.kid !== prevProps.kid) {
-      this.loadKey()
+      this.loadKey(this.props.update)
     }
   }
 
-  loadKey = () => {
+  loadKey = (update: boolean) => {
     if (!this.props.kid) {
       this.setState({key: null})
       return
     }
 
-    this.setState({loading: this.props.update, error: ''})
+    this.setState({loading: update, error: ''})
     const req: KeyRequest = {
       identity: this.props.kid,
-      update: this.props.update,
+      update: update,
     }
     key(req, (err: RPCError, resp: KeyResponse) => {
       if (err) {
@@ -87,6 +88,11 @@ export default class KeyDialog extends React.Component<Props, State> {
         this.setState({error: 'Key not found', loading: false})
       }
     })
+  }
+
+  refresh = (update: boolean) => {
+    this.loadKey(update)
+    this.props.refresh()
   }
 
   import = () => {
@@ -118,7 +124,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading}>Key</DialogTitle>
         <DialogContent dividers style={{minHeight: 155}}>
           {this.state.error && <Typography style={{color: 'red'}}>{this.state.error}</Typography>}
-          {this.state.key && <KeyView value={this.state.key} />}
+          {this.state.key && <KeyView value={this.state.key} refresh={this.refresh} />}
         </DialogContent>
         <DialogActions>
           {this.props.source == 'search' && (

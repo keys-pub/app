@@ -49,7 +49,11 @@ export default class SearchView extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.search('')
+    this.refresh()
+  }
+
+  refresh = () => {
+    this.search(this.state.input)
   }
 
   search = (query: string) => {
@@ -140,6 +144,7 @@ export default class SearchView extends React.Component<Props, State> {
           kid={this.state.openKey}
           update={true}
           source="search"
+          refresh={this.refresh}
         />
       </Box>
     )
