@@ -26,6 +26,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
     loading: false,
     error: '',
   }
+  private inputRef = React.createRef<HTMLInputElement>()
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -46,7 +47,11 @@ export default class AuthUnlockView extends React.Component<Props, State> {
             variant="outlined"
             type="password"
             onChange={this.onInputChange}
-            inputProps={{onKeyDown: this.onKeyDown, style: {fontSize: 32, height: 18}}}
+            inputProps={{
+              ref: this.inputRef,
+              style: {fontSize: 32, height: 18},
+              onKeyDown: this.onKeyDown,
+            }}
             value={this.state.password}
             style={{fontSize: 48, width: 400}}
             disabled={this.state.loading}
@@ -80,6 +85,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       this.setState({
         error: 'Oops, password is empty',
       })
+      this.inputRef?.current?.focus()
       return
     }
 
@@ -93,6 +99,8 @@ export default class AuthUnlockView extends React.Component<Props, State> {
     authUnlock(req, (err: RPCError, resp: AuthUnlockResponse) => {
       if (err) {
         this.setState({loading: false, error: err.details})
+        this.inputRef.current?.focus()
+        this.inputRef.current?.select()
         return
       }
 
