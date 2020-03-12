@@ -1,6 +1,7 @@
 import {app} from 'electron'
 import * as path from 'path'
 import * as os from 'os'
+import * as getenv from 'getenv'
 
 // Path to resources directory
 export const appResourcesPath = (): string => {
@@ -12,7 +13,12 @@ export const appResourcesPath = (): string => {
   return resourcesPath
 }
 
-export const appSupportPath = (appName: string): string => {
+const getAppName = (): string => {
+  return getenv.string('KEYS_APP', 'Keys')
+}
+
+export const appSupportPath = (): string => {
+  const appName: string = getAppName()
   let supportDir
   if (os.platform() == 'linux') {
     if (process.env.XDG_DATA_HOME) {
@@ -42,7 +48,7 @@ export const appPath = (): string => {
   const resourcesPath = appResourcesPath()
   let appPath
   switch (os.platform()) {
-    case 'darwin': 
+    case 'darwin':
       appPath = path.resolve(resourcesPath, '..', '..')
       break
     case 'win32':
@@ -56,7 +62,7 @@ export const appPath = (): string => {
 }
 
 // Path to an executable
-export const binPath = (name: string): string => { 
+export const binPath = (name: string): string => {
   const resourcesPath = appResourcesPath()
-  return path.join(resourcesPath, "bin", name)
+  return path.join(resourcesPath, 'bin', name)
 }

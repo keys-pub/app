@@ -1,22 +1,31 @@
 import {binPath} from './paths'
 import {execProc, spawnProc} from './run'
 
-export const keysStart = (): Promise<any> => {
+const keysPath = (): string => {
   let path = ''
-
   if (process.env.NODE_ENV === 'production') {
     path = binPath('keys')
   }
-
   if (process.env.KEYS_BIN) {
     path = process.env.KEYS_BIN
   }
+  console.log('Keys path:', path)
+  return path
+}
 
+export const keysStart = (): Promise<any> => {
+  const path = keysPath()
   if (path) {
-    console.log('Keys path:', path)
     return execProc(path + ' start --from=app')
   }
+  return Promise.resolve()
+}
 
+export const keysStop = (): Promise<any> => {
+  const path = keysPath()
+  if (path) {
+    return execProc(path + ' stop')
+  }
   return Promise.resolve()
 }
 
