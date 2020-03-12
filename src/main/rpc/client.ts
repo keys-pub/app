@@ -12,6 +12,7 @@ import {app} from 'electron'
 import {appResourcesPath, appSupportPath} from '../paths'
 
 let rpcClient: any = null
+let authToken: string = ''
 
 const getAppName = (): string => {
   return getenv.string('KEYS_APP', 'Keys')
@@ -29,11 +30,20 @@ const resolveProtoPath = (): string => {
   return './src/main/rpc/keys.proto'
 }
 
-export const initializeClient = (authToken: string) => {
-  if (rpcClient) {
-    console.log('Closing client...')
-    grpc.closeClient(rpcClient)
-    rpcClient = null
+const auth = (serviceUrl, callback) => {
+  const metadata = new grpc.Metadata()
+  metadata.set('authorization', authToken)
+  callback(null, metadata)
+}
+
+export const setAuthToken = (t: string) => {
+  authToken = t
+}
+
+export const initializeClient = () => {
+  if (rpcClient != null) {
+    console.error('RPC client already initialized')
+    return
   }
   console.log('Initializing client')
 
@@ -44,11 +54,6 @@ export const initializeClient = (authToken: string) => {
   console.log('Loading cert', certPath)
   const cert = fs.readFileSync(certPath, 'ascii')
 
-  const auth = (serviceUrl, callback) => {
-    const metadata = new grpc.Metadata()
-    metadata.set('authorization', authToken)
-    callback(null, metadata)
-  }
   const callCreds = grpc.credentials.createFromMetadataGenerator(auth)
   const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
   const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)

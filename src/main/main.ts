@@ -19,7 +19,7 @@ import {keysStart} from './service'
 import {update, Update} from './updater'
 
 import {RPCError} from './rpc/types'
-import {initializeClient, client} from './rpc/client'
+import {initializeClient, client, setAuthToken} from './rpc/client'
 import {status} from '@grpc/grpc-js'
 
 let mainWindow = null
@@ -170,7 +170,7 @@ app.on('ready', async () => {
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
-      initializeClient('')
+      initializeClient()
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {
@@ -246,7 +246,7 @@ ipcMain.on('rpc', async (event, arg) => {
 })
 
 ipcMain.on('authToken', (event, arg) => {
-  initializeClient(arg.authToken)
+  setAuthToken(arg.authToken)
 })
 
 type RPCStreamReply = {
