@@ -56,7 +56,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   close = () => {
-    this.setState({step: 'KEYGEN'})
+    this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
     store.dispatch({type: 'INTRO', payload: false})
     this.props.close()
   }
@@ -158,13 +158,19 @@ export default class KeyCreateDialog extends React.Component<Props> {
 
   renderCreated(open: boolean) {
     let buttonLabel = 'Close'
-    let buttonAction = this.close
+    let buttonAction = null
+    let next = ''
+    let closeLabel = ''
     switch (this.state.type) {
       case KeyType.EDX25519:
         buttonLabel = 'Next'
         buttonAction = () => this.setState({step: 'USER'})
+        next =
+          'In the next step we will ask if you want to publish your key or link it with a user account (Github, Twitter, Reddit, etc).'
+        closeLabel = 'Later'
+        break
       case KeyType.X25519:
-      // TODO
+        closeLabel = 'Close'
     }
 
     return (
@@ -186,17 +192,21 @@ export default class KeyCreateDialog extends React.Component<Props> {
               {this.state.kid}
             </Typography>
             <Typography>This key identifier is also the public key, you can share with others.</Typography>
-            <Typography>
-              In the next step we will ask if you want to publish your key or link it with a user account
-              (Github, Twitter, Reddit, etc).
-            </Typography>
+            {next && (
+              <Typography>
+                In the next step we will ask if you want to publish your key or link it with a user account
+                (Github, Twitter, Reddit, etc).
+              </Typography>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.close}>Later</Button>
-          <Button autoFocus onClick={buttonAction} color="primary">
-            {buttonLabel}
-          </Button>
+          <Button onClick={this.close}>{closeLabel}</Button>
+          {buttonAction && (
+            <Button autoFocus onClick={buttonAction} color="primary">
+              {buttonLabel}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     )
