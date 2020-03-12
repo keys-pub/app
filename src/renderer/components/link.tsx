@@ -9,10 +9,10 @@ export type Props = {
   style?: CSSProperties
   inline?: boolean
   span?: boolean
+  color?: string
 }
 
-const styles = {
-  color: '#2196f3',
+const defaultStyles = {
   textDecoration: 'none',
   cursor: 'pointer',
 }
@@ -22,12 +22,17 @@ const Link = (props: Props) => {
   const on = () => setHover(true)
   const off = () => setHover(false)
 
-  const style: CSSProperties = {...styles, ...(props.style || {})}
+  const style: CSSProperties = {...defaultStyles, ...(props.style || {})}
   if (hover) {
     style.textDecoration = hover ? 'underline' : 'none'
   }
   if (props.inline) {
     style.display = 'inline'
+  }
+  if (props.color == 'secondary') {
+    style.color = '#f50057'
+  } else {
+    style.color = '#2196f3'
   }
   if (props.span) {
     return (

@@ -5,10 +5,10 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 import {DialogTitle, styles} from '../../components'
 
 import {keyRemove} from '../../rpc/rpc'
-import {RPCError, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
+import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
 
 type Props = {
-  kid: string
+  value: Key
   open: boolean
   close: (removed: boolean) => void
 }
@@ -23,7 +23,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   }
 
   removeKey = () => {
-    const req: KeyRemoveRequest = {kid: this.props.kid}
+    const req: KeyRemoveRequest = {kid: this.props.value.id}
     keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
       if (err) {
         this.setState({error: err.details})
@@ -34,6 +34,9 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   }
 
   renderDialog(open: boolean) {
+    const key = this.props.value
+    const isPrivate = key?.type == KeyType.X25519 || key?.type == KeyType.EDX25519
+
     return (
       <Dialog
         onClose={() => this.props.close(false)}
@@ -45,7 +48,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
         // keepMounted
       >
         <DialogTitle>Delete Key</DialogTitle>
-        <DialogContent dividers>{this.renderContent()}</DialogContent>
+        <DialogContent dividers>{isPrivate ? this.renderPrivateKey() : this.renderPublicKey()}</DialogContent>
         <DialogActions>
           <Button onClick={() => this.props.close(false)}>Cancel</Button>
           <Button autoFocus onClick={this.removeKey} color="secondary">
@@ -56,14 +59,27 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
     )
   }
 
-  renderContent() {
+  renderPrivateKey() {
     return (
       <Box>
-        <Typography style={{paddingBottom: 20}}>Are you really sure you want to delete this key?</Typography>
-        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <Typography style={{paddingBottom: 20}}>
-          If you haven't backed up your key, you won't be able to recover it.
+          Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
         </Typography>
+        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.value?.id}</Typography>
+        <Typography>
+          <span style={{fontWeight: 600}}>
+            If you haven't backed up the key, you won't be able to recover it.
+          </span>
+        </Typography>
+      </Box>
+    )
+  }
+
+  renderPublicKey() {
+    return (
+      <Box>
+        <Typography style={{paddingBottom: 20}}>Do you want to delete this public key?</Typography>
+        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.value?.id}</Typography>
       </Box>
     )
   }

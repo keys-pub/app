@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Add as AddIcon} from '@material-ui/icons'
+import {Delete as DeleteIcon, Publish as ExportIcon} from '@material-ui/icons'
 
 import {styles} from '../../components'
 import UserLabel from '../user/label'
@@ -31,6 +31,9 @@ import {connect} from 'react-redux'
 
 import KeyCreateDialog from '../key/create'
 import KeyImportDialog from '../import'
+import KeyRemoveDialog from '../key/remove'
+import KeyExportDialog from '../export'
+import KeyDialog from '../key'
 
 import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/types'
@@ -40,7 +43,13 @@ type Props = {
   intro: boolean
 }
 
+type Position = {
+  x: number
+  y: number
+}
+
 type State = {
+  contextPosition: Position
   keys: Array<Key>
   sortField: string
   sortDirection: SortDirection
@@ -48,10 +57,15 @@ type State = {
   newKeyMenuEl: HTMLButtonElement
   openCreate: string // '' | 'NEW' | 'INTRO'
   openImport: boolean
+  openKey: string
+  openRemove: Key
+  openExport: string
+  selected: string
 }
 
 class KeysView extends React.Component<Props, State> {
   state = {
+    contextPosition: null,
     keys: [],
     sortField: '',
     sortDirection: 'ASC' as SortDirection,
@@ -59,6 +73,10 @@ class KeysView extends React.Component<Props, State> {
     newKeyMenuEl: null,
     openCreate: '',
     openImport: false,
+    openKey: '',
+    openRemove: null,
+    openExport: '',
+    selected: '',
   }
 
   componentDidMount() {
@@ -98,7 +116,37 @@ class KeysView extends React.Component<Props, State> {
   }
 
   select = (key: Key) => {
-    store.dispatch(push('/keys/key/index?kid=' + key.id))
+    //store.dispatch(push('/keys/key/index?kid=' + key.id))
+    this.setState({openKey: key.id, selected: key.id})
+  }
+
+  isSelected = (kid: string) => {
+    return this.state.selected == kid
+  }
+
+  onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const kid = event.currentTarget.id
+    this.setState({
+      contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
+      selected: kid,
+    })
+  }
+
+  closeContext = () => {
+    this.setState({contextPosition: null, selected: ''})
+  }
+
+  export = () => {
+    this.setState({contextPosition: null, openExport: this.state.selected})
+  }
+
+  delete = () => {
+    const key: Key = this.state.keys.find((k: Key) => {
+      return this.state.selected == k.id
+    })
+
+    this.setState({contextPosition: null, openRemove: key})
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {
@@ -133,6 +181,11 @@ class KeysView extends React.Component<Props, State> {
 
   closeImport = (imported: boolean) => {
     this.setState({openImport: false})
+    this.refresh()
+  }
+
+  closeRemove = (removed: boolean) => {
+    this.setState({openRemove: null, selected: ''})
     this.refresh()
   }
 
@@ -197,6 +250,26 @@ class KeysView extends React.Component<Props, State> {
 
     return (
       <Box>
+        <Menu
+          keepMounted
+          open={this.state.contextPosition !== null}
+          onClose={this.closeContext}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            this.state.contextPosition !== null
+              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
+              : undefined
+          }
+        >
+          <MenuItem onClick={this.export}>
+            <ExportIcon />
+            <Typography style={{marginLeft: 10, marginRight: 20}}>Export</Typography>
+          </MenuItem>
+          <MenuItem color="secondary" onClick={this.delete}>
+            <DeleteIcon />
+            <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
+          </MenuItem>
+        </Menu>
         <Divider />
         {this.renderHeader()}
         <Divider />
@@ -226,8 +299,17 @@ class KeysView extends React.Component<Props, State> {
           <TableBody>
             {this.state.keys.map((key, index) => {
               return (
-                <TableRow hover onClick={event => this.select(key)} key={key.id} style={{cursor: 'pointer'}}>
-                  <TableCell style={{verticalAlign: 'top', width: 520}}>
+                <TableRow
+                  hover
+                  onClick={event => this.select(key)}
+                  key={key.id}
+                  style={{cursor: 'pointer'}}
+                  selected={this.isSelected(key.id)}
+                  component={(props: any) => {
+                    return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
+                  }}
+                >
+                  <TableCell style={{verticalAlign: 'top', width: 490}}>
                     <IDView id={key.id} owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519} />
                   </TableCell>
                   <TableCell component="th" scope="row">
@@ -238,13 +320,28 @@ class KeysView extends React.Component<Props, State> {
             })}
           </TableBody>
         </Table>
-
         <KeyCreateDialog
           open={this.state.openCreate != ''}
           close={() => this.setState({openCreate: ''})}
           onChange={this.onChange}
         />
         <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
+        <KeyRemoveDialog
+          open={this.state.openRemove != null}
+          value={this.state.openRemove}
+          close={this.closeRemove}
+        />
+        <KeyExportDialog
+          open={this.state.openExport != ''}
+          kid={this.state.openExport}
+          close={() => this.setState({openExport: '', selected: ''})}
+        />
+        <KeyDialog
+          open={this.state.openKey != ''}
+          close={() => this.setState({openKey: '', selected: ''})}
+          kid={this.state.openKey}
+          source="keys"
+        />
       </Box>
     )
   }
@@ -268,13 +365,6 @@ const flipDirection = (d: SortDirection): SortDirection => {
       return SortDirection.ASC
   }
   return SortDirection.ASC
-}
-
-const cellStyles = {
-  paddingTop: 4,
-  paddingBottom: 8,
-  paddingLeft: 8,
-  paddingRight: 5,
 }
 
 const mapStateToProps = (state: {app: AppState}, ownProps: any) => {

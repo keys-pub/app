@@ -19,6 +19,8 @@ import {push} from 'connected-react-router'
 import {IDView} from '../key/content'
 import {store} from '../../store'
 
+import KeyDialog from '../key'
+
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
@@ -28,20 +30,22 @@ import {userSearch} from '../../rpc/rpc'
 type Props = {}
 
 type State = {
-  input: string
-  users: Array<User>
-  loading: boolean
-  query: string
   error: string
+  input: string
+  loading: boolean
+  openKey: string
+  query: string
+  users: Array<User>
 }
 
 export default class SearchView extends React.Component<Props, State> {
   state = {
-    input: '',
-    users: [],
-    loading: false,
-    query: '',
     error: '',
+    input: '',
+    loading: false,
+    openKey: '',
+    query: '',
+    users: [],
   }
 
   componentDidMount() {
@@ -75,8 +79,8 @@ export default class SearchView extends React.Component<Props, State> {
   }
 
   select = (user: User) => {
-    // this.setState({dialogOpen: true, key: key})
-    store.dispatch(push('/keys/key/index?kid=' + user.kid + '&update=1'))
+    this.setState({openKey: user.kid})
+    // store.dispatch(push('/keys/key/index?kid=' + user.kid + '&update=1'))
   }
 
   render() {
@@ -113,7 +117,12 @@ export default class SearchView extends React.Component<Props, State> {
             </TableHead>
             <TableBody>
               {this.state.users.map((user: User, index: number): any => (
-                <TableRow hover onClick={event => this.select(user)} key={user.kid + user.id}>
+                <TableRow
+                  hover
+                  onClick={event => this.select(user)}
+                  key={user.kid + user.id}
+                  style={{cursor: 'pointer'}}
+                >
                   <TableCell component="th" scope="row">
                     <UserLabel kid={user.kid} user={user} />
                   </TableCell>
@@ -125,13 +134,13 @@ export default class SearchView extends React.Component<Props, State> {
             </TableBody>
           </Table>
         </Box>
-        {/*<KeyDialog
-          open={this.state.dialogOpen}
-          close={() => this.setState({dialogOpen: false})}
-          add={this.add}
-          remove={this.remove}
-          value={this.state.key}
-        />*/}
+        <KeyDialog
+          open={this.state.openKey != ''}
+          close={() => this.setState({openKey: ''})}
+          kid={this.state.openKey}
+          update={true}
+          source="search"
+        />
       </Box>
     )
   }

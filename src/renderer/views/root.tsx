@@ -58,6 +58,18 @@ const theme = createMuiTheme({
         backgroundColor: fade('#f50057', 0.05),
       },
     },
+    MuiTableRow: {
+      root: {
+        '&$selected': {
+          backgroundColor: '#f4fafe',
+        },
+      },
+      hover: {
+        '&:hover': {
+          backgroundColor: '#fafafa !important',
+        },
+      },
+    },
     // MuiToggleButton: {
     //   root: {
     //     fontFamily: 'Roboto',

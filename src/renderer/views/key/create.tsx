@@ -40,9 +40,9 @@ type State = {
   step: 'KEYGEN' | 'CREATED' | 'USER' | 'SIGN'
 }
 
-const transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />
-})
+// const transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />
+// })
 
 const minHeight = 125
 
@@ -105,11 +105,10 @@ export default class KeyCreateDialog extends React.Component<Props> {
     let keyDesc = ''
     switch (this.state.type) {
       case KeyType.EDX25519:
-        keyDesc = `An EdX25519 key is the default key capable of signing and encryption. Ed25519 is an elliptic curve signing algorithm using EdDSA and Curve25519 and can be converted to an X25519 encryption key.`
+        keyDesc = `An EdX25519 key is the default key capable of signing (Ed25519) and encryption (X25519). This is the recommended key.`
         break
       case KeyType.X25519:
-        keyDesc =
-          'X25519 is an elliptic curve Diffie-Hellman key exchange using Curve25519. X25519 keys only provide public key authenticated encryption.'
+        keyDesc = 'An X25519 key only provides public key authenticated encryption.'
         break
     }
 
@@ -120,7 +119,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        TransitionComponent={transition}
+        // TransitionComponent={transition}
         keepMounted
       >
         <DialogTitle loading={this.state.loading}>Generate Key</DialogTitle>
@@ -175,7 +174,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        TransitionComponent={transition}
+        // TransitionComponent={transition}
         keepMounted
       >
         {/* TODO: This title? */}
@@ -211,7 +210,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        TransitionComponent={transition}
+        // TransitionComponent={transition}
         keepMounted
       >
         <DialogTitle>Publish / Link Key</DialogTitle>

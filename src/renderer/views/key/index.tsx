@@ -1,40 +1,76 @@
 import * as React from 'react'
 
-import {Box, Divider, LinearProgress, Typography} from '@material-ui/core'
+import {
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  FormControl,
+  MenuItem,
+  Select,
+  Slide,
+  Typography,
+} from '@material-ui/core'
 
-import {connect} from 'react-redux'
-import {query} from '../state'
+import {TransitionProps} from '@material-ui/core/transitions'
 
-import {store} from '../../store'
-
+import {DialogTitle} from '../../components'
 import KeyView from './view'
 
-import {key} from '../../rpc/rpc'
-import {RPCError, Key, KeyRequest, KeyResponse} from '../../rpc/types'
+import {goBack, push} from 'connected-react-router'
+import {store} from '../../store'
+
+import {key, keyRemove, pull} from '../../rpc/rpc'
+import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/types'
 
 type Props = {
+  open: boolean
+  close: () => void
   kid: string
-  update: boolean
+  update?: boolean
+  source: 'search' | 'keys'
 }
 
-interface State {
-  key: Key
-  loading: boolean
+type State = {
   error: string
+  loading: boolean
+  key: Key
+  openExport: boolean
+  openRemove: boolean
 }
 
-class KeyIndexView extends React.Component<Props, State> {
+// const transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />
+// })
+
+export default class KeyDialog extends React.Component<Props, State> {
   state = {
     error: '',
-    key: null,
+    export: false,
     loading: false,
+    key: null,
+    openExport: false,
+    openRemove: false,
   }
 
-  componentDidMount() {
-    this.loadKey()
+  close = () => {
+    this.props.close()
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
+    if (this.props.kid !== prevProps.kid) {
+      this.loadKey()
+    }
   }
 
   loadKey = () => {
+    if (!this.props.kid) {
+      this.setState({key: null})
+      return
+    }
+
     this.setState({loading: this.props.update, error: ''})
     const req: KeyRequest = {
       identity: this.props.kid,
@@ -53,27 +89,58 @@ class KeyIndexView extends React.Component<Props, State> {
     })
   }
 
+  import = () => {
+    this.setState({loading: true, error: ''})
+    const req: PullRequest = {
+      identity: this.props.kid,
+    }
+    pull(req, (err: RPCError, resp: PullResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false})
+      this.close()
+    })
+  }
+
   render() {
-    const loading = this.state.loading
     return (
-      <Box display="flex" flex={1} flexDirection="column">
-        {!loading && <Divider style={{marginBottom: 3}} />}
-        {loading && <LinearProgress />}
-        {this.state.error && (
-          <Typography style={{color: 'red', marginLeft: 30}}>{this.state.error}</Typography>
-        )}
-        <Box paddingBottom={1} />
-        {this.state.key && <KeyView value={this.state.key} />}
-      </Box>
+      <Dialog
+        onClose={this.close}
+        open={this.props.open}
+        maxWidth="sm"
+        fullWidth
+        disableBackdropClick
+        // TransitionComponent={transition}
+        keepMounted
+      >
+        <DialogTitle loading={this.state.loading}>Key</DialogTitle>
+        <DialogContent dividers style={{minHeight: 155}}>
+          {this.state.error && <Typography style={{color: 'red'}}>{this.state.error}</Typography>}
+          {this.state.key && <KeyView value={this.state.key} />}
+        </DialogContent>
+        <DialogActions>
+          {this.props.source == 'search' && (
+            <Box display="flex" flexDirection="row">
+              <Button onClick={this.close}>Close</Button>
+              <Button color="primary" onClick={this.import} disabled={this.state.loading}>
+                Import
+              </Button>
+            </Box>
+          )}
+          {this.props.source != 'search' && <Button onClick={this.close}>Close</Button>}
+        </DialogActions>
+      </Dialog>
     )
   }
 }
 
-const mapStateToProps = (state: {router: any}, ownProps: any) => {
-  return {
-    kid: query(state, 'kid'),
-    update: query(state, 'update') == '1',
-  }
-}
+// const mapStateToProps = (state: {router: any}, ownProps: any) => {
+//   return {
+//     kid: query(state, 'kid'),
+//     update: query(state, 'update') == '1',
+//   }
+// }
 
-export default connect(mapStateToProps)(KeyIndexView)
+// export default connect(mapStateToProps)(KeyIndexView)
