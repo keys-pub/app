@@ -23,17 +23,25 @@ export type Update = {
   applied: string
 }
 
-const emptyUpdate = (): Update => {
+const emptyUpdateResult = (): UpdateResult => {
   return {
-    version: '',
-    publishedAt: 0,
-    asset: {name: '', url: '', digest: '', digestType: '', localPath: ''},
-    needUpdate: false,
-    applied: '',
+    update: {
+      version: '',
+      publishedAt: 0,
+      asset: {name: '', url: '', digest: '', digestType: '', localPath: ''},
+      needUpdate: false,
+      applied: '',
+    },
+    relaunch: false,
   }
 }
 
-export const update = async (apply: boolean): Promise<Update> => {
+export type UpdateResult = {
+  update: Update
+  relaunch: boolean
+}
+
+export const update = async (apply: boolean): Promise<UpdateResult> => {
   return new Promise((resolve, reject) => {
     let updaterPath = ''
 
@@ -46,7 +54,7 @@ export const update = async (apply: boolean): Promise<Update> => {
     }
 
     if (!updaterPath) {
-      resolve(emptyUpdate())
+      resolve(emptyUpdateResult())
       return
     }
 
@@ -65,8 +73,10 @@ export const update = async (apply: boolean): Promise<Update> => {
       }
     }
 
+    let relaunch = false
     if (applyPath != '') {
       console.log('Apply:', applyPath)
+      relaunch = true
 
       if (os.platform() == 'win32') {
         const updaterDest = path.join(appSupportPath(), 'updater.exe')
@@ -76,6 +86,8 @@ export const update = async (apply: boolean): Promise<Update> => {
 
         console.log('Stopping keys...')
         keysStop()
+
+        relaunch = false
       }
     }
 
@@ -88,7 +100,7 @@ export const update = async (apply: boolean): Promise<Update> => {
     const out = execProc(cmd)
       .then((out: ExecOut) => {
         const update = JSON.parse(out.stdout) as Update
-        resolve(update)
+        resolve({update, relaunch})
       })
       .catch(err => {
         reject(err)

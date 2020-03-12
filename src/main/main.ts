@@ -16,7 +16,7 @@ const windowStateKeeper = require('electron-window-state')
 import {MenuActionType} from './menu'
 
 import {keysStart} from './service'
-import {update, Update} from './updater'
+import {update, Update, UpdateResult} from './updater'
 
 import {RPCError} from './rpc/types'
 import {initializeClient, client, setAuthToken} from './rpc/client'
@@ -180,8 +180,8 @@ ipcMain.on('keys-start', (event, arg) => {
 
 ipcMain.on('update-check', (event, arg) => {
   update(false)
-    .then((update: Update) => {
-      event.sender.send('update-needed', update)
+    .then((res: UpdateResult) => {
+      event.sender.send('update-needed', res.update)
     })
     .catch((err: Error) => {
       event.sender.send('update-check-err', err)
@@ -190,12 +190,12 @@ ipcMain.on('update-check', (event, arg) => {
 
 ipcMain.on('update-apply', (event, arg) => {
   update(true)
-    .then((update: Update) => {
-      console.log('Update applied:', update)
-      if (update.applied) {
+    .then((res: UpdateResult) => {
+      console.log('Update (apply):', res)
+      if (res.relaunch) {
         app.relaunch()
-        app.exit(0)
       }
+      app.exit(0)
     })
     .catch((err: Error) => {
       event.sender.send('update-apply-err', err)
