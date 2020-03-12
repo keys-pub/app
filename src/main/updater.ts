@@ -1,7 +1,11 @@
 import {binPath} from './paths'
 import {execProc, ExecOut} from './run'
 import {app} from 'electron'
-import {appPath} from './paths'
+import {appPath, appSupportPath} from './paths'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as os from 'os'
+import { keysStopSync} from './service'
 
 export type Asset = {
   name: string
@@ -19,30 +23,38 @@ export type Update = {
   applied: string
 }
 
-const emptyUpdate = (): Update => {
+const emptyUpdateResult = (): UpdateResult => {
   return {
-    version: '',
-    publishedAt: 0,
-    asset: {name: '', url: '', digest: '', digestType: '', localPath: ''},
-    needUpdate: false,
-    applied: '',
+    update: {
+      version: '',
+      publishedAt: 0,
+      asset: {name: '', url: '', digest: '', digestType: '', localPath: ''},
+      needUpdate: false,
+      applied: '',
+    },
+    relaunch: false,
   }
 }
 
-export const update = (apply: boolean): Promise<Update> => {
+export type UpdateResult = {
+  update: Update
+  relaunch: boolean
+}
+
+export const update = async (apply: boolean): Promise<UpdateResult> => {
   return new Promise((resolve, reject) => {
-    let path = ''
+    let updaterPath = ''
 
     if (process.env.NODE_ENV === 'production') {
-      path = binPath('updater')
+      updaterPath = binPath('updater')
     }
 
     if (process.env.UPDATER_BIN) {
-      path = process.env.UPDATER_BIN
+      updaterPath = process.env.UPDATER_BIN
     }
 
-    if (!path) {
-      resolve(emptyUpdate())
+    if (!updaterPath) {
+      resolve(emptyUpdateResult())
       return
     }
 
@@ -61,12 +73,26 @@ export const update = (apply: boolean): Promise<Update> => {
       }
     }
 
-    console.log('Updater path:', path)
+    let relaunch = false
     if (applyPath != '') {
       console.log('Apply:', applyPath)
+      relaunch = true
+
+      if (os.platform() == 'win32') {
+        const updaterDest = path.join(appSupportPath(), 'updater.exe')
+        console.log('Copying updater to', updaterDest)
+        fs.copyFileSync(updaterPath, updaterDest)
+        updaterPath = updaterDest
+
+        console.log('Stopping keys...')
+        keysStopSync()
+
+        relaunch = false
+      }
     }
 
-    let cmd = path + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version
+    console.log('Updater path:', updaterPath)
+    let cmd = updaterPath + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version
     if (applyPath != '') {
       cmd = cmd + ' -download -apply "' + applyPath + '"'
     }
@@ -74,7 +100,7 @@ export const update = (apply: boolean): Promise<Update> => {
     const out = execProc(cmd)
       .then((out: ExecOut) => {
         const update = JSON.parse(out.stdout) as Update
-        resolve(update)
+        resolve({update, relaunch})
       })
       .catch(err => {
         reject(err)

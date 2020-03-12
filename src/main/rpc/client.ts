@@ -1,5 +1,4 @@
 import * as getenv from 'getenv'
-
 import * as grpc from '@grpc/grpc-js'
 // import * as protoLoader from '@grpc/proto-loader'
 // @ln-zap/proto-loader works in electron, see https://github.com/grpc/grpc-node/issues/969
@@ -14,13 +13,8 @@ import {appResourcesPath, appSupportPath} from '../paths'
 let rpcClient: any = null
 let authToken: string = ''
 
-const getAppName = (): string => {
-  return getenv.string('KEYS_APP', 'Keys')
-}
-
 const loadCertPath = (): string => {
-  const appName: string = getAppName()
-  return path.join(appSupportPath(appName), 'ca.pem')
+  return path.join(appSupportPath(), 'ca.pem')
 }
 
 const resolveProtoPath = (): string => {
