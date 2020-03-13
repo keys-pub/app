@@ -72,7 +72,7 @@ export default class UpdateAlert extends React.Component<Props, State> {
     return (
       <Snackbar
         open={this.state.open}
-        onClose={this.close}
+        onClose={() => {}} // Alert must be closed manually (not via clickaway or timeout)
         anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
       >
         <Alert onClose={this.close} severity="info">
