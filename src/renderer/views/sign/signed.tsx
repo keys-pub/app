@@ -73,6 +73,7 @@ export default class SignedView extends React.Component<Props, State> {
   }
 
   render() {
+    const disabled = !this.state.signed
     return (
       <Box style={{width: '100%', height: '100%', position: 'relative'}}>
         <Input
@@ -84,18 +85,27 @@ export default class SignedView extends React.Component<Props, State> {
             style: {
               ...styles.mono,
               height: '100%',
+              overflow: 'auto',
+              paddingTop: 0,
+              paddingLeft: 8,
+              paddingBottom: 0,
+              paddingRight: 0,
             },
           }}
           style={{
             height: '100%',
             width: '100%',
-            paddingLeft: 10,
-            paddingTop: 10,
-            overflowY: 'scroll',
           }}
         />
         <Box style={{position: 'absolute', right: 20, bottom: 6}}>
-          <Button size="small" variant="outlined" onClick={this.copyToClipboard}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            disabled={disabled}
+            onClick={this.copyToClipboard}
+            style={{backgroundColor: 'white'}}
+          >
             Copy to Clipboard
           </Button>
         </Box>

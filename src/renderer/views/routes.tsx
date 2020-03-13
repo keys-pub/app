@@ -25,11 +25,7 @@ import SettingsView from './settings'
 import DBView from './db'
 import KeyView from './key'
 import KeysView from './keys'
-
-import EncryptView from './encrypt'
-import DecryptView from './decrypt'
-import SignView from './sign'
-import VerifyView from './verify'
+import ToolsView from './tools'
 
 // TODO: Make path string RoutePath type
 export type RouteInfo = {
@@ -41,22 +37,15 @@ export const routes: Array<RouteInfo> = [
   {path: '/auth/index', component: () => <AuthView />},
   {path: '/db', component: () => <DBView />},
   {path: '/debug', component: () => <DebugView />},
-  // {path: '/keys/key/index', component: () => <KeyView />},
-  // {path: '/keys/key/create', component: () => <KeyCreateView />},
-  // {path: '/keys/key/export', component: () => <KeyExportView />},
-  // {path: '/keys/key/import', component: () => <KeyImportView />},
-  // {path: '/keys/key/remove', component: () => <KeyRemoveView />},
+
   {path: '/keys/index', component: () => <KeysView />},
 
   {path: '/search/index', component: () => <SearchView />},
 
+  {path: '/tools/index', component: () => <ToolsView />},
+
   {path: '/splash', component: () => <Splash delay={0} />},
   {path: '/style-guide', component: () => <StyleGuide />},
-
-  {path: '/encrypt/index', component: () => <EncryptView />},
-  {path: '/decrypt/index', component: () => <DecryptView />},
-  {path: '/sign/index', component: () => <SignView />},
-  {path: '/verify/index', component: () => <VerifyView />},
 
   {path: '/settings/index', component: () => <SettingsView />},
 ]

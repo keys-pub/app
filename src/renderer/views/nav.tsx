@@ -18,15 +18,11 @@ import {AppState} from '../reducers/app'
 import {store} from '../store'
 
 import {
-  Person as ProfileIcon,
   VpnKeyOutlined as KeysIcon,
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
-  EnhancedEncryption as EncryptIcon,
-  LockOpen as DecryptIcon,
-  CreateOutlined as SignIcon,
-  VisibilityOutlined as VerifyIcon,
+  Build as ToolsIcon,
   Settings as SettingsIcon,
 } from '@material-ui/icons'
 
@@ -41,13 +37,12 @@ type Props = {
   navMinimize: boolean
 }
 
+// TODO: hover
+
 const navs = [
   {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
   {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
-  {name: 'Encrypt', icon: EncryptIcon, route: '/encrypt/index', prefix: '/encrypt'},
-  {name: 'Decrypt', icon: DecryptIcon, route: '/decrypt/index', prefix: '/decrypt'},
-  {name: 'Sign', icon: SignIcon, route: '/sign/index', prefix: '/sign'},
-  {name: 'Verify', icon: VerifyIcon, route: '/verify/index', prefix: '/verify'},
+  {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
   {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
 ]
 
@@ -73,9 +68,7 @@ class Nav extends React.Component<Props> {
           <Box height={38} style={{backgroundColor: backgroundColor}}></Box>
           <List style={{minWidth: width, height: '100%', padding: 0}}>
             {navs.map((nav, index) =>
-              row(nav, index, (route && route.path.startsWith(nav.prefix)) || false, open, () =>
-                store.dispatch(push(nav.route))
-              )
+              row(nav, index, route?.path.startsWith(nav.prefix), open, () => store.dispatch(push(nav.route)))
             )}
           </List>
           <Box display="flex" flexDirection="row">

@@ -26,6 +26,10 @@ export default class VerifiedView extends React.Component<Props, State> {
     error: '',
   }
 
+  componentDidMount() {
+    this.verify()
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps != this.props) {
       this.verify()
@@ -33,6 +37,7 @@ export default class VerifiedView extends React.Component<Props, State> {
   }
 
   verify = () => {
+    console.log('Verify...')
     this.setState({error: '', signer: null, verified: ''})
 
     if (this.props.value == '') return
@@ -65,13 +70,16 @@ export default class VerifiedView extends React.Component<Props, State> {
           inputProps={{
             style: {
               height: '100%',
+              overflow: 'auto',
+              paddingTop: 8,
+              paddingLeft: 8,
+              paddingBottom: 0,
+              paddingRight: 0,
             },
           }}
           style={{
             height: '100%',
-            paddingLeft: 10,
-            paddingTop: 10,
-            overflowY: 'scroll',
+            width: '100%',
           }}
         />
       </Box>

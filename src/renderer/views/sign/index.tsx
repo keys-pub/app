@@ -123,7 +123,6 @@ class SignView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-        <Divider />
         <SignKeySelectView
           defaultValue={this.props.signer}
           onChange={this.setSigner}
@@ -131,55 +130,63 @@ class SignView extends React.Component<Props, State> {
           placeholderDisabled
         />
         <Divider />
-        {this.props.file && (
-          <Box style={{height: '50%', paddingTop: 8, paddingLeft: 8}}>
-            <Typography style={{...styles.mono, display: 'inline'}}>{this.props.file}&nbsp;</Typography>
-            <Link inline onClick={this.clearFile}>
-              Clear
-            </Link>
-          </Box>
-        )}
-        {!this.props.file && (
-          <Box style={{position: 'relative', height: '50%', paddingLeft: 8, paddingTop: 8}}>
-            <Input
-              multiline
-              autoFocus
-              onChange={this.onInputChange}
-              value={this.state.value}
-              disableUnderline
-              inputProps={{
-                ref: this.inputRef,
-                style: {
+        <Box style={{position: 'relative', height: '47%'}}>
+          {this.props.file && (
+            <Box style={{paddingTop: 6, paddingLeft: 8}}>
+              <Typography style={{...styles.mono, display: 'inline'}}>{this.props.file}&nbsp;</Typography>
+              <Link inline onClick={this.clearFile}>
+                Clear
+              </Link>
+            </Box>
+          )}
+          {!this.props.file && (
+            <Box style={{height: '100%'}}>
+              <Input
+                multiline
+                autoFocus
+                onChange={this.onInputChange}
+                value={this.state.value}
+                disableUnderline
+                inputProps={{
+                  ref: this.inputRef,
+                  style: {
+                    height: '100%',
+                    overflow: 'auto',
+                    paddingTop: 8,
+                    paddingLeft: 8,
+                    paddingBottom: 0,
+                    paddingRight: 0,
+                  },
+                }}
+                style={{
                   height: '100%',
-                  overflowY: 'scroll',
-                },
-              }}
-              style={{
-                height: '100%',
-                width: '100%',
-              }}
-            />
-            {!this.state.value && (
-              <Box style={{position: 'absolute', top: 10, left: 10}}>
-                <Typography
-                  style={{display: 'inline', color: '#a2a2a2'}}
-                  onClick={() => this.inputRef.current.focus()}
-                >
-                  Type text or{' '}
-                </Typography>
-                <Link inline onClick={this.openFile}>
-                  select a file
-                </Link>
-                <Typography style={{display: 'inline'}}>.</Typography>
-              </Box>
-            )}
+                  width: '100%',
+                }}
+              />
+              {!this.state.value && (
+                <Box style={{position: 'absolute', top: 6, left: 8}}>
+                  <Typography
+                    style={{display: 'inline', color: '#a2a2a2'}}
+                    onClick={() => this.inputRef.current.focus()}
+                  >
+                    Type text or{' '}
+                  </Typography>
+                  <Link inline onClick={this.openFile}>
+                    select a file
+                  </Link>
+                  <Typography style={{display: 'inline'}}>.</Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+          <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
+            {!this.state.loading && <Divider />}
+            {this.state.loading && <LinearProgress />}
           </Box>
-        )}
-        {!this.state.loading && <Divider style={{marginTop: 3}} />}
-        {this.state.loading && <LinearProgress />}
+        </Box>
         <Box
           style={{
-            height: '50%',
+            height: '53%',
             width: '100%',
           }}
         >

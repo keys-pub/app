@@ -118,18 +118,27 @@ export default class EncryptedView extends React.Component<Props, State> {
               ...styles.mono,
               ...stylesInput,
               height: '100%',
+              overflow: 'auto',
+              paddingTop: 0,
+              paddingLeft: 8,
+              paddingBottom: 0,
+              paddingRight: 0,
             },
           }}
           style={{
             height: '100%',
             width: '100%',
-            paddingLeft: 10,
-            paddingTop: 10,
-            overflowY: 'scroll',
           }}
         />
         <Box style={{position: 'absolute', right: 20, bottom: 6}}>
-          <Button size="small" variant="outlined" disabled={disabled} onClick={this.copyToClipboard}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            disabled={disabled}
+            onClick={this.copyToClipboard}
+            style={{backgroundColor: 'white'}}
+          >
             Copy to Clipboard
           </Button>
         </Box>
