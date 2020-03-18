@@ -17,7 +17,12 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Delete as DeleteIcon, Publish as ExportIcon} from '@material-ui/icons'
+import {
+  Delete as DeleteIcon,
+  Publish as ExportIcon,
+  DataUsage as GenerateKeyIcon,
+  ImportExport as ImportKeyIcon,
+} from '@material-ui/icons'
 
 import {styles} from '../../components'
 import UserLabel from '../user/label'
@@ -225,10 +230,12 @@ class KeysView extends React.Component<Props, State> {
           onClose={this.closeMenu}
         >
           <MenuItem onClick={this.keyGen}>
-            <Typography>Generate Key</Typography>
+            <GenerateKeyIcon />
+            <Typography style={{marginLeft: 10}}>Generate Key</Typography>
           </MenuItem>
           <MenuItem onClick={this.importKey}>
-            <Typography>Import Key</Typography>
+            <ImportKeyIcon />
+            <Typography style={{marginLeft: 10}}>Import Key</Typography>
           </MenuItem>
         </Menu>
         <Box paddingLeft={1} />

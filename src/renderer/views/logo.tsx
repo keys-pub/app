@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Divider, LinearProgress, Typography} from '@material-ui/core'
 
 type Props = {
-  loading: boolean
+  loading?: boolean
   top?: number
 }
 
