@@ -125,23 +125,25 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
     let placeholder = ''
     let question = "What's your username?"
-    let next = "In the next step, we'll create a signed message that you can post to your account."
+    let next =
+      "In the next step, we'll create a signed message using this key that you can post to your account."
     switch (service) {
       case 'github':
         placeholder = 'username'
         question = "What's your Github username?"
         next =
-          "In the next step, we'll create a signed message that you can post as a gist on your Github account."
+          "In the next step, we'll create a signed message using this key that you can post as a gist on your Github account."
         break
       case 'twitter':
         placeholder = '@username'
         question = "What's your Twitter handle?"
-        next = "In the next step, we'll create a signed message that you can post as a tweet."
+        next = "In the next step, we'll create a signed message using this key that you can post as a tweet."
         break
       case 'reddit':
         placeholder = 'username'
         question = "What's your Reddit username?"
-        next = "In the next step, we'll create a signed message that you can post on r/keyspubmsgs."
+        next =
+          "In the next step, we'll create a signed message using this key that you can post on r/keyspubmsgs."
         break
     }
 
