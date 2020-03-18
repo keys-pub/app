@@ -30,7 +30,13 @@ type State = {
   selected: string // 'encrypt' | 'decrypt' | 'sign' | 'verify'
 }
 
-const navs = [
+type Nav = {
+  name: string
+  id: string
+  icon: any
+}
+
+const navs: Array<Nav> = [
   {name: 'Encrypt', icon: EncryptIcon, id: 'encrypt'},
   {name: 'Decrypt', icon: DecryptIcon, id: 'decrypt'},
   {name: 'Sign', icon: SignIcon, id: 'sign'},
@@ -75,13 +81,13 @@ export default class ToolsView extends React.Component<Props, State> {
 const backgroundColor = 'white'
 const backgroundColorSelected = '#f4fafe'
 
-const row = (nav: any, index: number, selected: boolean, onClick: any) => {
+const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem
       button
       style={{height: 42, backgroundColor: selected ? backgroundColorSelected : backgroundColor}}
       onClick={onClick}
-      key={nav.route}
+      key={nav.id}
     >
       <ListItemIcon style={{minWidth: 0, marginRight: 10}}>
         <nav.icon style={{fontSize: 20, color: selected ? '' : ''}} />
