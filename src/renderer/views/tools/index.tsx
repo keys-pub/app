@@ -79,7 +79,7 @@ export default class ToolsView extends React.Component<Props, State> {
 }
 
 const backgroundColor = 'white'
-const backgroundColorSelected = '#f4fafe'
+const backgroundColorSelected = '#e4eaee'
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (

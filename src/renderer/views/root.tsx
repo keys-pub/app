@@ -61,7 +61,7 @@ const theme = createMuiTheme({
     MuiTableRow: {
       root: {
         '&$selected': {
-          backgroundColor: '#f4fafe',
+          backgroundColor: '#e4eaee',
         },
       },
       hover: {
