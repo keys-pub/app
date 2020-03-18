@@ -261,24 +261,25 @@ export interface EncryptOutput {
 export interface DecryptRequest {
     // Data to decrypt.
     data?: Uint8Array;
-    // Armored, if true will return armored string output.
+    // Armored, if true, expects data to be armored.
     armored?: boolean;
     // Mode is the encryption mode.
     mode?: EncryptMode;
 }
 
 export interface DecryptResponse {
-    // Data (if out is not specified in request).
+    // Data decrypted.
     data?: Uint8Array;
+    // Sender (if not anonymous)
     sender?: Key;
 }
 
 export interface DecryptFileInput {
-    // In is input file path. 
+    // In is the input encrypted file path. 
     in?: string;
-    // Out is output file path.
+    // Out is the output decrypted file path.
     out?: string;
-    // Armored, if true will return armored string output.
+    // Armored, if true, expects file to be armored.
     armored?: boolean;
     // Mode is the encryption mode.
     mode?: EncryptMode;
@@ -631,8 +632,8 @@ export interface MessageContent {
 }
 
 export interface MessagePrepareRequest {
-    kid?: string;
     sender?: string;
+    recipient?: string;
     text?: string;
 }
 
@@ -641,10 +642,8 @@ export interface MessagePrepareResponse {
 }
 
 export interface MessageCreateRequest {
-    kid?: string;
     sender?: string;
-    // ID is usually from MessagePrepareResponse.ID, or auto generated if empty
-    id?: string;
+    recipient?: string;
     text?: string;
 }
 
@@ -653,7 +652,8 @@ export interface MessageCreateResponse {
 }
 
 export interface MessagesRequest {
-    kid?: string;
+    sender?: string;
+    recipient?: string;
 }
 
 export interface MessagesResponse {

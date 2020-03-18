@@ -312,23 +312,24 @@ message EncryptOutput {
 message DecryptRequest {
   // Data to decrypt.
   bytes data = 1;
-  // Armored, if true will return armored string output.
+  // Armored, if true, expects data to be armored.
   bool armored = 10;
   // Mode is the encryption mode.
   EncryptMode mode = 13;
 }
 message DecryptResponse {
-  // Data (if out is not specified in request).
+  // Data decrypted.
   bytes data = 1;
+  // Sender (if not anonymous)
   Key sender = 2;
 }
 
 message DecryptFileInput {
-  // In is input file path. 
+  // In is the input encrypted file path. 
   string in = 1;
-  // Out is output file path.
+  // Out is the output decrypted file path.
   string out = 2;
-  // Armored, if true will return armored string output.
+  // Armored, if true, expects file to be armored.
   bool armored = 10;
   // Mode is the encryption mode.
   EncryptMode mode = 13;
@@ -710,9 +711,9 @@ message MessageContent {
   string text = 1;
 }
 
-message MessagePrepareRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string sender = 2;
+message MessagePrepareRequest {  
+  string sender = 1;
+  string recipient = 2;
   string text = 10;
 }
 
@@ -720,12 +721,9 @@ message MessagePrepareResponse {
   Message message = 1;
 }
 
-message MessageCreateRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string sender = 2;
-
-  // ID is usually from MessagePrepareResponse.ID, or auto generated if empty
-  string id = 10 [(gogoproto.customname) = "ID"];
+message MessageCreateRequest {  
+  string sender = 1;
+  string recipient = 2;
   string text = 11;
 }
 
@@ -733,8 +731,9 @@ message MessageCreateResponse {
   Message message = 1;
 }
 
-message MessagesRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+message MessagesRequest {  
+  string sender = 1;
+  string recipient = 2;
 }
 
 message MessagesResponse {

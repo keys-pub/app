@@ -56,8 +56,8 @@ export default class MessagesView extends React.Component<Props, State> {
       return false
     }
     const prep: MessagePrepareRequest = {
-      kid: this.props.inbox.kid,
-      sender: this.props.inbox.kid,
+      // kid: this.props.inbox.kid,
+      // sender: this.props.inbox.kid,
       text,
     }
     messagePrepare(prep, (err: RPCError, resp: MessagePrepareResponse) => {
@@ -72,7 +72,7 @@ export default class MessagesView extends React.Component<Props, State> {
       this.setState({pendingMessage: resp.message})
       const req: MessageCreateRequest = {
         ...prep,
-        id: message.id,
+        // id: message.id,
       }
 
       this.listRef.setPending(resp.message)

@@ -8,9 +8,6 @@ import Row from './row'
 import {connect} from 'react-redux'
 import {push} from 'connected-react-router'
 
-import {inboxRows} from './actions'
-import {inbox} from '../../rpc/rpc'
-
 import {Inbox, InboxRequest} from '../../rpc/types'
 import {InboxRow} from './types'
 
@@ -66,10 +63,7 @@ class InboxList extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => {
-  const rows: Array<InboxRow> = inboxRows(state.rpc, state.app.selectedInbox)
-  return {
-    rows,
-  }
+  return {}
 }
 
 export default connect(mapStateToProps)(InboxList)

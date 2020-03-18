@@ -7,7 +7,6 @@ import InboxList from './list'
 import InboxFooter from './footer'
 import Messages from '../messages'
 import MessagesHeader from '../messages/header'
-import {selectedInbox, inboxRows} from './actions'
 
 import ErrorView from './error'
 
@@ -53,10 +52,7 @@ class InboxRoot extends React.Component<Props & DispatchProp> {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => {
-  const inbox: Inbox | void = selectedInbox(state.rpc, state.app.selectedInbox)
-  const error: Error = inbox && inbox.error ? new Error(inbox.error) : null
-
-  return {inbox, error}
+  return {}
 }
 
 // $FlowFixMe

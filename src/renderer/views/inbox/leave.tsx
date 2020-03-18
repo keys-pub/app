@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {selectedInbox} from './actions'
 import Step from '../../components/step'
 
 import {push, goBack} from 'connected-react-router'
@@ -54,11 +53,7 @@ class InboxLeave extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => {
-  let inbox: Inbox | void = selectedInbox(state.rpc, state.app.selectedInbox)
-  if (!inbox) inbox = {name: '', kid: '', createdAt: 0, error: '', messageCount: 0, snippet: ''}
-  return {
-    inbox,
-  }
+  return {}
 }
 
 export default connect(mapStateToProps)(InboxLeave)

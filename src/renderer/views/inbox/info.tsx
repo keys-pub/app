@@ -9,8 +9,6 @@ import {connect} from 'react-redux'
 
 import {RowHoriz, RowHorizComp} from './details'
 
-import {selectedInbox} from './actions'
-
 import {Inbox} from '../../rpc/types'
 
 type Props = {
@@ -55,8 +53,7 @@ class InboxInfo extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => {
-  const inbox = selectedInbox(state.rpc, state.app.selectedInbox)
-  return {inbox}
+  return {}
 }
 
 export default connect(mapStateToProps)(InboxInfo)

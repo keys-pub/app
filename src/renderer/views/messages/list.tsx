@@ -121,7 +121,7 @@ export default class MessagesListView extends React.Component<Props, State> {
       return
     }
     const req: MessagesRequest = {
-      kid: this.props.kid,
+      // kid: this.props.kid,
     }
     console.log('Load rows, RPC messages:', req)
     messages(req, (err: RPCError, resp: MessagesResponse) => {
