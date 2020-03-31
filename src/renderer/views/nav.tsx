@@ -24,6 +24,7 @@ import {
   Search as SearchIcon,
   Build as ToolsIcon,
   Settings as SettingsIcon,
+  Album as WormholeIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -42,6 +43,7 @@ type Props = {
 const navs = [
   {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
   {name: 'Search', icon: SearchIcon, route: '/search/index', prefix: '/search'},
+  {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
   {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
   {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
 ]

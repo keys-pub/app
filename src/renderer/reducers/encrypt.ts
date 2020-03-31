@@ -1,7 +1,7 @@
 import {Key} from '../rpc/types'
 
 export type EncryptState = {
-  recipients: Key[]
+  recipients: string[]
   sender: string
   value: string
   file: string

@@ -65,7 +65,7 @@ class DecryptView extends React.Component<Props, State> {
 
     console.log('Decrypting...')
     this.setState({loading: true, fileError: ''})
-    decryptFile(req, (err: RPCError, resp: DecryptFileOutput, done: boolean) => {
+    const send = decryptFile((err: RPCError, resp: DecryptFileOutput, done: boolean) => {
       if (err) {
         if (err.code == grpc.status.CANCELLED) {
           this.setState({loading: false})
@@ -81,6 +81,7 @@ class DecryptView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
+    send(req, true)
   }
 
   cancel = () => {

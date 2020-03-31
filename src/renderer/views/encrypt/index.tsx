@@ -5,10 +5,10 @@ import {connect} from 'react-redux'
 import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material-ui/core'
 
 import {Link, styles} from '../../components'
-import RecipientsView from '../user/recipients'
+import AutocompletesView from '../keys/autocompletes'
 import EncryptedView from './encrypted'
 import EncryptedFileView from './encryptedfile'
-import SignKeySelectView from '../keys/skselect'
+import SignKeySelectView from '../keys/select'
 
 import {remote} from 'electron'
 import {store} from '../../store'
@@ -20,7 +20,7 @@ import {encryptFile} from '../../rpc/rpc'
 import {Key, RPCError, EncryptFileInput, EncryptFileOutput} from '../../rpc/types'
 
 export type Props = {
-  recipients: Key[]
+  recipients: string[]
   sender: string
   defaultValue: string
   file: string
@@ -49,7 +49,7 @@ class EncryptView extends React.Component<Props, State> {
     this.debounceDefaultValue(target.value || '')
   }
 
-  setRecipients = (recipients: Key[]) => {
+  setRecipients = (recipients: string[]) => {
     store.dispatch({type: 'ENCRYPT_RECIPIENTS', payload: {recipients}})
   }
 
@@ -77,14 +77,10 @@ class EncryptView extends React.Component<Props, State> {
   }
 
   encryptFile = async () => {
-    const recs = this.props.recipients.map((r: Key) => {
-      return r.id
-    })
-
     const fileOut = this.props.file + '.enc'
 
     const req: EncryptFileInput = {
-      recipients: recs,
+      recipients: this.props.recipients,
       sender: this.props.sender,
       in: this.props.file,
       out: fileOut,
@@ -92,7 +88,7 @@ class EncryptView extends React.Component<Props, State> {
 
     console.log('Encrypting...')
     this.setState({loading: true, fileError: ''})
-    encryptFile(req, (err: RPCError, resp: EncryptFileOutput, done: boolean) => {
+    const send = encryptFile((err: RPCError, resp: EncryptFileOutput, done: boolean) => {
       if (err) {
         if (err.code == grpc.status.CANCELLED) {
           this.setState({loading: false})
@@ -108,6 +104,7 @@ class EncryptView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
+    send(req, true)
   }
 
   cancel = () => {
@@ -143,10 +140,11 @@ class EncryptView extends React.Component<Props, State> {
         style={{height: '100%', position: 'relative', overflow: 'hidden'}}
       >
         <Box style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 6, paddingRight: 2}}>
-          <RecipientsView
-            recipients={this.props.recipients}
+          <AutocompletesView
+            identities={this.props.recipients}
             disabled={this.state.loading}
             onChange={this.setRecipients}
+            placeholder="Recipients"
           />
         </Box>
         <Divider />

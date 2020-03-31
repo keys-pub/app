@@ -27,7 +27,7 @@ import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   value: string
-  recipients: Key[]
+  recipients: string[]
   sender: string
 }
 
@@ -65,11 +65,7 @@ export default class EncryptedView extends React.Component<Props, State> {
   encrypt = async () => {
     this.setState({error: '', encrypted: ''})
 
-    const recs = this.props.recipients.map((r: Key) => {
-      return r.id
-    })
-
-    if (recs.length == 0 || this.props.value == '') {
+    if (this.props.recipients.length == 0 || this.props.value == '') {
       return
     }
 
@@ -77,7 +73,7 @@ export default class EncryptedView extends React.Component<Props, State> {
     const req: EncryptRequest = {
       data: data,
       armored: true,
-      recipients: recs,
+      recipients: this.props.recipients,
       sender: this.props.sender,
     }
     encrypt(req, (err: RPCError, resp: EncryptResponse) => {

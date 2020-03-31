@@ -31,19 +31,37 @@ export enum Encoding {
     BIP39 = "BIP39",
 }
 export enum UserStatus {
-    UNKNOWN = "UNKNOWN",
-    OK = "OK",
-    RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND",
-    CONTENT_NOT_FOUND = "CONTENT_NOT_FOUND",
-    CONN_FAILURE = "CONN_FAILURE",
-    FAILURE = "FAILURE",
+    USER_UNKNOWN = "USER_UNKNOWN",
+    USER_OK = "USER_OK",
+    USER_RESOURCE_NOT_FOUND = "USER_RESOURCE_NOT_FOUND",
+    USER_CONTENT_NOT_FOUND = "USER_CONTENT_NOT_FOUND",
+    USER_CONN_FAILURE = "USER_CONN_FAILURE",
+    USER_FAILURE = "USER_FAILURE",
 }
 export enum WatchStatus {
-    NO_STATUS = "NO_STATUS",
-    OUTAGE = "OUTAGE",
-    DISRUPTED = "DISRUPTED",
-    STARTING = "STARTING",
-    DATA = "DATA",
+    WATCH_UKNOWN = "WATCH_UKNOWN",
+    WATCH_OUTAGE = "WATCH_OUTAGE",
+    WATCH_DISRUPTED = "WATCH_DISRUPTED",
+    WATCH_STARTING = "WATCH_STARTING",
+    WATCH_DATA = "WATCH_DATA",
+}
+export enum WormholeStatus {
+    WORMHOLE_DEFAULT = "WORMHOLE_DEFAULT",
+    WORMHOLE_STARTING = "WORMHOLE_STARTING",
+    WORMHOLE_OFFERING = "WORMHOLE_OFFERING",
+    WORMHOLE_ANSWERING = "WORMHOLE_ANSWERING",
+    WORMHOLE_HANDSHAKE = "WORMHOLE_HANDSHAKE",
+    WORMHOLE_CONNECTED = "WORMHOLE_CONNECTED",
+    WORMHOLE_CLOSED = "WORMHOLE_CLOSED",
+}
+export enum ContentType {
+    BINARY_CONTENT = "BINARY_CONTENT",
+    UTF8_CONTENT = "UTF8_CONTENT",
+}
+export enum MessageType {
+    MESSAGE_SENT = "MESSAGE_SENT",
+    MESSAGE_PENDING = "MESSAGE_PENDING",
+    MESSAGE_ACK = "MESSAGE_ACK",
 }
 export interface RPCError {
     code?: number;
@@ -600,40 +618,40 @@ export interface ConfigSetRequest {
 export interface ConfigSetResponse {
 }
 
-export interface Inbox {
-    kid?: string;
-    name?: string;
-    createdAt?: number;
-    messageCount?: number;
-    snippet?: string;
-    error?: string;
+export interface WormholeInput {
+    sender?: string;
+    recipient?: string;
+    invite?: string;
+    id?: string;
+    data?: Uint8Array;
+    type?: ContentType;
 }
 
-export interface InboxRequest {
-}
-
-export interface InboxResponse {
-    inboxes?: Array<Inbox>;
+export interface WormholeOutput {
+    message?: Message;
+    status?: WormholeStatus;
 }
 
 export interface Message {
     id?: string;
-    sender?: string;
-    content?: MessageContent;
-    user?: User;
+    sender?: Key;
+    recipient?: Key;
+    type?: MessageType;
+    content?: Content;
     createdAt?: number;
     timeDisplay?: string;
     dateDisplay?: string;
-    path?: string;
 }
 
-export interface MessageContent {
-    text?: string;
+export interface Content {
+    data?: Uint8Array;
+    type?: ContentType;
 }
 
 export interface MessagePrepareRequest {
     sender?: string;
     recipient?: string;
+    id?: string;
     text?: string;
 }
 
@@ -644,6 +662,7 @@ export interface MessagePrepareResponse {
 export interface MessageCreateRequest {
     sender?: string;
     recipient?: string;
+    id?: string;
     text?: string;
 }
 
@@ -698,6 +717,7 @@ export interface KeysService {
     Push: (r:PushRequest) => PushResponse;
     Config: (r:ConfigRequest) => ConfigResponse;
     ConfigSet: (r:ConfigSetRequest) => ConfigSetResponse;
+    Wormhole: (r:() => {value: WormholeInput, done: boolean}, cb:(a:{value: WormholeOutput, done: boolean}) => void) => void;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
@@ -706,7 +726,6 @@ export interface KeysService {
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;
-    Inbox: (r:InboxRequest) => InboxResponse;
     MessagePrepare: (r:MessagePrepareRequest) => MessagePrepareResponse;
     MessageCreate: (r:MessageCreateRequest) => MessageCreateResponse;
     Messages: (r:MessagesRequest) => MessagesResponse;

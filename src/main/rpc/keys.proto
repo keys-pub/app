@@ -68,6 +68,8 @@ service Keys {
   
   rpc Config(ConfigRequest) returns (ConfigResponse) {}
   rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
+
+  rpc Wormhole(stream WormholeInput) returns (stream WormholeOutput) {}  
   
   // These requests do not need auth, since they are used to set or check auth.
   // BEGIN NO AUTH
@@ -83,7 +85,6 @@ service Keys {
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
 
   // Experimental
-  rpc Inbox(InboxRequest) returns (InboxResponse) {}
   rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
   rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
   rpc Messages(MessagesRequest) returns (MessagesResponse) {}
@@ -613,12 +614,12 @@ enum UserStatus {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_customname) = "UserStatus";
 
-  UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
-  OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
-  RESOURCE_NOT_FOUND = 2 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
-  CONTENT_NOT_FOUND = 3 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
-  CONN_FAILURE = 4 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
-  FAILURE = 5 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
+  USER_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
+  USER_OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
+  USER_RESOURCE_NOT_FOUND = 2 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
+  USER_CONTENT_NOT_FOUND = 3 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
+  USER_CONN_FAILURE = 4 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
+  USER_FAILURE = 5 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
 }
 
 message User {  
@@ -658,11 +659,11 @@ enum WatchStatus {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_customname) = "WatchStatus";
 
-  NO_STATUS = 0 [(gogoproto.enumvalue_customname) = "WatchStatusNone"];
-  OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
-  DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
-  STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
-  DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
+  WATCH_UKNOWN = 0 [(gogoproto.enumvalue_customname) = "WatchStatusUnknown"];
+  WATCH_OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
+  WATCH_DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
+  WATCH_STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
+  WATCH_DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
 }
 
 message WatchEvent {  
@@ -681,40 +682,85 @@ message ConfigSetRequest {
 }
 message ConfigSetResponse {}
 
-message Inbox {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  string name = 2;
-  int64 createdAt = 3;
-  int32 messageCount = 4;
-  string snippet = 5;
-  string error = 10;
+message WormholeInput {  
+  string sender = 1;
+  string recipient = 2;
+  string invite = 3;
+    
+  string id = 10 [(gogoproto.customname) = "ID"];
+  bytes data = 11;
+  ContentType type = 12;
 }
-message InboxRequest {}
-message InboxResponse {
-  repeated Inbox inboxes = 1;
+
+enum WormholeStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "WormholeStatus";
+
+  WORMHOLE_DEFAULT = 0 [(gogoproto.enumvalue_customname) = "WormholeDefault"];
+  
+  // WormholeStarting if starting.
+  WORMHOLE_STARTING = 10 [(gogoproto.enumvalue_customname) = "WormholeStarting"];
+  
+  // WormholeOffering if offering.
+  WORMHOLE_OFFERING = 20 [(gogoproto.enumvalue_customname) = "WormholeOffering"];
+  // WormholeAnswering if answering.
+  WORMHOLE_ANSWERING = 21 [(gogoproto.enumvalue_customname) = "WormholeAnswering"];
+
+  // WormholeHandshake if found offer/answer and trying to SCTP/Noise handshake.
+  WORMHOLE_HANDSHAKE = 40 [(gogoproto.enumvalue_customname) = "WormholeHandshake"];
+  
+  // WormholeConnected if connected
+  WORMHOLE_CONNECTED = 100 [(gogoproto.enumvalue_customname) = "WormholeConnected"];
+  // WormholeClosed if closed
+  WORMHOLE_CLOSED = 200 [(gogoproto.enumvalue_customname) = "WormholeClosed"]; 
+}
+
+message WormholeOutput {
+  Message message = 1;
+  WormholeStatus status = 2;
+}
+
+enum ContentType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "ContentType";
+
+  BINARY_CONTENT = 0 [(gogoproto.enumvalue_customname) = "BinaryContent"];
+  UTF8_CONTENT = 1 [(gogoproto.enumvalue_customname) = "UTF8Content"];
+}
+
+enum MessageType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "MessageType";
+
+  MESSAGE_SENT = 0 [(gogoproto.enumvalue_customname) = "MessageSent"];
+  MESSAGE_PENDING = 1 [(gogoproto.enumvalue_customname) = "MessagePending"];
+  MESSAGE_ACK = 2 [(gogoproto.enumvalue_customname) = "MessageAck"];
 }
 
 message Message {
   string id = 1 [(gogoproto.customname) = "ID"];
-  string sender = 2;
-  MessageContent content = 10;
+  
+  Key sender = 2;
+  Key recipient = 3;
+  MessageType type = 5;
+  Content content = 10;
     
-  User user = 20;
   int64 createdAt = 21;
 
   string timeDisplay = 31;
   string dateDisplay = 32;  
-  string path = 33;
 }
 
-message MessageContent {
-  string text = 1;
+message Content {
+  bytes data = 1;
+  ContentType type = 2;
 }
 
 message MessagePrepareRequest {  
   string sender = 1;
   string recipient = 2;
-  string text = 10;
+  string id = 10 [(gogoproto.customname) = "ID"];
+  string text = 11;
 }
 
 message MessagePrepareResponse {
@@ -724,6 +770,7 @@ message MessagePrepareResponse {
 message MessageCreateRequest {  
   string sender = 1;
   string recipient = 2;
+  string id = 10 [(gogoproto.customname) = "ID"];
   string text = 11;
 }
 

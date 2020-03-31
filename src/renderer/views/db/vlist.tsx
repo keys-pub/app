@@ -76,15 +76,13 @@ export default class DBVListView extends React.Component<Props> {
               <Typography
                 style={{
                   ...styles.mono,
+                  ...styles.breakWords,
                   fontSize: 11,
                   paddingLeft: 8,
                   paddingTop: 6,
                   paddingBottom: 6,
                   width: 400,
                   minWidth: 400,
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  wordBreak: 'break-all',
                   backgroundColor: '#fafafa',
                   borderRight: '1px solid #efefef',
                 }}

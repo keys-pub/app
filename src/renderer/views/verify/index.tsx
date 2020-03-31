@@ -64,7 +64,7 @@ class VerifyView extends React.Component<Props, State> {
     console.log('Verifying...')
     this.setState({loading: true, fileError: ''})
 
-    verifyFile(req, (err: RPCError, resp: VerifyFileOutput, done: boolean) => {
+    const send = verifyFile((err: RPCError, resp: VerifyFileOutput, done: boolean) => {
       if (err) {
         if (err.code == grpc.status.CANCELLED) {
           this.setState({loading: false})
@@ -80,6 +80,7 @@ class VerifyView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
+    send(req, true)
   }
 
   cancel = () => {

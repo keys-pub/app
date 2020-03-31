@@ -25,3 +25,29 @@ body {
   left: 0;
   right: 0;
 }
+
+.message-owner,
+.message-other {
+  border-radius: 10px;
+}
+
+.message-other + .message-owner {
+  border-bottom-right-radius: 5px;
+}
+
+.message-me + .message-owner {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.message-owner:last-of-type {
+  border-bottom-right-radius: 10px;
+}
+
+.message-status {
+  opacity: 0.5;
+}
+
+.message-status:last-of-type {
+  opacity: 1;
+}

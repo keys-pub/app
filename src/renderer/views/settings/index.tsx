@@ -28,6 +28,7 @@ export default class SettingsView extends React.Component<Props> {
   }
 
   forceUpdate = () => {
+    // TODO: Test this (if there is no update to force?)
     ipcRenderer.send('update-force')
     store.dispatch({type: 'UPDATING'})
   }

@@ -89,8 +89,8 @@ class UserIntroDialog extends React.Component<Props, State> {
           <DialogContentText id="alert-dialog-description">
             Link your key with a Github or Twitter account by generating a signed message and posting it
             there. This helps others find your key and verify who you are. For more information, see{' '}
-            <Link inline onClick={() => electron.shell.openExternal('https://docs.keys.pub/specs/user')}>
-              docs.keys.pub/specs/user
+            <Link inline onClick={() => electron.shell.openExternal('https://keys.pub/docs/specs/user.html')}>
+              keys.pub/docs/specs/user
             </Link>
             .
           </DialogContentText>

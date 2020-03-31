@@ -14,7 +14,7 @@ import * as grpc from '@grpc/grpc-js'
 
 import SignedView from './signed'
 import SignFileView from './signedfile'
-import SignKeySelectView from '../keys/skselect'
+import SignKeySelectView from '../keys/select'
 
 import {SignState} from '../../reducers/sign'
 import {signFile} from '../../rpc/rpc'
@@ -78,7 +78,7 @@ class SignView extends React.Component<Props, State> {
 
     console.log('Signing...')
     this.setState({loading: true, fileError: ''})
-    signFile(req, (err: RPCError, resp: SignFileOutput, done: boolean) => {
+    const send = signFile((err: RPCError, resp: SignFileOutput, done: boolean) => {
       if (err) {
         if (err.code == grpc.status.CANCELLED) {
           this.setState({loading: false})
@@ -94,6 +94,7 @@ class SignView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
+    send(req, true)
   }
 
   cancel = () => {

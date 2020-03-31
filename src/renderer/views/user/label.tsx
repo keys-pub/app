@@ -4,7 +4,7 @@ import {Box, Typography} from '@material-ui/core'
 
 import styles, {serviceColor} from '../../components/styles'
 
-import {User} from '../../rpc/types'
+import {User, UserStatus} from '../../rpc/types'
 
 export default (props: {kid: string; user: User}) => {
   const {user} = props
@@ -25,7 +25,7 @@ export default (props: {kid: string; user: User}) => {
   let textColor = ''
   let scolor = serviceColor(user.service)
 
-  if (user.status !== 'OK') {
+  if (user.status !== UserStatus.USER_OK) {
     textColor = 'red'
     scolor = 'red'
   }

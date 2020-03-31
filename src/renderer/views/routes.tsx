@@ -7,18 +7,14 @@ import AuthView from './auth'
 
 import DebugView from './settings/debug'
 
-import ComposeView from './compose'
-
 // import KeyCreateView from './key/create'
 // import KeyExportView from './export'
 // import KeyImportView from './import'
 // import KeyRemoveView from './key/remove'
 
-// import InboxView  from './inbox'
-// import InboxInfoView  from './inbox/info'
-// import InboxLeaveView  from './inbox/leave'
-
 import SearchView from './search'
+import WormholeView from './wormhole'
+
 import StyleGuide from './style-guide'
 import SettingsView from './settings'
 
@@ -41,7 +37,7 @@ export const routes: Array<RouteInfo> = [
   {path: '/keys/index', component: () => <KeysView />},
 
   {path: '/search/index', component: () => <SearchView />},
-
+  {path: '/wormhole/index', component: () => <WormholeView />},
   {path: '/tools/index', component: () => <ToolsView />},
 
   {path: '/splash', component: () => <Splash delay={0} />},

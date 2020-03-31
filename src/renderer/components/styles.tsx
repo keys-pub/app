@@ -23,6 +23,12 @@ const mono = {
   fontSize: 13,
 }
 
+const breakWords = {
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word',
+  wordBreak: 'break-all',
+}
+
 const messageInput = {
   color: 'rgba(0, 0, 0, 0.87)',
   fontSize: '0.875rem',
@@ -33,11 +39,11 @@ const messageInput = {
 }
 
 export type AppStyles = {
+  colors: Colors
   messageInput: CSSProperties
   logo: CSSProperties
   mono: any
-  colors: Colors
-  cells: CellStyles
+  breakWords: any
 }
 
 export const colors: Colors = {
@@ -46,45 +52,46 @@ export const colors: Colors = {
   reddit: '#FF5700',
 }
 
-type CellStyles = {
-  user: CSSProperties
-  owner: CSSProperties
-}
+// type CellStyles = {
+//   user: CSSProperties
+//   owner: CSSProperties
+// }
 
-export const cells: CellStyles = {
-  user: {
-    // backgroundColor: '#efefef',
-    // border: '0.5px solid #afafaf',
-    boxShadow: '0 0 0 0.5px #afafaf',
-    borderRadius: 3,
-    paddingLeft: 4,
-    paddingRight: 4,
-    paddingTop: 2,
-    paddingBottom: 4,
-    marginRight: 6,
-    marginTop: 1,
-    marginBottom: -1,
-  },
-  owner: {
-    boxShadow: '0 0 0 0.5px #9f9f9f',
-    borderRadius: 3,
-    paddingLeft: 4,
-    paddingRight: 4,
-    paddingTop: 2,
-    paddingBottom: 4,
-    marginRight: 6,
-    marginTop: 1,
-    marginBottom: 2,
-    color: 'green',
-  },
-}
+// export const cells: CellStyles = {
+//   user: {
+//     // backgroundColor: '#efefef',
+//     // border: '0.5px solid #afafaf',
+//     boxShadow: '0 0 0 0.5px #afafaf',
+//     borderRadius: 3,
+//     paddingLeft: 4,
+//     paddingRight: 4,
+//     paddingTop: 2,
+//     paddingBottom: 4,
+//     marginRight: 6,
+//     marginTop: 1,
+//     marginBottom: -1,
+//   },
+//   owner: {
+//     boxShadow: '0 0 0 0.5px #9f9f9f',
+//     borderRadius: 3,
+//     paddingLeft: 4,
+//     paddingRight: 4,
+//     paddingTop: 2,
+//     paddingBottom: 4,
+//     marginRight: 6,
+//     marginTop: 1,
+//     marginBottom: 2,
+//     color: 'green',
+//   },
+// }
 
 const styles: AppStyles = {
   colors,
   messageInput,
   logo,
   mono,
-  cells,
+  // cells,
+  breakWords,
 }
 
 export const serviceColor = (service: string): string => {

@@ -8,7 +8,7 @@ import {CSSProperties} from '@material-ui/styles'
 import {shell} from 'electron'
 
 import {Key, KeyType, User} from '../../rpc/types'
-import ServiceSelect from '../user/service-select'
+import ServiceSelect from '../user/service'
 import {styles, Link} from '../../components'
 import UserLabel from '../user/label'
 

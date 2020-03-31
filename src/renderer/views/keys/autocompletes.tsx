@@ -5,16 +5,18 @@ import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import UserLabel from './label'
+import UserLabel from '../user/label'
+import matchSorter from 'match-sorter'
 
 import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/types'
 import {styles} from '../../components'
 
 export type Props = {
-  recipients?: Key[]
+  identities?: string[]
   disabled?: boolean
-  onChange?: (value: Key[]) => void
+  onChange?: (value: string[]) => void
+  placeholder?: string
 }
 
 type State = {
@@ -22,15 +24,17 @@ type State = {
   loading: boolean
   options: Key[]
   selected: Key[]
+  defaultValues: string[]
   error: string
 }
 
-export default class RecipientsView extends React.Component<Props, State> {
+export default class AutocompletesView extends React.Component<Props, State> {
   state = {
     open: false,
     loading: false,
     options: [],
-    selected: this.props.recipients || [],
+    selected: [],
+    defaultValues: this.props.identities || [],
     error: '',
   }
 
@@ -46,6 +50,15 @@ export default class RecipientsView extends React.Component<Props, State> {
         this.setState({error: err.details, loading: false})
         return
       }
+
+      // Set default selected keys.
+      if (this.state.defaultValues.length > 0) {
+        const selected = resp.keys.filter((k: Key) => {
+          return this.state.defaultValues.includes(k.id) || this.state.defaultValues.includes(k.user?.id)
+        })
+        this.setState({defaultValues: [], selected: selected})
+      }
+
       this.setState({options: resp.keys || [], loading: false})
     })
   }
@@ -59,10 +72,15 @@ export default class RecipientsView extends React.Component<Props, State> {
     this.search(value)
   }
 
-  onChange = (event: React.ChangeEvent<{}>, value: Key[]) => {
-    this.setState({selected: value})
+  onChange = (event: React.ChangeEvent<{}>, value: any) => {
+    const keys = value as Key[]
+    this.setState({selected: keys})
+    const identities = keys.map((k: Key) => {
+      return k.user?.id || k.id
+    })
+
     if (!!this.props.onChange) {
-      this.props.onChange(value)
+      this.props.onChange(identities)
     }
   }
 
@@ -74,38 +92,45 @@ export default class RecipientsView extends React.Component<Props, State> {
     )
   }
 
-  optionSelected = (option: Key, value: Key) => {
-    return option.id === value.id && option.user?.id === value.user?.id
+  optionSelected = (option: Key, value: string) => {
+    return option.id === value && option.user?.id === value
+  }
+
+  getOptionLabel = (option: Key): string => {
+    return ((<UserLabel kid={option.id} user={option.user} />) as unknown) as string
   }
 
   render() {
+    const filterOptions = (options, {inputValue}) =>
+      matchSorter(options, inputValue, {keys: ['user.id', 'id']})
+
     const {open, loading, options} = this.state
     return (
       <Autocomplete
         open={open}
-        multiple
         disabled={this.props.disabled}
         onOpen={this.openAutoComplete}
         onClose={() => {
           this.setState({open: false})
         }}
+        multiple
+        filterOptions={filterOptions}
         onInputChange={this.onInputChange}
         onChange={this.onChange}
         value={this.state.selected}
         getOptionSelected={this.optionSelected}
-        getOptionLabel={(option: Key) =>
-          ((<UserLabel kid={option.id} user={option.user} />) as unknown) as string
-        }
+        getOptionLabel={this.getOptionLabel}
         options={options}
         ChipProps={{variant: 'outlined', size: 'small'}} //  icon: <FaceIcon />,
         renderOption={this.renderOption}
         renderInput={params => (
           <TextField
             {...params}
-            placeholder="Recipients"
+            placeholder={this.props.placeholder}
             fullWidth
             InputProps={{
               ...params.InputProps,
+              style: {...styles.mono},
               disableUnderline: true,
               // endAdornment: (
               //   <React.Fragment>

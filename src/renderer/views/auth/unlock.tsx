@@ -17,6 +17,7 @@ type Props = {}
 type State = {
   password: string
   loading: boolean
+  progress: boolean
   error: string
 }
 
@@ -24,6 +25,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
   state = {
     password: '',
     loading: false,
+    progress: false,
     error: '',
   }
   private inputRef = React.createRef<HTMLInputElement>()
@@ -36,7 +38,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
-        <Logo top={60} />
+        <Logo loading={this.state.progress} top={60} />
         <Typography style={{paddingTop: 10, paddingBottom: 20}}>
           The keyring is locked. Enter your password to continue.
         </Typography>
@@ -89,16 +91,23 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       return
     }
 
+    // Have progress indicator come after a little delay, usually it's very fast
+    // and we don't want show the loading indicator just for a split second.
+    const timeout = setTimeout(() => {
+      this.setState({progress: true})
+    }, 2000)
+
     this.setState({loading: true, error: ''})
-    // TODO: Use app name for client name
+    // TODO: Use config app name for client name
     const req: AuthUnlockRequest = {
       password: this.state.password,
       client: 'app',
     }
     console.log('Auth unlock')
     authUnlock(req, (err: RPCError, resp: AuthUnlockResponse) => {
+      clearTimeout(timeout)
       if (err) {
-        this.setState({loading: false, error: err.details})
+        this.setState({loading: false, progress: false, error: err.details})
         this.inputRef.current?.focus()
         this.inputRef.current?.select()
         return
@@ -107,7 +116,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       console.log('Auth unlocking...')
       ipcRenderer.send('authToken', {authToken: resp.authToken})
       setTimeout(() => {
-        this.setState({loading: false})
+        this.setState({loading: false, progress: false})
         store.dispatch({type: 'UNLOCK'})
         store.dispatch(push('/keys/index'))
       }, 100)

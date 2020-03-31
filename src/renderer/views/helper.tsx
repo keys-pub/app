@@ -1,6 +1,7 @@
 import emoji from 'node-emoji'
 
-import {Key, KeyType, User} from '../rpc/types'
+import {rand} from '../rpc/rpc'
+import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse} from '../rpc/types'
 
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
@@ -35,4 +36,16 @@ export const dateString = (ms: string): string => {
   //return d.toJSON()
 
   return d.toLocaleDateString('en-US', dateOptions)
+}
+
+export const generateID = (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    rand({length: 32, encoding: Encoding.BASE62}, (err: RPCError, resp: RandResponse) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(resp.data)
+    })
+  })
 }

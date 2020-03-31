@@ -19,7 +19,7 @@ const initialState: AppState = {
   selectedInbox: '',
   unlocked: null,
   updating: false,
-  watchStatus: WatchStatus.NO_STATUS,
+  watchStatus: WatchStatus.WATCH_UKNOWN,
 }
 
 type actionType = {

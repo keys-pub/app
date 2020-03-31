@@ -20,7 +20,7 @@ import {store} from '../../store'
 
 import {styles, DialogTitle, Link} from '../../components'
 import UserSignDialog from '../user/dialog'
-import ServiceSelect from '../user/service-select'
+import ServiceSelect from '../user/service'
 
 import {shell} from 'electron'
 

@@ -28,7 +28,7 @@ export default class MessageView extends React.Component<Props, State> {
 
   render() {
     const {row, index, selectMessage, follow} = this.props
-    if (!row.message.user) {
+    if (!row.message.sender?.user) {
       console.warn('No user for message row:', row)
       return null
     }
@@ -42,7 +42,7 @@ export default class MessageView extends React.Component<Props, State> {
     }
 
     // User styles
-    const user: User = row.message.user
+    const user: User = row.message.sender?.user
     let nameColor = 'green'
     // nameColor = '#2196f3'
     // nameColor = 'green' // #2196f3 #339933
@@ -126,7 +126,7 @@ export default class MessageView extends React.Component<Props, State> {
                 fontStyle,
               }}
             >
-              {row.message.content.text}
+              {row.message.content.data}
             </Typography>
           )}
           {/* {row.selected && (

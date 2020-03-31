@@ -26,6 +26,9 @@ type Props = {
   updating: boolean
 }
 
+// TODO: If service is disconnected, show disconnected UI...
+// {code: 14, message: "14 UNAVAILABLE: No connection established", details: "No connection established"}
+
 class Main extends React.Component<Props> {
   app() {
     return (
