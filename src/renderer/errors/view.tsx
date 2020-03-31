@@ -3,6 +3,7 @@ import * as React from 'react'
 import {Box} from '@material-ui/core'
 
 import {Button, Typography} from '@material-ui/core'
+import {styles} from '../components'
 
 type Props = {
   error: Error | void
@@ -13,15 +14,16 @@ export default (props: Props) => {
   return (
     <Typography
       style={{
-        fontFamily: 'Roboto Mono',
-        whiteSpace: 'pre-wrap',
-        overflow: 'auto',
-        width: 'calc(100% - 40px)',
-        height: '100%',
+        ...styles.mono,
+        ...styles.breakWords,
+        overflowY: 'scroll',
+        width: 'calc(100% - 30px)',
         backgroundColor: 'black',
         color: 'white',
-        paddingLeft: 40,
+        paddingLeft: 20,
         paddingTop: 20,
+        paddingBottom: 20,
+        paddingRight: 10,
       }}
     >
       {props.error && props.error.message}

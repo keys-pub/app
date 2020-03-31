@@ -21,12 +21,15 @@ export default class ErrorsView extends React.Component<Props> {
       <Box
         display="flex"
         flexDirection="column"
-        flex={1}
+        flexGrow={1}
         style={{
           backgroundColor: 'white',
-          height: '100%',
+          height: 'calc(100vh - 50px)',
         }}
       >
+        <Typography variant="h5" style={{marginBottom: 10, textAlign: 'center'}}>
+          Oops, there was an error.
+        </Typography>
         <ErrorView error={this.props.error} />
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
           <Button color="secondary" variant="contained" onClick={this.restart}>

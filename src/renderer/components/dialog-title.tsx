@@ -22,7 +22,7 @@ type Props = {
 
 export default (props: Props) => {
   return (
-    <Box display="flex" flex={1} flexDirection="column">
+    <Box display="flex" flexDirection="column">
       <Typography
         id="alert-dialog-title"
         variant="h5"

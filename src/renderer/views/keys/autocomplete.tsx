@@ -9,6 +9,7 @@ import UserLabel from '../user/label'
 import matchSorter from 'match-sorter'
 import {CSSProperties} from '@material-ui/styles'
 
+import {store} from '../../store'
 import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/types'
 import styles, {serviceColor} from '../../components/styles'
@@ -28,7 +29,6 @@ type State = {
   options: Key[]
   selected: Key
   defaultValue: string
-  error: string
 }
 
 export default class AutocompleteView extends React.Component<Props, State> {
@@ -38,7 +38,6 @@ export default class AutocompleteView extends React.Component<Props, State> {
     options: [],
     selected: null,
     defaultValue: this.props.identity,
-    error: '',
   }
 
   componentDidMount() {
@@ -50,7 +49,8 @@ export default class AutocompleteView extends React.Component<Props, State> {
     const req: KeysRequest = {query: q, types: this.props.keyTypes}
     keys(req, (err: RPCError, resp: KeysResponse) => {
       if (err) {
-        this.setState({error: err.details, loading: false})
+        this.setState({loading: false, options: []})
+        store.dispatch({type: 'ERROR', payload: {error: err}})
         return
       }
 

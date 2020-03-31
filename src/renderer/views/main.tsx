@@ -12,9 +12,11 @@ import Nav from './nav'
 import Header from './header'
 
 import {connect} from 'react-redux'
+import {store} from '../store'
 
 import {Box} from '@material-ui/core'
 import ErrorsView from '../errors'
+import ErrorsDialog from '../errors/dialog'
 import UpdateAlert from './update/alert'
 
 type Props = {
@@ -43,11 +45,11 @@ class Main extends React.Component<Props> {
     )
   }
 
-  cover() {
-    if (this.props.error) {
-      return <ErrorsView error={this.props.error} />
-    }
+  clearError = () => {
+    store.dispatch({type: 'CLEAR_ERROR'})
+  }
 
+  cover() {
     if (this.props.path == '/') {
       return <AuthSplash />
     }
@@ -87,6 +89,7 @@ class Main extends React.Component<Props> {
         <Header navMinimize={this.props.navMinimize} lock={!isCover} back={!isCover} />
         {view}
         <UpdateAlert />
+        <ErrorsDialog error={this.props.error} clearError={this.clearError} />
       </Box>
     )
   }
