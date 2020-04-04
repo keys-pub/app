@@ -759,7 +759,6 @@ message Content {
 message MessagePrepareRequest {  
   string sender = 1;
   string recipient = 2;
-  string id = 10 [(gogoproto.customname) = "ID"];
   string text = 11;
 }
 
@@ -770,7 +769,6 @@ message MessagePrepareResponse {
 message MessageCreateRequest {  
   string sender = 1;
   string recipient = 2;
-  string id = 10 [(gogoproto.customname) = "ID"];
   string text = 11;
 }
 

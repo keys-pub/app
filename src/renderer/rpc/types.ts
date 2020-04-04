@@ -651,7 +651,6 @@ export interface Content {
 export interface MessagePrepareRequest {
     sender?: string;
     recipient?: string;
-    id?: string;
     text?: string;
 }
 
@@ -662,7 +661,6 @@ export interface MessagePrepareResponse {
 export interface MessageCreateRequest {
     sender?: string;
     recipient?: string;
-    id?: string;
     text?: string;
 }
 
