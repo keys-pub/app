@@ -30,7 +30,9 @@ export default class ErrorsView extends React.Component<Props> {
         <Typography variant="h5" style={{marginBottom: 10, textAlign: 'center'}}>
           Oops, there was an error.
         </Typography>
-        <ErrorView error={this.props.error} />
+        <Box style={{overflowY: 'scroll', height: '100%', backgroundColor: 'black'}}>
+          <ErrorView error={this.props.error} />
+        </Box>
         <Box display="flex" flexDirection="row" paddingTop={2} paddingBottom={2} alignSelf="center">
           <Button color="secondary" variant="contained" onClick={this.restart}>
             Restart the App

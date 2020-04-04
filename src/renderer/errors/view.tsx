@@ -16,7 +16,6 @@ export default (props: Props) => {
       style={{
         ...styles.mono,
         ...styles.breakWords,
-        overflowY: 'scroll',
         width: 'calc(100% - 30px)',
         backgroundColor: 'black',
         color: 'white',

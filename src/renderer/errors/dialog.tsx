@@ -41,7 +41,7 @@ export default class ErrorsDialog extends React.Component<Props> {
         }}
       >
         <DialogTitle>Error</DialogTitle>
-        <DialogContent dividers style={{padding: 0}}>
+        <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
           <ErrorView error={this.props.error} />
         </DialogContent>
         <DialogActions>
