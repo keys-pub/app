@@ -11,7 +11,8 @@ fi
 yarn dist
 
 ver=`yarn run -s version`
-sh scripts/install-release.sh
+
+sh scripts/release-tool.sh
 
 release fix-build -version $ver -in release -out release
 release latest-yaml -version $ver -in release -out release

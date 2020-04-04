@@ -6,6 +6,6 @@ dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $dir/..
 
 ver=`yarn run -s version`
-sh scripts/install-release.sh
+sh scripts/release-tool.sh
 
 release download-extra -version $ver -out bin
