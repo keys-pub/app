@@ -39,6 +39,15 @@ export default class KeyImportDialog extends React.Component<Props, State> {
     password: '',
   }
 
+  reset = () => {
+    this.setState({error: '', in: '', loading: false, password: ''})
+  }
+
+  close = (added: boolean) => {
+    this.reset()
+    this.props.close(added)
+  }
+
   importKey = async () => {
     this.setState({loading: true, error: ''})
     const input = new TextEncoder().encode(this.state.in)
@@ -52,7 +61,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.props.close(true)
+      this.close(true)
     })
   }
 
@@ -81,7 +90,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography style={{paddingBottom: 20}}>
-              You can specify an key or a key ID and password (if encrypted).
+              You can specify a public key ID or an encrypted key and password.
             </Typography>
             <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
               <TextField

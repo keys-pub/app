@@ -338,6 +338,7 @@ class WormholeView extends React.Component<Props, State> {
                 onChange={this.setRecipient}
                 keyTypes={[KeyType.EDX25519_PUBLIC, KeyType.EDX25519]}
                 style={{width: '100%'}}
+                addOptions={true}
               />
             </Box>
             <Divider />

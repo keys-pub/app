@@ -55,13 +55,18 @@ export default class KeyCreateDialog extends React.Component<Props> {
     step: 'KEYGEN',
   }
 
-  close = () => {
-    this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
+  reset = () => {
     store.dispatch({type: 'INTRO', payload: false})
+    this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
+  }
+
+  close = () => {
+    this.reset()
     this.props.close()
   }
 
   closeUser = (added: boolean) => {
+    this.reset()
     if (added) {
       this.props.onChange()
     }

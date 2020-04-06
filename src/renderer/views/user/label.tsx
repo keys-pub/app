@@ -15,6 +15,7 @@ export default (props: {kid: string; user: User}) => {
         display="inline"
         style={{
           ...styles.mono,
+          ...styles.breakWords,
         }}
       >
         {props.kid}

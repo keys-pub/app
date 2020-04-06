@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {TextField, Typography} from '@material-ui/core'
+import {Box, Divider, TextField, Typography} from '@material-ui/core'
 import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete, {createFilterOptions} from '@material-ui/lab/Autocomplete'
@@ -14,6 +14,9 @@ import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/types'
 import styles, {serviceColor} from '../../components/styles'
 
+import SearchDialog from '../search/dialog'
+import KeyImportDialog from '../import'
+
 export type Props = {
   identity?: string
   disabled?: boolean
@@ -21,23 +24,28 @@ export type Props = {
   placeholder?: string
   keyTypes?: KeyType[]
   style?: CSSProperties
+  addOptions?: boolean
 }
 
 type State = {
-  open: boolean
+  defaultValue: string
   loading: boolean
+  open: boolean
+  openImport: boolean
+  openSearch: boolean
   options: Key[]
   selected: Key
-  defaultValue: string
 }
 
 export default class AutocompleteView extends React.Component<Props, State> {
   state = {
-    open: false,
+    defaultValue: this.props.identity,
     loading: false,
+    open: false,
+    openImport: false,
+    openSearch: false,
     options: [],
     selected: null,
-    defaultValue: this.props.identity,
   }
 
   componentDidMount() {
@@ -62,8 +70,20 @@ export default class AutocompleteView extends React.Component<Props, State> {
         this.setState({defaultValue: null, selected: selected})
       }
 
-      this.setState({options: resp.keys || [], loading: false})
+      const keys = this.createOptions(resp.keys)
+
+      this.setState({options: keys, loading: false})
     })
+  }
+
+  createOptions = (options: Key[]): Key[] => {
+    if (this.props.addOptions) {
+      options = options.filter((k: Key) => k.id != 'search')
+      options.push({id: 'search'})
+      options = options.filter((k: Key) => k.id != 'import')
+      options.push({id: 'import'})
+    }
+    return options
   }
 
   openAutoComplete = () => {
@@ -77,6 +97,15 @@ export default class AutocompleteView extends React.Component<Props, State> {
 
   onChange = (event: React.ChangeEvent<{}>, value: any) => {
     const key = value as Key
+    if (key?.id == 'search') {
+      this.openSearch()
+      return
+    }
+    if (key?.id == 'import') {
+      this.openImport()
+      return
+    }
+
     this.setState({selected: key})
     const identity = key?.user?.id || key?.id
     if (!!this.props.onChange) {
@@ -84,7 +113,30 @@ export default class AutocompleteView extends React.Component<Props, State> {
     }
   }
 
+  openSearch = () => {
+    this.setState({openSearch: true})
+  }
+
+  closeSearch = () => {
+    this.setState({openSearch: false})
+  }
+
+  openImport = () => {
+    this.setState({openImport: true})
+  }
+
+  closeImport = () => {
+    this.setState({openImport: false})
+  }
+
   renderOption = (option: Key) => {
+    if (option.id == 'search') {
+      return <Typography style={{...styles.mono}}>Search for key...</Typography>
+    }
+    if (option.id == 'import') {
+      return <Typography style={{...styles.mono}}>Import key...</Typography>
+    }
+
     return (
       <React.Fragment>
         <UserLabel kid={option.id} user={option.user} />
@@ -97,48 +149,58 @@ export default class AutocompleteView extends React.Component<Props, State> {
   }
 
   optionLabel = (option: Key): string => {
+    if (option.id == 'search' || option.id == 'import') {
+      return ''
+    }
     return option.user?.id || option.id
   }
 
   render() {
-    const filterOptions = (options, {inputValue}) =>
-      matchSorter(options, inputValue, {keys: ['user.id', 'id']})
+    const filterOptions = (options, {inputValue}) => {
+      const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
+      return this.createOptions(filter)
+    }
 
     const {open, loading, options} = this.state
     return (
-      <Autocomplete
-        open={open}
-        disabled={this.props.disabled}
-        onOpen={this.openAutoComplete}
-        onClose={() => {
-          this.setState({open: false})
-        }}
-        style={this.props.style}
-        filterOptions={filterOptions}
-        onInputChange={this.onInputChange}
-        onChange={this.onChange}
-        value={this.state.selected}
-        getOptionSelected={this.optionSelected}
-        getOptionLabel={this.optionLabel}
-        options={options}
-        renderOption={this.renderOption}
-        renderInput={params => (
-          <TextField
-            {...params}
-            placeholder={this.props.placeholder}
-            fullWidth
-            InputProps={{
-              ...params.InputProps,
-              style: {...styles.mono},
-              disableUnderline: true,
-              inputComponent: InputCustom as any,
-            }}
-          />
-        )}
-      />
+      <Box display="flex" flex={1}>
+        <Autocomplete
+          open={open}
+          disabled={this.props.disabled}
+          onOpen={this.openAutoComplete}
+          onClose={() => {
+            this.setState({open: false})
+          }}
+          style={this.props.style}
+          filterOptions={filterOptions}
+          onInputChange={this.onInputChange}
+          onChange={this.onChange}
+          value={this.state.selected}
+          getOptionSelected={this.optionSelected}
+          getOptionLabel={this.optionLabel}
+          options={options}
+          renderOption={this.renderOption}
+          renderInput={params => (
+            <TextField
+              {...params}
+              placeholder={this.props.placeholder}
+              fullWidth
+              InputProps={{
+                ...params.InputProps,
+                style: {...styles.mono},
+                disableUnderline: true,
+                inputComponent: InputCustom as any,
+              }}
+            />
+          )}
+        />
+        <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
+        <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
+      </Box>
     )
   }
 }
+
 interface InputCustomProps {
   inputRef: (ref: HTMLInputElement | null) => void
 }
@@ -169,7 +231,7 @@ const InputCustom = (props: InputCustomProps) => {
     <div style={{position: 'relative', width: '100%'}}>
       <span style={{position: 'absolute', left: 4, top: 5, opacity: focused ? 0.01 : 1.0}}>
         {name}
-        {name && <span style={{color: scolor}}>@{service}</span>}
+        {name && service && <span style={{color: scolor}}>@{service}</span>}
       </span>
       <input ref={inputRef} {...inprops} style={{width: '100%', opacity: focused ? 1.0 : 0.01}} />
     </div>

@@ -59,6 +59,8 @@ service Keys {
   rpc UserService(UserServiceRequest) returns (UserServiceResponse) {}
   rpc UserSign(UserSignRequest) returns (UserSignResponse) {}
   rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}    
+
+  rpc Search(SearchRequest) returns (SearchResponse) {}
   
   rpc Item(ItemRequest) returns (ItemResponse) {}
   rpc Items(ItemsRequest) returns (ItemsResponse) {}  
@@ -651,6 +653,13 @@ message UserSearchRequest {
 }
 message UserSearchResponse {
   repeated User users = 1;  
+}
+
+message SearchRequest {
+  string query = 1;  
+}
+message SearchResponse {
+  repeated Key keys = 1;  
 }
 
 message WatchRequest {}

@@ -310,6 +310,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
+        transitionDuration={0}
         // TransitionComponent={transition}
         // keepMounted
       >

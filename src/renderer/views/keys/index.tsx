@@ -22,6 +22,7 @@ import {
   Publish as ExportIcon,
   DataUsage as GenerateKeyIcon,
   ImportExport as ImportKeyIcon,
+  Search as SearchIcon,
 } from '@material-ui/icons'
 
 import {styles} from '../../components'
@@ -39,6 +40,7 @@ import KeyImportDialog from '../import'
 import KeyRemoveDialog from '../key/remove'
 import KeyExportDialog from '../export'
 import KeyDialog from '../key'
+import SearchDialog from '../search/dialog'
 
 import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/types'
@@ -61,10 +63,11 @@ type State = {
   input: string
   newKeyMenuEl: HTMLButtonElement
   openCreate: string // '' | 'NEW' | 'INTRO'
+  openExport: string
   openImport: boolean
   openKey: string
   openRemove: Key
-  openExport: string
+  openSearch: boolean
   selected: string
 }
 
@@ -77,10 +80,11 @@ class KeysView extends React.Component<Props, State> {
     input: '',
     newKeyMenuEl: null,
     openCreate: '',
+    openExport: '',
     openImport: false,
     openKey: '',
     openRemove: null,
-    openExport: '',
+    openSearch: false,
     selected: '',
   }
 
@@ -189,6 +193,15 @@ class KeysView extends React.Component<Props, State> {
     this.refresh()
   }
 
+  searchKey = () => {
+    this.closeMenu()
+    this.setState({openSearch: true})
+  }
+
+  closeSearch = () => {
+    this.setState({openSearch: false})
+  }
+
   closeRemove = (removed: boolean) => {
     this.setState({openRemove: null, selected: ''})
     this.refresh()
@@ -237,16 +250,21 @@ class KeysView extends React.Component<Props, State> {
             <ImportKeyIcon />
             <Typography style={{marginLeft: 10}}>Import Key</Typography>
           </MenuItem>
+          <MenuItem onClick={this.searchKey}>
+            <SearchIcon />
+            <Typography style={{marginLeft: 10}}>Search for Key</Typography>
+          </MenuItem>
         </Menu>
         <Box paddingLeft={1} />
         <TextField
-          placeholder="Search"
+          placeholder="Filter"
           variant="outlined"
           value={this.state.input}
           onChange={this.onInputChange}
           inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
           style={{marginTop: 2, width: 500}}
         />
+        <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
       </Box>
     )
   }
@@ -280,53 +298,58 @@ class KeysView extends React.Component<Props, State> {
         <Divider />
         {this.renderHeader()}
         <Divider />
-        <Table size="small" stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'kid'}
-                  direction={direction}
-                  onClick={() => this.sort(sortField, 'kid', sortDirection)}
-                >
-                  <Typography style={{...styles.mono}}>ID</Typography>
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'user'}
-                  direction={direction}
-                  onClick={() => this.sort(sortField, 'user', sortDirection)}
-                >
-                  <Typography style={{...styles.mono}}>User</Typography>
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {this.state.keys.map((key, index) => {
-              return (
-                <TableRow
-                  hover
-                  onClick={event => this.select(key)}
-                  key={key.id}
-                  style={{cursor: 'pointer'}}
-                  selected={this.isSelected(key.id)}
-                  component={(props: any) => {
-                    return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
-                  }}
-                >
-                  <TableCell style={{verticalAlign: 'top', width: 490}}>
-                    <IDView id={key.id} owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519} />
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {key.user && <UserLabel kid={key.id} user={key.user} />}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'scroll'}}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField === 'kid'}
+                    direction={direction}
+                    onClick={() => this.sort(sortField, 'kid', sortDirection)}
+                  >
+                    <Typography style={{...styles.mono}}>ID</Typography>
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField === 'user'}
+                    direction={direction}
+                    onClick={() => this.sort(sortField, 'user', sortDirection)}
+                  >
+                    <Typography style={{...styles.mono}}>User</Typography>
+                  </TableSortLabel>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {this.state.keys.map((key, index) => {
+                return (
+                  <TableRow
+                    hover
+                    onClick={event => this.select(key)}
+                    key={key.id}
+                    style={{cursor: 'pointer'}}
+                    selected={this.isSelected(key.id)}
+                    component={(props: any) => {
+                      return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
+                    }}
+                  >
+                    <TableCell style={{verticalAlign: 'top', width: 490}}>
+                      <IDView
+                        id={key.id}
+                        owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
+                      />
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {key.user && <UserLabel kid={key.id} user={key.user} />}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Box>
         <KeyCreateDialog
           open={this.state.openCreate != ''}
           close={() => this.setState({openCreate: ''})}

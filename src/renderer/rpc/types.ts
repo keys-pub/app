@@ -590,6 +590,14 @@ export interface UserSearchResponse {
     users?: Array<User>;
 }
 
+export interface SearchRequest {
+    query?: string;
+}
+
+export interface SearchResponse {
+    keys?: Array<Key>;
+}
+
 export interface WatchRequest {
 }
 
@@ -709,6 +717,7 @@ export interface KeysService {
     UserService: (r:UserServiceRequest) => UserServiceResponse;
     UserSign: (r:UserSignRequest) => UserSignResponse;
     UserAdd: (r:UserAddRequest) => UserAddResponse;
+    Search: (r:SearchRequest) => SearchResponse;
     Item: (r:ItemRequest) => ItemResponse;
     Items: (r:ItemsRequest) => ItemsResponse;
     Pull: (r:PullRequest) => PullResponse;

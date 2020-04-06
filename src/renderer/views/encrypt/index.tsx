@@ -145,6 +145,7 @@ class EncryptView extends React.Component<Props, State> {
             disabled={this.state.loading}
             onChange={this.setRecipients}
             placeholder="Recipients"
+            addOptions={true}
           />
         </Box>
         <Divider />
