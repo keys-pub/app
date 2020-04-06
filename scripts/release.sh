@@ -12,6 +12,10 @@ yarn dist
 
 ver=`yarn run -s version`
 
+# Notarize (using afterSign notarize.js)
+# sh scripts/notarize.sh $ver    
+
+# Install release tool
 sh scripts/release-tool.sh
 
 release fix-build -version $ver -in release -out release
