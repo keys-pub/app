@@ -18,3 +18,5 @@ release fix-build -version $ver -in release -out release
 release latest-yaml -version $ver -in release -out release
 release publish -version $ver -in release
 release cask -version $ver
+
+echo "Draft saved, go to https://github.com/keys-pub/app/releases to promote."
