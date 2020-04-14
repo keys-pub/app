@@ -72,8 +72,8 @@ export const initializeClient = () => {
   rpcClient = cl
 }
 
-const sleep = milliseconds => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
+const sleep = (milliseconds) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
 
 export const client = async () => {
