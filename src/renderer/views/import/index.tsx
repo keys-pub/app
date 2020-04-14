@@ -29,21 +29,24 @@ type State = {
   in: string
   loading: boolean
   password: string
+  imported: string
 }
 
 export default class KeyImportDialog extends React.Component<Props, State> {
   state = {
     error: '',
+    imported: '',
     in: '',
     loading: false,
     password: '',
   }
 
   reset = () => {
-    this.setState({error: '', in: '', loading: false, password: ''})
+    this.setState({error: '', in: '', loading: false, password: '', imported: ''})
   }
 
-  close = (added: boolean) => {
+  close = () => {
+    const added = this.state.imported != ''
     this.reset()
     this.props.close(added)
   }
@@ -60,8 +63,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         this.setState({loading: false, error: err.details})
         return
       }
-      this.setState({loading: false})
-      this.close(true)
+      this.setState({loading: false, imported: resp.kid})
     })
   }
 
@@ -73,6 +75,50 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   onPasswordInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     this.setState({password: target.value, error: ''})
+  }
+
+  renderImport() {
+    return (
+      <Box display="flex" flexDirection="column">
+        <Typography style={{paddingBottom: 20}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
+        <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+          <TextField
+            multiline
+            autoFocus
+            label="Import Key"
+            rows={8}
+            variant="outlined"
+            placeholder={''}
+            onChange={this.onInputChange}
+            value={this.state.in}
+            InputProps={{
+              style: {...styles.mono, fontSize: 12},
+            }}
+          />
+        </FormControl>
+        <FormControl error={this.state.error !== ''}>
+          <TextField
+            label="Password"
+            variant="outlined"
+            type="password"
+            onChange={this.onPasswordInputChange}
+            value={this.state.password}
+          />
+          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+        </FormControl>
+      </Box>
+    )
+  }
+
+  renderImported() {
+    return (
+      <Box display="flex" flexDirection="column">
+        <Typography style={{paddingBottom: 10}}>We imported the key:</Typography>
+        <Typography style={{...styles.mono, paddingBottom: 10, paddingLeft: 10}}>
+          {this.state.imported}
+        </Typography>
+      </Box>
+    )
   }
 
   render() {
@@ -88,42 +134,16 @@ export default class KeyImportDialog extends React.Component<Props, State> {
       >
         <DialogTitle loading={this.state.loading}>Import Key</DialogTitle>
         <DialogContent dividers>
-          <Box display="flex" flexDirection="column">
-            <Typography style={{paddingBottom: 20}}>
-              You can specify a public key ID or an encrypted key and password.
-            </Typography>
-            <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
-              <TextField
-                multiline
-                autoFocus
-                label="Import Key"
-                rows={6}
-                variant="outlined"
-                placeholder={''}
-                onChange={this.onInputChange}
-                value={this.state.in}
-                InputProps={{
-                  style: {...styles.mono},
-                }}
-              />
-            </FormControl>
-            <FormControl error={this.state.error !== ''}>
-              <TextField
-                label="Password"
-                variant="outlined"
-                type="password"
-                onChange={this.onPasswordInputChange}
-                value={this.state.password}
-              />
-              <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
-            </FormControl>
-          </Box>
+          {!this.state.imported && this.renderImport()}
+          {this.state.imported && this.renderImported()}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => this.props.close(false)}>Close</Button>
-          <Button color="primary" onClick={this.importKey}>
-            Import
-          </Button>
+          <Button onClick={this.close}>Close</Button>
+          {!this.state.imported && (
+            <Button color="primary" onClick={this.importKey}>
+              Import
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     )

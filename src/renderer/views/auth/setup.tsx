@@ -29,6 +29,8 @@ type State = {
   error: string
 }
 
+// TODO: password length check (if we are adding a password mananger...)
+
 export default class AuthSetupView extends React.Component<Props, State> {
   state = {
     loading: false,

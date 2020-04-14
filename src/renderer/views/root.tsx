@@ -32,12 +32,12 @@ const theme = createMuiTheme({
       underline: {
         '&:after': {
           borderBottomColor: `#2196f3`,
-          borderBottomWidth: 1,
+          // borderBottomWidth: 1,
         },
-        '&:hover:not($disabled):not($focused):not($error):before': {
-          borderBottomColor: `black`,
-          borderBottomWidth: 1,
-        },
+        // '&:hover:not($disabled):not($focused):not($error):before': {
+        //   borderBottomColor: `black`,
+        //   borderBottomWidth: 1,
+        // },
       },
     },
     MuiButton: {
@@ -52,16 +52,20 @@ const theme = createMuiTheme({
         fontSize: 16,
       },
       outlinedPrimary: {
-        backgroundColor: fade('#2196f3', 0.05),
+        'not($disabled)': {
+          backgroundColor: fade('#2196f3', 0.05),
+        },
       },
       outlinedSecondary: {
-        backgroundColor: fade('#f50057', 0.05),
+        'not($disabled)': {
+          backgroundColor: fade('#f50057', 0.05),
+        },
       },
     },
     MuiTableRow: {
       root: {
         '&$selected': {
-          backgroundColor: '#e4eaee',
+          backgroundColor: fade('#2196f3', 0.05),
         },
       },
       hover: {

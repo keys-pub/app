@@ -18,10 +18,11 @@ import {
 } from '@material-ui/core'
 
 import {
+  Add as AddIcon,
   Delete as DeleteIcon,
   Publish as ExportIcon,
   DataUsage as GenerateKeyIcon,
-  ImportExport as ImportKeyIcon,
+  ArrowDownward as ImportKeyIcon,
   Search as SearchIcon,
 } from '@material-ui/icons'
 
@@ -41,6 +42,7 @@ import KeyRemoveDialog from '../key/remove'
 import KeyExportDialog from '../export'
 import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
+import {directionString, flipDirection} from '../helper'
 
 import {keys} from '../../rpc/rpc'
 import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/types'
@@ -200,6 +202,7 @@ class KeysView extends React.Component<Props, State> {
 
   closeSearch = () => {
     this.setState({openSearch: false})
+    this.refresh()
   }
 
   closeRemove = (removed: boolean) => {
@@ -224,17 +227,46 @@ class KeysView extends React.Component<Props, State> {
         style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
       >
         <Button
-          aria-controls="new-key-menu"
-          aria-haspopup="true"
           color="primary"
           variant="outlined"
           size="small"
-          onClick={this.openMenu}
-          style={{height: 32, marginTop: 2}}
+          onClick={this.keyGen}
+          style={{marginTop: 2, minWidth: 90}}
           // startIcon={<AddIcon />}
         >
-          Add Key
+          New
         </Button>
+        <Box paddingLeft={1} />
+        <Button
+          // color="primary"
+          variant="outlined"
+          size="small"
+          onClick={this.importKey}
+          style={{marginTop: 2, minWidth: 90}}
+          // startIcon={<ImportKeyIcon />}
+        >
+          Import
+        </Button>
+        <Box paddingLeft={1} />
+        <Button
+          // color="primary"
+          variant="outlined"
+          size="small"
+          onClick={this.searchKey}
+          style={{marginTop: 2, minWidth: 90}}
+          // startIcon={<SearchIcon />}
+        >
+          Search
+        </Button>
+        <Box display="flex" flexDirection="row" flexGrow={1} />
+        <TextField
+          placeholder="Filter"
+          variant="outlined"
+          value={this.state.input}
+          onChange={this.onInputChange}
+          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+          style={{marginTop: 2, width: 300, marginRight: 10}}
+        />
         <Menu
           id="new-key-menu"
           anchorEl={this.state.newKeyMenuEl}
@@ -250,20 +282,7 @@ class KeysView extends React.Component<Props, State> {
             <ImportKeyIcon />
             <Typography style={{marginLeft: 10}}>Import Key</Typography>
           </MenuItem>
-          <MenuItem onClick={this.searchKey}>
-            <SearchIcon />
-            <Typography style={{marginLeft: 10}}>Search for Key</Typography>
-          </MenuItem>
         </Menu>
-        <Box paddingLeft={1} />
-        <TextField
-          placeholder="Filter"
-          variant="outlined"
-          value={this.state.input}
-          onChange={this.onInputChange}
-          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, width: 500}}
-        />
         <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
       </Box>
     )
@@ -298,19 +317,10 @@ class KeysView extends React.Component<Props, State> {
         <Divider />
         {this.renderHeader()}
         <Divider />
-        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'scroll'}}>
+        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortField === 'kid'}
-                    direction={direction}
-                    onClick={() => this.sort(sortField, 'kid', sortDirection)}
-                  >
-                    <Typography style={{...styles.mono}}>ID</Typography>
-                  </TableSortLabel>
-                </TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={sortField === 'user'}
@@ -320,6 +330,15 @@ class KeysView extends React.Component<Props, State> {
                     <Typography style={{...styles.mono}}>User</Typography>
                   </TableSortLabel>
                 </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField === 'kid'}
+                    direction={direction}
+                    onClick={() => this.sort(sortField, 'kid', sortDirection)}
+                  >
+                    <Typography style={{...styles.mono}}>Key</Typography>
+                  </TableSortLabel>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -327,7 +346,7 @@ class KeysView extends React.Component<Props, State> {
                 return (
                   <TableRow
                     hover
-                    onClick={event => this.select(key)}
+                    onClick={(event) => this.select(key)}
                     key={key.id}
                     style={{cursor: 'pointer'}}
                     selected={this.isSelected(key.id)}
@@ -335,14 +354,14 @@ class KeysView extends React.Component<Props, State> {
                       return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
                     }}
                   >
-                    <TableCell style={{verticalAlign: 'top', width: 490}}>
+                    <TableCell component="th" scope="row" style={{minWidth: 200}}>
+                      {key.user && <UserLabel kid={key.id} user={key.user} />}
+                    </TableCell>
+                    <TableCell style={{verticalAlign: 'top'}}>
                       <IDView
                         id={key.id}
                         owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
                       />
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {key.user && <UserLabel kid={key.id} user={key.user} />}
                     </TableCell>
                   </TableRow>
                 )
@@ -376,26 +395,6 @@ class KeysView extends React.Component<Props, State> {
       </Box>
     )
   }
-}
-
-const directionString = (d: SortDirection): 'asc' | 'desc' => {
-  switch (d) {
-    case 'ASC':
-      return 'asc'
-    case 'DESC':
-      return 'desc'
-  }
-  return 'asc'
-}
-
-const flipDirection = (d: SortDirection): SortDirection => {
-  switch (d) {
-    case SortDirection.ASC:
-      return SortDirection.DESC
-    case SortDirection.DESC:
-      return SortDirection.ASC
-  }
-  return SortDirection.ASC
 }
 
 const mapStateToProps = (state: {app: AppState}, ownProps: any) => {

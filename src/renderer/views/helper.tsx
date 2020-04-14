@@ -1,7 +1,7 @@
 import emoji from 'node-emoji'
 
 import {rand} from '../rpc/rpc'
-import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse} from '../rpc/types'
+import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse, SortDirection} from '../rpc/types'
 
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
@@ -48,4 +48,28 @@ export const generateID = (): Promise<string> => {
       resolve(resp.data)
     })
   })
+}
+
+export const directionString = (d: SortDirection): 'asc' | 'desc' => {
+  switch (d) {
+    case 'ASC':
+      return 'asc'
+    case 'DESC':
+      return 'desc'
+  }
+  return 'asc'
+}
+
+export const flipDirection = (d: SortDirection): SortDirection => {
+  switch (d) {
+    case SortDirection.ASC:
+      return SortDirection.DESC
+    case SortDirection.DESC:
+      return SortDirection.ASC
+  }
+  return SortDirection.ASC
+}
+
+export const deepCopy = (o: any) => {
+  return JSON.parse(JSON.stringify(o))
 }

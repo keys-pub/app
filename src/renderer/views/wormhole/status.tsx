@@ -12,6 +12,7 @@ import {shell} from 'electron'
 import {WormholeState, WormholeMessage, WormholeMessageType} from '../../reducers/wormhole'
 
 export const welcomeStatus = () => {
+  // TODO: Make messages are only available for the life of the connection (+1 minute?).
   return {
     id: 'welcome',
     severity: 'info',

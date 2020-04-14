@@ -110,7 +110,7 @@ export default class SearchView extends React.Component<Props, State> {
         )}
         {!loading && <Divider style={{marginTop: 3}} />}
         {loading && <LinearProgress />}
-        <Box style={{overflowY: 'scroll', height: this.props.tableHeight}}>
+        <Box style={{overflowY: 'auto', height: this.props.tableHeight}}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -124,7 +124,7 @@ export default class SearchView extends React.Component<Props, State> {
             </TableHead>
             <TableBody>
               {this.state.keys.map((k: Key, index: number): any => (
-                <TableRow hover onClick={event => this.select(k)} key={k.id} style={{cursor: 'pointer'}}>
+                <TableRow hover onClick={(event) => this.select(k)} key={k.id} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">
                     <UserLabel kid={k.id} user={k.user} />
                   </TableCell>

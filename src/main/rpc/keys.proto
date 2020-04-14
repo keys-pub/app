@@ -62,6 +62,11 @@ service Keys {
 
   rpc Search(SearchRequest) returns (SearchResponse) {}
   
+  rpc Secret(SecretRequest) returns (SecretResponse) {}
+  rpc SecretSave(SecretSaveRequest) returns (SecretSaveResponse) {}
+  rpc SecretRemove(SecretRemoveRequest) returns (SecretRemoveResponse) {}
+  rpc Secrets(SecretsRequest) returns (SecretsResponse) {}
+
   rpc Item(ItemRequest) returns (ItemResponse) {}
   rpc Items(ItemsRequest) returns (ItemsResponse) {}  
 
@@ -492,6 +497,10 @@ message Key {
   User user = 6;  
   // Saved if saved locally.
   bool saved = 10;
+
+  // Metadata
+  int64 createdAt = 100;
+  string notes = 110;
 }
 
 message KeyRequest {
@@ -522,6 +531,66 @@ message KeysResponse {
   repeated Key keys = 1;
   string sortField = 10;
   SortDirection sortDirection = 11;
+}
+
+enum SecretType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "SecretType";
+  
+  UNKNOWN_SECRET_TYPE = 0 [(gogoproto.enumvalue_customname) = "UnknownSecret"];
+  
+  PASSWORD_SECRET = 10 [(gogoproto.enumvalue_customname) = "PasswordSecret"];  
+  CONTACT_SECRET = 11 [(gogoproto.enumvalue_customname) = "ContactSecret"];  
+  CARD_SECRET = 12 [(gogoproto.enumvalue_customname) = "CardSecret"];  
+  NOTE_SECRET = 13 [(gogoproto.enumvalue_customname) = "NoteSecret"];  
+}
+
+message Secret {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  string name = 2;
+  SecretType type = 3;
+
+  string username = 10;
+  string password = 11;
+	
+  string url = 20 [(gogoproto.customname) = "URL"];
+
+  string notes = 30;
+
+  int64 createdAt = 100;
+  int64 updatedAt = 101;
+}
+
+message SecretRequest {
+  string id = 1 [(gogoproto.customname) = "ID"];
+}
+message SecretResponse {
+  Secret secret = 1;
+}
+
+message SecretSaveRequest {
+  Secret secret = 1;
+}
+message SecretSaveResponse {
+  Secret secret = 1;
+}
+
+message SecretRemoveRequest {
+  string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message SecretRemoveResponse {}
+
+message SecretsRequest {
+  string query = 1;
+
+  string sortField = 10;
+  SortDirection sortDirection = 11;  
+}
+message SecretsResponse {
+  repeated Secret secrets = 1;
+  string sortField = 10;
+  SortDirection sortDirection = 11;  
 }
 
 message ItemRequest {

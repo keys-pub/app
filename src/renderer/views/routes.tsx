@@ -7,10 +7,7 @@ import AuthView from './auth'
 
 import DebugView from './settings/debug'
 
-// import KeyCreateView from './key/create'
-// import KeyExportView from './export'
-// import KeyImportView from './import'
-// import KeyRemoveView from './key/remove'
+import SecretsView from './secrets'
 
 import SearchView from './search'
 import WormholeView from './wormhole'
@@ -35,6 +32,7 @@ export const routes: Array<RouteInfo> = [
   {path: '/debug', component: () => <DebugView />},
 
   {path: '/keys/index', component: () => <KeysView />},
+  {path: '/secrets/index', component: () => <SecretsView />},
 
   {path: '/search/index', component: () => <SearchView />},
   {path: '/wormhole/index', component: () => <WormholeView />},

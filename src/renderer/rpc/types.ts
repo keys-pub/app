@@ -20,6 +20,13 @@ export enum SortDirection {
     ASC = "ASC",
     DESC = "DESC",
 }
+export enum SecretType {
+    UNKNOWN_SECRET_TYPE = "UNKNOWN_SECRET_TYPE",
+    PASSWORD_SECRET = "PASSWORD_SECRET",
+    CONTACT_SECRET = "CONTACT_SECRET",
+    CARD_SECRET = "CARD_SECRET",
+    NOTE_SECRET = "NOTE_SECRET",
+}
 export enum Encoding {
     HEX = "HEX",
     BASE62 = "BASE62",
@@ -452,6 +459,9 @@ export interface Key {
     user?: User;
     // Saved if saved locally.
     saved?: boolean;
+    // Metadata
+    createdAt?: number;
+    notes?: string;
 }
 
 export interface KeyRequest {
@@ -472,6 +482,53 @@ export interface KeysRequest {
 
 export interface KeysResponse {
     keys?: Array<Key>;
+    sortField?: string;
+    sortDirection?: SortDirection;
+}
+
+export interface Secret {
+    id?: string;
+    name?: string;
+    type?: SecretType;
+    username?: string;
+    password?: string;
+    url?: string;
+    notes?: string;
+    createdAt?: number;
+    updatedAt?: number;
+}
+
+export interface SecretRequest {
+    id?: string;
+}
+
+export interface SecretResponse {
+    secret?: Secret;
+}
+
+export interface SecretSaveRequest {
+    secret?: Secret;
+}
+
+export interface SecretSaveResponse {
+    secret?: Secret;
+}
+
+export interface SecretRemoveRequest {
+    id?: string;
+}
+
+export interface SecretRemoveResponse {
+}
+
+export interface SecretsRequest {
+    query?: string;
+    sortField?: string;
+    sortDirection?: SortDirection;
+}
+
+export interface SecretsResponse {
+    secrets?: Array<Secret>;
     sortField?: string;
     sortDirection?: SortDirection;
 }
@@ -718,6 +775,10 @@ export interface KeysService {
     UserSign: (r:UserSignRequest) => UserSignResponse;
     UserAdd: (r:UserAddRequest) => UserAddResponse;
     Search: (r:SearchRequest) => SearchResponse;
+    Secret: (r:SecretRequest) => SecretResponse;
+    SecretSave: (r:SecretSaveRequest) => SecretSaveResponse;
+    SecretRemove: (r:SecretRemoveRequest) => SecretRemoveResponse;
+    Secrets: (r:SecretsRequest) => SecretsResponse;
     Item: (r:ItemRequest) => ItemResponse;
     Items: (r:ItemsRequest) => ItemsResponse;
     Pull: (r:PullRequest) => PullResponse;

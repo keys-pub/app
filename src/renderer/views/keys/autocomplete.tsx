@@ -180,7 +180,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
           getOptionLabel={this.optionLabel}
           options={options}
           renderOption={this.renderOption}
-          renderInput={params => (
+          renderInput={(params) => (
             <TextField
               {...params}
               placeholder={this.props.placeholder}
@@ -211,12 +211,12 @@ const InputCustom = (props: InputCustomProps) => {
 
   const [focused, setFocused] = React.useState(false)
   const focus = inprops.onFocus
-  inprops.onFocus = event => {
+  inprops.onFocus = (event) => {
     focus(event)
     setFocused(true)
   }
   const blur = inprops.onBlur
-  inprops.onBlur = event => {
+  inprops.onBlur = (event) => {
     blur(event)
     setFocused(false)
   }

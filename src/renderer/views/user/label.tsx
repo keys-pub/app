@@ -26,10 +26,13 @@ export default (props: {kid: string; user: User}) => {
   let textColor = ''
   let scolor = serviceColor(user.service)
 
-  if (user.status !== UserStatus.USER_OK) {
+  if (user.status == UserStatus.USER_OK || user.status == UserStatus.USER_CONN_FAILURE) {
+    // Don't show red on conn failure
+  } else {
     textColor = 'red'
     scolor = 'red'
   }
+
   const name = user.name
 
   return (
