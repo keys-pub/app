@@ -49,14 +49,12 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
         version = process.env.VERSION
       }
     }
-
-    let updaterPath = ''
-    if (process.env.NODE_ENV === 'production') {
-      updaterPath = binPath('updater')
-    }
+    console.log('Version:', version)
+    let updaterPath = binPath('updater')
     if (process.env.UPDATER_BIN) {
       updaterPath = process.env.UPDATER_BIN
     }
+    console.log('Updater path:', updaterPath)
     if (!updaterPath) {
       resolve(emptyUpdateResult())
       return
@@ -81,6 +79,9 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
       if (os.platform() == 'win32') {
         // Copy updater to support path, so we can update over the installed version.
         const updaterDest = path.join(appSupportPath(), 'updater.exe')
+        if (fs.existsSync(updaterDest)) {
+          fs.unlinkSync(updaterDest)
+        }
         console.log('Copying updater to', updaterDest)
         fs.copyFileSync(updaterPath, updaterDest)
         updaterPath = updaterDest
@@ -93,7 +94,6 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
       }
     }
 
-    console.log('Updater path:', updaterPath)
     let cmd = updaterPath + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version
     if (applyPath != '') {
       cmd = cmd + ' -download -apply "' + applyPath + '"'
