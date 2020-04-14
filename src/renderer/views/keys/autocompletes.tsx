@@ -182,7 +182,7 @@ export default class AutocompletesView extends React.Component<Props, State> {
           options={options}
           ChipProps={{variant: 'outlined', size: 'small'}} //  icon: <FaceIcon />,
           renderOption={this.renderOption}
-          renderInput={params => (
+          renderInput={(params) => (
             <TextField
               {...params}
               placeholder={this.props.placeholder}

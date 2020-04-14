@@ -2,6 +2,8 @@ import purple from '@material-ui/core/colors/purple'
 
 import {CSSProperties} from '@material-ui/styles'
 
+import {fade} from '@material-ui/core/styles/colorManipulator'
+
 type Colors = {
   github: string
   twitter: string
@@ -105,6 +107,10 @@ export const serviceColor = (service: string): string => {
     default:
       return 'black'
   }
+}
+
+export const backgroundSelectedColor = () => {
+  return fade('#2196f3', 0.05)
 }
 
 export default styles

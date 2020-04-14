@@ -5,6 +5,7 @@ import {ConnectedRouter, push} from 'connected-react-router'
 import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade} from '@material-ui/core/styles/colorManipulator'
+import {backgroundSelectedColor} from '../components/styles'
 
 import Main from './main'
 
@@ -65,7 +66,7 @@ const theme = createMuiTheme({
     MuiTableRow: {
       root: {
         '&$selected': {
-          backgroundColor: fade('#2196f3', 0.05),
+          backgroundColor: backgroundSelectedColor(),
         },
       },
       hover: {

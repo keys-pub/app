@@ -16,6 +16,7 @@ import EncryptView from '../encrypt'
 import DecryptView from '../decrypt'
 import SignView from '../sign'
 import VerifyView from '../verify'
+import {backgroundSelectedColor} from '../../components/styles'
 
 import {
   EnhancedEncryption as EncryptIcon,
@@ -79,7 +80,7 @@ export default class ToolsView extends React.Component<Props, State> {
 }
 
 const backgroundColor = 'white'
-const backgroundColorSelected = '#e4eaee'
+const backgroundColorSelected = backgroundSelectedColor()
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
