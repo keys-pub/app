@@ -110,7 +110,7 @@ export const serviceColor = (service: string): string => {
 }
 
 export const backgroundSelectedColor = () => {
-  return fade('#2196f3', 0.05)
+  return '#eaeaea' // fade('#2196f3', 0.075)
 }
 
 export default styles
