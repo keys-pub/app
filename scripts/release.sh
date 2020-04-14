@@ -8,15 +8,17 @@ cd $dir/..
 if [[ -d release ]]; then
     rm -rf release
 fi
-yarn dist
+
+# Install release tool
+./scripts/release-tool.sh
 
 ver=`yarn run -s version`
+release download-extra -version $ver -out bin
+
+yarn dist
 
 # Notarize (using afterSign notarize.js)
 # sh scripts/notarize.sh $ver    
-
-# Install release tool
-sh scripts/release-tool.sh
 
 release fix-build -version $ver -in release -out release
 release latest-yaml -version $ver -in release -out release
