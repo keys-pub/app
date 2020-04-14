@@ -16,6 +16,7 @@ const keysPath = (): string => {
 export const keysStart = (): Promise<any> => {
   const path = keysPath()
   if (path) {
+    // This returns when the service is ready.
     return execProc(path + ' start --from=app')
   }
   return Promise.resolve()
