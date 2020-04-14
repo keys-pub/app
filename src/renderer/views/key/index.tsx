@@ -27,7 +27,7 @@ import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from 
 
 type Props = {
   open: boolean
-  close: () => void
+  close: (snack: string) => void
   kid: string
   update?: boolean
   source: 'search' | 'keys'
@@ -56,8 +56,8 @@ export default class KeyDialog extends React.Component<Props, State> {
     openRemove: false,
   }
 
-  close = () => {
-    this.props.close()
+  close = (snack: string) => {
+    this.props.close(snack)
   }
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
@@ -106,7 +106,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.close()
+      this.close('Imported')
     })
   }
 
@@ -129,24 +129,15 @@ export default class KeyDialog extends React.Component<Props, State> {
         <DialogActions>
           {this.props.source == 'search' && (
             <Box display="flex" flexDirection="row">
-              <Button onClick={this.close}>Close</Button>
+              <Button onClick={() => this.close('')}>Close</Button>
               <Button color="primary" onClick={this.import} disabled={this.state.loading}>
                 Import
               </Button>
             </Box>
           )}
-          {this.props.source != 'search' && <Button onClick={this.close}>Close</Button>}
+          {this.props.source != 'search' && <Button onClick={() => this.close('')}>Close</Button>}
         </DialogActions>
       </Dialog>
     )
   }
 }
-
-// const mapStateToProps = (state: {router: any}, ownProps: any) => {
-//   return {
-//     kid: query(state, 'kid'),
-//     update: query(state, 'update') == '1',
-//   }
-// }
-
-// export default connect(mapStateToProps)(KeyIndexView)

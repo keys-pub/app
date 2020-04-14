@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box} from '@material-ui/core'
+import {Box, Snackbar} from '@material-ui/core'
 
 import KeyDialog from '../key'
 import SearchView from './view'
@@ -33,7 +33,7 @@ export default class SearchIndexView extends React.Component<Props, State> {
         <SearchView select={this.select} tableHeight="calc(100vh - 80px)" />
         <KeyDialog
           open={this.state.openKey != ''}
-          close={() => this.setState({openKey: ''})}
+          close={(snack: string) => this.setState({openKey: ''})}
           kid={this.state.openKey}
           update={true}
           source="search"
