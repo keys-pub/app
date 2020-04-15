@@ -309,7 +309,7 @@ const nowrapStyle = {
 
 const Cell = (props: {secret: Secret}) => {
   return (
-    <Box display="flex" flexDirection="row" style={{paddingTop: 10, paddingBottom: 10, paddingLeft: 8}}>
+    <Box display="flex" flexDirection="row" style={{paddingTop: 6, paddingBottom: 6, paddingLeft: 8}}>
       {props.secret.type == SecretType.PASSWORD_SECRET && <PasswordCell {...props} />}
       {props.secret.type == SecretType.NOTE_SECRET && <NoteCell {...props} />}
     </Box>
@@ -321,11 +321,11 @@ const PasswordCell = (props: {secret: Secret}) => {
     <Box display="flex" flexDirection="row">
       <PasswordIcon style={{alignSelf: 'center', paddingRight: 8}} />
       <Box display="flex" flexDirection="column">
-        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.25em', paddingBottom: 2}}>
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.1em', paddingBottom: 2}}>
           {props.secret.name}
         </Typography>
         <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
-          {props.secret.username}&nbsp;
+          {props.secret.username || '-'}
         </Typography>
       </Box>
     </Box>
@@ -337,7 +337,7 @@ const NoteCell = (props: {secret: Secret}) => {
     <Box display="flex" flexDirection="row">
       <NoteIcon style={{alignSelf: 'center', paddingRight: 8}} />
       <Box display="flex" flexDirection="column">
-        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.25em', paddingBottom: 2}}>
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.1em', paddingBottom: 2}}>
           {props.secret.name}
         </Typography>
         <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
