@@ -18,6 +18,8 @@ import {
 } from '@material-ui/core'
 
 import {
+  VpnLock as PasswordIcon,
+  EventNote as NoteIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   Publish as ExportIcon,
@@ -266,8 +268,8 @@ class SecretsView extends React.Component<Props, State> {
                           return <tr onContextMenu={this.onContextMenu} {...props} id={secret.id} />
                         }}
                       >
-                        <TableCell component="th" scope="row">
-                          <Typography style={{fontSize: '1.2em'}}>{secret.name}</Typography>
+                        <TableCell component="th" scope="row" style={{padding: 0}}>
+                          <Cell secret={secret} />
                         </TableCell>
                       </TableRow>
                     )
@@ -297,6 +299,53 @@ class SecretsView extends React.Component<Props, State> {
       </Box>
     )
   }
+}
+
+const nowrapStyle = {
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  width: 195,
+}
+
+const Cell = (props: {secret: Secret}) => {
+  return (
+    <Box display="flex" flexDirection="row" style={{paddingTop: 10, paddingBottom: 10, paddingLeft: 8}}>
+      {props.secret.type == SecretType.PASSWORD_SECRET && <PasswordCell {...props} />}
+      {props.secret.type == SecretType.NOTE_SECRET && <NoteCell {...props} />}
+    </Box>
+  )
+}
+
+const PasswordCell = (props: {secret: Secret}) => {
+  return (
+    <Box display="flex" flexDirection="row">
+      <PasswordIcon style={{alignSelf: 'center', paddingRight: 8}} />
+      <Box display="flex" flexDirection="column">
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.25em', paddingBottom: 2}}>
+          {props.secret.name}
+        </Typography>
+        <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
+          {props.secret.username}&nbsp;
+        </Typography>
+      </Box>
+    </Box>
+  )
+}
+
+const NoteCell = (props: {secret: Secret}) => {
+  return (
+    <Box display="flex" flexDirection="row">
+      <NoteIcon style={{alignSelf: 'center', paddingRight: 8}} />
+      <Box display="flex" flexDirection="column">
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.25em', paddingBottom: 2}}>
+          {props.secret.name}
+        </Typography>
+        <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
+          (note)
+        </Typography>
+      </Box>
+    </Box>
+  )
 }
 
 const mapStateToProps = (state: {app: AppState}, ownProps: any) => {

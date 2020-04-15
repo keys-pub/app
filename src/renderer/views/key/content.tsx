@@ -12,7 +12,7 @@ import ServiceSelect from '../user/service'
 import {styles, Link} from '../../components'
 import UserLabel from '../user/label'
 
-import {keyDescription} from '../helper'
+import {keyDescription, dateString} from '../helper'
 
 const cstyles = {
   cell: {
@@ -53,12 +53,7 @@ const UserView = (props: Props) => {
     <Box>
       {(!isPrivate || !signable) && !user && <Typography style={{color: '#999'}}>none</Typography>}
       {user && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          key={'user-' + user.kid + '-' + user.seq}
-          paddingBottom={1}
-        >
+        <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
           <Box display="flex" flexDirection="row">
             <UserLabel kid={user.kid} user={user} />
             <Box style={{marginLeft: 10}} />
@@ -73,7 +68,7 @@ const UserView = (props: Props) => {
         </Box>
       )}
       {signable && !user && (
-        <Box display="flex" flexDirection="row" paddingBottom={1}>
+        <Box display="flex" flexDirection="row">
           <ServiceSelect service={service} setService={setService} size="small" />
           <Box marginRight={1} />
           <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
@@ -88,6 +83,9 @@ const UserView = (props: Props) => {
 export default (props: Props) => {
   const key: Key = props.value
   const kid = key.id
+
+  const sigchainURL = 'https://keys.pub/sigchain/' + key.id
+  const openSigchain = () => shell.openExternal(sigchainURL)
 
   return (
     <Box>
@@ -119,6 +117,41 @@ export default (props: Props) => {
               <UserView {...props} />
             </TableCell>
           </TableRow>
+          {dateString(key.createdAt) && (
+            <TableRow>
+              <TableCell style={{...cstyles.cell}}>
+                <Typography align="right">Created</Typography>
+              </TableCell>
+              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+                <Typography>{dateString(key.createdAt) || '-'}</Typography>
+              </TableCell>
+            </TableRow>
+          )}
+          {key.user && (
+            <TableRow>
+              <TableCell style={{...cstyles.cell}}>
+                <Typography align="right">Verified</Typography>
+              </TableCell>
+              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+                <Typography>{dateString(key.user.verifiedAt) || '-'}</Typography>
+              </TableCell>
+            </TableRow>
+          )}
+          {key.sigchainLength > 0 && (
+            <TableRow>
+              <TableCell style={{...cstyles.cell}}>
+                <Typography align="right">Sigchain</Typography>
+              </TableCell>
+              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+                <Typography>
+                  <Link span onClick={openSigchain}>
+                    View {key.sigchainLength} {key.sigchainLength == 1 ? 'entry' : 'entries'}
+                  </Link>
+                  {/* &nbsp;&nbsp;(Updated {dateString(key.sigchainUpdatedAt)}) */}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </Box>

@@ -21,7 +21,19 @@ import Alert from '@material-ui/lab/Alert'
 import {styles, DialogTitle} from '../../components'
 import {deepCopy} from '../helper'
 
-import {RPCError, Secret, SecretSaveRequest, SecretSaveResponse, SecretType} from '../../rpc/types'
+import PasswordOptions from './pw'
+
+import {randPassword} from '../../rpc/rpc'
+import {
+  RPCError,
+  Secret,
+  SecretSaveRequest,
+  SecretSaveResponse,
+  SecretType,
+  RandPasswordRequest,
+  RandPasswordResponse,
+  Encoding,
+} from '../../rpc/types'
 import {secretSave} from '../../rpc/rpc'
 
 type Props = {
@@ -36,6 +48,7 @@ type State = {
   errorName: string
   loading: boolean
   secret: Secret
+  passwordVisible: boolean
 }
 
 export default class SecretEditView extends React.Component<Props, State> {
@@ -43,6 +56,7 @@ export default class SecretEditView extends React.Component<Props, State> {
     error: '',
     errorName: '',
     loading: false,
+    passwordVisible: false,
     secret: deepCopy(this.props.secret),
   }
 
@@ -53,7 +67,7 @@ export default class SecretEditView extends React.Component<Props, State> {
   }
 
   save = async () => {
-    if (this.state.secret.name.trim() == '') {
+    if (!this.state.secret.name?.trim()) {
       this.setState({errorName: 'Name is required'})
       return
     }
@@ -77,8 +91,22 @@ export default class SecretEditView extends React.Component<Props, State> {
     const value = e.target.value as string
     const secret = deepCopy(this.state.secret)
     secret[fieldName] = value
-    const state = {error: '', errorName: '', secret: secret}
+    const state = {error: '', errorName: '', secret}
     this.setState(state)
+  }
+
+  generatePassword = () => {
+    // TODO: Prompt to overwrite
+    // TODO: Keep saved password history
+    randPassword({length: 14}, (err: RPCError, resp: RandPasswordResponse) => {
+      if (err) {
+        this.setState({error: err.details})
+        return
+      }
+      const secret = deepCopy(this.state.secret)
+      secret.password = resp.password
+      this.setState({secret})
+    })
   }
 
   renderEditActions() {
@@ -119,7 +147,7 @@ export default class SecretEditView extends React.Component<Props, State> {
         variant="outlined"
         value={this.state.secret.type}
         onChange={(e) => this.onChange(e, 'type')}
-        style={{width: 200, height: 40}}
+        style={{width: 200, height: 32}}
       >
         <MenuItem value={SecretType.PASSWORD_SECRET}>Password</MenuItem>
         {/* <MenuItem value={SecretType.CONTACT_SECRET}>Contact</MenuItem>
@@ -132,47 +160,61 @@ export default class SecretEditView extends React.Component<Props, State> {
   renderPassword() {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
-        <FormControl error={this.state.errorName != ''}>
-          <TextField
-            label="Name"
-            onChange={(e) => this.onChange(e, 'name')}
-            value={this.state.secret.name}
-            InputProps={{style: styles.mono}}
-          />
-          <FormHelperText id="component-error-text">{this.state.errorName || ' '}</FormHelperText>
-        </FormControl>
+        {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
+        {this.state.errorName && (
+          <Typography style={labelStyle}>
+            <span style={errStyle}>{this.state.errorName}</span>
+          </Typography>
+        )}
+        <TextField
+          onChange={(e) => this.onChange(e, 'name')}
+          value={this.state.secret.name}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 20}}
+        />
+
+        <Typography style={labelStyle}>Username</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'username')}
+          value={this.state.secret.username}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 19}}
+        />
+
+        <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative', marginBottom: 20}}>
+          <Box display="flex" flexDirection="column" style={{width: '100%'}}>
+            <Typography style={labelStyle}>Password</Typography>
+            <TextField
+              fullWidth
+              onChange={(e) => this.onChange(e, 'password')}
+              value={this.state.secret.password}
+              type={this.state.passwordVisible ? '' : 'password'}
+              InputProps={{style: styles.mono}}
+              inputProps={{maxLength: 128}}
+            />
+          </Box>
+          <Box style={{position: 'absolute', right: 0}}>
+            <PasswordOptions
+              password={this.state.secret.password}
+              visible={this.state.passwordVisible}
+              setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
+              generate={this.generatePassword}
+            />
+          </Box>
+        </Box>
+
+        <Typography style={labelStyle}>URL</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'url')}
+          value={this.state.secret.url}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 256}}
+          style={{marginBottom: 20}}
+        />
 
         <FormControl>
-          <TextField
-            label="Username"
-            onChange={(e) => this.onChange(e, 'username')}
-            value={this.state.secret.username}
-            InputProps={{style: styles.mono}}
-          />
-          <FormHelperText id="component-error-text"> </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <TextField
-            label="Password"
-            onChange={(e) => this.onChange(e, 'password')}
-            value={this.state.secret.password}
-            type="password"
-            InputProps={{style: styles.mono}}
-          />
-          <FormHelperText id="component-error-text"> </FormHelperText>
-        </FormControl>
-
-        <FormControl style={{marginBottom: 10}}>
-          <TextField
-            label="URL"
-            onChange={(e) => this.onChange(e, 'url')}
-            value={this.state.secret.url}
-            InputProps={{style: styles.mono}}
-          />
-          <FormHelperText id="component-error-text"> </FormHelperText>
-        </FormControl>
-
-        <FormControl style={{marginBottom: 10}}>
           <TextField
             label="Notes"
             variant="outlined"
@@ -181,6 +223,7 @@ export default class SecretEditView extends React.Component<Props, State> {
             multiline
             rows={8}
             InputProps={{style: styles.mono}}
+            inputProps={{maxLength: 1024}}
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
@@ -191,15 +234,20 @@ export default class SecretEditView extends React.Component<Props, State> {
   renderNote() {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
-        <FormControl error={this.state.errorName != ''}>
-          <TextField
-            label="Name"
-            onChange={(e) => this.onChange(e, 'name')}
-            value={this.state.secret.name}
-            InputProps={{style: styles.mono}}
-          />
-          <FormHelperText id="component-error-text">{this.state.errorName || ' '}</FormHelperText>
-        </FormControl>
+        {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
+        {this.state.errorName && (
+          <Typography style={labelStyle}>
+            <span style={errStyle}>{this.state.errorName}</span>
+          </Typography>
+        )}
+        <TextField
+          onChange={(e) => this.onChange(e, 'name')}
+          value={this.state.secret.name}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 20}}
+        />
+
         <FormControl style={{marginBottom: 10}}>
           <TextField
             label="Notes"
@@ -209,6 +257,7 @@ export default class SecretEditView extends React.Component<Props, State> {
             multiline
             rows={8}
             InputProps={{style: styles.mono}}
+            inputProps={{maxLength: 1536}}
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
@@ -223,9 +272,25 @@ export default class SecretEditView extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderEditActions()}
         <Divider />
-        <Box display="flex" flexDirection="column" style={{marginLeft: 10, marginTop: 10, marginRight: 10}}>
-          {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
-          {this.props.isNew && <FormControl style={{marginBottom: 8}}>{this.renderTypeSelect()}</FormControl>}
+        <Box
+          display="flex"
+          flexDirection="column"
+          style={{
+            overflowY: 'auto',
+            height: 'calc(100vh - 94px)',
+            paddingLeft: 10,
+            paddingTop: 10,
+            paddingRight: 10,
+          }}
+        >
+          {this.state.error && (
+            <Box marginBottom={2}>
+              <Alert severity="error">{this.state.error}</Alert>
+            </Box>
+          )}
+          {this.props.isNew && (
+            <FormControl style={{marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
+          )}
           <Box display="flex" flexDirection="column" marginLeft={1} marginRight={1}>
             {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
             {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
@@ -234,4 +299,17 @@ export default class SecretEditView extends React.Component<Props, State> {
       </Box>
     )
   }
+}
+
+const labelStyle = {
+  transform: 'scale(0.75)',
+  transformOrigin: 'top left',
+  color: 'rgba(0, 0, 0, 0.54)',
+  marginTop: -1,
+  marginBottom: -3,
+  fontSize: '0.857rem',
+}
+
+const errStyle = {
+  color: 'red',
 }

@@ -35,7 +35,7 @@ export default class SearchIndexView extends React.Component<Props, State> {
           open={this.state.openKey != ''}
           close={(snack: string) => this.setState({openKey: ''})}
           kid={this.state.openKey}
-          update={true}
+          // update={true}
           source="search"
           refresh={this.refresh}
         />

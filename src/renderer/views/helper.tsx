@@ -3,6 +3,8 @@ import emoji from 'node-emoji'
 import {rand} from '../rpc/rpc'
 import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse, SortDirection} from '../rpc/types'
 
+import * as Long from 'long'
+
 export const keyDescription = (key: Key): string => {
   switch (key.type) {
     case KeyType.X25519:
@@ -25,22 +27,24 @@ var dateOptions = {
   hour: 'numeric',
   minute: 'numeric',
   second: 'numeric',
+  timeZoneName: 'short',
 }
 
-export const dateString = (ms: string): string => {
-  const n = parseInt(ms)
+export const dateString = (ms): string => {
+  if (!ms) return ''
+  const s = new Long(ms.low, ms.high, ms.unsigned).toString()
+  const n = parseInt(s)
   if (n === 0) {
     return ''
   }
   const d = new Date(n)
-  //return d.toJSON()
-
+  // return d.toJSON()
   return d.toLocaleDateString('en-US', dateOptions)
 }
 
 export const generateID = (): Promise<string> => {
   return new Promise((resolve, reject) => {
-    rand({length: 32, encoding: Encoding.BASE62}, (err: RPCError, resp: RandResponse) => {
+    rand({numBytes: 32, encoding: Encoding.BASE62}, (err: RPCError, resp: RandResponse) => {
       if (err) {
         reject(err)
         return

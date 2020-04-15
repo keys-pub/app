@@ -93,7 +93,7 @@ export default class DBView extends React.Component<Props, State> {
               */}
             <TableBody>
               {collections.map((col, index) => (
-                <TableRow hover onClick={event => this.selectCollection(col)} key={col.path}>
+                <TableRow hover onClick={(event) => this.selectCollection(col)} key={col.path}>
                   <TableCell>
                     <Typography style={{...styles.mono}}>{col.path}</Typography>
                   </TableCell>
@@ -116,8 +116,8 @@ export default class DBView extends React.Component<Props, State> {
               </TableHead>
               */}
             <TableBody>
-              {documents.map((doc, index) => (
-                <TableRow hover onClick={event => this.selectDocument(doc)} key={doc.path}>
+              {documents.map((doc: Document, index: number) => (
+                <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
                   <TableCell style={{width: 300, verticalAlign: 'top'}}>
                     <Typography style={{...styles.mono, wordBreak: 'break-all'}}>{doc.path}</Typography>
                   </TableCell>

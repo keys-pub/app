@@ -85,6 +85,7 @@ service Keys {
   rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
   rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
   rpc Rand(RandRequest) returns (RandResponse) {}
+  rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}
   // END NO AUTH
   
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
@@ -497,10 +498,15 @@ message Key {
   User user = 6;  
   // Saved if saved locally.
   bool saved = 10;
+  // CreatedAt.
+  int64 createdAt = 20;
 
-  // Metadata
-  int64 createdAt = 100;
-  string notes = 110;
+  // TODO: Notes saved with the key.
+  // string notes = 30;
+
+  // SigchainLength is length of sigchain (if any).
+  int32 sigchainLength = 40;
+  int64 sigchainUpdatedAt = 41;
 }
 
 message KeyRequest {
@@ -627,11 +633,18 @@ enum Encoding {
 }
 
 message RandRequest {
-  int32 length = 1;
+  int32 numBytes = 1;
   Encoding encoding = 2;
 }
 message RandResponse {
   string data = 1;
+}
+
+message RandPasswordRequest {
+  int32 length = 1;
+}
+message RandPasswordResponse {
+  string password = 1;
 }
 
 message PullRequest {
@@ -703,6 +716,7 @@ message User {
   
   UserStatus status = 10;
   int64 verifiedAt = 11; 
+  int64 timestamp = 12;
   
   string err = 20;
 }

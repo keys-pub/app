@@ -459,9 +459,11 @@ export interface Key {
     user?: User;
     // Saved if saved locally.
     saved?: boolean;
-    // Metadata
+    // CreatedAt.
     createdAt?: number;
-    notes?: string;
+    // SigchainLength is length of sigchain (if any).
+    sigchainLength?: number;
+    sigchainUpdatedAt?: number;
 }
 
 export interface KeyRequest {
@@ -555,12 +557,20 @@ export interface Item {
 }
 
 export interface RandRequest {
-    length?: number;
+    numBytes?: number;
     encoding?: Encoding;
 }
 
 export interface RandResponse {
     data?: string;
+}
+
+export interface RandPasswordRequest {
+    length?: number;
+}
+
+export interface RandPasswordResponse {
+    password?: string;
 }
 
 export interface PullRequest {
@@ -625,6 +635,7 @@ export interface User {
     url?: string;
     status?: UserStatus;
     verifiedAt?: number;
+    timestamp?: number;
     err?: string;
 }
 
@@ -791,6 +802,7 @@ export interface KeysService {
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
     RuntimeStatus: (r:RuntimeStatusRequest) => RuntimeStatusResponse;
     Rand: (r:RandRequest) => RandResponse;
+    RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

@@ -43,7 +43,7 @@ type Props = {
 
 const navs = [
   {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
-  // {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
+  {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
   {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
   {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
   {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},

@@ -1,32 +1,15 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Divider,
-  IconButton,
-  LinearProgress,
-  FormControl,
-  FormHelperText,
-  Snackbar,
-  SnackbarContent,
-  TextField,
-  Typography,
-} from '@material-ui/core'
+import {Box, Button, Divider, Snackbar, SnackbarContent, TextField, Typography} from '@material-ui/core'
 
 import {Visibility as PasswordVisibleIcon} from '@material-ui/icons'
 
-import Alert from '@material-ui/lab/Alert'
+import {styles} from '../../components'
+import {dateString} from '../helper'
 
-import {styles, DialogTitle} from '../../components'
+import PasswordOptions from './pw'
 
-import {clipboard} from 'electron'
-
-import {RPCError, Secret, SecretSaveRequest, SecretSaveResponse, SecretType} from '../../rpc/types'
-import {secretSave} from '../../rpc/rpc'
+import {RPCError, Secret, SecretType} from '../../rpc/types'
 
 type Props = {
   secret: Secret
@@ -64,6 +47,53 @@ export default class SecretContentView extends React.Component<Props, State> {
     )
   }
 
+  renderPassword() {
+    return (
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Typography style={labelStyle}>Name</Typography>
+        <Typography style={valueStyle}>{this.props.secret.name || ' '}</Typography>
+
+        <Typography style={labelStyle}>Username</Typography>
+        <Typography style={valueStyle}>{this.props.secret.username || ' '}</Typography>
+
+        <Typography style={labelStyle}>Password</Typography>
+        <Box display="flex" flexDirection="row" style={{position: 'relative'}}>
+          {!this.state.passwordVisible && (
+            <Typography style={valueStyle}>{this.props.secret.password ? '•'.repeat(12) : ' '}</Typography>
+          )}
+          {this.state.passwordVisible && (
+            <Typography style={valueStyle}>{this.props.secret.password || ' '}</Typography>
+          )}
+          <Box style={{position: 'absolute', right: 10, top: -22}}>
+            <PasswordOptions
+              password={this.props.secret.password}
+              visible={this.state.passwordVisible}
+              setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
+            />
+          </Box>
+        </Box>
+
+        <Typography style={labelStyle}>URL</Typography>
+        <Typography style={valueStyle}>{this.props.secret.url || ' '}</Typography>
+
+        <Typography style={labelStyle}>Notes</Typography>
+        <Typography style={valueStyle}>{this.props.secret.notes || ' '}</Typography>
+      </Box>
+    )
+  }
+
+  renderNote() {
+    return (
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Typography style={labelStyle}>Name</Typography>
+        <Typography style={valueStyle}>{this.props.secret.name || ' '}</Typography>
+
+        <Typography style={labelStyle}>Notes</Typography>
+        <Typography style={valueStyle}>{this.props.secret.notes || ' '}</Typography>
+      </Box>
+    )
+  }
+
   render() {
     if (!this.props.secret) return null
 
@@ -77,79 +107,30 @@ export default class SecretContentView extends React.Component<Props, State> {
           flexDirection="column"
           style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 18}}
         >
-          <Typography style={labelStyle}>Name</Typography>
-          <Typography style={valueStyle}>{this.props.secret.name || ' '}</Typography>
+          {this.props.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
+          {this.props.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
 
-          <Typography style={labelStyle}>Username</Typography>
-          <Typography style={valueStyle}>{this.props.secret.username || ' '}</Typography>
-
-          <Typography style={labelStyle}>Password</Typography>
           <Box display="flex" flexDirection="row">
-            {!this.state.passwordVisible && (
-              <Typography style={valueStyle}>{this.props.secret.password ? '•'.repeat(12) : ' '}</Typography>
-            )}
-            {this.state.passwordVisible && (
-              <Typography style={valueStyle}>{this.props.secret.password || ' '}</Typography>
-            )}
             <Box display="flex" flexGrow={1} />
-            <PasswordOptions
-              password={this.props.secret.password}
-              visible={this.state.passwordVisible}
-              setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
-            />
+            <Box display="flex" flexDirection="column" marginRight={2} marginBottom={1}>
+              <Box display="flex" flexDirection="row">
+                <Typography style={{...dateLabelStyle, textAlign: 'right'}}>Created:&nbsp;</Typography>
+                <Typography style={dateValueStyle}>{dateString(this.props.secret.createdAt)}</Typography>
+              </Box>
+              <Box display="flex" flexDirection="row">
+                <Typography style={{...dateLabelStyle, textAlign: 'right'}}>Updated:&nbsp;</Typography>
+                <Typography style={dateValueStyle}>{dateString(this.props.secret.updatedAt)}</Typography>
+              </Box>
+            </Box>
           </Box>
-          <Box style={{marginBottom: 3}} />
-
-          <Typography style={labelStyle}>URL</Typography>
-          <Typography style={valueStyle}>{this.props.secret.url || ' '}</Typography>
-
-          <Box style={{marginBottom: 3}} />
-
-          <Typography style={labelStyle}>Notes</Typography>
-          <Typography style={valueStyle}>{this.props.secret.notes || ' '}</Typography>
         </Box>
       </Box>
     )
   }
 }
 
-const PasswordOptions = (props: {password: string; visible: boolean; setVisible: (b: boolean) => void}) => {
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
-  const copyPassword = () => {
-    clipboard.writeText(props.password)
-    setSnackOpen(true)
-  }
-
-  return (
-    <Box display="flex" flexDirection="row" style={{marginTop: -8, height: 34}}>
-      {/* <IconButton onClick={() => this.setState({passwordVisible: !this.state.passwordVisible})}>
-    <PasswordVisibleIcon />
-  </IconButton> */}
-      <Button size="small" variant="outlined" onClick={() => props.setVisible(!props.visible)}>
-        {props.visible ? 'Hide' : 'Show'}
-      </Button>
-      <Box style={{paddingRight: 10}} />
-      <Button size="small" variant="outlined" onClick={copyPassword}>
-        Copy
-      </Button>
-      <Box style={{paddingRight: 10}} />
-      <Snackbar
-        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-        open={snackOpen}
-        autoHideDuration={2000}
-        onClose={() => setSnackOpen(false)}
-      >
-        <SnackbarContent
-          aria-describedby="client-snackbar"
-          message={<span id="client-snackbar">Copied to Clipboard</span>}
-        />
-      </Snackbar>
-    </Box>
-  )
-}
-
 const labelStyle = {
+  ...styles.breakWords,
   transform: 'scale(0.75)',
   transformOrigin: 'top left',
   color: 'rgba(0, 0, 0, 0.54)',
@@ -157,7 +138,22 @@ const labelStyle = {
   paddingBottom: 2,
   fontSize: '0.857rem',
 }
-const valueStyle = {...styles.mono, paddingBottom: 24}
+const valueStyle = {...styles.mono, ...styles.breakWords, paddingBottom: 24}
+
+const dateLabelStyle = {
+  color: 'rgba(0, 0, 0, 0.5)',
+  display: 'inline',
+  fontSize: '0.7rem',
+  paddingBottom: 4,
+  // fontWeight: 600,
+  width: 60,
+}
+
+const dateValueStyle = {
+  color: 'rgba(0, 0, 0, 0.5)',
+  display: 'inline',
+  fontSize: '0.7rem',
+}
 
 const secretTypeLabel = (t: SecretType) => {
   switch (t) {

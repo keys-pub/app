@@ -72,7 +72,7 @@ export default class KeyDialog extends React.Component<Props, State> {
       return
     }
 
-    this.setState({loading: update, error: ''})
+    this.setState({loading: true, error: ''})
     const req: KeyRequest = {
       identity: this.props.kid,
       update: update,
