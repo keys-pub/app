@@ -114,7 +114,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   back = () => {
     if (this.state.step == 'sign') {
-      this.setState({step: 'name'})
+      this.setState({step: 'name', error: ''})
     } else {
       this.props.close(false)
     }
@@ -191,7 +191,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         openAction = () =>
           shell.openExternal('https://twitter.com/intent/tweet?text=' + this.state.signedMessage)
         placeholder = 'https://twitter.com/...'
-        urlLabel = "What's the location (URL) on twitter.com where the signed message tweet was saved?"
+        urlLabel = "What's the location (URL) on twitter.com where the tweet was saved?"
         break
       case 'reddit':
         instructions = 'Save it as a post on r/keyspubmsgs.'
@@ -251,7 +251,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Button>
           </Box>
         </Box>
-        <Box display="flex" flexDirection="column" flex={1} style={{paddingBottom: 10}}>
+        <Box display="flex" flexDirection="column" flex={1}>
           <Box display="flex" flexDirection="row" flex={1}>
             <Typography variant="subtitle1">&bull; &nbsp;</Typography>
             <Typography variant="subtitle1">{urlLabel}</Typography>
@@ -264,7 +264,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
               disabled={this.state.loading}
               style={{width: 500}}
             />
-            <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+            <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
           </FormControl>
         </Box>
 
