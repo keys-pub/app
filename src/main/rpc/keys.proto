@@ -498,9 +498,7 @@ message Key {
   User user = 6;  
   // Saved if saved locally.
   bool saved = 10;
-  // CreatedAt.
-  int64 createdAt = 20;
-
+  
   // TODO: Notes saved with the key.
   // string notes = 30;
 

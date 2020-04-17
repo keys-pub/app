@@ -459,8 +459,6 @@ export interface Key {
     user?: User;
     // Saved if saved locally.
     saved?: boolean;
-    // CreatedAt.
-    createdAt?: number;
     // SigchainLength is length of sigchain (if any).
     sigchainLength?: number;
     sigchainUpdatedAt?: number;

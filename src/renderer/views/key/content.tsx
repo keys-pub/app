@@ -117,16 +117,6 @@ export default (props: Props) => {
               <UserView {...props} />
             </TableCell>
           </TableRow>
-          {dateString(key.createdAt) && (
-            <TableRow>
-              <TableCell style={{...cstyles.cell}}>
-                <Typography align="right">Created</Typography>
-              </TableCell>
-              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
-                <Typography>{dateString(key.createdAt) || '-'}</Typography>
-              </TableCell>
-            </TableRow>
-          )}
           {key.user && (
             <TableRow>
               <TableCell style={{...cstyles.cell}}>

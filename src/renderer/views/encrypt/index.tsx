@@ -33,6 +33,9 @@ type State = {
   value: string
 }
 
+// TODO: Option to include self/sender
+// TODO: Default sender
+
 class EncryptView extends React.Component<Props, State> {
   state = {
     fileError: '',
