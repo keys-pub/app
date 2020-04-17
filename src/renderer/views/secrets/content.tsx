@@ -111,17 +111,12 @@ export default class SecretContentView extends React.Component<Props, State> {
           {this.props.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
 
           <Box display="flex" flexDirection="row">
-            <Box display="flex" flexGrow={1} />
-            <Box display="flex" flexDirection="column" marginRight={2} marginBottom={1}>
-              <Box display="flex" flexDirection="row">
-                <Typography style={{...dateLabelStyle, textAlign: 'right'}}>Created:&nbsp;</Typography>
-                <Typography style={dateValueStyle}>{dateString(this.props.secret.createdAt)}</Typography>
-              </Box>
-              <Box display="flex" flexDirection="row">
-                <Typography style={{...dateLabelStyle, textAlign: 'right'}}>Updated:&nbsp;</Typography>
-                <Typography style={dateValueStyle}>{dateString(this.props.secret.updatedAt)}</Typography>
-              </Box>
-            </Box>
+            <Typography style={{...dateLabelStyle}}>Created:&nbsp;</Typography>
+            <Typography style={dateValueStyle}>{dateString(this.props.secret.createdAt)}</Typography>
+          </Box>
+          <Box display="flex" flexDirection="row" marginBottom={1}>
+            <Typography style={{...dateLabelStyle}}>Updated:&nbsp;</Typography>
+            <Typography style={dateValueStyle}>{dateString(this.props.secret.updatedAt)}</Typography>
           </Box>
         </Box>
       </Box>
