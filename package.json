@@ -87,6 +87,9 @@
       ],
       "category": "Development"
     },
+    "snap": {
+      "confinement": "classic"
+    },
     "directories": {
       "buildResources": "resources",
       "output": "release"
