@@ -81,7 +81,7 @@ class DecryptView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
-    send(req, true)
+    send(req, false)
   }
 
   cancel = () => {
@@ -172,14 +172,13 @@ class DecryptView extends React.Component<Props, State> {
             width: '100%',
           }}
         >
-          {this.state.fileError ||
-            (this.props.fileOut && (
-              <DecryptedFileView
-                fileOut={this.props.fileOut}
-                sender={this.props.fileSender}
-                error={this.state.fileError}
-              />
-            ))}
+          {(this.props.fileOut || this.state.fileError) && (
+            <DecryptedFileView
+              fileOut={this.props.fileOut}
+              sender={this.props.fileSender}
+              error={this.state.fileError}
+            />
+          )}
           {!this.state.fileError && !this.props.fileOut && <DecryptedView value={this.state.value} />}
         </Box>
       </Box>

@@ -26,28 +26,30 @@ export default class VerifiedFileView extends React.Component<Props, State> {
   }
 
   render() {
-    let value = ''
-    let stylesInput: CSSProperties = {}
-    let unsigned
-    const disabled = !this.props.fileOut
-    if (this.props.error) {
-      value = this.props.error
-      stylesInput.color = 'red'
-    } else {
-      value = this.props.fileOut
-      unsigned = !disabled && !this.props.signer
-    }
+    const unsigned = this.props.fileOut && !this.props.signer
 
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.props.signer} unsigned={unsigned} />
-        <Divider />
-        <Box style={{paddingLeft: 10, paddingTop: 10}}>
-          <Typography style={{...styles.mono, ...stylesInput, display: 'inline'}}>{value}&nbsp;</Typography>
-          <Link inline onClick={this.openFolder}>
-            Open Folder
-          </Link>
-        </Box>
+        {this.props.error && (
+          <Box style={{paddingLeft: 10, paddingTop: 10}}>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>
+              {this.props.error}&nbsp;
+            </Typography>
+          </Box>
+        )}
+        {!this.props.error && (
+          <Box>
+            <SignerView signer={this.props.signer} unsigned={unsigned} />
+            <Divider />
+
+            <Box style={{paddingLeft: 10, paddingTop: 10}}>
+              <Typography style={{...styles.mono, display: 'inline'}}>{this.props.fileOut}&nbsp;</Typography>
+              <Link inline onClick={this.openFolder}>
+                Open Folder
+              </Link>
+            </Box>
+          </Box>
+        )}
       </Box>
     )
   }

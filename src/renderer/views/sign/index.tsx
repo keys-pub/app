@@ -68,7 +68,7 @@ class SignView extends React.Component<Props, State> {
   }
 
   signFile = async () => {
-    const fileOut = this.props.file + '.sig'
+    const fileOut = this.props.file + '.signed'
 
     const req: SignFileInput = {
       signer: this.props.signer,
@@ -94,7 +94,7 @@ class SignView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
-    send(req, true)
+    send(req, false)
   }
 
   cancel = () => {

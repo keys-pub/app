@@ -37,6 +37,9 @@ service Keys {
   rpc VerifyFile(stream VerifyFileInput) returns (stream VerifyFileOutput) {}
   rpc VerifyStream(stream VerifyInput) returns (stream VerifyOutput) {}  
   rpc VerifyArmoredStream(stream VerifyInput) returns (stream VerifyOutput) {}  
+  rpc VerifyDetached(VerifyDetachedRequest) returns (VerifyDetachedResponse) {}
+  rpc VerifyDetachedFile(stream VerifyDetachedFileInput) returns (VerifyDetachedResponse) {}
+  rpc VerifyDetachedStream(stream VerifyDetachedInput) returns (VerifyDetachedResponse) {}  
 
   rpc Encrypt(EncryptRequest) returns (EncryptResponse) {}  
   rpc EncryptStream(stream EncryptInput) returns (stream EncryptOutput) {}  
@@ -124,7 +127,7 @@ message SignResponse {
 message SignFileInput {
   // In is input file path. 
   string in = 1;
-  // Out is output file path.
+  // Out file path (or sig if detached).
   string out = 2;
 
   string signer = 5;
@@ -145,9 +148,33 @@ message VerifyRequest {
   
   // Armored, if true, output will be armored.
   bool armored = 10;
+  // Detached signature.
+  bool detached = 11;
 }
 message VerifyResponse {
   // Data (if out is not specified in request).
+  bytes data = 1;
+  Key signer = 2;
+}
+
+message VerifyDetachedRequest {
+  // Data to verify.
+  bytes data = 1;
+  bytes sig = 2;
+  
+  // Armored, if true, sig is armored.
+  bool armored = 10;
+}
+message VerifyDetachedResponse {
+  Key signer = 1;
+}
+
+message VerifyInput {
+  // Data to verify.
+  bytes data = 1;  
+}
+message VerifyOutput {
+  // Data, verified. If empty, is EOF.
   bytes data = 1;
   Key signer = 2;
 }
@@ -157,15 +184,30 @@ message VerifyFileInput {
   string in = 1;
   // Out is output file path.
   string out = 2;
-  // Armored, if true, output will be armored.
+  // Armored, if true, sig is armored.
+  bool armored = 10;
+}
+message VerifyFileOutput {
+  Key signer = 1;
+  string out = 2;  
+}
+
+message VerifyDetachedFileInput {
+  // In is input file path.  
+  string in = 1;
+  // Signature (detached).
+  bytes sig = 2;
+  // Armored, if true, sig is armored.
   bool armored = 10;
 }
 
-message VerifyFileOutput {
-  Key signer = 1;
-  string out = 2;
-  int32 bytes = 3;
-  int32 total = 4;
+message VerifyDetachedInput {
+  // Data to verify.
+  bytes data = 1;
+  // Signature (detached).
+  bytes sig = 2;
+  // Armored, if true, sig is armored.
+  bool armored = 10;
 }
 
 message Statement {
@@ -243,16 +285,6 @@ message SignOutput {
   // Data, signed.
   bytes data = 1;
   string kid = 2 [(gogoproto.customname) = "KID"];  
-}
-
-message VerifyInput {
-  // Data to verify.
-  bytes data = 1;  
-}
-message VerifyOutput {
-  // Data, verified. If empty, is EOF.
-  bytes data = 1;
-  Key signer = 2;
 }
 
 enum EncryptMode {
@@ -364,6 +396,8 @@ message RuntimeStatusRequest {}
 message RuntimeStatusResponse {
   // Version of running service.
   string version = 1;
+  // AppName app name.
+  string appName = 2;
   // Exe is the service executable path.
   string exe = 4;
   // AuthSetupNeeded if auth needs to be setup.

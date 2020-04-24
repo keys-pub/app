@@ -80,7 +80,7 @@ class VerifyView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
-    send(req, true)
+    send(req, false)
   }
 
   cancel = () => {
@@ -171,14 +171,13 @@ class VerifyView extends React.Component<Props, State> {
             width: '100%',
           }}
         >
-          {this.state.fileError ||
-            (this.props.fileOut && (
-              <VerifiedFileView
-                fileOut={this.props.fileOut}
-                signer={this.props.fileSigner}
-                error={this.state.fileError}
-              />
-            ))}
+          {(this.state.fileError || this.props.fileOut) && (
+            <VerifiedFileView
+              fileOut={this.props.fileOut}
+              signer={this.props.fileSigner}
+              error={this.state.fileError}
+            />
+          )}
           {!this.state.fileError && !this.props.fileOut && <VerifiedView value={this.state.value} />}
         </Box>
       </Box>

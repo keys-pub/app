@@ -102,7 +102,7 @@ class ReactProgressiveList extends React.PureComponent<Props, State> {
     })
   }
 
-  handleScroll = e => {
+  handleScroll = (e) => {
     if (this.props.onScroll) {
       this.props.onScroll(e)
     }
@@ -183,7 +183,7 @@ class ReactProgressiveList extends React.PureComponent<Props, State> {
     if (this.state.numRenderRows >= rowCount) return
     this.isLoading = true
     this.setState(
-      state => ({
+      (state) => ({
         numRenderRows: Math.min(state.numRenderRows + amount, rowCount),
       }),
       () => {
@@ -197,12 +197,12 @@ class ReactProgressiveList extends React.PureComponent<Props, State> {
     const {numRenderRows} = this.state
     return (
       <div
-        ref={ref => {
+        ref={(ref) => {
           this.ref = ref
         }}
         className={className}
       >
-        {times(numRenderRows, i => renderItem(i))}
+        {times(numRenderRows, (i) => renderItem(i))}
         {numRenderRows < rowCount && renderLoader()}
       </div>
     )

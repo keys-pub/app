@@ -107,7 +107,7 @@ class EncryptView extends React.Component<Props, State> {
         this.setState({loading: false})
       }
     })
-    send(req, true)
+    send(req, false)
   }
 
   cancel = () => {

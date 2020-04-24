@@ -85,13 +85,13 @@ export const rpcRegister = () => {
 
     streams.set(f.reply, newStream)
 
-    newStream.on('data', resp => {
+    newStream.on('data', (resp) => {
       console.log('rpc-stream data', f.reply)
       event.reply(f.reply, {resp: resp} as RPCStreamReply)
     })
-    newStream.on('error', err => {
+    newStream.on('error', (err) => {
       console.log('rpc-stream err', f.reply, err)
-      event.reply(f.reply, {err: convertErr(err)})
+      event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
       streams.delete(f.reply)
     })
     newStream.on('end', () => {

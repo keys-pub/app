@@ -94,7 +94,7 @@ export interface SignResponse {
 export interface SignFileInput {
     // In is input file path. 
     in?: string;
-    // Out is output file path.
+    // Out file path (or sig if detached).
     out?: string;
     signer?: string;
     // Armored, if true, output will be armored.
@@ -114,10 +114,35 @@ export interface VerifyRequest {
     data?: Uint8Array;
     // Armored, if true, output will be armored.
     armored?: boolean;
+    // Detached signature.
+    detached?: boolean;
 }
 
 export interface VerifyResponse {
     // Data (if out is not specified in request).
+    data?: Uint8Array;
+    signer?: Key;
+}
+
+export interface VerifyDetachedRequest {
+    // Data to verify.
+    data?: Uint8Array;
+    sig?: Uint8Array;
+    // Armored, if true, sig is armored.
+    armored?: boolean;
+}
+
+export interface VerifyDetachedResponse {
+    signer?: Key;
+}
+
+export interface VerifyInput {
+    // Data to verify.
+    data?: Uint8Array;
+}
+
+export interface VerifyOutput {
+    // Data, verified. If empty, is EOF.
     data?: Uint8Array;
     signer?: Key;
 }
@@ -127,15 +152,31 @@ export interface VerifyFileInput {
     in?: string;
     // Out is output file path.
     out?: string;
-    // Armored, if true, output will be armored.
+    // Armored, if true, sig is armored.
     armored?: boolean;
 }
 
 export interface VerifyFileOutput {
     signer?: Key;
     out?: string;
-    bytes?: number;
-    total?: number;
+}
+
+export interface VerifyDetachedFileInput {
+    // In is input file path.  
+    in?: string;
+    // Signature (detached).
+    sig?: Uint8Array;
+    // Armored, if true, sig is armored.
+    armored?: boolean;
+}
+
+export interface VerifyDetachedInput {
+    // Data to verify.
+    data?: Uint8Array;
+    // Signature (detached).
+    sig?: Uint8Array;
+    // Armored, if true, sig is armored.
+    armored?: boolean;
 }
 
 export interface Statement {
@@ -215,17 +256,6 @@ export interface SignOutput {
     // Data, signed.
     data?: Uint8Array;
     kid?: string;
-}
-
-export interface VerifyInput {
-    // Data to verify.
-    data?: Uint8Array;
-}
-
-export interface VerifyOutput {
-    // Data, verified. If empty, is EOF.
-    data?: Uint8Array;
-    signer?: Key;
 }
 
 export interface EncryptRequest {
@@ -334,6 +364,8 @@ export interface RuntimeStatusRequest {
 export interface RuntimeStatusResponse {
     // Version of running service.
     version?: string;
+    // AppName app name.
+    appName?: string;
     // Exe is the service executable path.
     exe?: string;
     // AuthSetupNeeded if auth needs to be setup.
@@ -765,6 +797,9 @@ export interface KeysService {
     VerifyFile: (r:() => {value: VerifyFileInput, done: boolean}, cb:(a:{value: VerifyFileOutput, done: boolean}) => void) => void;
     VerifyStream: (r:() => {value: VerifyInput, done: boolean}, cb:(a:{value: VerifyOutput, done: boolean}) => void) => void;
     VerifyArmoredStream: (r:() => {value: VerifyInput, done: boolean}, cb:(a:{value: VerifyOutput, done: boolean}) => void) => void;
+    VerifyDetached: (r:VerifyDetachedRequest) => VerifyDetachedResponse;
+    VerifyDetachedFile: (r:() => {value: VerifyDetachedFileInput, done: boolean}) => VerifyDetachedResponse;
+    VerifyDetachedStream: (r:() => {value: VerifyDetachedInput, done: boolean}) => VerifyDetachedResponse;
     Encrypt: (r:EncryptRequest) => EncryptResponse;
     EncryptStream: (r:() => {value: EncryptInput, done: boolean}, cb:(a:{value: EncryptOutput, done: boolean}) => void) => void;
     EncryptFile: (r:() => {value: EncryptFileInput, done: boolean}, cb:(a:{value: EncryptFileOutput, done: boolean}) => void) => void;
