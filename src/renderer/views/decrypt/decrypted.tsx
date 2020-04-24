@@ -9,7 +9,7 @@ import SignerView from '../verify/signer'
 import {clipboard} from 'electron'
 import {debounce} from 'lodash'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/service.keys.d'
+import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {

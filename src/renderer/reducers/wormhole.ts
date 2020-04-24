@@ -1,4 +1,4 @@
-import {Key} from '../rpc/service.keys.d'
+import {Key} from '../rpc/keys.d'
 
 export enum WormholeMessageType {
   Sent = 1,

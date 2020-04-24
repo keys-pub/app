@@ -25,6 +25,12 @@ service Authenticators {
     rpc DetectDevices(DetectDevicesRequest) returns (DetectDevicesResponse) {}
 }
 
+message RPCError {
+	int32 code = 1;
+	string message = 2;
+	string details = 3;
+}
+
 message DeviceInfo {
     string path = 1;
 	int32 productId = 2 [(gogoproto.customname) = "ProductID"];

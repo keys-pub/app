@@ -29,7 +29,7 @@ import {
   ConfigSetResponse,
   UserServiceRequest,
   UserServiceResponse,
-} from '../../rpc/service.keys.d'
+} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean

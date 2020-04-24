@@ -4,7 +4,7 @@ import {Box, Typography} from '@material-ui/core'
 
 import styles, {serviceColor} from '../../components/styles'
 
-import {User, UserStatus} from '../../rpc/service.keys.d'
+import {User, UserStatus} from '../../rpc/keys.d'
 
 export default (props: {kid: string; user: User}) => {
   const {user} = props

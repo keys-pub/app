@@ -19,13 +19,7 @@ import {clipboard, shell} from 'electron'
 import {styles, DialogTitle} from '../../components'
 
 import {userAdd, userSign} from '../../rpc/keys'
-import {
-  RPCError,
-  UserAddRequest,
-  UserAddResponse,
-  UserSignRequest,
-  UserSignResponse,
-} from '../../rpc/service.keys.d'
+import {RPCError, UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
 
 type Props = {
   kid: string

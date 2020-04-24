@@ -24,7 +24,7 @@ import KeyDialog from '../key'
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
-import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/keys.d'
 import {search} from '../../rpc/keys'
 
 type Props = {

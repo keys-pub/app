@@ -18,7 +18,7 @@ import SignKeySelectView from '../keys/select'
 
 import {SignState} from '../../reducers/sign'
 import {signFile} from '../../rpc/keys'
-import {RPCError, SignFileInput, SignFileOutput} from '../../rpc/service.keys.d'
+import {RPCError, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
 
 export type Props = {
   signer: string

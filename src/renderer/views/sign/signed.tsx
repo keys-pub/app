@@ -12,7 +12,7 @@ import {debounce} from 'lodash'
 
 import {sign} from '../../rpc/keys'
 
-import {RPCError, SignRequest, SignResponse} from '../../rpc/service.keys.d'
+import {RPCError, SignRequest, SignResponse} from '../../rpc/keys.d'
 
 export type Props = {
   value: string

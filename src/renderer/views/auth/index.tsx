@@ -6,7 +6,7 @@ import AuthSplash from './splash'
 import ErrorsView from '../../errors'
 
 import {runtimeStatus} from '../../rpc/keys'
-import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/service.keys.d'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/keys.d'
 
 type Props = {}
 

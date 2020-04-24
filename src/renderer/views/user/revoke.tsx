@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {statementRevoke} from '../../rpc/keys'
-import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/service.keys.d'
+import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/keys.d'
 
 type Props = {
   kid: string

@@ -7,7 +7,7 @@ import {store} from '../../store'
 import SignerView from './signer'
 
 import {verify} from '../../rpc/keys'
-import {RPCError, Key, VerifyRequest, VerifyResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, VerifyRequest, VerifyResponse} from '../../rpc/keys.d'
 
 export type Props = {
   value: string

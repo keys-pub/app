@@ -16,7 +16,7 @@ import {remote} from 'electron'
 
 import {VerifyState} from '../../reducers/verify'
 import {verifyFile} from '../../rpc/keys'
-import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/service.keys.d'
+import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/keys.d'
 
 export type Props = {
   defaultValue: string

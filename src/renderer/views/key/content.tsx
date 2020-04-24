@@ -7,7 +7,7 @@ import {Skeleton} from '@material-ui/lab'
 import {CSSProperties} from '@material-ui/styles'
 import {shell} from 'electron'
 
-import {Key, KeyType, User} from '../../rpc/service.keys.d'
+import {Key, KeyType, User} from '../../rpc/keys.d'
 import ServiceSelect from '../user/service'
 import {styles, Link} from '../../components'
 import UserLabel from '../user/label'

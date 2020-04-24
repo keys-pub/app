@@ -23,7 +23,7 @@ import {
   PullRequest,
   PullResponse,
   KeyType,
-} from '../../rpc/service.keys.d'
+} from '../../rpc/keys.d'
 
 type Props = {
   value: Key

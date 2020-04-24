@@ -7,7 +7,7 @@ import {styles, Link} from '../../components'
 import {shell} from 'electron'
 import {dirname} from 'path'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/service.keys.d'
+import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {

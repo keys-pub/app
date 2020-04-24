@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core'
 
 import {styles, DialogTitle} from '../../components'
-import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/service.keys.d'
+import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/keys.d'
 
 import {keyExport} from '../../rpc/keys'
 

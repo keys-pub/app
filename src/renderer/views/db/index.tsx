@@ -27,7 +27,7 @@ import {
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-} from '../../rpc/service.keys.d'
+} from '../../rpc/keys.d'
 
 type Props = {}
 

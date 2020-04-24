@@ -17,7 +17,7 @@ import {remote} from 'electron'
 
 import {DecryptState} from '../../reducers/decrypt'
 import {decryptFile} from '../../rpc/keys'
-import {Key, RPCError, DecryptFileInput, DecryptFileOutput} from '../../rpc/service.keys.d'
+import {Key, RPCError, DecryptFileInput, DecryptFileOutput} from '../../rpc/keys.d'
 
 export type Props = {
   defaultValue: string

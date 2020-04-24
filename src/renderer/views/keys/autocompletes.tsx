@@ -12,7 +12,7 @@ import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 
 import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/keys.d'
 import {styles} from '../../components'
 
 export type Props = {

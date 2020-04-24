@@ -6,7 +6,7 @@ import * as queryString from 'query-string'
 
 import {ipcRenderer} from 'electron'
 import {setErrHandler} from '../rpc/keys'
-import {RPCError, WatchEvent} from '../rpc/service.keys.d'
+import {RPCError, WatchEvent} from '../rpc/keys.d'
 import {store} from '../store'
 
 export {goBack, push}

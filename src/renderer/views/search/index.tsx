@@ -5,7 +5,7 @@ import {Box, Snackbar} from '@material-ui/core'
 import KeyDialog from '../key'
 import SearchView from './view'
 
-import {RPCError, Key, User, UserSearchRequest, UserSearchResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, User, UserSearchRequest, UserSearchResponse} from '../../rpc/keys.d'
 
 type Props = {}
 

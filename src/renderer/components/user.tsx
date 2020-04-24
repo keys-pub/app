@@ -4,7 +4,7 @@ import {Box, Button, Typography} from '@material-ui/core'
 
 import {styles} from '.'
 
-import {User} from '../rpc/service.keys.d'
+import {User} from '../rpc/keys.d'
 
 type ButtonProps = {
   user: User

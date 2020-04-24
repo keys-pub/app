@@ -9,7 +9,7 @@ import {dateString} from '../helper'
 
 import PasswordOptions from './pw'
 
-import {RPCError, Secret, SecretType} from '../../rpc/service.keys.d'
+import {RPCError, Secret, SecretType} from '../../rpc/keys.d'
 
 type Props = {
   secret: Secret

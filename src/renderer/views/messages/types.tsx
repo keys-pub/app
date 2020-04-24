@@ -1,4 +1,4 @@
-import {Message} from '../../rpc/service.keys.d'
+import {Message} from '../../rpc/keys.d'
 
 export type MessageRow = {
   message: Message

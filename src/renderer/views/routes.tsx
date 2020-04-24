@@ -19,6 +19,7 @@ import DBView from './db'
 import KeyView from './key'
 import KeysView from './keys'
 import ToolsView from './tools'
+import AuthenticatorsView from './authenticators'
 
 // TODO: Make path string RoutePath type
 export type RouteInfo = {
@@ -37,6 +38,8 @@ export const routes: Array<RouteInfo> = [
   {path: '/search/index', component: () => <SearchView />},
   {path: '/wormhole/index', component: () => <WormholeView />},
   {path: '/tools/index', component: () => <ToolsView />},
+
+  {path: '/authenticators/index', component: () => <AuthenticatorsView />},
 
   {path: '/splash', component: () => <Splash delay={0} />},
   {path: '/style-guide', component: () => <StyleGuide />},

@@ -33,7 +33,7 @@ import {
   RandPasswordRequest,
   RandPasswordResponse,
   Encoding,
-} from '../../rpc/service.keys.d'
+} from '../../rpc/keys.d'
 import {secretSave} from '../../rpc/keys'
 
 type Props = {

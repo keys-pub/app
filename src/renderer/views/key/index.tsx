@@ -23,7 +23,7 @@ import {goBack, push} from 'connected-react-router'
 import {store} from '../../store'
 
 import {key, keyRemove, pull} from '../../rpc/keys'
-import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean

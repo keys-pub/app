@@ -6,6 +6,12 @@ export enum CredentialType {
     EDDSA = "EDDSA",
     RS256 = "RS256",
 }
+export interface RPCError {
+    code?: number;
+    message?: string;
+    details?: string;
+}
+
 export interface DeviceInfo {
     path?: string;
     productId?: number;
@@ -30,7 +36,7 @@ export interface DetectDevicesRequest {
 }
 
 export interface DetectDevicesResponse {
-    detected?: Array<DeviceInfo>;
+    devices?: Array<DeviceInfo>;
 }
 
 export interface AuthenticatorsService {

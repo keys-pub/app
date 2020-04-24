@@ -16,11 +16,9 @@ const windowStateKeeper = require('electron-window-state')
 import {MenuActionType} from './menu'
 
 import {keysStart} from './service'
-import {update, Update, UpdateResult} from './updater'
+import {update, UpdateResult} from './updater'
 
-import {RPCError} from './rpc/service.keys'
-import {initializeClient, client, setAuthToken} from './rpc/client'
-import {status} from '@grpc/grpc-js'
+import {connectClients} from './rpc/client'
 
 import {rpcRegister} from './rpc'
 
@@ -174,7 +172,7 @@ app.on('ready', async () => {
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
-      initializeClient()
+      connectClients()
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {

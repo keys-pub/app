@@ -10,18 +10,19 @@ import * as os from 'os'
 import {app} from 'electron'
 import {appResourcesPath, appSupportPath} from '../paths'
 
-let rpcClient: any = null
+let keysClient: any = null
+let fido2Client: any = null
 let authToken: string = ''
 
 const loadCertPath = (): string => {
   return path.join(appSupportPath(), 'ca.pem')
 }
 
-const resolveProtoPath = (): string => {
+const resolveProtoPath = (name: string): string => {
   // Check in resources, otherwise use current path
-  const protoInResources = path.join(appResourcesPath(), 'src', 'main', 'rpc', 'keys.proto')
+  const protoInResources = path.join(appResourcesPath(), 'src', 'main', 'rpc', name)
   if (fs.existsSync(protoInResources)) return protoInResources
-  return './src/main/rpc/keys.proto'
+  return './src/main/rpc/' + name
 }
 
 const auth = (serviceUrl, callback) => {
@@ -34,15 +35,12 @@ export const setAuthToken = (t: string) => {
   authToken = t
 }
 
-export const initializeClient = () => {
-  if (rpcClient != null) {
-    console.error('RPC client already initialized')
-    return
-  }
-  console.log('Initializing client')
+// TODO: Type for grpc.ServiceClient
+export const newClient = (protoName: string, packageName: string, serviceName: string): any => {
+  console.log('New client:', protoName)
 
   const certPath = loadCertPath()
-  const protoPath = resolveProtoPath()
+  const protoPath = resolveProtoPath(protoName)
   console.log('Using proto path:', protoPath)
 
   console.log('Loading cert', certPath)
@@ -56,12 +54,12 @@ export const initializeClient = () => {
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})
   const protoDescriptor = grpc.loadPackageDefinition(packageDefinition)
-  if (!protoDescriptor.service) {
-    throw new Error('proto descriptor should have service package')
+  if (!protoDescriptor[packageName]) {
+    throw new Error('proto descriptor should have package ' + packageName)
   }
-  const serviceCls = protoDescriptor.service['Keys']
-  if (!serviceCls) {
-    throw new Error('proto descriptor should have a Keys service')
+  const serviceCls = protoDescriptor[packageName][serviceName]
+  if (typeof serviceCls !== 'function') {
+    throw new Error('proto descriptor missing service ' + serviceName)
   }
 
   const port = getenv.int('KEYS_PORT', 22405)
@@ -69,26 +67,65 @@ export const initializeClient = () => {
 
   const cl = new serviceCls('localhost:' + port, creds)
 
-  rpcClient = cl
+  return cl
+}
+
+export const connectClients = () => {
+  if (keysClient) {
+    keysClient.close()
+  }
+  keysClient = newClient('keys.proto', 'service', 'Keys')
+  if (fido2Client) {
+    fido2Client.close()
+  }
+  fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
 }
 
 const sleep = (milliseconds) => {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
 
-export const client = async () => {
+export const keys = async () => {
   let waitCount = 0
-  while (!rpcClient) {
+  while (!keysClient) {
     if (waitCount % 4 == 0) {
-      console.log('Waiting for client init...')
+      console.log('Waiting for keys client init...')
     }
     await sleep(250)
     if (waitCount++ > 1000) {
       break
     }
   }
-  if (!rpcClient) {
-    throw new Error('No client available (timed out)')
+  if (!keysClient) {
+    throw new Error('No keys client available (timed out)')
   }
-  return rpcClient
+  return keysClient
+}
+
+export const fido2 = async () => {
+  let waitCount = 0
+  while (!fido2Client) {
+    if (waitCount % 4 == 0) {
+      console.log('Waiting for fido2 client init...')
+    }
+    await sleep(250)
+    if (waitCount++ > 1000) {
+      break
+    }
+  }
+  if (!fido2Client) {
+    throw new Error('No fido2 client available (timed out)')
+  }
+  return fido2Client
+}
+
+export const client = (service: string) => {
+  switch (service) {
+    case 'Keys':
+      return keys()
+    case 'Authenticators':
+      return fido2()
+    default:
+      throw new Error('unknown service ' + service)
+  }
 }

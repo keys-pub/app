@@ -4,7 +4,7 @@ import * as React from 'react'
 import {Avatar, Box, Button, Divider, Typography} from '@material-ui/core'
 import {styles} from '../../components'
 
-import {Message, User} from '../../rpc/service.keys.d'
+import {Message, User} from '../../rpc/keys.d'
 import {MessageRow} from './types'
 
 type Props = {

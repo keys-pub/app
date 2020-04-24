@@ -20,7 +20,7 @@ import Alert from '@material-ui/lab/Alert'
 import {styles, DialogTitle} from '../../components'
 import SearchView from './view'
 
-import {RPCError, Key} from '../../rpc/service.keys.d'
+import {RPCError, Key} from '../../rpc/keys.d'
 
 import KeyDialog from '../key'
 

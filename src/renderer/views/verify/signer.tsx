@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Typography, Box} from '@material-ui/core'
 
-import {Key} from '../../rpc/service.keys.d'
+import {Key} from '../../rpc/keys.d'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'

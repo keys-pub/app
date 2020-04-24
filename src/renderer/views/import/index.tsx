@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../../components'
 
-import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/service.keys.d'
+import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/keys.d'
 import {keyImport} from '../../rpc/keys'
 
 type Props = {

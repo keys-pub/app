@@ -68,7 +68,7 @@ class Main extends React.Component<Props> {
 
     console.log('Unlocked:', this.props.unlocked)
 
-    if (!this.props.unlocked || this.props.path.startsWith('/auth')) {
+    if (!this.props.unlocked || this.props.path.startsWith('/auth/')) {
       return <Auth />
     }
 

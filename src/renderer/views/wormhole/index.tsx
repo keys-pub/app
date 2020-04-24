@@ -42,7 +42,7 @@ import {
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
-} from '../../rpc/service.keys.d'
+} from '../../rpc/keys.d'
 
 export type Props = {
   sender: string

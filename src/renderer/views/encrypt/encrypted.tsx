@@ -22,7 +22,7 @@ import {debounce} from 'lodash'
 import {clipboard} from 'electron'
 
 import {encrypt} from '../../rpc/keys'
-import {RPCError, Key, EncryptRequest, EncryptResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, EncryptRequest, EncryptResponse} from '../../rpc/keys.d'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {

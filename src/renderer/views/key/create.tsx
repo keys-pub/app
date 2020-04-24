@@ -25,7 +25,7 @@ import ServiceSelect from '../user/service'
 import {shell} from 'electron'
 
 import {keyGenerate} from '../../rpc/keys'
-import {RPCError, KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/service.keys.d'
+import {RPCError, KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean

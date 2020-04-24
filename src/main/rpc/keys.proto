@@ -8,6 +8,8 @@ package service;
 // gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
 import "gogoproto/gogo.proto";
 
+// import "fido2.proto";
+
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.marshaler_all) = true;
@@ -908,5 +910,3 @@ message MessagesRequest {
 message MessagesResponse {
   repeated Message messages = 1;
 }
-
-

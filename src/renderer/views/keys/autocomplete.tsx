@@ -11,7 +11,7 @@ import {CSSProperties} from '@material-ui/styles'
 
 import {store} from '../../store'
 import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/service.keys.d'
+import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/keys.d'
 import styles, {serviceColor} from '../../components/styles'
 
 import SearchDialog from '../search/dialog'

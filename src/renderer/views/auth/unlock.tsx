@@ -10,7 +10,7 @@ import {ipcRenderer} from 'electron'
 import {store} from '../../store'
 
 import {authUnlock} from '../../rpc/keys'
-import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/service.keys.d'
+import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/keys.d'
 
 type Props = {}
 
