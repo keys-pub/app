@@ -12,8 +12,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {statementRevoke} from '../../rpc/rpc'
-import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/types'
+import {statementRevoke} from '../../rpc/keys'
+import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/service.keys.d'
 
 type Props = {
   kid: string

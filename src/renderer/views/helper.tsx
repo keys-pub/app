@@ -1,7 +1,15 @@
 import emoji from 'node-emoji'
 
-import {rand} from '../rpc/rpc'
-import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse, SortDirection} from '../rpc/types'
+import {rand} from '../rpc/keys'
+import {
+  Key,
+  KeyType,
+  Encoding,
+  RPCError,
+  RandRequest,
+  RandResponse,
+  SortDirection,
+} from '../rpc/service.keys.d'
 
 import * as Long from 'long'
 

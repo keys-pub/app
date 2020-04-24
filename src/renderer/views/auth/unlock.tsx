@@ -9,8 +9,8 @@ import {push} from 'connected-react-router'
 import {ipcRenderer} from 'electron'
 import {store} from '../../store'
 
-import {authUnlock} from '../../rpc/rpc'
-import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/types'
+import {authUnlock} from '../../rpc/keys'
+import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/service.keys.d'
 
 type Props = {}
 

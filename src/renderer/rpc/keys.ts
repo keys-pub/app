@@ -112,7 +112,7 @@ import {
   MessagesResponse,
   WatchRequest,
   WatchEvent
-} from './types'
+} from './service.keys'
 
 export interface RPCError {
     code?: number;

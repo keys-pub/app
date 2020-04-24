@@ -1,4 +1,4 @@
-import {Key} from '../rpc/types'
+import {Key} from '../rpc/service.keys.d'
 
 export type SignState = {
   signer: string

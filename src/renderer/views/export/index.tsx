@@ -15,9 +15,9 @@ import {
 } from '@material-ui/core'
 
 import {styles, DialogTitle} from '../../components'
-import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/types'
+import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/service.keys.d'
 
-import {keyExport} from '../../rpc/rpc'
+import {keyExport} from '../../rpc/keys'
 
 type Props = {
   kid: string

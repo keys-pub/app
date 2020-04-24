@@ -1,4 +1,4 @@
-import {WatchStatus} from '../rpc/types'
+import {WatchStatus} from '../rpc/service.keys.d'
 
 export type AppState = {
   appFocused: boolean

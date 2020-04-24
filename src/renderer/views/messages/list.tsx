@@ -6,8 +6,8 @@ import MessageView from './message'
 
 import RList from '../../components/list'
 
-import {messages} from '../../rpc/rpc'
-import {RPCError, Message, MessagesRequest, MessagesResponse} from '../../rpc/types'
+import {messages} from '../../rpc/keys'
+import {RPCError, Message, MessagesRequest, MessagesResponse} from '../../rpc/service.keys.d'
 import {MessageRow} from './types'
 
 type Props = {

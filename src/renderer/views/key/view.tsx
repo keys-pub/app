@@ -12,7 +12,7 @@ import {goBack, push} from 'connected-react-router'
 
 import {store} from '../../store'
 
-import {key, keyRemove, pull} from '../../rpc/rpc'
+import {key, keyRemove, pull} from '../../rpc/keys'
 import {
   RPCError,
   Key,
@@ -23,7 +23,7 @@ import {
   PullRequest,
   PullResponse,
   KeyType,
-} from '../../rpc/types'
+} from '../../rpc/service.keys.d'
 
 type Props = {
   value: Key

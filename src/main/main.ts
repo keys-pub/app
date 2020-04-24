@@ -18,7 +18,7 @@ import {MenuActionType} from './menu'
 import {keysStart} from './service'
 import {update, Update, UpdateResult} from './updater'
 
-import {RPCError} from './rpc/types'
+import {RPCError} from './rpc/service.keys'
 import {initializeClient, client, setAuthToken} from './rpc/client'
 import {status} from '@grpc/grpc-js'
 

@@ -11,8 +11,8 @@ import matchSorter from 'match-sorter'
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 
-import {keys} from '../../rpc/rpc'
-import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys} from '../../rpc/keys'
+import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/service.keys.d'
 import {styles} from '../../components'
 
 export type Props = {

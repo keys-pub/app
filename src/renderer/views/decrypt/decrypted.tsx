@@ -2,14 +2,14 @@ import * as React from 'react'
 
 import {Button, Divider, Input, Box, Snackbar, SnackbarContent} from '@material-ui/core'
 
-import {decrypt, RPCError} from '../../rpc/rpc'
+import {decrypt, RPCError} from '../../rpc/keys'
 
 import SignerView from '../verify/signer'
 
 import {clipboard} from 'electron'
 import {debounce} from 'lodash'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/types'
+import {Key, DecryptRequest, DecryptResponse} from '../../rpc/service.keys.d'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {

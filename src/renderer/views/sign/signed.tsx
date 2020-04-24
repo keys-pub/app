@@ -10,9 +10,9 @@ import {clipboard} from 'electron'
 
 import {debounce} from 'lodash'
 
-import {sign} from '../../rpc/rpc'
+import {sign} from '../../rpc/keys'
 
-import {RPCError, SignRequest, SignResponse} from '../../rpc/types'
+import {RPCError, SignRequest, SignResponse} from '../../rpc/service.keys.d'
 
 export type Props = {
   value: string

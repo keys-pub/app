@@ -16,8 +16,8 @@ import Logo from '../logo'
 import {push} from 'connected-react-router'
 import {store} from '../../store'
 
-import {authSetup} from '../../rpc/rpc'
-import {RPCError, AuthSetupRequest, AuthSetupResponse} from '../../rpc/types'
+import {authSetup} from '../../rpc/keys'
+import {RPCError, AuthSetupRequest, AuthSetupResponse} from '../../rpc/service.keys.d'
 import {ipcRenderer} from 'electron'
 
 type Props = {}

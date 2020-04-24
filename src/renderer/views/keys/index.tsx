@@ -44,8 +44,8 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys} from '../../rpc/rpc'
-import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys} from '../../rpc/keys'
+import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/service.keys.d'
 import {AppState} from '../../reducers/app'
 
 type Props = {

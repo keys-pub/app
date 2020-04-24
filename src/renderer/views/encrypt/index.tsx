@@ -16,8 +16,8 @@ import {debounce} from 'lodash'
 import * as grpc from '@grpc/grpc-js'
 
 import {EncryptState} from '../../reducers/encrypt'
-import {encryptFile} from '../../rpc/rpc'
-import {Key, RPCError, EncryptFileInput, EncryptFileOutput} from '../../rpc/types'
+import {encryptFile} from '../../rpc/keys'
+import {Key, RPCError, EncryptFileInput, EncryptFileOutput} from '../../rpc/service.keys.d'
 
 export type Props = {
   recipients: string[]

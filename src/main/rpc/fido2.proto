@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package fido2;
+
+// Proto field names should be snake_case, but some plugins don't convert to 
+// camel like they should, so we use camelCase here.
+
+// gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
+import "gogoproto/gogo.proto";
+
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = true;
+option (gogoproto.goproto_enum_stringer_all) = true;
+
+// option (gogoproto.messagename_all) = true;
+// option (gogoproto.equal_all) = true;
+// option (gogoproto.verbose_equal_all) = true;
+// option (gogoproto.populate_all) = true;
+
+service Authenticators {  
+    rpc DetectDevices(DetectDevicesRequest) returns (DetectDevicesResponse) {}
+}
+
+message DeviceInfo {
+    string path = 1;
+	int32 productId = 2 [(gogoproto.customname) = "ProductID"];
+	int32 vendorId = 3 [(gogoproto.customname) = "VendorID"];
+	string manufacturer = 4;
+    string product = 5;
+}
+
+enum CredentialType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "CredentialType";
+  
+  UNKNOWN_CREDENTIAL = 0  [(gogoproto.enumvalue_customname) = "UnknownCredential"];
+  ES256 = -7 [(gogoproto.enumvalue_customname) = "ES256"];
+  EDDSA = -8 [(gogoproto.enumvalue_customname) = "EDDSA"];
+  RS256 = -257 [(gogoproto.enumvalue_customname) = "RS256"];
+}
+
+// Credential ...
+message Credential {
+    bytes id = 1 [(gogoproto.customname) = "ID"];
+	bytes authData = 2;
+	bytes clientDataHash = 3;	
+	CredentialType type = 4;
+	bytes pubKey = 5;
+	bytes cert = 6;
+	bytes sig = 7;
+	string format = 8;
+}
+
+message DetectDevicesRequest {}
+message DetectDevicesResponse {
+    repeated DeviceInfo devices = 1;
+}

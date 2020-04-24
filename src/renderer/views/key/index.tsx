@@ -22,8 +22,8 @@ import KeyView from './view'
 import {goBack, push} from 'connected-react-router'
 import {store} from '../../store'
 
-import {key, keyRemove, pull} from '../../rpc/rpc'
-import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/types'
+import {key, keyRemove, pull} from '../../rpc/keys'
+import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/service.keys.d'
 
 type Props = {
   open: boolean

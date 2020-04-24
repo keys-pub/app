@@ -5,8 +5,8 @@ import AuthUnlockView from './unlock'
 import AuthSplash from './splash'
 import ErrorsView from '../../errors'
 
-import {runtimeStatus} from '../../rpc/rpc'
-import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/types'
+import {runtimeStatus} from '../../rpc/keys'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/service.keys.d'
 
 type Props = {}
 

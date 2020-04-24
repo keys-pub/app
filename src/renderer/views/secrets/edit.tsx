@@ -23,7 +23,7 @@ import {deepCopy} from '../helper'
 
 import PasswordOptions from './pw'
 
-import {randPassword} from '../../rpc/rpc'
+import {randPassword} from '../../rpc/keys'
 import {
   RPCError,
   Secret,
@@ -33,8 +33,8 @@ import {
   RandPasswordRequest,
   RandPasswordResponse,
   Encoding,
-} from '../../rpc/types'
-import {secretSave} from '../../rpc/rpc'
+} from '../../rpc/service.keys.d'
+import {secretSave} from '../../rpc/keys'
 
 type Props = {
   secret: Secret

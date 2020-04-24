@@ -16,8 +16,8 @@ import {
 
 import {styles, DialogTitle} from '../../components'
 
-import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/types'
-import {keyImport} from '../../rpc/rpc'
+import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/service.keys.d'
+import {keyImport} from '../../rpc/keys'
 
 type Props = {
   open: boolean

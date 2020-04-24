@@ -21,7 +21,7 @@ import {push} from 'connected-react-router'
 import {query} from '../state'
 import {store} from '../../store'
 
-import {configSet, userService} from '../../rpc/rpc'
+import {configSet, userService} from '../../rpc/keys'
 
 import {
   RPCError,
@@ -29,7 +29,7 @@ import {
   ConfigSetResponse,
   UserServiceRequest,
   UserServiceResponse,
-} from '../../rpc/types'
+} from '../../rpc/service.keys.d'
 
 type Props = {
   open: boolean

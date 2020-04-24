@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {styles} from '../../components'
-import {Statement} from '../../rpc/types'
+import {Statement} from '../../rpc/service.keys.d'
 
 type Props = {
   statements: Array<Statement>

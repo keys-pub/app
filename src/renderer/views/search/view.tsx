@@ -24,8 +24,8 @@ import KeyDialog from '../key'
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
-import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/types'
-import {search} from '../../rpc/rpc'
+import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/service.keys.d'
+import {search} from '../../rpc/keys'
 
 type Props = {
   select: (k: Key) => void

@@ -9,7 +9,7 @@ import SignerView from '../verify/signer'
 import {shell} from 'electron'
 import {dirname} from 'path'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/types'
+import {Key, DecryptRequest, DecryptResponse} from '../../rpc/service.keys.d'
 import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {

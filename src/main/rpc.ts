@@ -1,6 +1,6 @@
 import {ipcMain} from 'electron'
 
-import {RPCError} from './rpc/types'
+import {RPCError} from './rpc/service.keys'
 import {client, setAuthToken} from './rpc/client'
 
 type RPC = {

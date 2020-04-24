@@ -7,8 +7,8 @@ import {store} from '../../store'
 import UserLabel from '../user/label'
 import {styles} from '../../components'
 
-import {keys} from '../../rpc/rpc'
-import {RPCError, KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/types'
+import {keys} from '../../rpc/keys'
+import {RPCError, KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/service.keys.d'
 
 export type Props = {
   defaultValue?: string

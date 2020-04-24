@@ -15,8 +15,8 @@ import * as grpc from '@grpc/grpc-js'
 import {remote} from 'electron'
 
 import {VerifyState} from '../../reducers/verify'
-import {verifyFile} from '../../rpc/rpc'
-import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/types'
+import {verifyFile} from '../../rpc/keys'
+import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/service.keys.d'
 
 export type Props = {
   defaultValue: string

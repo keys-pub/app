@@ -4,8 +4,8 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 
 import {DialogTitle, styles} from '../../components'
 
-import {keyRemove} from '../../rpc/rpc'
-import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/types'
+import {keyRemove} from '../../rpc/keys'
+import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/service.keys.d'
 
 type Props = {
   value: Key

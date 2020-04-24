@@ -18,7 +18,7 @@ import {connect} from 'react-redux'
 
 import {styles} from '../../components'
 import {dateString} from '../helper'
-import {collections, documents} from '../../rpc/rpc'
+import {collections, documents} from '../../rpc/keys'
 import {
   RPCError,
   Collection,
@@ -27,7 +27,7 @@ import {
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-} from '../../rpc/types'
+} from '../../rpc/service.keys.d'
 
 type Props = {}
 

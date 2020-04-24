@@ -40,8 +40,15 @@ import SecretContentView from './content'
 
 import {directionString, flipDirection} from '../helper'
 
-import {secrets} from '../../rpc/rpc'
-import {RPCError, Secret, SortDirection, SecretType, SecretsRequest, SecretsResponse} from '../../rpc/types'
+import {secrets} from '../../rpc/keys'
+import {
+  RPCError,
+  Secret,
+  SortDirection,
+  SecretType,
+  SecretsRequest,
+  SecretsResponse,
+} from '../../rpc/service.keys.d'
 import {AppState} from '../../reducers/app'
 import {throws} from 'assert'
 

@@ -4,8 +4,8 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 
 import {DialogTitle, styles} from '../../components'
 
-import {secretRemove} from '../../rpc/rpc'
-import {RPCError, Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/types'
+import {secretRemove} from '../../rpc/keys'
+import {RPCError, Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/service.keys.d'
 
 type Props = {
   value: Secret

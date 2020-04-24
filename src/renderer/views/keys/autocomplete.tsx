@@ -10,8 +10,8 @@ import matchSorter from 'match-sorter'
 import {CSSProperties} from '@material-ui/styles'
 
 import {store} from '../../store'
-import {keys} from '../../rpc/rpc'
-import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/types'
+import {keys} from '../../rpc/keys'
+import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/service.keys.d'
 import styles, {serviceColor} from '../../components/styles'
 
 import SearchDialog from '../search/dialog'

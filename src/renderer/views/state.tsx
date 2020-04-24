@@ -5,8 +5,8 @@ import * as grpc from '@grpc/grpc-js'
 import * as queryString from 'query-string'
 
 import {ipcRenderer} from 'electron'
-import {setErrHandler} from '../rpc/rpc'
-import {RPCError, WatchEvent} from '../rpc/types'
+import {setErrHandler} from '../rpc/keys'
+import {RPCError, WatchEvent} from '../rpc/service.keys.d'
 import {store} from '../store'
 
 export {goBack, push}
