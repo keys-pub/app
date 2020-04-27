@@ -44,8 +44,8 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {detectDevices} from '../../rpc/fido2'
-import {RPCError, DeviceInfo, DetectDevicesRequest, DetectDevicesResponse} from '../../rpc/fido2.d'
+import {devices} from '../../rpc/fido2'
+import {RPCError, Device, DevicesRequest, DevicesResponse} from '../../rpc/fido2.d'
 import {AppState} from '../../reducers/app'
 
 type Props = {}
@@ -57,7 +57,7 @@ type Position = {
 
 type State = {
   contextPosition: Position
-  devices: Array<DeviceInfo>
+  devices: Array<Device>
   selected: string
 }
 
@@ -78,8 +78,8 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 
   list = () => {
     console.log('List devices')
-    const req: DetectDevicesRequest = {}
-    detectDevices(req, (err: RPCError, resp: DetectDevicesResponse) => {
+    const req: DevicesRequest = {}
+    devices(req, (err: RPCError, resp: DevicesResponse) => {
       if (err) {
         // TODO: error
         return
@@ -94,7 +94,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     this.refresh()
   }
 
-  select = (device: DeviceInfo) => {
+  select = (device: Device) => {
     this.setState({selected: device.path})
   }
 
