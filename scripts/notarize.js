@@ -20,5 +20,6 @@ exports.default = async function notarizing(context) {
     appPath: `${appOutDir}/${appName}.app`,
     appleId: appleId,
     appleIdPassword: password,
+    ascProvider: 'GabrielHandford190785325',
   })
 }
