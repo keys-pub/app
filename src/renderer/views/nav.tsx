@@ -47,12 +47,12 @@ const navs = [
   {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
   {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
   {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
-  {
-    name: 'Devices',
-    icon: AuthenticatorsIcon,
-    route: '/authenticators/index',
-    prefix: '/authenticators',
-  },
+  // {
+  //   name: 'Devices',
+  //   icon: AuthenticatorsIcon,
+  //   route: '/authenticators/index',
+  //   prefix: '/authenticators',
+  // },
   {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
 ]
 

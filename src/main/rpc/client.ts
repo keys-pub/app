@@ -75,10 +75,10 @@ export const connectClients = () => {
     keysClient.close()
   }
   keysClient = newClient('keys.proto', 'service', 'Keys')
-  if (fido2Client) {
-    fido2Client.close()
-  }
-  fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
+  // if (fido2Client) {
+  //   fido2Client.close()
+  // }
+  // fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
 }
 
 const sleep = (milliseconds) => {
@@ -102,29 +102,29 @@ export const keys = async () => {
   return keysClient
 }
 
-export const fido2 = async () => {
-  let waitCount = 0
-  while (!fido2Client) {
-    if (waitCount % 4 == 0) {
-      console.log('Waiting for fido2 client init...')
-    }
-    await sleep(250)
-    if (waitCount++ > 1000) {
-      break
-    }
-  }
-  if (!fido2Client) {
-    throw new Error('No fido2 client available (timed out)')
-  }
-  return fido2Client
-}
+// export const fido2 = async () => {
+//   let waitCount = 0
+//   while (!fido2Client) {
+//     if (waitCount % 4 == 0) {
+//       console.log('Waiting for fido2 client init...')
+//     }
+//     await sleep(250)
+//     if (waitCount++ > 1000) {
+//       break
+//     }
+//   }
+//   if (!fido2Client) {
+//     throw new Error('No fido2 client available (timed out)')
+//   }
+//   return fido2Client
+// }
 
 export const client = (service: string) => {
   switch (service) {
     case 'Keys':
       return keys()
-    case 'Authenticators':
-      return fido2()
+    // case 'Authenticators':
+    //   return fido2()
     default:
       throw new Error('unknown service ' + service)
   }
