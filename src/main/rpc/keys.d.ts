@@ -42,6 +42,7 @@ export enum UserStatus {
     USER_OK = "USER_OK",
     USER_RESOURCE_NOT_FOUND = "USER_RESOURCE_NOT_FOUND",
     USER_CONTENT_NOT_FOUND = "USER_CONTENT_NOT_FOUND",
+    USER_CONTENT_INVALID = "USER_CONTENT_INVALID",
     USER_CONN_FAILURE = "USER_CONN_FAILURE",
     USER_FAILURE = "USER_FAILURE",
 }
@@ -783,6 +784,18 @@ export interface MessagesResponse {
     messages?: Array<Message>;
 }
 
+export interface AdminSignURLRequest {
+    signer?: string;
+    method?: string;
+    url?: string;
+}
+
+export interface AdminSignURLResponse {
+    auth?: string;
+    url?: string;
+    curl?: string;
+}
+
 export interface KeysService {
     KeyGenerate: (r:KeyGenerateRequest) => KeyGenerateResponse;
     Keys: (r:KeysRequest) => KeysResponse;
@@ -839,6 +852,7 @@ export interface KeysService {
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;
+    AdminSignURL: (r:AdminSignURLRequest) => AdminSignURLResponse;
     MessagePrepare: (r:MessagePrepareRequest) => MessagePrepareResponse;
     MessageCreate: (r:MessageCreateRequest) => MessageCreateResponse;
     Messages: (r:MessagesRequest) => MessagesResponse;

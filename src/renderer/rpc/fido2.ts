@@ -23,13 +23,13 @@ import {
   CredentialsRequest,
   CredentialsResponse,
   RelyingPartiesRequest,
-  RelyingPartiesResponse
+  RelyingPartiesResponse,
 } from './fido2.d'
 
 export interface RPCError {
-    code?: number;
-    message?: string;
-    details?: string;
+  code?: number
+  message?: string
+  details?: string
 }
 
 const replyID = (): string => {
@@ -42,193 +42,174 @@ export const setErrHandler = (eh: ErrHandler) => {
   errHandler = eh
 }
 
-export const devices = (
-  req: DevicesRequest,
-  cb: (err: RPCError, resp: DevicesResponse) => void
-) => {
-  const reply = 'Authenticators.devices-' + replyID()
+export const devices = (req: DevicesRequest, cb: (err: RPCError, resp: DevicesResponse) => void) => {
+  const reply = 'Authenticators.Devices-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.devices):', arg.err)
+      console.error('RPC error (Authenticators.Devices):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.devices) done')
+      console.log('RPC (Authenticators.Devices) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.devices)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'devices', args: req, reply: reply})
+  console.log('RPC (Authenticators.Devices)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'Devices', args: req, reply: reply})
 }
 
-export const deviceInfo = (
-  req: DeviceInfoRequest,
-  cb: (err: RPCError, resp: DeviceInfoResponse) => void
-) => {
-  const reply = 'Authenticators.deviceInfo-' + replyID()
+export const deviceInfo = (req: DeviceInfoRequest, cb: (err: RPCError, resp: DeviceInfoResponse) => void) => {
+  const reply = 'Authenticators.DeviceInfo-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.deviceInfo):', arg.err)
+      console.error('RPC error (Authenticators.DeviceInfo):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.deviceInfo) done')
+      console.log('RPC (Authenticators.DeviceInfo) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.deviceInfo)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'deviceInfo', args: req, reply: reply})
+  console.log('RPC (Authenticators.DeviceInfo)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'DeviceInfo', args: req, reply: reply})
 }
 
 export const makeCredential = (
   req: MakeCredentialRequest,
   cb: (err: RPCError, resp: MakeCredentialResponse) => void
 ) => {
-  const reply = 'Authenticators.makeCredential-' + replyID()
+  const reply = 'Authenticators.MakeCredential-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.makeCredential):', arg.err)
+      console.error('RPC error (Authenticators.MakeCredential):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.makeCredential) done')
+      console.log('RPC (Authenticators.MakeCredential) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.makeCredential)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'makeCredential', args: req, reply: reply})
+  console.log('RPC (Authenticators.MakeCredential)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'MakeCredential', args: req, reply: reply})
 }
 
-export const setPIN = (
-  req: SetPINRequest,
-  cb: (err: RPCError, resp: SetPINResponse) => void
-) => {
-  const reply = 'Authenticators.setPIN-' + replyID()
+export const setPIN = (req: SetPINRequest, cb: (err: RPCError, resp: SetPINResponse) => void) => {
+  const reply = 'Authenticators.SetPIN-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.setPIN):', arg.err)
+      console.error('RPC error (Authenticators.SetPIN):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.setPIN) done')
+      console.log('RPC (Authenticators.SetPIN) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.setPIN)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'setPIN', args: req, reply: reply})
+  console.log('RPC (Authenticators.SetPIN)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'SetPIN', args: req, reply: reply})
 }
 
-export const reset = (
-  req: ResetRequest,
-  cb: (err: RPCError, resp: ResetResponse) => void
-) => {
-  const reply = 'Authenticators.reset-' + replyID()
+export const reset = (req: ResetRequest, cb: (err: RPCError, resp: ResetResponse) => void) => {
+  const reply = 'Authenticators.Reset-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.reset):', arg.err)
+      console.error('RPC error (Authenticators.Reset):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.reset) done')
+      console.log('RPC (Authenticators.Reset) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.reset)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'reset', args: req, reply: reply})
+  console.log('RPC (Authenticators.Reset)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'Reset', args: req, reply: reply})
 }
 
-export const retryCount = (
-  req: RetryCountRequest,
-  cb: (err: RPCError, resp: RetryCountResponse) => void
-) => {
-  const reply = 'Authenticators.retryCount-' + replyID()
+export const retryCount = (req: RetryCountRequest, cb: (err: RPCError, resp: RetryCountResponse) => void) => {
+  const reply = 'Authenticators.RetryCount-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.retryCount):', arg.err)
+      console.error('RPC error (Authenticators.RetryCount):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.retryCount) done')
+      console.log('RPC (Authenticators.RetryCount) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.retryCount)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'retryCount', args: req, reply: reply})
+  console.log('RPC (Authenticators.RetryCount)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'RetryCount', args: req, reply: reply})
 }
 
-export const assertion = (
-  req: AssertionRequest,
-  cb: (err: RPCError, resp: AssertionResponse) => void
-) => {
-  const reply = 'Authenticators.assertion-' + replyID()
+export const assertion = (req: AssertionRequest, cb: (err: RPCError, resp: AssertionResponse) => void) => {
+  const reply = 'Authenticators.Assertion-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.assertion):', arg.err)
+      console.error('RPC error (Authenticators.Assertion):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.assertion) done')
+      console.log('RPC (Authenticators.Assertion) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.assertion)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'assertion', args: req, reply: reply})
+  console.log('RPC (Authenticators.Assertion)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'Assertion', args: req, reply: reply})
 }
 
 export const credentialsInfo = (
   req: CredentialsInfoRequest,
   cb: (err: RPCError, resp: CredentialsInfoResponse) => void
 ) => {
-  const reply = 'Authenticators.credentialsInfo-' + replyID()
+  const reply = 'Authenticators.CredentialsInfo-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.credentialsInfo):', arg.err)
+      console.error('RPC error (Authenticators.CredentialsInfo):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.credentialsInfo) done')
+      console.log('RPC (Authenticators.CredentialsInfo) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.credentialsInfo)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'credentialsInfo', args: req, reply: reply})
+  console.log('RPC (Authenticators.CredentialsInfo)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'CredentialsInfo', args: req, reply: reply})
 }
 
 export const credentials = (
   req: CredentialsRequest,
   cb: (err: RPCError, resp: CredentialsResponse) => void
 ) => {
-  const reply = 'Authenticators.credentials-' + replyID()
+  const reply = 'Authenticators.Credentials-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.credentials):', arg.err)
+      console.error('RPC error (Authenticators.Credentials):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.credentials) done')
+      console.log('RPC (Authenticators.Credentials) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.credentials)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'credentials', args: req, reply: reply})
+  console.log('RPC (Authenticators.Credentials)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'Credentials', args: req, reply: reply})
 }
 
 export const relyingParties = (
   req: RelyingPartiesRequest,
   cb: (err: RPCError, resp: RelyingPartiesResponse) => void
 ) => {
-  const reply = 'Authenticators.relyingParties-' + replyID()
+  const reply = 'Authenticators.RelyingParties-' + replyID()
   ipcRenderer.on(reply, (event, arg) => {
     ipcRenderer.removeAllListeners(reply)
     if (arg.err) {
-      console.error('RPC error (Authenticators.relyingParties):', arg.err)
+      console.error('RPC error (Authenticators.RelyingParties):', arg.err)
       errHandler(arg.err)
     } else {
-      console.log('RPC (Authenticators.relyingParties) done')
+      console.log('RPC (Authenticators.RelyingParties) done')
     }
     cb(arg.err, arg.resp)
   })
-  console.log('RPC (Authenticators.relyingParties)...')
-  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'relyingParties', args: req, reply: reply})
+  console.log('RPC (Authenticators.RelyingParties)...')
+  ipcRenderer.send('rpc', {service: 'Authenticators', method: 'RelyingParties', args: req, reply: reply})
 }
-

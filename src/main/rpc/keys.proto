@@ -8,8 +8,6 @@ package service;
 // gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
 import "gogoproto/gogo.proto";
 
-// import "fido2.proto";
-
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.marshaler_all) = true;
@@ -98,6 +96,8 @@ service Keys {
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
 
   // Experimental
+  rpc AdminSignURL(AdminSignURLRequest) returns (AdminSignURLResponse) {}
+
   rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
   rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
   rpc Messages(MessagesRequest) returns (MessagesResponse) {}
@@ -734,10 +734,15 @@ enum UserStatus {
 
   USER_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
   USER_OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
-  USER_RESOURCE_NOT_FOUND = 2 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
-  USER_CONTENT_NOT_FOUND = 3 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
-  USER_CONN_FAILURE = 4 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
-  USER_FAILURE = 5 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
+  
+  USER_RESOURCE_NOT_FOUND = 20 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
+  
+  USER_CONTENT_NOT_FOUND = 30 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
+  USER_CONTENT_INVALID = 31 [(gogoproto.enumvalue_customname) = "UserStatusContentInvalid"];
+  
+  USER_CONN_FAILURE = 40 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
+  
+  USER_FAILURE = 50 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
 }
 
 message User {  
@@ -909,4 +914,16 @@ message MessagesRequest {
 
 message MessagesResponse {
   repeated Message messages = 1;
+}
+
+message AdminSignURLRequest {
+  string signer = 1;
+  string method = 2;
+  string url = 3 [(gogoproto.customname) = "URL"];
+}
+
+message AdminSignURLResponse {
+  string auth = 1;
+  string url = 2 [(gogoproto.customname) = "URL"];
+  string curl = 3  [(gogoproto.customname) = "CURL"];
 }

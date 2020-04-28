@@ -77,3 +77,8 @@ export const flipDirection = (d: SortDirection): SortDirection => {
 export const deepCopy = (o: any) => {
   return JSON.parse(JSON.stringify(o))
 }
+
+export const toHex = (b: Uint8Array): string => {
+  if (!b) return ''
+  return Buffer.from(b).toString('hex')
+}

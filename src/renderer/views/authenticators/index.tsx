@@ -10,6 +10,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableRow,
   TableSortLabel,
@@ -27,22 +28,8 @@ import {
 } from '@material-ui/icons'
 
 import {styles} from '../../components'
-import UserLabel from '../user/label'
-import {IDView} from '../key/content'
 
-import {store} from '../../store'
-
-import {push} from 'connected-react-router'
-
-import {connect} from 'react-redux'
-
-import KeyCreateDialog from '../key/create'
-import KeyImportDialog from '../import'
-import KeyRemoveDialog from '../key/remove'
-import KeyExportDialog from '../export'
-import KeyDialog from '../key'
-import SearchDialog from '../search/dialog'
-import {directionString, flipDirection} from '../helper'
+import DeviceContentView from './content'
 
 import {devices} from '../../rpc/fido2'
 import {RPCError, Device, DevicesRequest, DevicesResponse} from '../../rpc/fido2.d'
@@ -58,14 +45,16 @@ type Position = {
 type State = {
   contextPosition: Position
   devices: Array<Device>
-  selected: string
+  input: string
+  selected: Device
 }
 
 export default class AuthenticatorsView extends React.Component<Props, State> {
   state = {
     contextPosition: null,
     devices: [],
-    selected: '',
+    input: '',
+    selected: null,
   }
 
   componentDidMount() {
@@ -73,10 +62,12 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   }
 
   refresh = () => {
-    this.list()
+    this.list('')
   }
 
-  list = () => {
+  list = (query: string) => {
+    const selected = this.state.devices.find((d: Device) => d.path == this.state.selected?.path)
+
     console.log('List devices')
     const req: DevicesRequest = {}
     devices(req, (err: RPCError, resp: DevicesResponse) => {
@@ -86,6 +77,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
       }
       this.setState({
         devices: resp.devices,
+        selected: selected,
       })
     })
   }
@@ -95,24 +87,63 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   }
 
   select = (device: Device) => {
-    this.setState({selected: device.path})
+    this.setState({selected: device})
   }
 
-  isSelected = (path: string): boolean => {
-    return this.state.selected == path
+  isSelected = (device: Device): boolean => {
+    return this.state.selected?.path == device?.path
   }
 
   onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const path = event.currentTarget.id
-    this.setState({
-      contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
-      selected: path,
-    })
+    // event.preventDefault()
+    // const path = event.currentTarget.id
+    // const device = this.state.devices.find((d: Device) => d.path == path)
+    // this.setState({
+    //   contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
+    //   selected: device,
+    // })
   }
 
   closeContext = () => {
-    this.setState({contextPosition: null, selected: ''})
+    this.setState({contextPosition: null, selected: null})
+  }
+
+  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    this.setState({
+      input: target.value,
+    })
+    this.list(target.value)
+  }
+
+  renderHeader() {
+    return (
+      <Box
+        display="flex"
+        flexDirection="row"
+        flex={1}
+        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
+      >
+        <TextField
+          placeholder="Filter"
+          variant="outlined"
+          value={this.state.input}
+          onChange={this.onInputChange}
+          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+          style={{marginTop: 2, marginRight: 10}}
+        />
+        <Button
+          color="primary"
+          variant="outlined"
+          size="small"
+          onClick={this.refresh}
+          style={{marginTop: 2, marginRight: 10}}
+          // startIcon={<AddIcon />}
+        >
+          Refresh
+        </Button>
+      </Box>
+    )
   }
 
   render() {
@@ -135,48 +166,61 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
           </MenuItem>
         </Menu>
         <Divider />
-        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography style={{...styles.mono}}>Product</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography style={{...styles.mono}}>Path</Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.devices.map((device, index) => {
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => this.select(device.path)}
-                    key={device.path}
-                    style={{cursor: 'pointer'}}
-                    selected={this.isSelected(device.path)}
-                    component={(props: any) => {
-                      return <tr onContextMenu={this.onContextMenu} {...props} id={device.path} />
-                    }}
-                  >
-                    <TableCell component="th" scope="row" style={{minWidth: 200, verticalAlign: 'top'}}>
-                      <Typography>
-                        {device.product}
-                        <br />
-                        {device.manufacturer}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography style={{...styles.breakWords}}>{device.path}</Typography>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+        <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
+          <Box style={{width: 200}}>
+            {this.renderHeader()}
+            <Divider />
+            <Box style={{height: 'calc(100vh - 88px)', overflowY: 'auto'}}>
+              <Table size="small">
+                <TableBody>
+                  {this.state.devices.map((device, index) => {
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => this.select(device)}
+                        key={device.path}
+                        style={{cursor: 'pointer'}}
+                        selected={this.isSelected(device)}
+                        component={(props: any) => {
+                          return <tr onContextMenu={this.onContextMenu} {...props} id={device.path} />
+                        }}
+                      >
+                        <TableCell component="th" scope="row" style={{minWidth: 150, verticalAlign: 'top'}}>
+                          <Typography
+                            style={{
+                              ...nowrapStyle,
+                              whiteSpace: 'nowrap',
+                              fontSize: '1.1em',
+                              paddingBottom: 2,
+                            }}
+                          >
+                            {device.product}
+                          </Typography>
+                          <Typography
+                            style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}
+                          >
+                            {device.manufacturer}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </Box>
+          </Box>
+          <Divider orientation="vertical" />
+          <Box display="flex" flex={1}>
+            <DeviceContentView device={this.state.selected} />
+          </Box>
         </Box>
       </Box>
     )
   }
+}
+
+const nowrapStyle = {
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  width: 145,
 }

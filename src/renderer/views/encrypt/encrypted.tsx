@@ -34,7 +34,7 @@ export type Props = {
 type State = {
   encrypted: string
   error: string
-  snackOpen: boolean
+  openSnack: boolean
 }
 
 // TODO: drag and drop file
@@ -43,7 +43,7 @@ export default class EncryptedView extends React.Component<Props, State> {
   state = {
     encrypted: '',
     error: '',
-    snackOpen: false,
+    openSnack: false,
   }
 
   debounceEncrypt = debounce(() => this.encrypt(), 10)
@@ -88,7 +88,7 @@ export default class EncryptedView extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.encrypted)
-    this.setState({snackOpen: true})
+    this.setState({openSnack: true})
   }
 
   render() {
@@ -140,11 +140,11 @@ export default class EncryptedView extends React.Component<Props, State> {
         </Box>
         <Snackbar
           anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-          open={this.state.snackOpen}
+          open={this.state.openSnack}
           autoHideDuration={2000}
           onClose={() =>
             this.setState({
-              snackOpen: false,
+              openSnack: false,
             })
           }
         >

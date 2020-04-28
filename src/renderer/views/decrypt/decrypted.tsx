@@ -20,7 +20,7 @@ type State = {
   decrypted: string
   sender: Key
   error: string
-  snackOpen: boolean
+  openSnack: boolean
 }
 
 export default class DecryptedView extends React.Component<Props, State> {
@@ -28,7 +28,7 @@ export default class DecryptedView extends React.Component<Props, State> {
     decrypted: '',
     error: '',
     sender: null,
-    snackOpen: false,
+    openSnack: false,
   }
 
   debounceDecrypt = debounce(() => this.decrypt(), 10)
@@ -65,7 +65,7 @@ export default class DecryptedView extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.decrypted)
-    this.setState({snackOpen: true})
+    this.setState({openSnack: true})
   }
 
   render() {
@@ -122,11 +122,11 @@ export default class DecryptedView extends React.Component<Props, State> {
         </Box>
         <Snackbar
           anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-          open={this.state.snackOpen}
+          open={this.state.openSnack}
           autoHideDuration={2000}
           onClose={() =>
             this.setState({
-              snackOpen: false,
+              openSnack: false,
             })
           }
         >

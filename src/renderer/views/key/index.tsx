@@ -123,7 +123,10 @@ export default class KeyDialog extends React.Component<Props, State> {
       >
         <DialogTitle loading={this.state.loading}>Key</DialogTitle>
         <DialogContent dividers style={{minHeight: 155}}>
-          {this.state.error && <Typography style={{color: 'red'}}>{this.state.error}</Typography>}
+          {/*TODO: Better error display*/}
+          {this.state.error && (
+            <Typography style={{color: 'red', paddingBottom: 20}}>{this.state.error}</Typography>
+          )}
           {this.state.key && <KeyView value={this.state.key} refresh={this.refresh} />}
         </DialogContent>
         <DialogActions>

@@ -12,7 +12,7 @@ type Props = {
 }
 
 export default (props: Props) => {
-  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [openSnack, setSnackOpen] = React.useState(false)
 
   const copyPassword = () => {
     clipboard.writeText(props.password)
@@ -55,7 +55,7 @@ export default (props: Props) => {
       )}
       <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-        open={snackOpen}
+        open={openSnack}
         autoHideDuration={2000}
         onClose={() => setSnackOpen(false)}
       >

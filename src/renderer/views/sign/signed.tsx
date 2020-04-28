@@ -22,14 +22,14 @@ export type Props = {
 type State = {
   error: string
   signed: string
-  snackOpen: boolean
+  openSnack: boolean
 }
 
 export default class SignedView extends React.Component<Props, State> {
   state = {
     signed: '',
     error: '',
-    snackOpen: false,
+    openSnack: false,
   }
   debounceSign = debounce(() => this.sign(), 10)
 
@@ -69,7 +69,7 @@ export default class SignedView extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.signed)
-    this.setState({snackOpen: true})
+    this.setState({openSnack: true})
   }
 
   render() {
@@ -111,11 +111,11 @@ export default class SignedView extends React.Component<Props, State> {
         </Box>
         <Snackbar
           anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-          open={this.state.snackOpen}
+          open={this.state.openSnack}
           autoHideDuration={2000}
           onClose={() =>
             this.setState({
-              snackOpen: false,
+              openSnack: false,
             })
           }
         >
