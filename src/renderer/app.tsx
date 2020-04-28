@@ -21,6 +21,7 @@ import './app.css'
 
 const mainElement = document.createElement('div')
 mainElement.setAttribute('id', 'root')
+document.title = 'Keys'
 document.body.appendChild(mainElement)
 
 const render = (Component: () => JSX.Element) => {
@@ -35,7 +36,7 @@ const render = (Component: () => JSX.Element) => {
 render(Application)
 
 ipcRenderer.removeAllListeners('log')
-ipcRenderer.on('log', function(event, text) {
+ipcRenderer.on('log', function (event, text) {
   console.log('Main process:', text)
 })
 
