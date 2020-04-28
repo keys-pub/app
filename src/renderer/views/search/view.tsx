@@ -29,7 +29,6 @@ import {search} from '../../rpc/keys'
 
 type Props = {
   select: (k: Key) => void
-  tableHeight: string
 }
 
 type State = {
@@ -93,8 +92,13 @@ export default class SearchView extends React.Component<Props, State> {
   render() {
     const {loading} = this.state
     return (
-      <Box display="flex" flex={1} flexDirection="column">
-        <Box paddingLeft={1} paddingBottom={1} paddingRight={1}>
+      <Box display="flex" flex={1} flexDirection="column" style={{position: 'relative'}}>
+        <Box
+          paddingTop={1}
+          paddingLeft={1}
+          paddingRight={1}
+          style={{position: 'sticky', top: 0, backgroundColor: 'white'}}
+        >
           <TextField
             placeholder="Search keys.pub"
             variant="outlined"
@@ -108,9 +112,10 @@ export default class SearchView extends React.Component<Props, State> {
         {this.state.error && (
           <Typography style={{color: 'red', marginLeft: 10}}>{this.state.error}</Typography>
         )}
+        <Box marginBottom={1} />
         {!loading && <Divider style={{marginTop: 3}} />}
         {loading && <LinearProgress />}
-        <Box style={{overflowY: 'auto', height: this.props.tableHeight}}>
+        <Box style={{overflowY: 'auto', height: '100%'}}>
           <Table size="small">
             <TableHead>
               <TableRow>

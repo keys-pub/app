@@ -9,7 +9,6 @@ import DebugView from './settings/debug'
 
 import SecretsView from './secrets'
 
-import SearchView from './search'
 import WormholeView from './wormhole'
 
 import StyleGuide from './style-guide'
@@ -35,7 +34,6 @@ export const routes: Array<RouteInfo> = [
   {path: '/keys/index', component: () => <KeysView />},
   {path: '/secrets/index', component: () => <SecretsView />},
 
-  {path: '/search/index', component: () => <SearchView />},
   {path: '/wormhole/index', component: () => <WormholeView />},
   {path: '/tools/index', component: () => <ToolsView />},
 

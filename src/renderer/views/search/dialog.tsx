@@ -57,9 +57,15 @@ export default class SearchDialog extends React.Component<Props, State> {
       >
         <DialogContent
           dividers
-          style={{paddingTop: 20, paddingLeft: 0, paddingRight: 0, paddingBottom: 0, height: 400}}
+          style={{
+            paddingTop: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingBottom: 0,
+            height: 400,
+          }}
         >
-          <SearchView select={this.select} tableHeight="calc(100vh - 246px)" />
+          <SearchView select={this.select} />
         </DialogContent>
         <DialogActions>
           <Button onClick={this.props.close}>Close</Button>
