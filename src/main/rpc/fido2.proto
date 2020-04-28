@@ -86,7 +86,8 @@ message Attestation {
 message Credential {
 	bytes id = 1 [(gogoproto.customname) = "ID"];
 	string type = 2;
-	User user = 3;
+    RelyingParty rp = 10 [(gogoproto.customname) = "RP"];
+	User user = 11;
 }
 
 message Assertion {
@@ -190,4 +191,33 @@ message RelyingPartiesRequest {
 }
 message RelyingPartiesResponse {
     repeated RelyingParty parties = 1;
+}
+
+
+enum DeviceType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "DeviceType";
+  
+  UNKNOWN_DEVICE = 0 [(gogoproto.enumvalue_customname) = "UnknownDevice"];
+  U2F = 1;
+  FIDO2 = 2;  
+}
+
+enum CredentialType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "CredentialType";
+  
+  UNKNOWN_CREDENTIAL = 0  [(gogoproto.enumvalue_customname) = "UnknownCredential"];
+  ES256 = 1 [(gogoproto.enumvalue_customname) = "ES256"];
+  EDDSA = 2 [(gogoproto.enumvalue_customname) = "EDDSA"];
+  RS256 = 3 [(gogoproto.enumvalue_customname) = "RS256"];
+}
+
+enum Extension {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "Extension";
+  
+  UNKNOWN_Extension = 0  [(gogoproto.enumvalue_customname) = "UnknownExtension"];
+  HMAC_SECRET = 1 [(gogoproto.enumvalue_customname) = "HMACSecret"];
+  CRED_PROTECT = 2 [(gogoproto.enumvalue_customname) = "CredProtect"];
 }

@@ -1,0 +1,230 @@
+import * as React from 'react'
+
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Divider,
+  LinearProgress,
+  FormControl,
+  FormHelperText,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@material-ui/core'
+
+import Alert from '@material-ui/lab/Alert'
+
+import {styles, DialogTitle} from '../../components'
+import {deepCopy, fromHex} from '../helper'
+
+import {makeCredential, credentials} from '../../rpc/fido2'
+import {
+  RPCError,
+  Device,
+  CredentialType,
+  MakeCredentialRequest,
+  MakeCredentialResponse,
+} from '../../rpc/fido2.d'
+
+type Props = {
+  device: Device
+  onChange: () => void
+  cancel: () => void
+}
+
+type Credential = {
+  clientDataHash: string
+  rpID: string
+  rpName: string
+  userID: string
+  userName: string
+  type: string
+}
+
+type State = {
+  error: string
+  loading: boolean
+  credential: Credential
+}
+
+export default class MakeCredentialView extends React.Component<Props, State> {
+  state = {
+    error: '',
+    loading: false,
+    credential: {} as Credential,
+  }
+
+  save = async () => {
+    this.setState({loading: true, error: ''})
+    const req: MakeCredentialRequest = {
+      device: this.props.device.path,
+      clientDataHash: fromHex(this.state.credential.clientDataHash),
+      rp: {
+        id: this.state.credential.rpID,
+        name: this.state.credential.rpName,
+      },
+      user: {
+        id: fromHex(this.state.credential.userID),
+        name: this.state.credential.userName,
+      },
+      type: this.state.credential.type,
+    }
+    makeCredential(req, (err: RPCError, resp: MakeCredentialResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({loading: false})
+      this.props.onChange()
+    })
+  }
+
+  onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {
+    const value = e.target.value as string
+    const credential = deepCopy(this.state.credential)
+    credential[fieldName] = value
+    const state = {error: '', credential}
+    this.setState(state)
+  }
+
+  renderEditActions() {
+    return (
+      <Box
+        display="flex"
+        flexDirection="row"
+        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
+      >
+        <Button
+          onClick={this.props.cancel}
+          color="secondary"
+          variant="outlined"
+          size="small"
+          style={{marginTop: 2, width: 55}}
+        >
+          Cancel
+        </Button>
+        <Box display="flex" flexGrow={1} />
+        <Button
+          color="primary"
+          variant="outlined"
+          size="small"
+          onClick={this.save}
+          style={{marginTop: 2, width: 55, marginRight: 10}}
+        >
+          Save
+        </Button>
+      </Box>
+    )
+  }
+
+  renderTypeSelect() {
+    return (
+      <Select
+        labelId="secret-type-label"
+        id="secret-type-select"
+        variant="outlined"
+        value={this.state.credential.type}
+        onChange={(e) => this.onChange(e, 'type')}
+        style={{width: 200, height: 32}}
+      >
+        <MenuItem value={'es256'}>ES256</MenuItem>
+      </Select>
+    )
+  }
+
+  renderCredential() {
+    return (
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Typography style={labelStyle}>ClientDataHash</Typography>}
+        <TextField
+          onChange={(e) => this.onChange(e, 'clientDataHash')}
+          value={this.state.credential.clientDataHash}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 20}}
+        />
+        <Typography style={labelStyle}>Relying Party ID</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'rp')}
+          value={this.state.credential.rpID}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 19}}
+        />
+        <Typography style={labelStyle}>Relying Party Name</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'rp')}
+          value={this.state.credential.rpID}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 19}}
+        />
+        <Typography style={labelStyle}>User ID</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'rp')}
+          value={this.state.credential.rpID}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 19}}
+        />
+        <Typography style={labelStyle}>User Name</Typography>
+        <TextField
+          onChange={(e) => this.onChange(e, 'rp')}
+          value={this.state.credential.rpID}
+          InputProps={{style: styles.mono}}
+          inputProps={{maxLength: 128}}
+          style={{marginBottom: 19}}
+        />
+        <FormControl style={{marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
+      </Box>
+    )
+  }
+
+  render() {
+    if (!this.props.device) return null
+
+    return (
+      <Box display="flex" flexDirection="column" flex={1}>
+        {this.renderEditActions()}
+        <Divider />
+        <Box
+          display="flex"
+          flexDirection="column"
+          style={{
+            overflowY: 'auto',
+            height: 'calc(100vh - 94px)',
+            paddingLeft: 10,
+            paddingTop: 10,
+            paddingRight: 10,
+          }}
+        >
+          {this.state.error && (
+            <Box marginBottom={2}>
+              <Alert severity="error">{this.state.error}</Alert>
+            </Box>
+          )}
+          <Box display="flex" flexDirection="column" marginLeft={1} marginRight={1}>
+            {this.renderCredential()}
+          </Box>
+        </Box>
+      </Box>
+    )
+  }
+}
+
+const labelStyle = {
+  transform: 'scale(0.75)',
+  transformOrigin: 'top left',
+  color: 'rgba(0, 0, 0, 0.54)',
+  marginTop: -1,
+  marginBottom: -3,
+  fontSize: '0.857rem',
+}
+
+const errStyle = {
+  color: 'red',
+}

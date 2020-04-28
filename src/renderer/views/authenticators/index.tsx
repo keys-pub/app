@@ -28,6 +28,7 @@ import {
 } from '@material-ui/icons'
 
 import {styles} from '../../components'
+import {pluralize} from '../helper'
 
 import DeviceContentView from './content'
 
@@ -45,7 +46,9 @@ type Position = {
 type State = {
   contextPosition: Position
   devices: Array<Device>
+  error: string
   input: string
+  loading: boolean
   selected: Device
 }
 
@@ -53,7 +56,9 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   state = {
     contextPosition: null,
     devices: [],
+    error: '',
     input: '',
+    loading: false,
     selected: null,
   }
 
@@ -62,22 +67,24 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   }
 
   refresh = () => {
-    this.list('')
+    this.list()
   }
 
-  list = (query: string) => {
-    const selected = this.state.devices.find((d: Device) => d.path == this.state.selected?.path)
-
+  list = () => {
     console.log('List devices')
+    this.setState({loading: true, error: ''})
     const req: DevicesRequest = {}
     devices(req, (err: RPCError, resp: DevicesResponse) => {
       if (err) {
-        // TODO: error
+        this.setState({devices: [], loading: false, error: err.details})
         return
       }
+
+      const selected = resp.devices.find((d: Device) => d.path == this.state.selected?.path)
       this.setState({
         devices: resp.devices,
         selected: selected,
+        loading: false,
       })
     })
   }
@@ -108,30 +115,17 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     this.setState({contextPosition: null, selected: null})
   }
 
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({
-      input: target.value,
-    })
-    this.list(target.value)
-  }
-
   renderHeader() {
     return (
       <Box
         display="flex"
         flexDirection="row"
         flex={1}
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
+        style={{paddingLeft: 8, paddingTop: 4, paddingBottom: 6, height: 30}}
       >
-        <TextField
-          placeholder="Filter"
-          variant="outlined"
-          value={this.state.input}
-          onChange={this.onInputChange}
-          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, marginRight: 10}}
-        />
+        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', paddingTop: 6, color: '#999'}}>
+          {pluralize(this.state.devices?.length, 'Device', 'Device')}
+        </Typography>
         <Button
           color="primary"
           variant="outlined"

@@ -64,6 +64,11 @@ export const directionString = (d: SortDirection): 'asc' | 'desc' => {
   return 'asc'
 }
 
+export const pluralize = (n: number, s: string, p: string): string => {
+  const out = n == 1 ? s : p
+  return n + ' ' + out
+}
+
 export const flipDirection = (d: SortDirection): SortDirection => {
   switch (d) {
     case SortDirection.ASC:
@@ -81,4 +86,8 @@ export const deepCopy = (o: any) => {
 export const toHex = (b: Uint8Array): string => {
   if (!b) return ''
   return Buffer.from(b).toString('hex')
+}
+
+export const fromHex = (s: string): Uint8Array => {
+  return Uint8Array.from(Buffer.from(s, 'hex'))
 }
