@@ -152,7 +152,7 @@
     "cross-var": "^1.1.0",
     "css-loader": "^3.2.0",
     "electron": "^8.0.1",
-    "electron-builder": "22.5.0",
+    "electron-builder": "^22.5.1",
     "electron-devtools-installer": "^3.0.0",
     "electron-notarize": "^0.3.0",
     "file-loader": "^6.0.0",
@@ -173,7 +173,7 @@
     "webpack-merge": "^4.1.2"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^0.8.1",
+    "@grpc/grpc-js": "^1.0.3",
     "@ln-zap/proto-loader": "^0.5.1",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
@@ -197,16 +197,13 @@
     "redux": "^4.0.0",
     "redux-promise": "^0.6.0",
     "redux-thunk": "^2.1.0",
-    "slate": "^0.57.1",
-    "slate-md-serializer": "^5.3.1",
-    "slate-react": "^0.57.1",
     "source-map-support": "^0.5.6",
     "typeface-open-sans": "^0.0.75",
     "typeface-roboto": "^0.0.75",
     "typeface-roboto-mono": "^0.0.75"
   },
   "engines": {
-    "node": ">=10.x <14",
+    "node": ">=10.x <15",
     "yarn": ">=1.x"
   }
 }
