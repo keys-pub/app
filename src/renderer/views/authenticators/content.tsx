@@ -10,9 +10,21 @@ import ResetDialog from './reset'
 
 import Alert from '@material-ui/lab/Alert'
 
-import {deviceInfo} from '../../rpc/fido2'
-import {RPCError, Device, DeviceInfo, Option, DeviceInfoRequest, DeviceInfoResponse} from '../../rpc/fido2.d'
+import {deviceInfo, relyingParties} from '../../rpc/fido2'
+import {
+  RPCError,
+  Device,
+  DeviceInfo,
+  Option,
+  DeviceInfoRequest,
+  DeviceInfoResponse,
+  RelyingParty,
+  RelyingPartiesRequest,
+  RelyingPartiesResponse,
+} from '../../rpc/fido2.d'
 import {toHex} from '../helper'
+
+import RelyingParties from './rps'
 
 type Props = {
   device: Device
@@ -25,6 +37,7 @@ type State = {
   openReset: boolean
   openSetPin: boolean
   openSnack: string
+  rps: Array<RelyingParty>
 }
 
 export default class DeviceContentView extends React.Component<Props, State> {
@@ -35,6 +48,7 @@ export default class DeviceContentView extends React.Component<Props, State> {
     openReset: false,
     openSetPin: false,
     openSnack: '',
+    rps: [],
   }
 
   componentDidMount() {
@@ -64,6 +78,28 @@ export default class DeviceContentView extends React.Component<Props, State> {
       }
       this.setState({
         info: resp.info,
+        loading: false,
+      })
+    })
+  }
+
+  rps = () => {
+    if (!this.props.device) {
+      this.setState({info: null, error: '', loading: false})
+      return
+    }
+
+    this.setState({loading: true, error: ''})
+    const req: RelyingPartiesRequest = {
+      device: this.props.device.path,
+    }
+    relyingParties(req, (err: RPCError, resp: RelyingPartiesResponse) => {
+      if (err) {
+        this.setState({loading: false, error: err.details})
+        return
+      }
+      this.setState({
+        rps: resp.parties,
         loading: false,
       })
     })
@@ -177,14 +213,13 @@ export default class DeviceContentView extends React.Component<Props, State> {
           style={{
             overflowY: 'auto',
             height: 'calc(100vh - 45px)',
-            paddingTop: 10,
-            marginLeft: 18,
-            paddingRight: 10,
           }}
         >
-          {this.renderDevice()}
-          {this.renderActions()}
-          {this.renderInfo()}
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderDevice()}</Box>
+
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderActions()}</Box>
+
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderInfo()}</Box>
         </Box>
         <SetPinDialog open={this.state.openSetPin} device={this.props.device} close={this.closePin} />
         <ResetDialog open={this.state.openReset} device={this.props.device} close={this.closeReset} />

@@ -35,30 +35,42 @@ import {connect} from 'react-redux'
 import {routesMap} from './routes'
 import {CSSProperties} from '@material-ui/styles'
 
+import {runtimeStatus} from '../rpc/keys'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
+
 type Props = {
   path: string
   navMinimize: boolean
 }
 
-// TODO: hover
+// TODO: Nav hover
 
-const navs = [
-  {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
-  {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
-  {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
-  {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
-  // {
-  //   name: 'Devices',
-  //   icon: AuthenticatorsIcon,
-  //   route: '/authenticators/index',
-  //   prefix: '/authenticators',
-  // },
-  {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
-]
+type State = {
+  fido2: boolean
+}
 
-class Nav extends React.Component<Props> {
+class Nav extends React.Component<Props, State> {
+  state = {
+    fido2: false,
+  }
+
+  componentDidMount() {
+    this.status()
+  }
+
   toggleDrawer = () => {
     store.dispatch({type: 'NAV_MINIMIZE', payload: {navMinimize: !this.props.navMinimize}})
+  }
+
+  status = () => {
+    const req: RuntimeStatusRequest = {}
+    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+      if (err) {
+        store.dispatch({type: 'ERROR', payload: {error: err}})
+        return
+      }
+      this.setState({fido2: resp.fido2})
+    })
   }
 
   render() {
@@ -71,6 +83,24 @@ class Nav extends React.Component<Props> {
     const drawerStyles: CSSProperties = open
       ? {width, border: 0, height: '100%'}
       : {width, border: 0, height: '100%', flexShrink: 0, overflowX: 'hidden'}
+
+    let navs = [
+      {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
+      {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
+      {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
+      {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
+    ]
+
+    if (this.state.fido2) {
+      navs.push({
+        name: 'Devices',
+        icon: AuthenticatorsIcon,
+        route: '/authenticators/index',
+        prefix: '/authenticators',
+      })
+    }
+
+    navs.push({name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'})
 
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>

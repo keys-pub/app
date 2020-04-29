@@ -18,8 +18,6 @@ import {MenuActionType} from './menu'
 import {keysStart} from './service'
 import {update, UpdateResult} from './updater'
 
-import {connectClients} from './rpc/client'
-
 import {rpcRegister} from './rpc'
 
 let mainWindow = null
@@ -172,7 +170,6 @@ app.on('ready', async () => {
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
-      connectClients()
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {

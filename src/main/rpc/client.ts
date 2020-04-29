@@ -14,8 +14,14 @@ let keysClient: any = null
 let fido2Client: any = null
 let authToken: string = ''
 
-const loadCertPath = (): string => {
-  return path.join(appSupportPath(), 'ca.pem')
+const creds = (): any => {
+  const certPath = path.join(appSupportPath(), 'ca.pem')
+  console.log('Loading cert', certPath)
+  const cert = fs.readFileSync(certPath, 'ascii')
+  const callCreds = grpc.credentials.createFromMetadataGenerator(auth)
+  const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
+  const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)
+  return creds
 }
 
 const resolveProtoPath = (name: string): string => {
@@ -39,17 +45,7 @@ export const setAuthToken = (t: string) => {
 export const newClient = (protoName: string, packageName: string, serviceName: string): any => {
   console.log('New client:', protoName)
 
-  const certPath = loadCertPath()
   const protoPath = resolveProtoPath(protoName)
-  console.log('Using proto path:', protoPath)
-
-  console.log('Loading cert', certPath)
-  const cert = fs.readFileSync(certPath, 'ascii')
-
-  const callCreds = grpc.credentials.createFromMetadataGenerator(auth)
-  const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
-  const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)
-
   console.log('Proto path:', protoPath)
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})
@@ -65,66 +61,31 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
   const port = getenv.int('KEYS_PORT', 22405)
   console.log('Using client on port', port)
 
-  const cl = new serviceCls('localhost:' + port, creds)
+  const cl = new serviceCls('localhost:' + port, creds())
 
   return cl
 }
 
-export const connectClients = () => {
-  if (keysClient) {
-    keysClient.close()
-  }
-  keysClient = newClient('keys.proto', 'service', 'Keys')
-  // if (fido2Client) {
-  //   fido2Client.close()
-  // }
-  // fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
-}
-
-const sleep = (milliseconds) => {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds))
-}
-
 export const keys = async () => {
-  let waitCount = 0
-  while (!keysClient) {
-    if (waitCount % 4 == 0) {
-      console.log('Waiting for keys client init...')
-    }
-    await sleep(250)
-    if (waitCount++ > 1000) {
-      break
-    }
-  }
   if (!keysClient) {
-    throw new Error('No keys client available (timed out)')
+    keysClient = newClient('keys.proto', 'service', 'Keys')
   }
   return keysClient
 }
 
-// export const fido2 = async () => {
-//   let waitCount = 0
-//   while (!fido2Client) {
-//     if (waitCount % 4 == 0) {
-//       console.log('Waiting for fido2 client init...')
-//     }
-//     await sleep(250)
-//     if (waitCount++ > 1000) {
-//       break
-//     }
-//   }
-//   if (!fido2Client) {
-//     throw new Error('No fido2 client available (timed out)')
-//   }
-//   return fido2Client
-// }
+export const fido2 = async () => {
+  if (!fido2Client) {
+    fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
+  }
+  return fido2Client
+}
 
 export const client = (service: string) => {
   switch (service) {
     case 'Keys':
       return keys()
-    // case 'Authenticators':
-    //   return fido2()
+    case 'Authenticators':
+      return fido2()
     default:
       throw new Error('unknown service ' + service)
   }

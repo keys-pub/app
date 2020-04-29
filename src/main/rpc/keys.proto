@@ -404,6 +404,8 @@ message RuntimeStatusResponse {
   string exe = 4;
   // AuthSetupNeeded if auth needs to be setup.
   bool authSetupNeeded = 5;
+  // FIDO2 available.
+  bool fido2 = 6 [(gogoproto.customname) = "FIDO2"];
 }
 
 message AuthSetupRequest {
