@@ -371,6 +371,8 @@ export interface RuntimeStatusResponse {
     exe?: string;
     // AuthSetupNeeded if auth needs to be setup.
     authSetupNeeded?: boolean;
+    // FIDO2 available.
+    fido2?: boolean;
 }
 
 export interface AuthSetupRequest {

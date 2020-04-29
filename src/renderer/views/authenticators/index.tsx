@@ -29,6 +29,7 @@ import {
 
 import {styles} from '../../components'
 import {pluralize} from '../helper'
+import {store} from '../../store'
 
 import DeviceContentView from './content'
 
@@ -77,6 +78,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     devices(req, (err: RPCError, resp: DevicesResponse) => {
       if (err) {
         this.setState({devices: [], loading: false, error: err.details})
+        store.dispatch({type: 'ERROR', payload: {error: err}})
         return
       }
 
@@ -124,7 +126,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
         style={{paddingLeft: 8, paddingTop: 4, paddingBottom: 6, height: 30}}
       >
         <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', paddingTop: 6, color: '#999'}}>
-          {pluralize(this.state.devices?.length, 'Device', 'Device')}
+          {pluralize(this.state.devices?.length, 'Device', 'Devices')}
         </Typography>
         <Button
           color="primary"
