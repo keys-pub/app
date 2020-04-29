@@ -9,6 +9,8 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
+  Menu,
+  MenuItem,
   Typography,
 } from '@material-ui/core'
 
@@ -27,6 +29,7 @@ import {
   Album as WormholeIcon,
   Security as SecretsIcon,
   Usb as AuthenticatorsIcon,
+  Toys as ExpermimentalIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -46,31 +49,50 @@ type Props = {
 // TODO: Nav hover
 
 type State = {
-  fido2: boolean
+  openExperimental: boolean
 }
 
 class Nav extends React.Component<Props, State> {
   state = {
-    fido2: false,
+    openExperimental: false,
   }
+  private experimentRef = React.createRef<HTMLButtonElement>()
 
-  componentDidMount() {
-    this.status()
-  }
+  // componentDidMount() {
+  //   this.status()
+  // }
 
   toggleDrawer = () => {
     store.dispatch({type: 'NAV_MINIMIZE', payload: {navMinimize: !this.props.navMinimize}})
   }
 
-  status = () => {
-    const req: RuntimeStatusRequest = {}
-    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-      if (err) {
-        store.dispatch({type: 'ERROR', payload: {error: err}})
-        return
-      }
-      this.setState({fido2: resp.fido2})
-    })
+  // status = () => {
+  //   const req: RuntimeStatusRequest = {}
+  //   runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+  //     if (err) {
+  //       store.dispatch({type: 'ERROR', payload: {error: err}})
+  //       return
+  //     }
+  //     this.setState({fido2: resp.fido2})
+  //   })
+  // }
+
+  openExperimental = (event: React.MouseEvent<HTMLButtonElement>) => {
+    this.setState({openExperimental: true})
+  }
+
+  closeExperimental = () => {
+    this.setState({openExperimental: false})
+  }
+
+  wormhole = () => {
+    store.dispatch(push('/wormhole/index'))
+    this.closeExperimental()
+  }
+
+  authenticators = () => {
+    store.dispatch(push('/authenticators/index'))
+    this.closeExperimental()
   }
 
   render() {
@@ -88,19 +110,14 @@ class Nav extends React.Component<Props, State> {
       {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
       {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
       {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
-      {name: 'Wormhole', icon: WormholeIcon, route: '/wormhole/index', prefix: '/wormhole'},
+      {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
+      {
+        name: 'Experiments',
+        icon: ExpermimentalIcon,
+        onClick: this.openExperimental,
+        anchorRef: this.experimentRef,
+      },
     ]
-
-    if (this.state.fido2) {
-      navs.push({
-        name: 'Devices',
-        icon: AuthenticatorsIcon,
-        route: '/authenticators/index',
-        prefix: '/authenticators',
-      })
-    }
-
-    navs.push({name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'})
 
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
@@ -108,7 +125,14 @@ class Nav extends React.Component<Props, State> {
           <Box height={38} style={{backgroundColor: backgroundColor}}></Box>
           <List style={{minWidth: width, height: '100%', padding: 0}}>
             {navs.map((nav, index) =>
-              row(nav, index, route?.path.startsWith(nav.prefix), open, () => store.dispatch(push(nav.route)))
+              row(
+                nav,
+                index,
+                route?.path.startsWith(nav.prefix),
+                open,
+                nav.onClick ? nav.onClick : () => store.dispatch(push(nav.route)),
+                nav.anchorRef
+              )
             )}
           </List>
           <Box display="flex" flexDirection="row">
@@ -121,6 +145,24 @@ class Nav extends React.Component<Props, State> {
             </IconButton>
           </Box>
         </Box>
+        <Menu
+          id="experimental-menu"
+          anchorEl={this.experimentRef.current}
+          keepMounted
+          open={this.state.openExperimental}
+          onClose={this.closeExperimental}
+          anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+          getContentAnchorEl={null}
+        >
+          <MenuItem onClick={this.wormhole}>
+            <WormholeIcon />
+            <Typography style={{marginLeft: 10}}>Wormhole</Typography>
+          </MenuItem>
+          <MenuItem onClick={this.authenticators}>
+            <AuthenticatorsIcon />
+            <Typography style={{marginLeft: 10}}>Authenticators</Typography>
+          </MenuItem>
+        </Menu>
       </Drawer>
     )
   }
@@ -129,23 +171,24 @@ class Nav extends React.Component<Props, State> {
 const backgroundColor = '#2f2f2f'
 const backgroundColorSelected = '#1a1a1a'
 
-const row = (nav: any, index: number, selected: boolean, open: boolean, onClick: any) => {
+const row = (nav: any, index: number, selected: boolean, open: boolean, onClick: any, anchorRef: any) => {
   return (
     <ListItem
       button
+      ref={anchorRef}
       style={{height: 40, backgroundColor: selected ? backgroundColorSelected : backgroundColor}}
       onClick={onClick}
       key={nav.route}
     >
-      <ListItemIcon style={{minWidth: 0, marginRight: 10}}>
+      <ListItemIcon style={{minWidth: 0, marginRight: 6}}>
         <nav.icon
-          style={{fontSize: open ? 20 : 24, marginLeft: open ? 0 : 4, color: selected ? 'white' : '#dfdfdf'}}
+          style={{fontSize: open ? 18 : 24, marginLeft: open ? -4 : 4, color: selected ? 'white' : '#dfdfdf'}}
         />
       </ListItemIcon>
       {open && (
         <ListItemText
           primary={nav.name}
-          primaryTypographyProps={{style: {color: selected ? 'white' : '#dfdfdf'}}}
+          primaryTypographyProps={{style: {fontSize: 14, color: selected ? 'white' : '#dfdfdf'}}}
         />
       )}
     </ListItem>

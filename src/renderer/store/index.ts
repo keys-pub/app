@@ -6,6 +6,7 @@ import {createLogger} from 'redux-logger'
 import createRootReducer from '../reducers'
 
 import {ipcRenderer} from 'electron'
+import {push} from 'connected-react-router'
 
 const history = createHashHistory()
 const rootReducer = createRootReducer(history)
@@ -44,8 +45,7 @@ if (typeof module.hot !== 'undefined') {
 }
 
 ipcRenderer.on('preferences', (event, message) => {
-  // TODO: Show preferences
-  // store.dispatch(push('/prefs/index'))
+  store.dispatch(push('/settings/index'))
 })
 
 ipcRenderer.on('focus', (event, message) => {

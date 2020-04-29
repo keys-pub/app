@@ -53,6 +53,9 @@ export enum WatchStatus {
     WATCH_STARTING = "WATCH_STARTING",
     WATCH_DATA = "WATCH_DATA",
 }
+export enum PrefKey {
+    PREF_UNKNOWN = "PREF_UNKNOWN",
+}
 export enum WormholeStatus {
     WORMHOLE_DEFAULT = "WORMHOLE_DEFAULT",
     WORMHOLE_STARTING = "WORMHOLE_STARTING",
@@ -707,24 +710,23 @@ export interface WatchEvent {
     path?: string;
 }
 
-export interface ConfigRequest {
-}
-
-export interface ConfigResponse_ConfigEntry {
+export interface Pref {
     key?: string;
     value?: string;
 }
 
-export interface ConfigResponse {
-    config?: { [key: string]: string };
+export interface PreferencesRequest {
 }
 
-export interface ConfigSetRequest {
-    key?: string;
-    value?: string;
+export interface PreferencesResponse {
+    prefs?: Array<Pref>;
 }
 
-export interface ConfigSetResponse {
+export interface PreferenceSetRequest {
+    pref?: Pref;
+}
+
+export interface PreferenceSetResponse {
 }
 
 export interface WormholeInput {
@@ -850,9 +852,9 @@ export interface KeysService {
     Items: (r:ItemsRequest) => ItemsResponse;
     Pull: (r:PullRequest) => PullResponse;
     Push: (r:PushRequest) => PushResponse;
-    Config: (r:ConfigRequest) => ConfigResponse;
-    ConfigSet: (r:ConfigSetRequest) => ConfigSetResponse;
     Wormhole: (r:() => {value: WormholeInput, done: boolean}, cb:(a:{value: WormholeOutput, done: boolean}) => void) => void;
+    Preferences: (r:PreferencesRequest) => PreferencesResponse;
+    PreferenceSet: (r:PreferenceSetRequest) => PreferenceSetResponse;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;

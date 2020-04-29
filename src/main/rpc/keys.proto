@@ -76,10 +76,10 @@ service Keys {
   rpc Pull(PullRequest) returns (PullResponse) {}
   rpc Push(PushRequest) returns (PushResponse) {}
   
-  rpc Config(ConfigRequest) returns (ConfigResponse) {}
-  rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
-
   rpc Wormhole(stream WormholeInput) returns (stream WormholeOutput) {}  
+
+  rpc Preferences(PreferencesRequest) returns (PreferencesResponse) {}
+  rpc PreferenceSet(PreferenceSetRequest) returns (PreferenceSetResponse) {}
   
   // These requests do not need auth, since they are used to set or check auth.
   // BEGIN NO AUTH
@@ -806,16 +806,28 @@ message WatchEvent {
   string path = 2;
 }
 
-message ConfigRequest {}
-message ConfigResponse {
-  map<string, string> config = 1;
-}
-
-message ConfigSetRequest {
+message Pref {
   string key = 1;
   string value = 2;
 }
-message ConfigSetResponse {}
+
+enum PrefKey {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "PrefKey";
+
+  PREF_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "PrefUnknown"];
+}
+
+message PreferencesRequest {  
+}
+message PreferencesResponse {
+  repeated Pref prefs = 1;
+}
+
+message PreferenceSetRequest {
+  Pref pref = 1;
+}
+message PreferenceSetResponse {}
 
 message WormholeInput {  
   string sender = 1;
@@ -939,3 +951,4 @@ message AdminCheckRequest {
 
 message AdminCheckResponse {
 }
+
