@@ -49,6 +49,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
     step: 'name',
   }
 
+  clear = () => {
+    this.setState({name: '', error: '', signedMessage: '', loading: false, url: '', step: 'name'})
+  }
+
+  close = (changed: boolean) => {
+    this.clear()
+    this.props.close(changed)
+  }
+
   onNameChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     this.setState({name: target ? target.value : '', error: ''})
@@ -108,7 +117,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.props.close(true)
+      this.close(true)
     })
   }
 
@@ -116,7 +125,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     if (this.state.step == 'sign') {
       this.setState({step: 'name', error: ''})
     } else {
-      this.props.close(false)
+      this.close(false)
     }
   }
 
@@ -160,9 +169,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
             value={this.state.name}
             style={{minWidth: 300}}
           />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
-        <Typography variant="body1" style={{paddingTop: 10, paddingBottom: 20}}>
+        <Typography variant="body1" style={{paddingBottom: 20}}>
           {next}
         </Typography>
       </Box>
@@ -305,7 +314,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
-        onClose={() => this.props.close(false)}
+        onClose={() => this.close(false)}
         open={this.props.open}
         maxWidth="sm"
         fullWidth
@@ -322,7 +331,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <DialogActions>
           {this.state.step == 'name' && (
             <Box>
-              <Button onClick={() => this.props.close(false)}>Close</Button>
+              <Button onClick={() => this.close(false)}>Close</Button>
               <Button color="primary" onClick={this.userSign}>
                 Next
               </Button>
