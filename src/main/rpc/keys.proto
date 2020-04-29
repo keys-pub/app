@@ -95,9 +95,11 @@ service Keys {
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
 
-  // Experimental
+  // Admin
   rpc AdminSignURL(AdminSignURLRequest) returns (AdminSignURLResponse) {}
+  rpc AdminCheck(AdminCheckRequest) returns (AdminCheckResponse) {}
 
+  // Experimental  
   rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
   rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
   rpc Messages(MessagesRequest) returns (MessagesResponse) {}
@@ -928,4 +930,12 @@ message AdminSignURLResponse {
   string auth = 1;
   string url = 2 [(gogoproto.customname) = "URL"];
   string curl = 3  [(gogoproto.customname) = "CURL"];
+}
+
+message AdminCheckRequest {
+  string signer = 1;
+  string kid = 2 [(gogoproto.customname) = "KID"];
+}
+
+message AdminCheckResponse {
 }

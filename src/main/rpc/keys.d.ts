@@ -798,6 +798,14 @@ export interface AdminSignURLResponse {
     curl?: string;
 }
 
+export interface AdminCheckRequest {
+    signer?: string;
+    kid?: string;
+}
+
+export interface AdminCheckResponse {
+}
+
 export interface KeysService {
     KeyGenerate: (r:KeyGenerateRequest) => KeyGenerateResponse;
     Keys: (r:KeysRequest) => KeysResponse;
@@ -855,6 +863,7 @@ export interface KeysService {
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;
     AdminSignURL: (r:AdminSignURLRequest) => AdminSignURLResponse;
+    AdminCheck: (r:AdminCheckRequest) => AdminCheckResponse;
     MessagePrepare: (r:MessagePrepareRequest) => MessagePrepareResponse;
     MessageCreate: (r:MessageCreateRequest) => MessageCreateResponse;
     Messages: (r:MessagesRequest) => MessagesResponse;
