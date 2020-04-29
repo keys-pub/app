@@ -39,6 +39,7 @@ type Props = {
   value: Key
   revoke: () => void
   userSign: (service: string) => void
+  update: () => void
 }
 
 const UserView = (props: Props) => {
@@ -123,7 +124,12 @@ export default (props: Props) => {
                 <Typography align="right">Verified</Typography>
               </TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
-                <Typography>{dateString(key.user.verifiedAt) || '-'}</Typography>
+                <Typography>
+                  {dateString(key.user.verifiedAt) || '-'}{' '}
+                  <Link span onClick={props.update}>
+                    Update
+                  </Link>
+                </Typography>
               </TableCell>
             </TableRow>
           )}

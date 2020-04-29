@@ -62,11 +62,11 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
     if (this.props.kid !== prevProps.kid) {
-      this.loadKey(this.props.update)
+      this.loadKey(this.props.update, false)
     }
   }
 
-  loadKey = (update: boolean) => {
+  loadKey = (update: boolean, refresh: boolean) => {
     if (!this.props.kid) {
       this.setState({key: null})
       return
@@ -87,12 +87,14 @@ export default class KeyDialog extends React.Component<Props, State> {
       } else {
         this.setState({error: 'Key not found', loading: false})
       }
+      if (refresh) {
+        this.props.refresh()
+      }
     })
   }
 
   refresh = (update: boolean) => {
-    this.loadKey(update)
-    this.props.refresh()
+    this.loadKey(update, true)
   }
 
   import = () => {

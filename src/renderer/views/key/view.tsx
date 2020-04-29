@@ -67,7 +67,12 @@ export default class KeyView extends React.Component<Props, State> {
 
     return (
       <Box>
-        <KeyContentView value={key} revoke={this.revoke} userSign={this.userSign} />
+        <KeyContentView
+          value={key}
+          revoke={this.revoke}
+          userSign={this.userSign}
+          update={() => this.props.refresh(true)}
+        />
         <UserRevokeDialog
           kid={kid}
           seq={this.state.openRevoke}
