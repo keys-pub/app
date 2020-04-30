@@ -35,6 +35,7 @@
       "src/main/rpc/keys.proto",
       "bin/keysd",
       "bin/keys",
+      "bin/fido2.so",
       "bin/updater",
       "bin/keysd.exe",
       "bin/keys.exe",
