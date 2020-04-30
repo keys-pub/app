@@ -1,7 +1,7 @@
 import {ipcMain} from 'electron'
 
 import {RPCError} from './rpc/keys.d'
-import {client, setAuthToken} from './rpc/client'
+import {client, setAuthToken, close} from './rpc/client'
 
 type RPC = {
   service: string
@@ -126,4 +126,8 @@ const notFound = (method: string): RPCError => {
     message: method + ' not found',
     details: method + ' not found',
   }
+}
+
+export const rpcReload = () => {
+  close()
 }

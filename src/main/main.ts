@@ -18,7 +18,7 @@ import {MenuActionType} from './menu'
 import {keysStart} from './service'
 import {update, UpdateResult} from './updater'
 
-import {rpcRegister} from './rpc'
+import {rpcRegister, rpcReload} from './rpc'
 
 let mainWindow = null
 
@@ -108,6 +108,7 @@ app.on('ready', async () => {
   ipcMain.on('reload-app', (event, arg) => {
     console.log('Reload!')
     if (process.env.NODE_ENV === 'development') {
+      rpcReload()
       if (mainWindow) {
         mainWindow.webContents.reload()
       }

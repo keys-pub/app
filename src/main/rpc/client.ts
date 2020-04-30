@@ -66,14 +66,25 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
   return cl
 }
 
-export const keys = async () => {
+export const close = () => {
+  if (keysClient) {
+    keysClient.close()
+    keysClient = null
+  }
+  if (fido2Client) {
+    fido2Client.close()
+    fido2Client = null
+  }
+}
+
+export const keys = () => {
   if (!keysClient) {
     keysClient = newClient('keys.proto', 'service', 'Keys')
   }
   return keysClient
 }
 
-export const fido2 = async () => {
+export const fido2 = () => {
   if (!fido2Client) {
     fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
   }
