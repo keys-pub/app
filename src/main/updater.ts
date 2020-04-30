@@ -104,7 +104,7 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
         const update = JSON.parse(out.stdout) as Update
         resolve({update, relaunch})
       })
-      .catch(err => {
+      .catch((err) => {
         reject(err)
       })
   })
