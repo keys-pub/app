@@ -77,8 +77,12 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     const req: DevicesRequest = {}
     devices(req, (err: RPCError, resp: DevicesResponse) => {
       if (err) {
-        this.setState({devices: [], loading: false, error: err.details})
-        store.dispatch({type: 'ERROR', payload: {error: err}})
+        let error = err.details
+        if (err.code == 12) {
+          error = "Sorry, this feature isn't currently available on your platform."
+        }
+
+        this.setState({devices: [], loading: false, error})
         return
       }
 
@@ -207,6 +211,16 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
           </Box>
           <Divider orientation="vertical" />
           <Box display="flex" flex={1}>
+            {this.state.error && (
+              <Box display="flex" flex={1}>
+                <Typography
+                  align="center"
+                  style={{color: 'red', width: '100%', paddingTop: 10, paddingBottom: 20}}
+                >
+                  {this.state.error}
+                </Typography>
+              </Box>
+            )}
             <DeviceContentView device={this.state.selected} />
           </Box>
         </Box>
