@@ -171,7 +171,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         buttonLabel = 'Next'
         buttonAction = () => this.setState({step: 'USER'})
         next =
-          'In the next step we will ask if you want to publish your key or link it with a user account (Github, Twitter, Reddit, etc).'
+          'In the next step we will ask if you want to publish your key or link it with your account on Github, Twitter, Reddit or a domain.'
         closeLabel = 'Later'
         break
       case KeyType.X25519:

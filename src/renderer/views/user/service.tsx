@@ -24,7 +24,7 @@ export default (props: Props) => {
 
   return (
     <FormControl variant="outlined">
-      <Select value={props.service} onChange={setService} style={styles}>
+      <Select value={props.service} onChange={setService} style={{...styles, height: 40}}>
         <MenuItem value={'github'}>
           <Typography>Link to Github</Typography>
         </MenuItem>
@@ -33,6 +33,9 @@ export default (props: Props) => {
         </MenuItem>
         <MenuItem value={'reddit'}>
           <Typography>Link to Reddit</Typography>
+        </MenuItem>
+        <MenuItem value={'https'}>
+          <Typography>Link to Domain (https)</Typography>
         </MenuItem>
       </Select>
     </FormControl>

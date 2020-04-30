@@ -92,7 +92,13 @@ export default class UserSignDialog extends React.Component<Props, State> {
         this.setState({loading: false, error: err.details})
         return
       }
-      this.setState({loading: false, name: resp.name, signedMessage: resp.message, step: 'sign'})
+
+      let url = ''
+      if (this.props.service == 'https') {
+        url = 'https://' + this.state.name + '/keyspub.txt'
+      }
+
+      this.setState({loading: false, name: resp.name, url: url, signedMessage: resp.message, step: 'sign'})
     })
   }
 
@@ -153,6 +159,12 @@ export default class UserSignDialog extends React.Component<Props, State> {
         question = "What's your Reddit username?"
         next =
           "In the next step, we'll create a signed message using this key that you can post on r/keyspubmsgs."
+        break
+      case 'https':
+        placeholder = ''
+        question = "What's the domain name?"
+        next =
+          "In the next step, we'll create a signed message that you can put on your domain as /keyspub.txt."
         break
     }
 
@@ -216,6 +228,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
         placeholder = 'https://reddit.com/...'
         urlLabel = "What's the location (URL) on reddit.com where the signed message was posted?"
         break
+      case 'https':
+        instructions = 'Save it to https://' + this.state.name + '/keyspub.txt'
+        break
     }
     return (
       <Box>
@@ -247,35 +262,39 @@ export default class UserSignDialog extends React.Component<Props, State> {
             Copy to Clipboard
           </Button>
         </Box>
-        <Box style={{paddingBottom: 20}}>
-          <Box display="flex" flexDirection="row">
-            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
-            <Typography variant="subtitle1" style={{paddingBottom: 10}}>
-              {instructions}
-            </Typography>
-          </Box>
-          <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20}}>
+
+        <Box display="flex" flexDirection="row">
+          <Typography variant="subtitle1">&bull; &nbsp;</Typography>
+          <Typography variant="subtitle1" style={{paddingBottom: 10}}>
+            {instructions}
+          </Typography>
+        </Box>
+        {openLabel && (
+          <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20, paddingBottom: 20}}>
             <Button color="primary" variant="outlined" onClick={openAction} disabled={this.state.loading}>
               {openLabel}
             </Button>
           </Box>
-        </Box>
-        <Box display="flex" flexDirection="column" flex={1}>
-          <Box display="flex" flexDirection="row" flex={1}>
-            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
-            <Typography variant="subtitle1">{urlLabel}</Typography>
+        )}
+        {urlLabel && (
+          <Box display="flex" flexDirection="column" flex={1}>
+            <Box display="flex" flexDirection="row" flex={1}>
+              <Typography variant="subtitle1">&bull; &nbsp;</Typography>
+              <Typography variant="subtitle1">{urlLabel}</Typography>
+            </Box>
+            <FormControl error={this.state.error !== ''} style={{marginLeft: 20}}>
+              <TextField
+                placeholder={placeholder}
+                onChange={this.onURLChange}
+                value={this.state.url}
+                disabled={this.state.loading}
+                style={{width: 500}}
+              />
+              <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+            </FormControl>
           </Box>
-          <FormControl error={this.state.error !== ''} style={{marginLeft: 20}}>
-            <TextField
-              placeholder={placeholder}
-              onChange={this.onURLChange}
-              value={this.state.url}
-              disabled={this.state.loading}
-              style={{width: 500}}
-            />
-            <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
-          </FormControl>
-        </Box>
+        )}
+        {!urlLabel && <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error}</Typography>}
 
         <Snackbar
           anchorOrigin={{vertical: 'top', horizontal: 'right'}}
@@ -309,6 +328,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
         break
       case 'reddit':
         title = 'Link to Reddit'
+        break
+      case 'https':
+        title = 'Link to Domain (https)'
         break
     }
 
