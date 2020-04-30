@@ -104,8 +104,10 @@ export const serviceColor = (service: string): string => {
       return colors.twitter
     case 'reddit':
       return colors.reddit
+    case 'https':
+      return '#669'
     default:
-      return 'black'
+      return '#666'
   }
 }
 
