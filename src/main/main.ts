@@ -18,7 +18,7 @@ import {MenuActionType} from './menu'
 import {keysStart} from './service'
 import {update, UpdateResult} from './updater'
 
-import {rpcRegister, rpcReload} from './rpc'
+import {rpcRegister, rpcReload, rpcSetWindow} from './rpc'
 
 let mainWindow = null
 
@@ -91,6 +91,7 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow(winOpts)
 
   ws.manage(mainWindow)
+  rpcSetWindow(mainWindow)
 
   if (process.env.NODE_ENV !== 'production') {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'

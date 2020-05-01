@@ -1,4 +1,4 @@
-import {ipcMain} from 'electron'
+import {ipcMain, BrowserWindow} from 'electron'
 
 import {RPCError} from './rpc/keys.d'
 import {client, setAuthToken, close} from './rpc/client'
@@ -49,6 +49,18 @@ const rpc = (cl, f): Promise<RPCReply> => {
 
 let streams: Map<string, any> = new Map()
 
+let mainWindow: BrowserWindow
+
+export const rpcSetWindow = (win: BrowserWindow) => {
+  mainWindow = win
+}
+
+export const reportErr = (err: RPCError) => {
+  if (err.code == 16 && mainWindow) {
+    mainWindow.webContents.send('unauthenticated', err)
+  }
+}
+
 export const rpcRegister = () => {
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
@@ -57,6 +69,7 @@ export const rpcRegister = () => {
     const out: RPCReply = await rpc(cl, f)
     if (out.err) {
       console.error('rpc err', f.reply, out.err)
+      reportErr(out.err)
     } else {
       console.log('rpc reply', f.reply)
     }
@@ -103,6 +116,7 @@ export const rpcRegister = () => {
     })
     newStream.on('error', (err) => {
       console.log('rpc-stream err', f.reply, err)
+      reportErr(err)
       event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
       streams.delete(f.reply)
     })

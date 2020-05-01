@@ -48,6 +48,11 @@ ipcRenderer.on('preferences', (event, message) => {
   store.dispatch(push('/settings/index'))
 })
 
+ipcRenderer.on('unauthenticated', (event, message) => {
+  // TODO: Reset router?
+  store.dispatch(push('/auth/index'))
+})
+
 ipcRenderer.on('focus', (event, message) => {
   // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
 })
