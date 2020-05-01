@@ -21,6 +21,7 @@ import {setPIN} from '../../rpc/fido2'
 
 type Props = {
   device: Device
+  create: boolean
   open: boolean
   close: (snack: string) => void
 }
@@ -29,6 +30,7 @@ type State = {
   error: string
   oldPin: string
   pin: string
+  confirmPin: string
   loading: boolean
 }
 
@@ -37,11 +39,12 @@ export default class SetPinDialog extends React.Component<Props, State> {
     error: '',
     oldPin: '',
     pin: '',
+    confirmPin: '',
     loading: false,
   }
 
   reset = () => {
-    this.setState({error: '', oldPin: '', pin: '', loading: false})
+    this.setState({error: '', oldPin: '', pin: '', confirmPin: '', loading: false})
   }
 
   close = (snack: string) => {
@@ -50,6 +53,11 @@ export default class SetPinDialog extends React.Component<Props, State> {
   }
 
   setPin = async () => {
+    if (this.state.pin != this.state.confirmPin) {
+      this.setState({error: "PINs don't match"})
+      return
+    }
+
     this.setState({loading: true, error: ''})
     const req: SetPINRequest = {
       device: this.props.device.path,
@@ -76,23 +84,70 @@ export default class SetPinDialog extends React.Component<Props, State> {
     this.setState({oldPin: target.value, error: ''})
   }
 
-  renderPinChange() {
+  onPinConfirmChange = (e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    this.setState({confirmPin: target.value, error: ''})
+  }
+
+  renderCreate() {
     return (
       <Box display="flex" flexDirection="column">
-        <Typography style={{paddingBottom: 20}}>
-          Set the PIN. If an old PIN was set, you'll need to enter that too.
-        </Typography>
+        <FormControl error={this.state.error !== ''}>
+          <TextField
+            autoFocus
+            variant="outlined"
+            label="New PIN"
+            type="password"
+            onChange={this.onPinChange}
+            value={this.state.pin}
+          />
+          <FormHelperText id="component-error-text"> </FormHelperText>
+        </FormControl>
+        <FormControl error={this.state.error !== ''}>
+          <TextField
+            variant="outlined"
+            label="Confirm PIN"
+            type="password"
+            onChange={this.onPinConfirmChange}
+            value={this.state.confirmPin}
+          />
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+        </FormControl>
+      </Box>
+    )
+  }
+
+  renderChange() {
+    return (
+      <Box display="flex" flexDirection="column">
         <FormControl style={{paddingBottom: 20}}>
           <TextField
             variant="outlined"
             autoFocus
             label="Old PIN"
+            type="password"
             onChange={this.onPinOldChange}
             value={this.state.oldPin}
           />
         </FormControl>
+        <FormControl>
+          <TextField
+            variant="outlined"
+            label="New PIN"
+            type="password"
+            onChange={this.onPinChange}
+            value={this.state.pin}
+          />
+          <FormHelperText id="component-error-text"> </FormHelperText>
+        </FormControl>
         <FormControl error={this.state.error !== ''}>
-          <TextField variant="outlined" label="New PIN" onChange={this.onPinChange} value={this.state.pin} />
+          <TextField
+            variant="outlined"
+            label="Confirm PIN"
+            type="password"
+            onChange={this.onPinConfirmChange}
+            value={this.state.confirmPin}
+          />
           <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
       </Box>
@@ -110,12 +165,17 @@ export default class SetPinDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>PIN</DialogTitle>
-        <DialogContent dividers>{this.renderPinChange()}</DialogContent>
+        <DialogTitle loading={this.state.loading}>
+          {this.props.create ? 'Create a PIN' : 'Change PIN'}
+        </DialogTitle>
+        <DialogContent dividers>
+          {this.props.create && this.renderCreate()}
+          {!this.props.create && this.renderChange()}
+        </DialogContent>
         <DialogActions>
           <Button onClick={() => this.close('')}>Close</Button>
           <Button color="primary" onClick={this.setPin}>
-            Change
+            {this.props.create ? 'Create' : 'Change'}
           </Button>
         </DialogActions>
       </Dialog>

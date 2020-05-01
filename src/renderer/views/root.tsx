@@ -75,6 +75,16 @@ const theme = createMuiTheme({
         },
       },
     },
+    MuiTabs: {
+      root: {
+        minHeight: 40,
+      },
+    },
+    MuiTab: {
+      root: {
+        minHeight: 40,
+      },
+    },
     // MuiToggleButton: {
     //   root: {
     //     fontFamily: 'Roboto',

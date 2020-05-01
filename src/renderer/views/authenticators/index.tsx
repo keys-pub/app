@@ -221,7 +221,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
                 </Typography>
               </Box>
             )}
-            <DeviceContentView device={this.state.selected} />
+            {!this.state.error && <DeviceContentView device={this.state.selected} />}
           </Box>
         </Box>
       </Box>
