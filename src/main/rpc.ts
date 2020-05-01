@@ -56,8 +56,14 @@ export const rpcSetWindow = (win: BrowserWindow) => {
 }
 
 export const reportErr = (err: RPCError) => {
-  if (err.code == 16 && mainWindow) {
-    mainWindow.webContents.send('unauthenticated', err)
+  if (!mainWindow) return
+  switch (err.code) {
+    case 16:
+      mainWindow.webContents.send('unauthenticated', err)
+      break
+    case 14:
+      mainWindow.webContents.send('unavailable', err)
+      break
   }
 }
 

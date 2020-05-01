@@ -122,7 +122,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
     )
   }
 
-  renderInfo() {
+  renderDetails() {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={labelStyle}>Versions</Typography>
@@ -192,8 +192,29 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 
   renderError() {
     return (
-      <Box marginTop={2}>
+      <Box marginLeft={2} marginTop={2}>
         <Typography style={{color: 'red'}}>{this.state.error}</Typography>
+      </Box>
+    )
+  }
+
+  renderInfo() {
+    return (
+      <Box>
+        <Box display="flex" flexDirection="column">
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderDevice()}</Box>
+
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderActions()}</Box>
+
+          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderDetails()}</Box>
+        </Box>
+        <SetPinDialog
+          open={this.state.openSetPin}
+          create={this.state.clientPin == 'false'}
+          device={this.props.device}
+          close={this.closePin}
+        />
+        <ResetDialog open={this.state.openReset} device={this.props.device} close={this.closeReset} />
       </Box>
     )
   }
@@ -207,21 +228,8 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         <Divider /> */}
 
         {this.state.error && this.renderError()}
+        {!this.state.error && this.renderInfo()}
 
-        <Box display="flex" flexDirection="column">
-          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderDevice()}</Box>
-
-          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderActions()}</Box>
-
-          <Box style={{paddingTop: 10, marginLeft: 18, paddingRight: 10}}>{this.renderInfo()}</Box>
-        </Box>
-        <SetPinDialog
-          open={this.state.openSetPin}
-          create={this.state.clientPin == 'false'}
-          device={this.props.device}
-          close={this.closePin}
-        />
-        <ResetDialog open={this.state.openReset} device={this.props.device} close={this.closeReset} />
         <Snackbar
           anchorOrigin={{vertical: 'top', horizontal: 'right'}}
           open={!!this.state.openSnack}

@@ -53,6 +53,10 @@ ipcRenderer.on('unauthenticated', (event, message) => {
   store.dispatch(push('/auth/index'))
 })
 
+ipcRenderer.on('unavailable', (event, message) => {
+  store.dispatch(push('/auth/index'))
+})
+
 ipcRenderer.on('focus', (event, message) => {
   // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
 })
