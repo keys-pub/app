@@ -6,6 +6,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import {keysStopSync} from './service'
+import * as Store from 'electron-store'
 
 export type Asset = {
   name: string
@@ -94,12 +95,19 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
       }
     }
 
-    let cmd = updaterPath + ' -github ' + repo + ' -app-name ' + appName + ' -current ' + version
-    if (applyPath != '') {
-      cmd = cmd + ' -download -apply "' + applyPath + '"'
+    let args = '-github ' + repo + ' -app-name ' + appName + ' -current ' + version
+
+    // Check for prerelease
+    const localStore = new Store()
+    if (localStore.get('prerelease') == '1') {
+      args = args + ' -prerelease'
     }
 
-    execProc(cmd)
+    if (applyPath != '') {
+      args = args + ' -download -apply "' + applyPath + '"'
+    }
+
+    execProc(updaterPath, args)
       .then((out: ExecOut) => {
         const update = JSON.parse(out.stdout) as Update
         resolve({update, relaunch})

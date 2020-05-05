@@ -1,6 +1,16 @@
 import * as React from 'react'
 
-import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@material-ui/core'
 
 import {Link} from '../../components'
 import {remote} from 'electron'
@@ -9,19 +19,22 @@ import {store} from '../../store'
 import {push} from 'connected-react-router'
 import {ipcRenderer} from 'electron'
 
-const cstyles = {
-  cell: {
-    borderBottom: 0,
-    paddingBottom: 20,
-    verticalAlign: 'top',
-  },
-}
+import * as Store from 'electron-store'
 
 type Props = {}
 
-const version = remote.app.getVersion()
+type State = {
+  prerelease: boolean
+}
 
-export default class SettingsView extends React.Component<Props> {
+const version = remote.app.getVersion()
+const localStore = new Store()
+
+export default class SettingsView extends React.Component<Props, State> {
+  state = {
+    prerelease: localStore.get('prerelease') == '1',
+  }
+
   devTools = () => {
     const win = remote.getCurrentWindow()
     win.webContents.toggleDevTools()
@@ -33,6 +46,16 @@ export default class SettingsView extends React.Component<Props> {
     store.dispatch({type: 'UPDATING'})
   }
 
+  onPrereleaseChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
+    this.setState({prerelease: checked})
+    if (checked) {
+      localStore.set('prerelease', '1')
+    } else {
+      localStore.delete('prerelease')
+    }
+  }
+
   render() {
     return (
       <Box display="flex" flex={1} flexDirection="column">
@@ -41,13 +64,28 @@ export default class SettingsView extends React.Component<Props> {
         <Table size="small">
           <TableBody>
             <TableRow>
-              <TableCell style={{...cstyles.cell, width: 100}}>
+              <TableCell style={{...cstyles.cell, width: 150}}>
                 <Typography align="right">Version</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
                 <Typography>{version}</Typography>
               </TableCell>
             </TableRow>
+
+            <TableRow>
+              <TableCell style={{...cstyles.cell, width: 150}}>
+                <Typography align="right">Preleases</Typography>
+              </TableCell>
+              <TableCell style={cstyles.cell}>
+                <Checkbox
+                  checked={this.state.prerelease}
+                  color="primary"
+                  onChange={this.onPrereleaseChange}
+                  style={{padding: 0}}
+                />
+              </TableCell>
+            </TableRow>
+
             <TableRow>
               <TableCell style={cstyles.cell}>
                 <Typography align="right">Debug</Typography>
@@ -65,4 +103,12 @@ export default class SettingsView extends React.Component<Props> {
       </Box>
     )
   }
+}
+
+const cstyles = {
+  cell: {
+    borderBottom: 0,
+    paddingBottom: 20,
+    verticalAlign: 'top',
+  },
 }
