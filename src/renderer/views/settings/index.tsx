@@ -74,7 +74,7 @@ export default class SettingsView extends React.Component<Props, State> {
 
             <TableRow>
               <TableCell style={{...cstyles.cell, width: 150}}>
-                <Typography align="right">Preleases</Typography>
+                <Typography align="right">Prereleases</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
                 <Checkbox
