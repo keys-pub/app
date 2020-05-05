@@ -63,7 +63,10 @@ class Nav extends React.Component<Props, State> {
   // }
 
   toggleDrawer = () => {
-    store.dispatch({type: 'NAV_MINIMIZE', payload: {navMinimize: !this.props.navMinimize}})
+    store.dispatch({
+      type: 'NAV_MINIMIZE',
+      payload: {navMinimize: !this.props.navMinimize},
+    })
   }
 
   // status = () => {
@@ -104,13 +107,34 @@ class Nav extends React.Component<Props, State> {
     const width = open ? 140 : 68
     const drawerStyles: CSSProperties = open
       ? {width, border: 0, height: '100%'}
-      : {width, border: 0, height: '100%', flexShrink: 0, overflowX: 'hidden'}
+      : {
+          width,
+          border: 0,
+          height: '100%',
+          flexShrink: 0,
+          overflowX: 'hidden',
+        }
 
     let navs = [
       {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
-      {name: 'Secrets', icon: SecretsIcon, route: '/secrets/index', prefix: '/secrets'},
-      {name: 'Tools', icon: ToolsIcon, route: '/tools/index', prefix: '/tools'},
-      {name: 'Settings', icon: SettingsIcon, route: '/settings/index', prefix: '/settings'},
+      {
+        name: 'Secrets',
+        icon: SecretsIcon,
+        route: '/secrets/index',
+        prefix: '/secrets',
+      },
+      {
+        name: 'Tools',
+        icon: ToolsIcon,
+        route: '/tools/index',
+        prefix: '/tools',
+      },
+      {
+        name: 'Settings',
+        icon: SettingsIcon,
+        route: '/settings/index',
+        prefix: '/settings',
+      },
       {
         name: 'Experiments',
         icon: ExpermimentalIcon,
@@ -176,19 +200,28 @@ const row = (nav: any, index: number, selected: boolean, open: boolean, onClick:
     <ListItem
       button
       ref={anchorRef}
-      style={{height: 40, backgroundColor: selected ? backgroundColorSelected : backgroundColor}}
+      style={{
+        height: 40,
+        backgroundColor: selected ? backgroundColorSelected : backgroundColor,
+      }}
       onClick={onClick}
-      key={nav.route}
+      key={nav.name}
     >
       <ListItemIcon style={{minWidth: 0, marginRight: 6}}>
         <nav.icon
-          style={{fontSize: open ? 18 : 24, marginLeft: open ? -4 : 4, color: selected ? 'white' : '#dfdfdf'}}
+          style={{
+            fontSize: open ? 18 : 24,
+            marginLeft: open ? -4 : 4,
+            color: selected ? 'white' : '#dfdfdf',
+          }}
         />
       </ListItemIcon>
       {open && (
         <ListItemText
           primary={nav.name}
-          primaryTypographyProps={{style: {fontSize: 14, color: selected ? 'white' : '#dfdfdf'}}}
+          primaryTypographyProps={{
+            style: {fontSize: 14, color: selected ? 'white' : '#dfdfdf'},
+          }}
         />
       )}
     </ListItem>
