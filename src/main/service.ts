@@ -17,7 +17,7 @@ export const keysStart = (): Promise<any> => {
   const path = keysPath()
   if (path) {
     // This returns when the service is ready.
-    return execProc(path + ' start --from=app')
+    return execProc(path, 'start --from=app')
   }
   return Promise.resolve()
 }
@@ -29,7 +29,7 @@ export const keysStopSync = async () => {
 export const keysStop = (): Promise<any> => {
   const path = keysPath()
   if (path) {
-    return execProc(path + ' stop')
+    return execProc(path, 'stop')
   }
   return Promise.resolve()
 }
@@ -37,12 +37,12 @@ export const keysStop = (): Promise<any> => {
 export const keysd = (): Promise<any> => {
   if (process.env.NODE_ENV === 'production') {
     const servicePath = binPath('keysd')
-    return spawnProc(servicePath, true)
+    return spawnProc(servicePath, '', true)
   }
 
   console.log('process.env.KEYSD', process.env.KEYSD_BIN)
   if (process.env.KEYSD_BIN) {
-    return spawnProc(process.env.KEYSD_BIN, true)
+    return spawnProc(process.env.KEYSD_BIN, '', true)
   }
 
   console.warn('No service spawn in dev mode')

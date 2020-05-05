@@ -6,14 +6,20 @@ export type ExecOut = {
   stderr: string
 }
 
-export const execProc = (path: string): Promise<ExecOut> => {
+export const execProc = (path: string, args: string): Promise<ExecOut> => {
   return new Promise((resolve, reject) => {
     if (path === '') {
       reject('No path to exec')
       return
     }
-    console.log('Exec:', path)
-    exec(path, (err, stdout, stderr) => {
+    // Include quotes for paths with spaces
+    let cmd = `"` + path + `"`
+    if (args) {
+      cmd = cmd + ' ' + args
+    }
+
+    console.log('Exec:', cmd)
+    exec(cmd, (err, stdout, stderr) => {
       if (err) {
         reject(err)
         return
@@ -24,11 +30,17 @@ export const execProc = (path: string): Promise<ExecOut> => {
   })
 }
 
-export const spawnProc = (path: string, killOnExit: boolean): Promise<any> => {
+export const spawnProc = (path: string, args: string, killOnExit: boolean): Promise<any> => {
   return new Promise((resolve, reject) => {
     if (path === '') {
       reject('No path to spawn')
       return
+    }
+
+    // Include quotes for paths with spaces
+    let cmd = `"` + path + `"`
+    if (args) {
+      cmd = cmd + ' ' + args
     }
 
     fs.access(path, fs.constants.X_OK, (err: Error) => {
@@ -37,27 +49,24 @@ export const spawnProc = (path: string, killOnExit: boolean): Promise<any> => {
         return
       }
 
-      let args = []
-      args.unshift(path)
-      let cmd = args.join(' ')
       console.log('Executing:', cmd)
       let proc = spawn(cmd, [], {windowsHide: true})
-      proc.stdout.on('data', data => {
+      proc.stdout.on('data', (data) => {
         console.log(`proc (stdout): ${data}`)
       })
-      proc.stderr.on('data', data => {
+      proc.stderr.on('data', (data) => {
         console.error(`proc (stderr): ${data}`)
       })
-      proc.on('close', code => {
+      proc.on('close', (code) => {
         console.log(`process exited with code ${code}`)
       })
-      proc.on('error', err => {
+      proc.on('error', (err) => {
         reject(err)
       })
 
       if (killOnExit) {
         // Kill the process if parent process exits
-        process.on('exit', function() {
+        process.on('exit', function () {
           proc.kill()
         })
       }
