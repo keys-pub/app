@@ -92,9 +92,20 @@ export default class SettingsView extends React.Component<Props, State> {
               </TableCell>
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="column">
-                  <Link onClick={() => store.dispatch(push('/db'))}>DB</Link>
-                  <Link onClick={this.devTools}>Toggle Dev Tools</Link>
-                  <Link onClick={this.forceUpdate}>Force Update</Link>
+                  <Typography>
+                    <Link span onClick={() => store.dispatch(push('/db'))}>
+                      DB
+                    </Link>
+                    <br />
+                    <Link span onClick={this.devTools}>
+                      Toggle Dev Tools
+                    </Link>
+                    <br />
+                    <Link span onClick={this.forceUpdate}>
+                      Force Update
+                    </Link>
+                    <br />
+                  </Typography>
                 </Box>
               </TableCell>
             </TableRow>
