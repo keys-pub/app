@@ -14,16 +14,6 @@ import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
 
-const cstyles = {
-  cell: {
-    borderBottom: 0,
-    paddingTop: 0,
-    paddingLeft: 0,
-    paddingRight: 16,
-    verticalAlign: 'top',
-  },
-}
-
 export const IDView = (props: {id: string; owner?: boolean}) => {
   const styl = {}
   if (props.owner) styl['fontWeight'] = 600
@@ -42,7 +32,7 @@ type Props = {
   update: () => void
 }
 
-const UserView = (props: Props) => {
+const UserRow = (props: Props) => {
   const key = props.value
   const user = key.user
   const signable = key.type == KeyType.EDX25519
@@ -50,35 +40,64 @@ const UserView = (props: Props) => {
 
   const [service, setService] = React.useState('github')
 
-  return (
-    <Box>
-      {(!isPrivate || !signable) && !user && <Typography style={{color: '#999'}}>none</Typography>}
-      {user && (
-        <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
-          <Box display="flex" flexDirection="row">
-            <UserLabel kid={user.kid} user={user} />
-            <Box style={{marginLeft: 10}} />
-            {isPrivate && (
-              <Link color="secondary" style={{marginTop: -1}} onClick={props.revoke}>
-                [revoke]
-              </Link>
-            )}
+  if (user) {
+    return (
+      <TableRow>
+        <TableCell style={{...cstyles.cell}}>
+          <Typography align="right">User</Typography>
+        </TableCell>
+        <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+          <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
+            <Box display="flex" flexDirection="row">
+              <UserLabel kid={user.kid} user={user} />
+              <Box style={{marginLeft: 10}} />
+              {isPrivate && (
+                <Link color="secondary" style={{marginTop: -1}} onClick={props.revoke}>
+                  [revoke]
+                </Link>
+              )}
+            </Box>
+            {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
+            <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
           </Box>
-          {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
-          <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
-        </Box>
-      )}
-      {signable && !user && (
-        <Box display="flex" flexDirection="row">
-          <ServiceSelect service={service} setService={setService} size="small" />
-          <Box marginRight={1} />
-          <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
-            OK
-          </Button>
-        </Box>
-      )}
-    </Box>
-  )
+        </TableCell>
+      </TableRow>
+    )
+  }
+
+  if (signable && !user) {
+    return (
+      <TableRow>
+        <TableCell style={{...cstyles.cell, verticalAlign: 'center'}}>
+          <Typography align="right">User</Typography>
+        </TableCell>
+        <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+          <Box display="flex" flexDirection="row">
+            <ServiceSelect service={service} setService={setService} />
+            <Box marginRight={1} />
+            <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
+              OK
+            </Button>
+          </Box>
+        </TableCell>
+      </TableRow>
+    )
+  }
+
+  if ((!isPrivate || !signable) && !user) {
+    return (
+      <TableRow>
+        <TableCell style={{...cstyles.cell}}>
+          <Typography align="right">User</Typography>
+        </TableCell>
+        <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+          <Typography style={{color: '#999'}}>none</Typography>
+        </TableCell>
+      </TableRow>
+    )
+  }
+
+  return null
 }
 
 export default (props: Props) => {
@@ -110,26 +129,31 @@ export default (props: Props) => {
               <KeyDescriptionView value={key} />
             </TableCell>
           </TableRow>
-          <TableRow>
-            <TableCell style={{...cstyles.cell}}>
-              <Typography align="right">User</Typography>
-            </TableCell>
-            <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
-              <UserView {...props} />
-            </TableCell>
-          </TableRow>
+          <UserRow {...props} />
           {key.user && (
             <TableRow>
-              <TableCell style={{...cstyles.cell}}>
+              <TableCell style={{...cstyles.cell, paddingBottom: 6, verticalAlign: 'center'}}>
                 <Typography align="right">Verified</Typography>
               </TableCell>
-              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+              <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
-                  {dateString(key.user.verifiedAt) || '-'}{' '}
-                  <Link span onClick={props.update}>
-                    Update
-                  </Link>
+                  {dateString(key.user.verifiedAt) || '-'}&nbsp;&nbsp;
+                  <Button size="small" color="primary" variant="outlined" onClick={props.update}>
+                    Pull
+                  </Button>
                 </Typography>
+              </TableCell>
+            </TableRow>
+          )}
+          {!key.user && (
+            <TableRow>
+              <TableCell style={{...cstyles.cell}}>
+                <Typography align="right">&nbsp;</Typography>
+              </TableCell>
+              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+                <Button size="small" variant="outlined" onClick={props.update}>
+                  Pull
+                </Button>
               </TableCell>
             </TableRow>
           )}
@@ -138,7 +162,7 @@ export default (props: Props) => {
               <TableCell style={{...cstyles.cell}}>
                 <Typography align="right">Sigchain</Typography>
               </TableCell>
-              <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+              <TableCell style={{...cstyles.cell}}>
                 <Typography>
                   <Link span onClick={openSigchain}>
                     View {key.sigchainLength} {key.sigchainLength == 1 ? 'entry' : 'entries'}
@@ -152,4 +176,15 @@ export default (props: Props) => {
       </Table>
     </Box>
   )
+}
+
+const cstyles = {
+  cell: {
+    borderBottom: 0,
+    paddingTop: 0,
+    paddingLeft: 0,
+    paddingRight: 16,
+    paddingBottom: 0,
+    verticalAlign: 'top',
+  },
 }

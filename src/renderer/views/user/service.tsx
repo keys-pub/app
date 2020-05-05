@@ -7,7 +7,6 @@ import {CSSProperties} from '@material-ui/styles'
 type Props = {
   service: string
   setService: (service: string) => void
-  size?: 'small' | ''
 }
 
 export default (props: Props) => {
@@ -17,14 +16,10 @@ export default (props: Props) => {
   }
 
   const styles: CSSProperties = {width: 200}
-  switch (props.size) {
-    case 'small':
-      styles.height = 30
-  }
 
   return (
     <FormControl variant="outlined">
-      <Select value={props.service} onChange={setService} style={{...styles, height: 40}}>
+      <Select value={props.service} onChange={setService} style={{...styles, height: 31}}>
         <MenuItem value={'github'}>
           <Typography>Link to Github</Typography>
         </MenuItem>
