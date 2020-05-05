@@ -74,7 +74,6 @@ export default class SearchDialog extends React.Component<Props, State> {
           open={this.state.openKey != ''}
           close={(snack: string) => this.setState({openKey: '', openSnack: snack})}
           kid={this.state.openKey}
-          // update={true}
           source="search"
           refresh={() => {}}
         />

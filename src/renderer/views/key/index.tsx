@@ -29,7 +29,6 @@ type Props = {
   open: boolean
   close: (snack: string) => void
   kid: string
-  update?: boolean
   source: 'search' | 'keys'
   refresh: () => void
 }
@@ -62,11 +61,11 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
     if (this.props.kid !== prevProps.kid) {
-      this.loadKey(this.props.update, false)
+      this.loadKey(this.props.source == 'search', false)
     }
   }
 
-  loadKey = (update: boolean, refresh: boolean) => {
+  loadKey = (update: boolean, propsRefresh: boolean) => {
     if (!this.props.kid) {
       this.setState({key: null})
       return
@@ -87,7 +86,7 @@ export default class KeyDialog extends React.Component<Props, State> {
       } else {
         this.setState({error: 'Key not found', loading: false})
       }
-      if (refresh) {
+      if (propsRefresh) {
         this.props.refresh()
       }
     })
@@ -124,7 +123,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         keepMounted
       >
         <DialogTitle loading={this.state.loading}>Key</DialogTitle>
-        <DialogContent dividers style={{minHeight: 155}}>
+        <DialogContent dividers style={{minHeight: 161}}>
           {/*TODO: Better error display*/}
           {this.state.error && (
             <Typography style={{color: 'red', paddingBottom: 20}}>{this.state.error}</Typography>
