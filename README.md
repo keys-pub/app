@@ -30,13 +30,3 @@ yarn install
 yarn start-dev
 ```
 
-### Running Another Instance
-
-To run a second instance that connects to different service:
-
-```console
-KEYS_PORT=10002 KEYS_APP=Keys2 yarn start-dev
-
-# Run a service on that port and app
-keysd -port=10002 -app=Keys2
-```
