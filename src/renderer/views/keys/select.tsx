@@ -65,7 +65,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box style={{paddingRight: 2}}>
+      <Box style={{paddingRight: 2, paddingBottom: 4}}>
         <Select
           onChange={this.onChange}
           value={this.state.selected || ''}
@@ -86,14 +86,14 @@ export default class SignKeySelectView extends React.Component<Props, State> {
         >
           {this.props.placeholder && (
             <MenuItem key="sk-none" value="" disabled={this.props.placeholderDisabled}>
-              <Typography style={{...styles.mono, color: '#a2a2a2'}}>{this.props.placeholder}</Typography>
+              <Typography style={{color: '#a2a2a2'}}>{this.props.placeholder}</Typography>
             </MenuItem>
           )}
           {this.state.options.map((k: Key) => (
             <MenuItem key={k.id} value={k.id}>
               <Box>
                 {this.props.itemLabel && (
-                  <Typography display="inline" style={{...styles.mono, color: '#a2a2a2', paddingLeft: 4}}>
+                  <Typography display="inline" style={{color: '#a2a2a2', paddingLeft: 4}}>
                     {this.props.itemLabel}&nbsp;
                   </Typography>
                 )}

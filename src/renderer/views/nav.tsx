@@ -211,7 +211,7 @@ const row = (nav: any, index: number, selected: boolean, open: boolean, onClick:
         <nav.icon
           style={{
             fontSize: open ? 18 : 24,
-            marginLeft: open ? -4 : 4,
+            marginLeft: open ? -1 : 4,
             color: selected ? 'white' : '#dfdfdf',
           }}
         />

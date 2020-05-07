@@ -133,10 +133,10 @@ export default class AutocompletesView extends React.Component<Props, State> {
 
   renderOption = (option: Key) => {
     if (option.id == 'search') {
-      return <Typography style={{...styles.mono}}>Search for key...</Typography>
+      return <Typography style={{color: '#2196f3'}}>Search for key...</Typography>
     }
     if (option.id == 'import') {
-      return <Typography style={{...styles.mono}}>Import key...</Typography>
+      return <Typography style={{color: '#2196f3'}}>Import key...</Typography>
     }
     return (
       <React.Fragment>

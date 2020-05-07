@@ -331,7 +331,9 @@ class WormholeView extends React.Component<Props, State> {
               flex={1}
               style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
             >
-              <Typography style={{...styles.mono, paddingTop: 3}}>&nbsp;&nbsp;To:&nbsp;</Typography>
+              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+                To:
+              </Typography>
               <Autocomplete
                 identity={this.props.recipient}
                 disabled={this.state.loading || this.state.connected}
@@ -349,7 +351,9 @@ class WormholeView extends React.Component<Props, State> {
               flex={1}
               style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
             >
-              <Typography style={{...styles.mono, paddingTop: 3}}>From:&nbsp;</Typography>
+              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+                From:
+              </Typography>
               <Autocomplete
                 identity={this.props.sender}
                 disabled={this.state.loading || this.state.connected}
