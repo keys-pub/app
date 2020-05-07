@@ -184,7 +184,7 @@ class AutocompletesView extends React.Component<Props, State> {
           getOptionSelected={this.optionSelected}
           getOptionLabel={this.getOptionLabel}
           options={options}
-          ChipProps={{variant: 'outlined', size: 'small'}} //  icon: <FaceIcon />,
+          ChipProps={{variant: 'outlined', size: 'small', style: {marginLeft: 0, marginRight: 5}}} //  icon: <FaceIcon />,
           renderOption={this.renderOption}
           renderInput={(params) => (
             <TextField
