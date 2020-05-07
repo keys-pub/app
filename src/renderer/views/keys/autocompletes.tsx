@@ -15,12 +15,16 @@ import {keys} from '../../rpc/keys'
 import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/keys.d'
 import {styles} from '../../components'
 
+import {createStyles} from '@material-ui/styles'
+import {withStyles} from '@material-ui/core/styles'
+
 export type Props = {
   identities?: string[]
   disabled?: boolean
   onChange?: (value: string[]) => void
   placeholder?: string
   addOptions?: boolean
+  classes: any
 }
 
 type State = {
@@ -34,7 +38,7 @@ type State = {
   selected: Key[]
 }
 
-export default class AutocompletesView extends React.Component<Props, State> {
+class AutocompletesView extends React.Component<Props, State> {
   state = {
     defaultValues: this.props.identities || [],
     loading: false,
@@ -189,7 +193,8 @@ export default class AutocompletesView extends React.Component<Props, State> {
               fullWidth
               InputProps={{
                 ...params.InputProps,
-                style: {...styles.mono},
+                classes: {input: this.props.classes.input},
+                style: {...styles.mono, minHeight: 31},
                 disableUnderline: true,
                 // endAdornment: (
                 //   <React.Fragment>
@@ -208,6 +213,14 @@ export default class AutocompletesView extends React.Component<Props, State> {
   }
 }
 
-const ChipLabel = (props: {children?: any}) => {
-  return <Typography style={{...styles.mono}}>{props.children}</Typography>
-}
+const cstyles = (theme: any) =>
+  createStyles({
+    input: {
+      '&::placeholder': {
+        fontFamily: 'Open Sans',
+        fontSize: 13.7143, // TODO: Why is the placeholder default smaller?
+      },
+    },
+  })
+
+export default withStyles(cstyles)(AutocompletesView)

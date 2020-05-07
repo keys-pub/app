@@ -73,7 +73,6 @@ export default class SignKeySelectView extends React.Component<Props, State> {
           fullWidth
           disabled={this.props.disabled}
           displayEmpty
-          inputProps={{style: {color: 'red'}}}
           SelectDisplayProps={{
             style: {
               paddingLeft: 8,
@@ -93,7 +92,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
             <MenuItem key={k.id} value={k.id}>
               <Box>
                 {this.props.itemLabel && (
-                  <Typography display="inline" style={{color: '#a2a2a2', paddingLeft: 4}}>
+                  <Typography display="inline" style={{color: '#a2a2a2'}}>
                     {this.props.itemLabel}&nbsp;
                   </Typography>
                 )}

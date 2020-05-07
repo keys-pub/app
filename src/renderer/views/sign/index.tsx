@@ -129,6 +129,7 @@ class SignView extends React.Component<Props, State> {
           onChange={this.setSigner}
           placeholder="Signer"
           placeholderDisabled
+          itemLabel="Signed by"
         />
         <Divider />
         <Box style={{position: 'relative', height: '47%'}}>

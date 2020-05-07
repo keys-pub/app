@@ -142,7 +142,7 @@ class EncryptView extends React.Component<Props, State> {
         flexDirection="column"
         style={{height: '100%', position: 'relative', overflow: 'hidden'}}
       >
-        <Box style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 6, paddingRight: 2}}>
+        <Box style={{paddingLeft: 8, paddingTop: 5, paddingBottom: 5, paddingRight: 2}}>
           <AutocompletesView
             identities={this.props.recipients}
             disabled={this.state.loading}
