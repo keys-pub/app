@@ -30,7 +30,7 @@ export default (props: Props) => {
           <Typography>Link to Reddit</Typography>
         </MenuItem>
         <MenuItem value={'https'}>
-          <Typography>Link to Domain (https)</Typography>
+          <Typography>Link to Website (HTTPS)</Typography>
         </MenuItem>
       </Select>
     </FormControl>

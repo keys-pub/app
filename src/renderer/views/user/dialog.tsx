@@ -330,7 +330,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         title = 'Link to Reddit'
         break
       case 'https':
-        title = 'Link to Domain (https)'
+        title = 'Link to Website (HTTPS)'
         break
     }
 
