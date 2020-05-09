@@ -194,7 +194,7 @@ class AutocompletesView extends React.Component<Props, State> {
               InputProps={{
                 ...params.InputProps,
                 classes: {input: this.props.classes.input},
-                style: {...styles.mono, minHeight: 31},
+                style: {...styles.mono, minHeight: 31, fontSize: 13.7143}, // TODO: Font size
                 disableUnderline: true,
                 // endAdornment: (
                 //   <React.Fragment>
@@ -218,7 +218,6 @@ const cstyles = (theme: any) =>
     input: {
       '&::placeholder': {
         fontFamily: 'Open Sans',
-        fontSize: 13.7143, // TODO: Why is the placeholder default smaller?
       },
     },
   })
