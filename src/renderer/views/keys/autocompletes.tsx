@@ -191,10 +191,13 @@ class AutocompletesView extends React.Component<Props, State> {
               {...params}
               placeholder={this.props.placeholder}
               fullWidth
+              inputProps={{
+                style: {fontSize: 13.7143, color: 'black'}, // TODO: Font size
+              }}
               InputProps={{
                 ...params.InputProps,
                 classes: {input: this.props.classes.input},
-                style: {...styles.mono, minHeight: 31, fontSize: 13.7143}, // TODO: Font size
+                style: {...styles.mono, minHeight: 31},
                 disableUnderline: true,
                 // endAdornment: (
                 //   <React.Fragment>
