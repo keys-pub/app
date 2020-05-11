@@ -137,10 +137,10 @@ class AutocompletesView extends React.Component<Props, State> {
 
   renderOption = (option: Key) => {
     if (option.id == 'search') {
-      return <Typography style={{color: '#2196f3'}}>Search for key...</Typography>
+      return <Typography style={{color: '#2196f3'}}>Search for key</Typography>
     }
     if (option.id == 'import') {
-      return <Typography style={{color: '#2196f3'}}>Import key...</Typography>
+      return <Typography style={{color: '#2196f3'}}>Import key</Typography>
     }
     return (
       <React.Fragment>
@@ -192,6 +192,7 @@ class AutocompletesView extends React.Component<Props, State> {
               placeholder={this.props.placeholder}
               fullWidth
               inputProps={{
+                ...params.inputProps,
                 style: {fontSize: 13.7143, color: 'black'}, // TODO: Font size
               }}
               InputProps={{
