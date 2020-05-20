@@ -18,7 +18,8 @@ import {MenuActionType} from './menu'
 import {keysStart} from './service'
 import {update, UpdateResult} from './updater'
 
-import {rpcRegister, rpcReload, rpcSetWindow} from './rpc'
+import {rpcRegister} from './rpc'
+import {reloadApp} from './app'
 
 let mainWindow = null
 
@@ -91,7 +92,6 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow(winOpts)
 
   ws.manage(mainWindow)
-  rpcSetWindow(mainWindow)
 
   if (process.env.NODE_ENV !== 'production') {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
@@ -105,19 +105,6 @@ app.on('ready', async () => {
       })
     )
   }
-
-  ipcMain.on('reload-app', (event, arg) => {
-    console.log('Reload!')
-    if (process.env.NODE_ENV === 'development') {
-      rpcReload()
-      if (mainWindow) {
-        mainWindow.webContents.reload()
-      }
-    } else {
-      app.relaunch()
-      app.exit(0)
-    }
-  })
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -165,6 +152,10 @@ app.on('ready', async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow, menuAction)
   menuBuilder.buildMenu()
+})
+
+ipcMain.on('reload-app', (event, arg) => {
+  reloadApp(mainWindow)
 })
 
 // TODO: stop keysd on app exit?
@@ -217,4 +208,8 @@ ipcMain.on('update-force', (event, arg) => {
     })
 })
 
-rpcRegister()
+rpcRegister(
+  (): BrowserWindow => {
+    return mainWindow
+  }
+)

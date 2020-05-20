@@ -1,4 +1,5 @@
 import {app, Menu, shell, BrowserWindow} from 'electron'
+import {reloadApp} from './app'
 
 export enum MenuActionType {
   Preferences,
@@ -49,7 +50,7 @@ export default class MenuBuilder {
         {
           label: 'Reload',
           click: () => {
-            this.mainWindow.webContents.reload()
+            reloadApp(this.mainWindow)
           },
         },
       ]).popup({window: this.mainWindow})

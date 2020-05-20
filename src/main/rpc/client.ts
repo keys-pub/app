@@ -67,6 +67,7 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
 }
 
 export const close = () => {
+  console.log('Close rpc...')
   if (keysClient) {
     keysClient.close()
     keysClient = null

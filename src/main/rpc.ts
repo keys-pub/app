@@ -49,25 +49,24 @@ const rpc = (cl, f): Promise<RPCReply> => {
 
 let streams: Map<string, any> = new Map()
 
-let mainWindow: BrowserWindow
-
-export const rpcSetWindow = (win: BrowserWindow) => {
-  mainWindow = win
-}
-
-export const reportErr = (err: RPCError) => {
-  if (!mainWindow) return
+export const reportErr = (currentWindow: () => BrowserWindow, err: RPCError) => {
+  const mainWindow = currentWindow()
   switch (err.code) {
     case 16:
-      mainWindow.webContents.send('unauthenticated', err)
+      if (mainWindow) {
+        mainWindow.webContents.send('unauthenticated', err)
+      }
       break
     case 14:
-      mainWindow.webContents.send('unavailable', err)
+      if (mainWindow) {
+        mainWindow.webContents.send('unavailable', err)
+      }
+      rpcReload()
       break
   }
 }
 
-export const rpcRegister = () => {
+export const rpcRegister = (currentWindow: () => BrowserWindow) => {
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
     const cl = await client(arg.service)
@@ -75,7 +74,7 @@ export const rpcRegister = () => {
     const out: RPCReply = await rpc(cl, f)
     if (out.err) {
       console.error('rpc err', f.reply, out.err)
-      reportErr(out.err)
+      reportErr(currentWindow, out.err)
     } else {
       console.log('rpc reply', f.reply)
     }
@@ -122,7 +121,7 @@ export const rpcRegister = () => {
     })
     newStream.on('error', (err) => {
       console.log('rpc-stream err', f.reply, err)
-      reportErr(err)
+      reportErr(currentWindow, err)
       event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
       streams.delete(f.reply)
     })
