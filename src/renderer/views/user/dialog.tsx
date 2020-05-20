@@ -193,21 +193,21 @@ export default class UserSignDialog extends React.Component<Props, State> {
   renderSign() {
     const {service} = this.props
     let intro = 'Copy the signed message.'
-    let instructions = ''
+    let instructions
     let openLabel = ''
     let openAction = null
     let placeholder = ''
     let urlLabel = ''
     switch (service) {
       case 'github':
-        instructions = 'Create a new gist on your Github account, and paste it there.'
+        instructions = <Typography>Create a new gist on your Github account, and paste it there.</Typography>
         openLabel = 'Open gist.github.com/new'
         openAction = () => shell.openExternal('https://gist.github.com/new')
         placeholder = 'https://gist.github.com/...'
         urlLabel = "What's the location (URL) on github.com where the signed message was saved?"
         break
       case 'twitter':
-        instructions = 'Save it as a tweet on your Twitter account.'
+        instructions = <Typography>Save it as a tweet on your Twitter account.</Typography>
         openLabel = 'Open twitter.com/intent/tweet'
         openAction = () =>
           shell.openExternal('https://twitter.com/intent/tweet?text=' + this.state.signedMessage)
@@ -215,7 +215,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         urlLabel = "What's the location (URL) on twitter.com where the tweet was saved?"
         break
       case 'reddit':
-        instructions = 'Save it as a post on r/keyspubmsgs.'
+        instructions = <Typography>Save it as a post on r/keyspubmsgs.</Typography>
         openLabel = 'Open reddit.com/r/keyspubmsgs/submit'
         const postTitle = this.state.name + ' ' + this.props.kid
         openAction = () =>
@@ -229,7 +229,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
         urlLabel = "What's the location (URL) on reddit.com where the signed message was posted?"
         break
       case 'https':
-        instructions = 'Save it to https://' + this.state.name + '/keyspub.txt'
+        instructions = (
+          <Typography>
+            Save it to any of:
+            <br />
+            <span style={{...styles.mono}}>https://{this.state.name}/keyspub.txt</span>
+            <br />
+            <span style={{...styles.mono}}>https://{this.state.name}/.well-known/keyspub.txt</span>
+          </Typography>
+        )
         break
     }
     return (
@@ -265,9 +273,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
         <Box display="flex" flexDirection="row">
           <Typography variant="subtitle1">&bull; &nbsp;</Typography>
-          <Typography variant="subtitle1" style={{paddingBottom: 10}}>
-            {instructions}
-          </Typography>
+          {instructions}
         </Box>
         {openLabel && (
           <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20, paddingBottom: 20}}>
