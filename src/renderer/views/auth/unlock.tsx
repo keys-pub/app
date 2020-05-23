@@ -10,7 +10,7 @@ import {ipcRenderer} from 'electron'
 import {store} from '../../store'
 
 import {authUnlock} from '../../rpc/keys'
-import {RPCError, AuthUnlockRequest, AuthUnlockResponse} from '../../rpc/keys.d'
+import {RPCError, AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
 
 type Props = {}
 
@@ -100,7 +100,8 @@ export default class AuthUnlockView extends React.Component<Props, State> {
     this.setState({loading: true, error: ''})
     // TODO: Use config app name for client name
     const req: AuthUnlockRequest = {
-      password: this.state.password,
+      secret: this.state.password,
+      type: AuthType.PASSWORD_AUTH,
       client: 'app',
     }
     console.log('Auth unlock')

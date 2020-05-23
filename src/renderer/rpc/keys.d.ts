@@ -5,9 +5,15 @@ export enum EncryptMode {
     ENCRYPT_V2 = "ENCRYPT_V2",
     SIGNCRYPT_V1 = "SIGNCRYPT_V1",
 }
+export enum AuthType {
+    UNKNOWN_AUTH = "UNKNOWN_AUTH",
+    PASSWORD_AUTH = "PASSWORD_AUTH",
+    FIDO2_HMAC_SECRET_AUTH = "FIDO2_HMAC_SECRET_AUTH",
+}
 export enum ExportType {
     DEFAULT_EXPORT_TYPE = "DEFAULT_EXPORT_TYPE",
     SALTPACK_EXPORT_TYPE = "SALTPACK_EXPORT_TYPE",
+    SSH_EXPORT_TYPE = "SSH_EXPORT_TYPE",
 }
 export enum KeyType {
     UNKNOWN_KEY_TYPE = "UNKNOWN_KEY_TYPE",
@@ -379,8 +385,10 @@ export interface RuntimeStatusResponse {
 }
 
 export interface AuthSetupRequest {
-    // Password used to encrypt key backup.
-    password?: string;
+    // Secret for auth depending on auth type, e.g. password, pin, etc
+    secret?: string;
+    // Type for auth.
+    type?: AuthType;
     // Client name.
     client?: string;
 }
@@ -390,8 +398,10 @@ export interface AuthSetupResponse {
 }
 
 export interface AuthUnlockRequest {
-    // Password.
-    password?: string;
+    // Secret for auth depending on auth type, e.g. password, pin, etc
+    secret?: string;
+    // Type for auth.
+    type?: AuthType;
     // Client name.
     client?: string;
 }
@@ -465,6 +475,8 @@ export interface KeyExportRequest {
     kid?: string;
     password?: string;
     type?: ExportType;
+    public?: boolean;
+    noPassword?: boolean;
 }
 
 export interface KeyExportResponse {
@@ -808,6 +820,14 @@ export interface AdminCheckRequest {
 export interface AdminCheckResponse {
 }
 
+export interface GitSetupRequest {
+    url?: string;
+    key?: string;
+}
+
+export interface GitSetupResponse {
+}
+
 export interface KeysService {
     KeyGenerate: (r:KeyGenerateRequest) => KeyGenerateResponse;
     Keys: (r:KeysRequest) => KeysResponse;
@@ -861,6 +881,7 @@ export interface KeysService {
     RuntimeStatus: (r:RuntimeStatusRequest) => RuntimeStatusResponse;
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
+    GitSetup: (r:GitSetupRequest) => GitSetupResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;
@@ -869,5 +890,4 @@ export interface KeysService {
     MessagePrepare: (r:MessagePrepareRequest) => MessagePrepareResponse;
     MessageCreate: (r:MessageCreateRequest) => MessageCreateResponse;
     Messages: (r:MessagesRequest) => MessagesResponse;
-    Watch: (r:WatchRequest, cb:(a:{value: WatchEvent, done: boolean}) => void) => void;
 }

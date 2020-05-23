@@ -81,7 +81,7 @@ service Keys {
   rpc Preferences(PreferencesRequest) returns (PreferencesResponse) {}
   rpc PreferenceSet(PreferenceSetRequest) returns (PreferenceSetResponse) {}
   
-  // These requests do not need auth, since they are used to set or check auth.
+  // These requests do not need auth.
   // BEGIN NO AUTH
   rpc AuthSetup(AuthSetupRequest) returns (AuthSetupResponse) {}
   rpc AuthUnlock(AuthUnlockRequest) returns (AuthUnlockResponse) {}
@@ -89,6 +89,7 @@ service Keys {
   rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
   rpc Rand(RandRequest) returns (RandResponse) {}
   rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}
+  rpc GitSetup(GitSetupRequest) returns (GitSetupResponse) {}
   // END NO AUTH
   
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
@@ -103,8 +104,6 @@ service Keys {
   rpc MessagePrepare(MessagePrepareRequest) returns (MessagePrepareResponse) {}
   rpc MessageCreate(MessageCreateRequest) returns (MessageCreateResponse) {}
   rpc Messages(MessagesRequest) returns (MessagesResponse) {}
-
-  rpc Watch(WatchRequest) returns (stream WatchEvent) {}
 }
 
 message RPCError {
@@ -410,9 +409,23 @@ message RuntimeStatusResponse {
   bool fido2 = 6 [(gogoproto.customname) = "FIDO2"];
 }
 
+enum AuthType {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "AuthType";
+  
+  UNKNOWN_AUTH = 0 [(gogoproto.enumvalue_customname) = "UnknownAuth"];
+  // PasswordAuth using argon2id.
+  PASSWORD_AUTH = 1 [(gogoproto.enumvalue_customname) = "PasswordAuth"];
+  // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension
+  FIDO2_HMAC_SECRET_AUTH = 10 [(gogoproto.enumvalue_customname) = "FIDO2HMACSecretAuth"];
+}
+
+
 message AuthSetupRequest {
-  // Password used to encrypt key backup.
-  string password = 1;
+  // Secret for auth depending on auth type, e.g. password, pin, etc
+  string secret = 1;
+  // Type for auth.
+  AuthType type = 2;
   // Client name.
   string client = 6;
 }
@@ -421,10 +434,12 @@ message AuthSetupResponse {
 }
 
 message AuthUnlockRequest {
-  // Password.
-  string password = 1;
+  // Secret for auth depending on auth type, e.g. password, pin, etc
+  string secret = 1;
+  // Type for auth.
+  AuthType type = 2;
   // Client name.
-  string client = 2;
+  string client = 6;
 }
 message AuthUnlockResponse {
   // AuthToken to use for requests.
@@ -489,14 +504,17 @@ enum ExportType {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_customname) = "ExportType";
   
-  DEFAULT_EXPORT_TYPE = 0 [(gogoproto.enumvalue_customname) = "DefaultExportType"];
-  SALTPACK_EXPORT_TYPE = 1 [(gogoproto.enumvalue_customname) = "SaltpackExportType"];
+  DEFAULT_EXPORT_TYPE = 0 [(gogoproto.enumvalue_customname) = "DefaultExport"];
+  SALTPACK_EXPORT_TYPE = 1 [(gogoproto.enumvalue_customname) = "SaltpackExport"];
+  SSH_EXPORT_TYPE = 2 [(gogoproto.enumvalue_customname) = "SSHExport"];
 }
 
 message KeyExportRequest {
   string kid = 1 [(gogoproto.customname) = "KID"];
   string password = 2;
   ExportType type = 3;
+  bool public = 4;
+  bool noPassword = 5;
 }
 message KeyExportResponse {
   bytes export = 1;
@@ -952,3 +970,10 @@ message AdminCheckRequest {
 message AdminCheckResponse {
 }
 
+message GitSetupRequest {
+  string url = 1 [(gogoproto.customname) = "URL"];
+  string key = 2;
+}
+
+message GitSetupResponse {
+}

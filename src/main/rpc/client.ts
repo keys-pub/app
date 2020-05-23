@@ -87,7 +87,7 @@ export const keys = () => {
 
 export const fido2 = () => {
   if (!fido2Client) {
-    fido2Client = newClient('fido2.proto', 'fido2', 'Authenticators')
+    fido2Client = newClient('fido2.proto', 'fido2', 'Auth')
   }
   return fido2Client
 }
@@ -96,7 +96,7 @@ export const client = (service: string) => {
   switch (service) {
     case 'Keys':
       return keys()
-    case 'Authenticators':
+    case 'Auth':
       return fido2()
     default:
       throw new Error('unknown service ' + service)

@@ -146,7 +146,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         </Typography>
 
         <Typography style={labelStyle}>AAGUID</Typography>
-        <Typography style={valueStyle}>{toHex(this.state.info?.aaguid)}</Typography>
+        <Typography style={valueStyle}>{this.state.info?.aaguid}</Typography>
 
         <Typography style={labelStyle}>Options</Typography>
         <Typography style={valueStyle}>
