@@ -6,20 +6,20 @@ import AuthSplash from './splash'
 import ErrorsView from '../../errors'
 
 import {runtimeStatus} from '../../rpc/keys'
-import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../../rpc/keys.d'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '../../rpc/keys.d'
 
 type Props = {}
 
 type State = {
   loading: boolean
-  authSetupNeeded: boolean
+  authStatus: AuthStatus
   error: RPCError | void
 }
 
 export default class AuthView extends React.Component<Props, State> {
   state = {
     loading: true,
-    authSetupNeeded: false,
+    authStatus: AuthStatus.AUTH_UNKNOWN,
     error: null,
   }
 
@@ -34,8 +34,8 @@ export default class AuthView extends React.Component<Props, State> {
         this.setState({loading: false, error: err})
         return
       }
-      console.log('Auth setup needed:', resp.authSetupNeeded)
-      this.setState({loading: false, authSetupNeeded: resp.authSetupNeeded})
+      console.log('Auth status:', resp.authStatus)
+      this.setState({loading: false, authStatus: resp.authStatus})
     })
   }
 
@@ -43,11 +43,11 @@ export default class AuthView extends React.Component<Props, State> {
     if (this.state.error) {
       return <ErrorsView error={this.state.error} />
     }
-    if (this.state.loading) {
+    if (this.state.loading || this.state.authStatus == AuthStatus.AUTH_UNKNOWN) {
       return <AuthSplash />
     }
 
-    if (this.state.authSetupNeeded) {
+    if (this.state.authStatus == AuthStatus.AUTH_SETUP) {
       return <AuthSetupView />
     } else {
       return <AuthUnlockView />

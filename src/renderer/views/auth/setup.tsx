@@ -16,8 +16,15 @@ import Logo from '../logo'
 import {push} from 'connected-react-router'
 import {store} from '../../store'
 
-import {authSetup} from '../../rpc/keys'
-import {RPCError, AuthSetupRequest, AuthSetupResponse, AuthType} from '../../rpc/keys.d'
+import {authSetup, authUnlock} from '../../rpc/keys'
+import {
+  RPCError,
+  AuthSetupRequest,
+  AuthSetupResponse,
+  AuthUnlockRequest,
+  AuthUnlockResponse,
+  AuthType,
+} from '../../rpc/keys.d'
 import {ipcRenderer} from 'electron'
 
 type Props = {}
@@ -143,7 +150,6 @@ export default class AuthSetupView extends React.Component<Props, State> {
     const req: AuthSetupRequest = {
       secret: this.state.password,
       type: AuthType.PASSWORD_AUTH,
-      client: 'app',
     }
     this.setState({loading: true, error: ''})
     authSetup(req, (err: RPCError, resp: AuthSetupResponse) => {
@@ -151,15 +157,21 @@ export default class AuthSetupView extends React.Component<Props, State> {
         this.setState({loading: false, error: err.details})
         return
       }
-      if (!resp) {
-        return
+
+      const reqUnlock: AuthUnlockRequest = {
+        secret: this.state.password,
+        type: AuthType.PASSWORD_AUTH,
+        client: 'app',
       }
-      ipcRenderer.send('authToken', {authToken: resp.authToken})
-      setTimeout(() => {
-        this.setState({loading: false})
-        store.dispatch({type: 'UNLOCK'})
-        store.dispatch(push('/keys/index'))
-      }, 100)
+
+      authUnlock(reqUnlock, (err: RPCError, resp: AuthUnlockResponse) => {
+        ipcRenderer.send('authToken', {authToken: resp.authToken})
+        setTimeout(() => {
+          this.setState({loading: false})
+          store.dispatch({type: 'UNLOCK'})
+          store.dispatch(push('/keys/index'))
+        }, 100)
+      })
     })
   }
 }

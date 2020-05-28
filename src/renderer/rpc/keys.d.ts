@@ -5,6 +5,12 @@ export enum EncryptMode {
     ENCRYPT_V2 = "ENCRYPT_V2",
     SIGNCRYPT_V1 = "SIGNCRYPT_V1",
 }
+export enum AuthStatus {
+    AUTH_UNKNOWN = "AUTH_UNKNOWN",
+    AUTH_SETUP = "AUTH_SETUP",
+    AUTH_UNLOCKED = "AUTH_UNLOCKED",
+    AUTH_LOCKED = "AUTH_LOCKED",
+}
 export enum AuthType {
     UNKNOWN_AUTH = "UNKNOWN_AUTH",
     PASSWORD_AUTH = "PASSWORD_AUTH",
@@ -378,27 +384,24 @@ export interface RuntimeStatusResponse {
     appName?: string;
     // Exe is the service executable path.
     exe?: string;
-    // AuthSetupNeeded if auth needs to be setup.
-    authSetupNeeded?: boolean;
+    // AuthStatus is status of auth.
+    authStatus?: AuthStatus;
     // FIDO2 available.
     fido2?: boolean;
 }
 
 export interface AuthSetupRequest {
-    // Secret for auth depending on auth type, e.g. password, pin, etc
+    // Secret for auth depending on auth type, e.g. password, pin, etc.
     secret?: string;
     // Type for auth.
     type?: AuthType;
-    // Client name.
-    client?: string;
 }
 
 export interface AuthSetupResponse {
-    authToken?: string;
 }
 
 export interface AuthUnlockRequest {
-    // Secret for auth depending on auth type, e.g. password, pin, etc
+    // Secret for auth depending on auth type, e.g. password, pin, etc.
     secret?: string;
     // Type for auth.
     type?: AuthType;
@@ -409,6 +412,43 @@ export interface AuthUnlockRequest {
 export interface AuthUnlockResponse {
     // AuthToken to use for requests.
     authToken?: string;
+}
+
+export interface AuthProvisionRequest {
+    // Secret for auth depending on auth type, e.g. password, pin, etc.
+    secret?: string;
+    // Type for auth.
+    type?: AuthType;
+    // Setup phase for auth (for FIDO2 make credential step).
+    setup?: boolean;
+}
+
+export interface AuthProvisionResponse {
+    id?: string;
+}
+
+export interface AuthDeprovisionRequest {
+    id?: string;
+}
+
+export interface AuthDeprovisionResponse {
+}
+
+export interface AuthProvision {
+    id?: string;
+    type?: AuthType;
+    createdAt?: number;
+    // For FIDO2
+    // AAGUID is a device "identifier" (only unique across batches for privacy reasons).
+    aaguid?: string;
+    noPin?: boolean;
+}
+
+export interface AuthProvisionsRequest {
+}
+
+export interface AuthProvisionsResponse {
+    provisions?: Array<AuthProvision>;
 }
 
 export interface AuthLockRequest {
@@ -882,6 +922,9 @@ export interface KeysService {
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
     GitSetup: (r:GitSetupRequest) => GitSetupResponse;
+    AuthProvision: (r:AuthProvisionRequest) => AuthProvisionResponse;
+    AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
+    AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

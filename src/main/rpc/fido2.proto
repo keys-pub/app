@@ -206,8 +206,10 @@ message GenerateHMACSecretRequest {
     string pin = 2 [(gogoproto.customname) = "PIN"];
         
     bytes clientDataHash = 10;
-    string rpId = 11 [(gogoproto.customname) = "RPID"];
-    OptionValue rk = 20 [(gogoproto.customname) = "RK"];
+    RelyingParty rp = 11 [(gogoproto.customname) = "RP"];    
+    User user = 12;
+
+    OptionValue rk = 20 [(gogoproto.customname) = "RK"];    
 }
 message GenerateHMACSecretResponse {        
     bytes credentialId = 2 [(gogoproto.customname) = "CredentialID"];
@@ -220,7 +222,7 @@ message HMACSecretRequest {
     string rpId = 10 [(gogoproto.customname) = "RPID"];
     bytes clientDataHash = 11;
     bytes credentialId = 12 [(gogoproto.customname) = "CredentialID"];
-    bytes salt = 13;    
+    bytes salt = 13;      
 }
 message HMACSecretResponse {
     bytes hmacSecret = 1 [(gogoproto.customname) = "HMACSecret"];

@@ -22,13 +22,7 @@ import {styles, DialogTitle} from '../../components'
 import {deepCopy, fromHex} from '../helper'
 
 import {makeCredential, credentials} from '../../rpc/fido2'
-import {
-  RPCError,
-  Device,
-  CredentialType,
-  MakeCredentialRequest,
-  MakeCredentialResponse,
-} from '../../rpc/fido2.d'
+import {RPCError, Device, MakeCredentialRequest, MakeCredentialResponse} from '../../rpc/fido2.d'
 
 type Props = {
   device: Device

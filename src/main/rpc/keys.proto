@@ -91,6 +91,10 @@ service Keys {
   rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}
   rpc GitSetup(GitSetupRequest) returns (GitSetupResponse) {}
   // END NO AUTH
+
+  rpc AuthProvision(AuthProvisionRequest) returns (AuthProvisionResponse) {}
+  rpc AuthDeprovision(AuthDeprovisionRequest) returns (AuthDeprovisionResponse) {}
+  rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
   
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
@@ -403,10 +407,23 @@ message RuntimeStatusResponse {
   string appName = 2;
   // Exe is the service executable path.
   string exe = 4;
-  // AuthSetupNeeded if auth needs to be setup.
-  bool authSetupNeeded = 5;
+  // AuthStatus is status of auth.
+  AuthStatus authStatus = 5;
   // FIDO2 available.
-  bool fido2 = 6 [(gogoproto.customname) = "FIDO2"];
+  bool fido2 = 20 [(gogoproto.customname) = "FIDO2"];
+}
+
+enum AuthStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  option (gogoproto.enum_customname) = "AuthStatus";
+  
+  AUTH_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "AuthUnknown"];
+  // AuthSetup if setup needed.
+  AUTH_SETUP = 1 [(gogoproto.enumvalue_customname) = "AuthSetup"];  
+  // AuthUnlocked if unlocked.
+  AUTH_UNLOCKED = 2 [(gogoproto.enumvalue_customname) = "AuthUnlocked"];  
+  // AuthLocked if locked.
+  AUTH_LOCKED = 3 [(gogoproto.enumvalue_customname) = "AuthLocked"];  
 }
 
 enum AuthType {
@@ -415,26 +432,21 @@ enum AuthType {
   
   UNKNOWN_AUTH = 0 [(gogoproto.enumvalue_customname) = "UnknownAuth"];
   // PasswordAuth using argon2id.
-  PASSWORD_AUTH = 1 [(gogoproto.enumvalue_customname) = "PasswordAuth"];
-  // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension
-  FIDO2_HMAC_SECRET_AUTH = 10 [(gogoproto.enumvalue_customname) = "FIDO2HMACSecretAuth"];
+  PASSWORD_AUTH = 10 [(gogoproto.enumvalue_customname) = "PasswordAuth"];
+  // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension.
+  FIDO2_HMAC_SECRET_AUTH = 20 [(gogoproto.enumvalue_customname) = "FIDO2HMACSecretAuth"];
 }
-
 
 message AuthSetupRequest {
-  // Secret for auth depending on auth type, e.g. password, pin, etc
+  // Secret for auth depending on auth type, e.g. password, pin, etc.
   string secret = 1;
   // Type for auth.
-  AuthType type = 2;
-  // Client name.
-  string client = 6;
+  AuthType type = 2;  
 }
-message AuthSetupResponse {
-  string authToken = 1;
-}
+message AuthSetupResponse {}
 
 message AuthUnlockRequest {
-  // Secret for auth depending on auth type, e.g. password, pin, etc
+  // Secret for auth depending on auth type, e.g. password, pin, etc.
   string secret = 1;
   // Type for auth.
   AuthType type = 2;
@@ -444,6 +456,39 @@ message AuthUnlockRequest {
 message AuthUnlockResponse {
   // AuthToken to use for requests.
   string authToken = 1;
+}
+
+message AuthProvisionRequest {
+  // Secret for auth depending on auth type, e.g. password, pin, etc.
+  string secret = 1;
+  // Type for auth.
+  AuthType type = 2;
+  // Setup phase for auth (for FIDO2 make credential step).
+  bool setup = 7;
+}
+message AuthProvisionResponse {
+  string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message AuthDeprovisionRequest {
+  string id = 1 [(gogoproto.customname) = "ID"];
+}
+message AuthDeprovisionResponse {}
+
+message AuthProvision {
+  string id = 1 [(gogoproto.customname) = "ID"];
+  AuthType type = 2;
+  int64 createdAt = 3;
+
+  // For FIDO2
+  // AAGUID is a device "identifier" (only unique across batches for privacy reasons).
+  string aaguid = 100 [(gogoproto.customname) = "AAGUID"];
+  bool noPin = 101;
+}
+
+message AuthProvisionsRequest {}
+message AuthProvisionsResponse {
+  repeated AuthProvision provisions = 1;
 }
 
 message AuthLockRequest {}

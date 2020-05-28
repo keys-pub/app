@@ -175,7 +175,8 @@ export interface GenerateHMACSecretRequest {
     device?: string;
     pin?: string;
     clientDataHash?: Uint8Array;
-    rpId?: string;
+    rp?: RelyingParty;
+    user?: User;
     rk?: OptionValue;
 }
 
