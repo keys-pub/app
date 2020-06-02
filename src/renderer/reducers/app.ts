@@ -1,5 +1,3 @@
-import {WatchStatus} from '../rpc/keys.d'
-
 export type AppState = {
   appFocused: boolean
   error: Error | void
@@ -8,7 +6,6 @@ export type AppState = {
   selectedInbox: string
   unlocked: boolean
   updating: boolean
-  watchStatus: WatchStatus
 }
 
 const initialState: AppState = {
@@ -19,7 +16,6 @@ const initialState: AppState = {
   selectedInbox: '',
   unlocked: null,
   updating: false,
-  watchStatus: WatchStatus.WATCH_UKNOWN,
 }
 
 type actionType = {
@@ -38,11 +34,6 @@ export default function reducer(state: AppState = initialState, action: actionTy
       return {
         ...state,
         error: null,
-      }
-    case 'WATCH_STATUS':
-      return {
-        ...state,
-        watchStatus: action.payload.status,
       }
     case '@@router/LOCATION_CHANGE':
       if (action.payload.location.pathname !== '/inbox') {

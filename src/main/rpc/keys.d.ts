@@ -58,16 +58,6 @@ export enum UserStatus {
     USER_CONN_FAILURE = "USER_CONN_FAILURE",
     USER_FAILURE = "USER_FAILURE",
 }
-export enum WatchStatus {
-    WATCH_UKNOWN = "WATCH_UKNOWN",
-    WATCH_OUTAGE = "WATCH_OUTAGE",
-    WATCH_DISRUPTED = "WATCH_DISRUPTED",
-    WATCH_STARTING = "WATCH_STARTING",
-    WATCH_DATA = "WATCH_DATA",
-}
-export enum PrefKey {
-    PREF_UNKNOWN = "PREF_UNKNOWN",
-}
 export enum WormholeStatus {
     WORMHOLE_DEFAULT = "WORMHOLE_DEFAULT",
     WORMHOLE_STARTING = "WORMHOLE_STARTING",
@@ -424,7 +414,7 @@ export interface AuthProvisionRequest {
 }
 
 export interface AuthProvisionResponse {
-    id?: string;
+    provision?: AuthProvision;
 }
 
 export interface AuthDeprovisionRequest {
@@ -754,33 +744,6 @@ export interface SearchResponse {
     keys?: Array<Key>;
 }
 
-export interface WatchRequest {
-}
-
-export interface WatchEvent {
-    status?: WatchStatus;
-    path?: string;
-}
-
-export interface Pref {
-    key?: string;
-    value?: string;
-}
-
-export interface PreferencesRequest {
-}
-
-export interface PreferencesResponse {
-    prefs?: Array<Pref>;
-}
-
-export interface PreferenceSetRequest {
-    pref?: Pref;
-}
-
-export interface PreferenceSetResponse {
-}
-
 export interface WormholeInput {
     sender?: string;
     recipient?: string;
@@ -860,12 +823,34 @@ export interface AdminCheckRequest {
 export interface AdminCheckResponse {
 }
 
-export interface GitSetupRequest {
+export interface GitImportRequest {
     url?: string;
-    key?: string;
+    keyPath?: string;
 }
 
-export interface GitSetupResponse {
+export interface GitImportResponse {
+}
+
+export interface GitCloneRequest {
+    url?: string;
+    keyPath?: string;
+}
+
+export interface GitCloneResponse {
+}
+
+export interface BackupRequest {
+}
+
+export interface BackupResponse {
+    path?: string;
+}
+
+export interface RestoreRequest {
+    path?: string;
+}
+
+export interface RestoreResponse {
 }
 
 export interface KeysService {
@@ -913,18 +898,19 @@ export interface KeysService {
     Pull: (r:PullRequest) => PullResponse;
     Push: (r:PushRequest) => PushResponse;
     Wormhole: (r:() => {value: WormholeInput, done: boolean}, cb:(a:{value: WormholeOutput, done: boolean}) => void) => void;
-    Preferences: (r:PreferencesRequest) => PreferencesResponse;
-    PreferenceSet: (r:PreferenceSetRequest) => PreferenceSetResponse;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
     RuntimeStatus: (r:RuntimeStatusRequest) => RuntimeStatusResponse;
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
-    GitSetup: (r:GitSetupRequest) => GitSetupResponse;
+    Restore: (r:RestoreRequest) => RestoreResponse;
+    GitClone: (r:GitCloneRequest) => GitCloneResponse;
     AuthProvision: (r:AuthProvisionRequest) => AuthProvisionResponse;
     AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
+    GitImport: (r:GitImportRequest) => GitImportResponse;
+    Backup: (r:BackupRequest) => BackupResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

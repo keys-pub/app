@@ -77,9 +77,6 @@ service Keys {
   rpc Push(PushRequest) returns (PushResponse) {}
   
   rpc Wormhole(stream WormholeInput) returns (stream WormholeOutput) {}  
-
-  rpc Preferences(PreferencesRequest) returns (PreferencesResponse) {}
-  rpc PreferenceSet(PreferenceSetRequest) returns (PreferenceSetResponse) {}
   
   // These requests do not need auth.
   // BEGIN NO AUTH
@@ -88,14 +85,19 @@ service Keys {
   rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
   rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
   rpc Rand(RandRequest) returns (RandResponse) {}
-  rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}
-  rpc GitSetup(GitSetupRequest) returns (GitSetupResponse) {}
+  rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}  
+  rpc Restore(RestoreRequest) returns (RestoreResponse) {}
+  rpc GitClone(GitCloneRequest) returns (GitCloneResponse) {}  
   // END NO AUTH
 
   rpc AuthProvision(AuthProvisionRequest) returns (AuthProvisionResponse) {}
   rpc AuthDeprovision(AuthDeprovisionRequest) returns (AuthDeprovisionResponse) {}
   rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
   
+  rpc GitImport(GitImportRequest) returns (GitImportResponse) {}
+  
+  rpc Backup(BackupRequest) returns (BackupResponse) {}  
+
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
@@ -467,7 +469,7 @@ message AuthProvisionRequest {
   bool setup = 7;
 }
 message AuthProvisionResponse {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  AuthProvision provision = 1;
 }
 
 message AuthDeprovisionRequest {
@@ -851,47 +853,6 @@ message SearchResponse {
   repeated Key keys = 1;  
 }
 
-message WatchRequest {}
-
-enum WatchStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "WatchStatus";
-
-  WATCH_UKNOWN = 0 [(gogoproto.enumvalue_customname) = "WatchStatusUnknown"];
-  WATCH_OUTAGE = 12 [(gogoproto.enumvalue_customname) = "WatchStatusOutage"];    // Persisting error, the service may be down
-  WATCH_DISRUPTED = 13 [(gogoproto.enumvalue_customname) = "WatchStatusDisrupted"]; // Temporary error, we'll retry and probably come back
-  WATCH_STARTING = 14 [(gogoproto.enumvalue_customname) = "WatchStatusStarting"];
-  WATCH_DATA = 16 [(gogoproto.enumvalue_customname) = "WatchStatusData"];
-}
-
-message WatchEvent {  
-  WatchStatus status = 1;  
-  string path = 2;
-}
-
-message Pref {
-  string key = 1;
-  string value = 2;
-}
-
-enum PrefKey {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "PrefKey";
-
-  PREF_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "PrefUnknown"];
-}
-
-message PreferencesRequest {  
-}
-message PreferencesResponse {
-  repeated Pref prefs = 1;
-}
-
-message PreferenceSetRequest {
-  Pref pref = 1;
-}
-message PreferenceSetResponse {}
-
 message WormholeInput {  
   string sender = 1;
   string recipient = 2;
@@ -1012,13 +973,26 @@ message AdminCheckRequest {
   string kid = 2 [(gogoproto.customname) = "KID"];
 }
 
-message AdminCheckResponse {
-}
+message AdminCheckResponse {}
 
-message GitSetupRequest {
+message GitImportRequest {
   string url = 1 [(gogoproto.customname) = "URL"];
-  string key = 2;
+  string keyPath = 2;
+}
+message GitImportResponse {}
+
+message GitCloneRequest {
+  string url = 1 [(gogoproto.customname) = "URL"];
+  string keyPath = 2; 
+}
+message GitCloneResponse {}
+
+message BackupRequest {}
+message BackupResponse {
+  string path = 1;
 }
 
-message GitSetupResponse {
+message RestoreRequest {
+  string path = 1;
 }
+message RestoreResponse {}
