@@ -905,11 +905,9 @@ export interface KeysService {
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
     Restore: (r:RestoreRequest) => RestoreResponse;
-    GitClone: (r:GitCloneRequest) => GitCloneResponse;
     AuthProvision: (r:AuthProvisionRequest) => AuthProvisionResponse;
     AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
-    GitImport: (r:GitImportRequest) => GitImportResponse;
     Backup: (r:BackupRequest) => BackupResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;

@@ -87,14 +87,11 @@ service Keys {
   rpc Rand(RandRequest) returns (RandResponse) {}
   rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}  
   rpc Restore(RestoreRequest) returns (RestoreResponse) {}
-  rpc GitClone(GitCloneRequest) returns (GitCloneResponse) {}  
   // END NO AUTH
 
   rpc AuthProvision(AuthProvisionRequest) returns (AuthProvisionResponse) {}
   rpc AuthDeprovision(AuthDeprovisionRequest) returns (AuthDeprovisionResponse) {}
   rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
-  
-  rpc GitImport(GitImportRequest) returns (GitImportResponse) {}
   
   rpc Backup(BackupRequest) returns (BackupResponse) {}  
 
