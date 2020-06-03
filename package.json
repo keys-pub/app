@@ -83,7 +83,6 @@
         "github"
       ],
       "target": [
-        "snap",
         "AppImage",
         "deb"
       ],
