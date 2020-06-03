@@ -1,4 +1,4 @@
-import {goBack, push} from 'connected-react-router'
+import {replace} from 'connected-react-router'
 
 import * as grpc from '@grpc/grpc-js'
 
@@ -9,8 +9,6 @@ import {setErrHandler} from '../rpc/keys'
 import {RPCError} from '../rpc/keys.d'
 import {store} from '../store'
 
-export {goBack, push}
-
 export const init = () => {
   setErrHandler((err: RPCError) => {
     if (err.code === grpc.status.PERMISSION_DENIED) {
@@ -18,8 +16,8 @@ export const init = () => {
       store.dispatch({type: 'LOCK'})
     }
   })
-  // dispatch(startWatchStream())
-  store.dispatch(push('/keys/index'))
+  // Replace '/' so users can't go back to the splash screen and get stuck
+  store.dispatch(replace('/keys/index'))
 }
 
 export const lock = () => {
