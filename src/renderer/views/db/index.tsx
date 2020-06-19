@@ -95,7 +95,7 @@ export default class DBView extends React.Component<Props, State> {
               {collections.map((col, index) => (
                 <TableRow hover onClick={(event) => this.selectCollection(col)} key={col.path}>
                   <TableCell>
-                    <Typography style={{...styles.mono}}>{col.path}</Typography>
+                    <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
                   </TableCell>
                 </TableRow>
               ))}
@@ -118,17 +118,25 @@ export default class DBView extends React.Component<Props, State> {
             <TableBody>
               {documents.map((doc: Document, index: number) => (
                 <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                  <TableCell style={{width: 300, verticalAlign: 'top'}}>
-                    <Typography style={{...styles.mono, wordBreak: 'break-all'}}>{doc.path}</Typography>
+                  <TableCell style={{width: '33%', verticalAlign: 'top', paddingRight: 0, paddingLeft: 0}}>
+                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                      {doc.path}
+                    </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography style={{...styles.mono, verticalAlign: 'top', wordBreak: 'break-all'}}>
+                    <Typography
+                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                    >
                       {doc.value}
                     </Typography>
-                    <Typography style={{...styles.mono, verticalAlign: 'top', wordBreak: 'break-all'}}>
+                    <Typography
+                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                    >
                       {dateString(doc.createdAt)}
                     </Typography>
-                    <Typography style={{...styles.mono, verticalAlign: 'top', wordBreak: 'break-all'}}>
+                    <Typography
+                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                    >
                       {dateString(doc.updatedAt)}
                     </Typography>
                   </TableCell>

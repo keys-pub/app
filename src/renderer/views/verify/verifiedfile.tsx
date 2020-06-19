@@ -22,7 +22,7 @@ type State = {}
 
 export default class VerifiedFileView extends React.Component<Props, State> {
   openFolder = () => {
-    shell.openItem(dirname(this.props.fileOut))
+    shell.showItemInFolder(this.props.fileOut)
   }
 
   render() {

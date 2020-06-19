@@ -13,9 +13,7 @@
     "prestart": "yarn run build",
     "start": "electron .",
     "lint": "tslint '{src,test,mocks}/**/*.{ts,tsx}' --project ./tsconfig.json",
-    "test": "jest '(\\/test\\/(?!e2e/)).*'",
     "pretest:e2e": "yarn run build",
-    "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "yarn run build && electron-builder --dir",
     "dist": "yarn run build && electron-builder",
     "postinstall": "electron-builder install-app-deps",
@@ -111,24 +109,6 @@
   },
   "keywords": [],
   "homepage": "https://github.com/keys-pub/app#README",
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "key-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "js"
-    ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "transform": {
-      "^.+\\.js$": "babel-jest"
-    },
-    "setupFiles": [
-      "./internals/scripts/CheckBuiltsExist.js"
-    ]
-  },
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
@@ -138,9 +118,8 @@
     "@babel/preset-typescript": "^7.3.3",
     "@hot-loader/react-dom": "^16.8.6",
     "@types/electron-devtools-installer": "^2.2.0",
-    "@types/jest": "^25.1.4",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.9.0",
+    "@types/node": "^14.0.13",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
     "@types/react-redux": "^7.1.6",
@@ -152,7 +131,7 @@
     "cross-spawn": "^7.0.0",
     "cross-var": "^1.1.0",
     "css-loader": "^3.2.0",
-    "electron": "^8.0.1",
+    "electron": "^9.0.4",
     "electron-builder": "^22.5.1",
     "electron-devtools-installer": "^3.0.0",
     "electron-notarize": "^0.3.0",
@@ -162,7 +141,7 @@
     "prettier": "^2.0.2",
     "react-hot-loader": "^4.3.6",
     "redux-logger": "^3.0.6",
-    "source-map-loader": "^0.2.4",
+    "source-map-loader": "^1.0.0",
     "style-loader": "^1.0.0",
     "tcomb": "^3.2.27",
     "ts-loader": "^7.0.0",
