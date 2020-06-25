@@ -231,13 +231,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
       case 'https':
         instructions = (
           <Typography>
-            Save it to any of:
+            Save it to any of the following locations:
             <br />
             <span style={{...styles.mono}}>https://{this.state.name}/keyspub.txt</span>
             <br />
             <span style={{...styles.mono}}>https://{this.state.name}/.well-known/keyspub.txt</span>
           </Typography>
         )
+        placeholder = 'https://' + this.state.name + '/keyspub.txt'
+        urlLabel = 'Where did you save it?'
         break
     }
     return (
@@ -276,12 +278,14 @@ export default class UserSignDialog extends React.Component<Props, State> {
           {instructions}
         </Box>
         {openLabel && (
-          <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20, paddingBottom: 20}}>
+          <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20}}>
             <Button color="primary" variant="outlined" onClick={openAction} disabled={this.state.loading}>
               {openLabel}
             </Button>
           </Box>
         )}
+        <Box style={{paddingBottom: 20}} />
+
         {urlLabel && (
           <Box display="flex" flexDirection="column" flex={1}>
             <Box display="flex" flexDirection="row" flex={1}>
