@@ -81,19 +81,20 @@ service Keys {
   // These requests do not need auth.
   // BEGIN NO AUTH
   rpc AuthSetup(AuthSetupRequest) returns (AuthSetupResponse) {}
+  rpc AuthVault(AuthVaultRequest) returns (AuthVaultResponse) {}
   rpc AuthUnlock(AuthUnlockRequest) returns (AuthUnlockResponse) {}
   rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
   rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
   rpc Rand(RandRequest) returns (RandResponse) {}
   rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}  
-  rpc Restore(RestoreRequest) returns (RestoreResponse) {}
   // END NO AUTH
 
   rpc AuthProvision(AuthProvisionRequest) returns (AuthProvisionResponse) {}
   rpc AuthDeprovision(AuthDeprovisionRequest) returns (AuthDeprovisionResponse) {}
   rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
+  rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse) {}
   
-  rpc Backup(BackupRequest) returns (BackupResponse) {}  
+  rpc VaultSync(VaultSyncRequest) returns (VaultSyncResponse) {}
 
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
@@ -444,6 +445,11 @@ message AuthSetupRequest {
 }
 message AuthSetupResponse {}
 
+message AuthVaultRequest {
+  string key = 1;
+}
+message AuthVaultResponse {}
+
 message AuthUnlockRequest {
   // Secret for auth depending on auth type, e.g. password, pin, etc.
   string secret = 1;
@@ -473,6 +479,12 @@ message AuthDeprovisionRequest {
   string id = 1 [(gogoproto.customname) = "ID"];
 }
 message AuthDeprovisionResponse {}
+
+message PasswordChangeRequest {
+  string old = 1;
+  string new = 2;
+}
+message PasswordChangeResponse {}
 
 message AuthProvision {
   string id = 1 [(gogoproto.customname) = "ID"];
@@ -735,6 +747,8 @@ enum Encoding {
 message RandRequest {
   int32 numBytes = 1;
   Encoding encoding = 2;
+  bool noPadding = 10;
+  bool lowercase = 11;
 }
 message RandResponse {
   string data = 1;
@@ -768,7 +782,10 @@ message Collection {
 }
 
 message CollectionsRequest {
-  string path = 1;
+  string parent = 1;
+
+  // DB is "service" or "vault".
+  string db = 5 [(gogoproto.customname) = "DB"];
 }
 message CollectionsResponse {
   repeated Collection collections = 1;
@@ -777,13 +794,16 @@ message CollectionsResponse {
 message Document {
   string path = 1;
   string value = 2;
+
   int64 createdAt = 10;
   int64 updatedAt = 11;
 }
 
 message DocumentsRequest {
-  string path = 1;
-  string prefix = 2;
+  string prefix = 1;
+
+  // DB is "service" or "vault".
+  string db = 5 [(gogoproto.customname) = "DB"];  
 }
 message DocumentsResponse {
   repeated Document documents = 1;
@@ -849,6 +869,9 @@ message SearchRequest {
 message SearchResponse {
   repeated Key keys = 1;  
 }
+
+message VaultSyncRequest {}
+message VaultSyncResponse {}
 
 message WormholeInput {  
   string sender = 1;
@@ -967,29 +990,8 @@ message AdminSignURLResponse {
 
 message AdminCheckRequest {
   string signer = 1;
-  string kid = 2 [(gogoproto.customname) = "KID"];
+  string check = 2;
 }
 
 message AdminCheckResponse {}
 
-message GitImportRequest {
-  string url = 1 [(gogoproto.customname) = "URL"];
-  string keyPath = 2;
-}
-message GitImportResponse {}
-
-message GitCloneRequest {
-  string url = 1 [(gogoproto.customname) = "URL"];
-  string keyPath = 2; 
-}
-message GitCloneResponse {}
-
-message BackupRequest {}
-message BackupResponse {
-  string path = 1;
-}
-
-message RestoreRequest {
-  string path = 1;
-}
-message RestoreResponse {}

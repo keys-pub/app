@@ -390,6 +390,13 @@ export interface AuthSetupRequest {
 export interface AuthSetupResponse {
 }
 
+export interface AuthVaultRequest {
+    key?: string;
+}
+
+export interface AuthVaultResponse {
+}
+
 export interface AuthUnlockRequest {
     // Secret for auth depending on auth type, e.g. password, pin, etc.
     secret?: string;
@@ -422,6 +429,14 @@ export interface AuthDeprovisionRequest {
 }
 
 export interface AuthDeprovisionResponse {
+}
+
+export interface PasswordChangeRequest {
+    old?: string;
+    new?: string;
+}
+
+export interface PasswordChangeResponse {
 }
 
 export interface AuthProvision {
@@ -637,6 +652,8 @@ export interface Item {
 export interface RandRequest {
     numBytes?: number;
     encoding?: Encoding;
+    noPadding?: boolean;
+    lowercase?: boolean;
 }
 
 export interface RandResponse {
@@ -674,7 +691,9 @@ export interface Collection {
 }
 
 export interface CollectionsRequest {
-    path?: string;
+    parent?: string;
+    // DB is "service" or "vault".
+    db?: string;
 }
 
 export interface CollectionsResponse {
@@ -689,8 +708,9 @@ export interface Document {
 }
 
 export interface DocumentsRequest {
-    path?: string;
     prefix?: string;
+    // DB is "service" or "vault".
+    db?: string;
 }
 
 export interface DocumentsResponse {
@@ -742,6 +762,12 @@ export interface SearchRequest {
 
 export interface SearchResponse {
     keys?: Array<Key>;
+}
+
+export interface VaultSyncRequest {
+}
+
+export interface VaultSyncResponse {
 }
 
 export interface WormholeInput {
@@ -817,40 +843,10 @@ export interface AdminSignURLResponse {
 
 export interface AdminCheckRequest {
     signer?: string;
-    kid?: string;
+    check?: string;
 }
 
 export interface AdminCheckResponse {
-}
-
-export interface GitImportRequest {
-    url?: string;
-    keyPath?: string;
-}
-
-export interface GitImportResponse {
-}
-
-export interface GitCloneRequest {
-    url?: string;
-    keyPath?: string;
-}
-
-export interface GitCloneResponse {
-}
-
-export interface BackupRequest {
-}
-
-export interface BackupResponse {
-    path?: string;
-}
-
-export interface RestoreRequest {
-    path?: string;
-}
-
-export interface RestoreResponse {
 }
 
 export interface KeysService {
@@ -899,16 +895,17 @@ export interface KeysService {
     Push: (r:PushRequest) => PushResponse;
     Wormhole: (r:() => {value: WormholeInput, done: boolean}, cb:(a:{value: WormholeOutput, done: boolean}) => void) => void;
     AuthSetup: (r:AuthSetupRequest) => AuthSetupResponse;
+    AuthVault: (r:AuthVaultRequest) => AuthVaultResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
     RuntimeStatus: (r:RuntimeStatusRequest) => RuntimeStatusResponse;
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;
-    Restore: (r:RestoreRequest) => RestoreResponse;
     AuthProvision: (r:AuthProvisionRequest) => AuthProvisionResponse;
     AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
-    Backup: (r:BackupRequest) => BackupResponse;
+    PasswordChange: (r:PasswordChangeRequest) => PasswordChangeResponse;
+    VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

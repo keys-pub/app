@@ -123,11 +123,7 @@ export default class DBVListView extends React.Component<Props> {
   loadMoreRows = (r: Range): Promise<any> => {
     return new Promise((resolve, reject) => {
       const req: DocumentsRequest = {
-        path: this.props.path,
-        prefix: '',
-        // index: r.startIndex,
-        // length: r.stopIndex - r.startIndex + 1,
-        // pretty: true,
+        prefix: this.props.path + '/',
       }
       documents(req, (err: RPCError, resp: DocumentsResponse) => {
         if (err) {

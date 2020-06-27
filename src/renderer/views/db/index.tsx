@@ -29,7 +29,9 @@ import {
   DocumentsResponse,
 } from '../../rpc/keys.d'
 
-type Props = {}
+type Props = {
+  db: string
+}
 
 type State = {
   collections: Array<Collection>
@@ -43,7 +45,9 @@ export default class DBView extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const req: CollectionsRequest = {}
+    const req: CollectionsRequest = {
+      db: this.props.db,
+    }
     collections(req, (err: RPCError, resp: CollectionsResponse) => {
       if (err) {
         // TODO: error
@@ -61,8 +65,8 @@ export default class DBView extends React.Component<Props, State> {
       documents: [],
     })
     const req: DocumentsRequest = {
-      path: col.path,
-      prefix: '',
+      prefix: col.path + '/',
+      db: this.props.db,
     }
     documents(req, (err: RPCError, resp: DocumentsResponse) => {
       if (err) {
@@ -80,10 +84,12 @@ export default class DBView extends React.Component<Props, State> {
   render() {
     const {collections, documents} = this.state
     return (
-      <Box display="flex" flexDirection="row" flex={1}>
-        <Box display="flex" flexDirection="column" style={{width: 200}}>
-          <Table size="small">
-            {/*<TableHead>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Divider />
+        <Box display="flex" flexDirection="row" flex={1}>
+          <Box display="flex" flexDirection="column" style={{width: 110}}>
+            <Table size="small">
+              {/*<TableHead>
                 <TableRow>
                   <TableCell>
                     <Typography style={{...styles.mono}}>Path</Typography>
@@ -91,20 +97,21 @@ export default class DBView extends React.Component<Props, State> {
                 </TableRow>
               </TableHead>
               */}
-            <TableBody>
-              {collections.map((col, index) => (
-                <TableRow hover onClick={(event) => this.selectCollection(col)} key={col.path}>
-                  <TableCell>
-                    <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-        <Box display="flex" flexDirection="column" flex={1}>
-          <Table size="small">
-            {/*<TableHead>
+              <TableBody>
+                {collections.map((col, index) => (
+                  <TableRow hover onClick={(event) => this.selectCollection(col)} key={col.path}>
+                    <TableCell style={{paddingLeft: 8}}>
+                      <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+          <Divider orientation="vertical" />
+          <Box display="flex" flexDirection="column" flex={1}>
+            <Table size="small">
+              {/*<TableHead>
                 <TableRow>
                   <TableCell>
                     <Typography style={{...styles.mono}}></Typography>
@@ -115,35 +122,36 @@ export default class DBView extends React.Component<Props, State> {
                 </TableRow>
               </TableHead>
               */}
-            <TableBody>
-              {documents.map((doc: Document, index: number) => (
-                <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                  <TableCell style={{width: '33%', verticalAlign: 'top', paddingRight: 0, paddingLeft: 0}}>
-                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                      {doc.path}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                    >
-                      {doc.value}
-                    </Typography>
-                    <Typography
-                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                    >
-                      {dateString(doc.createdAt)}
-                    </Typography>
-                    <Typography
-                      style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                    >
-                      {dateString(doc.updatedAt)}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              <TableBody>
+                {documents.map((doc: Document, index: number) => (
+                  <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
+                    <TableCell style={{width: '25%', verticalAlign: 'top', paddingRight: 0, paddingLeft: 8}}>
+                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        {doc.path}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                      >
+                        {doc.value}
+                      </Typography>
+                      <Typography
+                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                      >
+                        {dateString(doc.createdAt)}
+                      </Typography>
+                      <Typography
+                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
+                      >
+                        {dateString(doc.updatedAt)}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
         </Box>
       </Box>
     )

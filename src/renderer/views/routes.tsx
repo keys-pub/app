@@ -28,7 +28,10 @@ export type RouteInfo = {
 
 export const routes: Array<RouteInfo> = [
   {path: '/auth/index', component: () => <AuthView />},
-  {path: '/db', component: () => <DBView />},
+
+  {path: '/db/service', component: () => <DBView db="service" />},
+  {path: '/db/vault', component: () => <DBView db="vault" />},
+
   {path: '/debug', component: () => <DebugView />},
 
   {path: '/keys/index', component: () => <KeysView />},
