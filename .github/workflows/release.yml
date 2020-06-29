@@ -1,0 +1,17 @@
+on:
+  release:
+    types:
+      - created
+name: Release
+jobs:
+  runs-on: macos-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.x
+    - name: Build
+      run: |
+        sh ./scripts/release.sh
