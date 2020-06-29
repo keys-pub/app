@@ -6,7 +6,8 @@ dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $dir/..
 
 # TODO: git pull & check dirty?
-# TODO: yarn install
+
+yarn install
 
 if [[ -d release ]]; then
     rm -rf release
