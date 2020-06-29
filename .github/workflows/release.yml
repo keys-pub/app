@@ -1,4 +1,7 @@
 on:
+  push:
+    branches:
+      - releaseworkflow
   release:
     types:
       - created
