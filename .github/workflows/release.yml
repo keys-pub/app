@@ -25,5 +25,6 @@ jobs:
         env:
           APPLEID: ${{ secrets.APPLEID }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           sh ./scripts/release.sh
