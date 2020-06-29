@@ -16,6 +16,11 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.13.x
+      - name: Import codesign
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
       - name: Build
         run: |
           sh ./scripts/release.sh
