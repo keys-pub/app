@@ -22,5 +22,8 @@ jobs:
           p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
       - name: Build
+        env:
+          APPLEID: ${{ secrets.APPLEID }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
           sh ./scripts/release.sh
