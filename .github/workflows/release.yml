@@ -1,13 +1,10 @@
 on:
   push:
     branches:
-      - releaseworkflow
-  release:
-    types:
-      - created
+      - v0*
 name: Release
 jobs:
-  release:
+  release-macos:
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -26,3 +23,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           sh ./scripts/release.sh
+  release-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+      - name: Build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          bash ./scripts/release.sh
