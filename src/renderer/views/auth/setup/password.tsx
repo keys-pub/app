@@ -11,12 +11,12 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import Logo from '../logo'
+import Logo from '../../logo'
 
 import {push} from 'connected-react-router'
-import {store} from '../../store'
+import {store} from '../../../store'
 
-import {authSetup, authUnlock} from '../../rpc/keys'
+import {authSetup, authUnlock} from '../../../rpc/keys'
 import {
   RPCError,
   AuthSetupRequest,
@@ -24,10 +24,12 @@ import {
   AuthUnlockRequest,
   AuthUnlockResponse,
   AuthType,
-} from '../../rpc/keys.d'
+} from '../../../rpc/keys.d'
 import {ipcRenderer} from 'electron'
 
-type Props = {}
+type Props = {
+  back: () => void
+}
 type State = {
   loading: boolean
   password: string
@@ -36,9 +38,7 @@ type State = {
   error: string
 }
 
-// TODO: password length check (if we are adding a password mananger...)
-
-export default class AuthSetupView extends React.Component<Props, State> {
+export default class AuthSetupPasswordView extends React.Component<Props, State> {
   state = {
     loading: false,
     password: '',
@@ -66,9 +66,9 @@ export default class AuthSetupView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Logo loading={this.state.loading} top={60} />
-        <Typography style={{paddingTop: 0, paddingBottom: 20, width: 550}}>
-          Hi! Let's create a password. This password will be used to unlock your local keyring and secure your
-          keys. This password is not stored or transmitted anywhere.
+        <Typography style={{paddingTop: 0, paddingBottom: 20, width: 550, textAlign: 'center'}}>
+          This password will be used to unlock your vault and secure your keys and secrets. <br />
+          This password is not stored or transmitted anywhere.
         </Typography>
         <FormControl error={this.state.passwordError !== ''}>
           <TextField
@@ -100,15 +100,18 @@ export default class AuthSetupView extends React.Component<Props, State> {
             disabled={this.state.loading}
             inputRef={this.inputConfirm}
           />
-          <FormHelperText id="component-error-text">{this.state.passwordError}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.passwordError || ' '}</FormHelperText>
         </FormControl>
-        <Box
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="center"
-          style={{marginTop: 10}}
-        >
+        <Box display="flex" flexDirection="row" style={{marginTop: 10, width: 400}}>
+          <Button
+            color="secondary"
+            variant="outlined"
+            onClick={this.props.back}
+            disabled={this.state.loading}
+          >
+            Back
+          </Button>
+          <Box flex={1} flexGrow={1} />
           <Button color="primary" variant="outlined" onClick={this.setPassword} disabled={this.state.loading}>
             Set Password
           </Button>

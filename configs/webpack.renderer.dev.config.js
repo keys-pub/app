@@ -3,6 +3,12 @@ const spawn = require('child_process').spawn
 
 const baseConfig = require('./webpack.renderer.config')
 
+let port = process.env.DEV_PORT
+if (!port) {
+  port = '2003'
+}
+console.log('Webpack dev server port:', port)
+
 module.exports = merge.smart(baseConfig, {
   resolve: {
     alias: {
@@ -10,7 +16,7 @@ module.exports = merge.smart(baseConfig, {
     },
   },
   devServer: {
-    port: 2003,
+    port: port,
     compress: true,
     noInfo: true,
     stats: 'errors-only',
@@ -29,8 +35,8 @@ module.exports = merge.smart(baseConfig, {
           env: process.env,
           stdio: 'inherit',
         })
-          .on('close', code => process.exit(code))
-          .on('error', spawnError => console.error(spawnError))
+          .on('close', (code) => process.exit(code))
+          .on('error', (spawnError) => console.error(spawnError))
       }
     },
   },

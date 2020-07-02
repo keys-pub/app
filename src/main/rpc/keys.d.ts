@@ -391,7 +391,7 @@ export interface AuthSetupResponse {
 }
 
 export interface AuthVaultRequest {
-    key?: string;
+    phrase?: string;
 }
 
 export interface AuthVaultResponse {
@@ -770,6 +770,13 @@ export interface VaultSyncRequest {
 export interface VaultSyncResponse {
 }
 
+export interface VaultAuthRequest {
+}
+
+export interface VaultAuthResponse {
+    phrase?: string;
+}
+
 export interface WormholeInput {
     sender?: string;
     recipient?: string;
@@ -906,6 +913,7 @@ export interface KeysService {
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
     PasswordChange: (r:PasswordChangeRequest) => PasswordChangeResponse;
     VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
+    VaultAuth: (r:VaultAuthRequest) => VaultAuthResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

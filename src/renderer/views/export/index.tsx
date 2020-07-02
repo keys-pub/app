@@ -28,6 +28,7 @@ type Props = {
 type State = {
   export: string
   password: string
+  passwordConfirm: string
   error: string
 }
 
@@ -35,10 +36,26 @@ export default class KeyExportDialog extends React.Component<Props, State> {
   state = {
     export: '',
     password: '',
+    passwordConfirm: '',
     error: '',
   }
 
   export = async () => {
+    const password = this.state.password
+    const confirm = this.state.passwordConfirm
+    if (password !== confirm) {
+      this.setState({
+        error: "Passwords don't match",
+      })
+      return
+    }
+    if (password === '') {
+      this.setState({
+        error: 'Oops, password is empty',
+      })
+      return
+    }
+
     this.setState({error: ''})
     const req: KeyExportRequest = {kid: this.props.kid, password: this.state.password}
     keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
@@ -47,24 +64,30 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         return
       }
       const out = new TextDecoder().decode(resp.export)
-      this.setState({password: '', export: out})
+      this.setState({password: '', passwordConfirm: '', export: out})
     })
   }
 
   close = () => {
     this.props.close()
-    this.setState({password: '', export: '', error: ''})
+    this.setState({password: '', passwordConfirm: '', export: '', error: ''})
   }
 
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
+  onInputChangePassword = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     this.setState({password: target ? target.value : '', error: ''})
   }
 
+  onInputChangeConfirm = (e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    this.setState({passwordConfirm: target ? target.value : '', error: ''})
+  }
+
   renderExport() {
+    // TODO: Export type
     return (
-      <Box display="flex" flexDirection="column" style={{height: 142}}>
-        <Typography style={{paddingBottom: 10}}>Export your key encrypted with your password.</Typography>
+      <Box display="flex" flexDirection="column" style={{height: 200}}>
+        <Typography style={{paddingBottom: 10}}>Export a key encrypted with a password.</Typography>
         <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
         <FormControl error={this.state.error !== ''}>
           <TextField
@@ -72,11 +95,18 @@ export default class KeyExportDialog extends React.Component<Props, State> {
             label="Password"
             variant="outlined"
             type="password"
-            onChange={this.onInputChange}
+            onChange={this.onInputChangePassword}
             value={this.state.password}
-            style={{width: 400}}
           />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          <Box padding={1} />
+          <TextField
+            label="Confirm Password"
+            variant="outlined"
+            type="password"
+            onChange={this.onInputChangeConfirm}
+            value={this.state.passwordConfirm}
+          />
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )
@@ -89,7 +119,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        style={{height: 142}}
+        style={{height: 200}}
       >
         <Typography
           style={{

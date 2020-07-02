@@ -48,7 +48,7 @@ export default class AuthView extends React.Component<Props, State> {
     }
 
     if (this.state.authStatus == AuthStatus.AUTH_SETUP) {
-      return <AuthSetupView />
+      return <AuthSetupView refresh={this.refresh} />
     } else {
       return <AuthUnlockView />
     }

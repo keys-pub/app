@@ -95,7 +95,12 @@ app.on('ready', async () => {
 
   if (process.env.NODE_ENV !== 'production') {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
-    mainWindow.loadURL(`http://localhost:2003`)
+    let port = process.env.DEV_PORT
+    if (!port) {
+      port = '2003'
+    }
+    console.log('Using dev port', port)
+    mainWindow.loadURL(`http://localhost:` + port)
   } else {
     mainWindow.loadURL(
       url.format({
