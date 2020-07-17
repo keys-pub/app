@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
+  Tooltip,
   Typography,
 } from '@material-ui/core'
 
@@ -16,7 +17,8 @@ import EncryptView from '../encrypt'
 import DecryptView from '../decrypt'
 import SignView from '../sign'
 import VerifyView from '../verify'
-import {backgroundSelectedColor} from '../../components/styles'
+
+// import {withStyles, Theme, makeStyles} from '@material-ui/core/styles'
 
 import {
   EnhancedEncryption as EncryptIcon,
@@ -79,21 +81,24 @@ export default class ToolsView extends React.Component<Props, State> {
   }
 }
 
-const backgroundColor = 'white'
-const backgroundColorSelected = backgroundSelectedColor()
+// const LightTooltip = withStyles((theme: Theme) => ({
+//   tooltip: {
+//     backgroundColor: theme.palette.common.white,
+//     color: 'rgba(0, 0, 0, 0.87)',
+//     boxShadow: theme.shadows[1],
+//     fontSize: 11,
+//   },
+// }))(Tooltip)
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
-    <ListItem
-      button
-      style={{height: 42, backgroundColor: selected ? backgroundColorSelected : backgroundColor}}
-      onClick={onClick}
-      key={nav.id}
-    >
-      <ListItemIcon style={{minWidth: 0, marginRight: 10}}>
-        <nav.icon style={{fontSize: 20, color: selected ? '' : ''}} />
-      </ListItemIcon>
-      <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '' : ''}}} />
+    <ListItem button style={{height: 42}} onClick={onClick} key={nav.id}>
+      <Tooltip title={nav.name} arrow>
+        <ListItemIcon style={{minWidth: 0}}>
+          <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
+        </ListItemIcon>
+      </Tooltip>
+      {/* <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}} /> */}
     </ListItem>
   )
 }

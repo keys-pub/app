@@ -22,16 +22,10 @@ import {ipcRenderer} from 'electron'
 
 import * as Store from 'electron-store'
 
-import {vaultAuth} from '../../rpc/keys'
-import {RPCError, VaultAuthRequest, VaultAuthResponse} from '../../rpc/keys.d'
-
 type Props = {}
 
 type State = {
-  loading: boolean
   prerelease: boolean
-  vaultError: string
-  vaultPhrase: string
 }
 
 const version = remote.app.getVersion()
@@ -39,10 +33,7 @@ const localStore = new Store()
 
 export default class SettingsView extends React.Component<Props, State> {
   state = {
-    loading: false,
     prerelease: localStore.get('prerelease') == '1',
-    vaultError: '',
-    vaultPhrase: '',
   }
 
   devTools = () => {
@@ -66,23 +57,8 @@ export default class SettingsView extends React.Component<Props, State> {
     }
   }
 
-  vaultAuth = () => {
-    const req: VaultAuthRequest = {}
-    this.setState({loading: true, vaultError: ''})
-    vaultAuth(req, (err: RPCError, resp: VaultAuthResponse) => {
-      if (err) {
-        this.setState({loading: false, vaultError: err.details})
-        return
-      }
-      this.setState({loading: false, vaultPhrase: resp.phrase})
-    })
-  }
-
-  vaultAuthClear = () => {
-    this.setState({vaultPhrase: ''})
-  }
-
   render() {
+    const labelWidth = 60
     return (
       <Box display="flex" flex={1} flexDirection="column">
         <Divider />
@@ -90,7 +66,7 @@ export default class SettingsView extends React.Component<Props, State> {
         <Table size="small">
           <TableBody>
             <TableRow>
-              <TableCell style={{...cstyles.cell, width: 150}}>
+              <TableCell style={{...cstyles.cell, width: labelWidth}}>
                 <Typography align="right">Version</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
@@ -99,7 +75,7 @@ export default class SettingsView extends React.Component<Props, State> {
             </TableRow>
 
             <TableRow>
-              <TableCell style={{...cstyles.cell, width: 150}}>
+              <TableCell style={{...cstyles.cell, width: labelWidth}}>
                 <Typography align="right">Updater</Typography>
               </TableCell>
               <TableCell style={cstyles.cell}>
@@ -114,49 +90,6 @@ export default class SettingsView extends React.Component<Props, State> {
                   }
                   label="Use preleases"
                 />
-              </TableCell>
-            </TableRow>
-
-            <TableRow>
-              <TableCell style={{...cstyles.cell, width: 150}}>
-                <Typography align="right">Vault</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <Box flex={1} flexDirection="column">
-                  {this.state.vaultPhrase && (
-                    <Box flex={1} flexDirection="column">
-                      <Typography style={{paddingBottom: 10}}>
-                        This is a vault auth phrase that allows another device to connect to your vault.
-                        <br />
-                        This one time auth will expire in 5 minutes.
-                      </Typography>
-                      <Typography style={{...styles.mono, paddingBottom: 5}}>
-                        {this.state.vaultPhrase}
-                      </Typography>
-                      <Link onClick={this.vaultAuthClear}>Clear</Link>
-                    </Box>
-                  )}
-                  {!this.state.vaultPhrase && (
-                    <Box flex={1} flexDirection="column">
-                      <Typography style={{paddingBottom: 10, width: 400}}>
-                        A vault auth phrase is used to allow another device to connect to your vault (it is
-                        one time use and expiring).
-                      </Typography>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={this.vaultAuth}
-                        size="small"
-                        disabled={this.state.loading}
-                      >
-                        Generate Vault Auth
-                      </Button>
-                    </Box>
-                  )}
-                  {this.state.vaultError && (
-                    <Typography style={{color: 'red', paddingBottom: 20}}>{this.state.vaultError}</Typography>
-                  )}
-                </Box>
               </TableCell>
             </TableRow>
 

@@ -17,6 +17,7 @@ import SettingsView from './settings'
 import DBView from './db'
 import KeyView from './key'
 import KeysView from './keys'
+import VaultView from './vault'
 import ToolsView from './tools'
 import AuthenticatorsView from './authenticators'
 
@@ -39,6 +40,8 @@ export const routes: Array<RouteInfo> = [
 
   {path: '/wormhole/index', component: () => <WormholeView />},
   {path: '/tools/index', component: () => <ToolsView />},
+
+  {path: '/vault/index', component: () => <VaultView />},
 
   {path: '/authenticators/index', component: () => <AuthenticatorsView />},
 

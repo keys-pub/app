@@ -36,4 +36,7 @@ KEYS_APP=Keys2 KEYS_PORT=22406 DEV_PORT=2004 yarn start-dev
 
 # Set port for Keys2
 keys -app Keys2 config set port 22406
+
+# Start keysd for Keys2
+keysd -app Keys2
 ```

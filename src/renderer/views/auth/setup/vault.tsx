@@ -56,12 +56,12 @@ export default class AuthVaultView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Logo loading={this.state.loading} top={60} />
-        <Typography style={{paddingTop: 0, paddingBottom: 10, width: 550, textAlign: 'center'}}>
+        <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
           Enter in a vault auth phrase to connect to your vault.
           <br />
-          You can generate a vault auth phrase from any of your devices (in the app Settings).
+          You can generate an auth phrase from any of your devices (in Vault settings).
         </Typography>
-        <Box marginBottom={2}>{this.renderServerSelect()}</Box>
+        <Box marginBottom={1}>{this.renderServerSelect()}</Box>
         <FormControl error={this.state.error !== ''}>
           <TextField
             autoFocus
@@ -79,16 +79,10 @@ export default class AuthVaultView extends React.Component<Props, State> {
               style: {...styles.mono, fontSize: 12, width: 450},
             }}
           />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
-        <Box
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="center"
-          style={{marginTop: 10}}
-        >
-          <Box display="flex" flexDirection="row" style={{marginTop: 10, width: 450}}>
+        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
+          <Box display="flex" flexDirection="row" style={{width: 450, paddingTop: 6}}>
             <Button
               color="secondary"
               variant="outlined"

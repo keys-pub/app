@@ -30,6 +30,7 @@ import {
   Security as SecretsIcon,
   Usb as AuthenticatorsIcon,
   Toys as ExpermimentalIcon,
+  Backup as VaultIcon,
 } from '@material-ui/icons'
 
 import {push} from 'connected-react-router'
@@ -128,6 +129,12 @@ class Nav extends React.Component<Props, State> {
         icon: ToolsIcon,
         route: '/tools/index',
         prefix: '/tools',
+      },
+      {
+        name: 'Vault',
+        icon: VaultIcon,
+        route: '/vault/index',
+        prefix: '/vault',
       },
       {
         name: 'Settings',

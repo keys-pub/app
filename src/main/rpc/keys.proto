@@ -96,6 +96,8 @@ service Keys {
   
   rpc VaultSync(VaultSyncRequest) returns (VaultSyncResponse) {}
   rpc VaultAuth(VaultAuthRequest) returns (VaultAuthResponse) {}
+  rpc VaultUnsync(VaultUnsyncRequest) returns (VaultUnsyncResponse) {}
+  rpc VaultStatus(VaultStatusRequest) returns (VaultStatusResponse) {}
 
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
@@ -810,8 +812,9 @@ message DocumentsResponse {
   repeated Document documents = 1;
 }
 
-message DocumentDeleteRequest {
+message DocumentDeleteRequest {  
   string path = 1;
+  string db = 5 [(gogoproto.customname) = "DB"];
 }
 message DocumentDeleteResponse {}
 
@@ -874,9 +877,18 @@ message SearchResponse {
 message VaultSyncRequest {}
 message VaultSyncResponse {}
 
+message VaultUnsyncRequest {}
+message VaultUnsyncResponse {}
+
 message VaultAuthRequest {}
 message VaultAuthResponse {
   string phrase = 1;
+}
+
+message VaultStatusRequest {}
+message VaultStatusResponse {
+  string kid = 1 [(gogoproto.customname) = "KID"];
+  int64 syncedAt = 2;
 }
 
 message WormholeInput {  

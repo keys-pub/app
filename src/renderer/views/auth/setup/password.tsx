@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   FormHelperText,
   Snackbar,
@@ -12,6 +13,7 @@ import {
 } from '@material-ui/core'
 
 import Logo from '../../logo'
+import {Link} from '../../../components'
 
 import {push} from 'connected-react-router'
 import {store} from '../../../store'
@@ -27,9 +29,7 @@ import {
 } from '../../../rpc/keys.d'
 import {ipcRenderer} from 'electron'
 
-type Props = {
-  back: () => void
-}
+type Props = {}
 type State = {
   loading: boolean
   password: string
@@ -64,16 +64,16 @@ export default class AuthSetupPasswordView extends React.Component<Props, State>
 
   render() {
     return (
-      <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
-        <Logo loading={this.state.loading} top={60} />
+      <Box display="flex" flexDirection="column" alignItems="center">
         <Typography style={{paddingTop: 0, paddingBottom: 20, width: 550, textAlign: 'center'}}>
-          This password will be used to unlock your vault and secure your keys and secrets. <br />
-          This password is not stored or transmitted anywhere.
+          Hi! If this is the first time you are here, let's create a password. This password will be used to
+          encrypt your keys and secrets and will be required to unlock your vault. This password is not stored
+          or transmitted anywhere.
         </Typography>
         <FormControl error={this.state.passwordError !== ''}>
           <TextField
             autoFocus
-            label="Password"
+            label="Create a Password"
             variant="outlined"
             type="password"
             onChange={this.onInputChangePassword}
@@ -102,16 +102,7 @@ export default class AuthSetupPasswordView extends React.Component<Props, State>
           />
           <FormHelperText id="component-error-text">{this.state.passwordError || ' '}</FormHelperText>
         </FormControl>
-        <Box display="flex" flexDirection="row" style={{marginTop: 10, width: 400}}>
-          <Button
-            color="secondary"
-            variant="outlined"
-            onClick={this.props.back}
-            disabled={this.state.loading}
-          >
-            Back
-          </Button>
-          <Box flex={1} flexGrow={1} />
+        <Box display="flex" flexDirection="row" justifyContent="center" style={{width: 400}}>
           <Button color="primary" variant="outlined" onClick={this.setPassword} disabled={this.state.loading}>
             Set Password
           </Button>

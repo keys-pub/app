@@ -67,6 +67,12 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     this.refresh()
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props != prevProps) {
+      this.refresh()
+    }
+  }
+
   refresh = () => {
     this.list()
   }

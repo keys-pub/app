@@ -719,6 +719,7 @@ export interface DocumentsResponse {
 
 export interface DocumentDeleteRequest {
     path?: string;
+    db?: string;
 }
 
 export interface DocumentDeleteResponse {
@@ -770,11 +771,25 @@ export interface VaultSyncRequest {
 export interface VaultSyncResponse {
 }
 
+export interface VaultUnsyncRequest {
+}
+
+export interface VaultUnsyncResponse {
+}
+
 export interface VaultAuthRequest {
 }
 
 export interface VaultAuthResponse {
     phrase?: string;
+}
+
+export interface VaultStatusRequest {
+}
+
+export interface VaultStatusResponse {
+    kid?: string;
+    syncedAt?: number;
 }
 
 export interface WormholeInput {
@@ -914,6 +929,8 @@ export interface KeysService {
     PasswordChange: (r:PasswordChangeRequest) => PasswordChangeResponse;
     VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
     VaultAuth: (r:VaultAuthRequest) => VaultAuthResponse;
+    VaultUnsync: (r:VaultUnsyncRequest) => VaultUnsyncResponse;
+    VaultStatus: (r:VaultStatusRequest) => VaultStatusResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

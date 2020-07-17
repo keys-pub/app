@@ -199,7 +199,7 @@ class EncryptView extends React.Component<Props, State> {
                     style={{display: 'inline', color: '#a2a2a2'}}
                     onClick={() => this.inputRef.current.focus()}
                   >
-                    Type text or{' '}
+                    Type text to encrypt or{' '}
                   </Typography>
                   <Link inline onClick={this.openFile}>
                     select a file
