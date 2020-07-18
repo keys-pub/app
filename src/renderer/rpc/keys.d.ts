@@ -618,6 +618,7 @@ export interface SecretRemoveResponse {
 
 export interface SecretsRequest {
     query?: string;
+    sync?: boolean;
     sortField?: string;
     sortDirection?: SortDirection;
 }
@@ -792,6 +793,12 @@ export interface VaultStatusResponse {
     syncedAt?: number;
 }
 
+export interface VaultUpdateRequest {
+}
+
+export interface VaultUpdateResponse {
+}
+
 export interface WormholeInput {
     sender?: string;
     recipient?: string;
@@ -927,10 +934,11 @@ export interface KeysService {
     AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
     PasswordChange: (r:PasswordChangeRequest) => PasswordChangeResponse;
-    VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
     VaultAuth: (r:VaultAuthRequest) => VaultAuthResponse;
+    VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
     VaultUnsync: (r:VaultUnsyncRequest) => VaultUnsyncResponse;
     VaultStatus: (r:VaultStatusRequest) => VaultStatusResponse;
+    VaultUpdate: (r:VaultUpdateRequest) => VaultUpdateResponse;
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;

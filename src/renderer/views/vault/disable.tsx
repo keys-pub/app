@@ -54,7 +54,7 @@ export default class DisableDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.close('Sync disabled')
+      this.close('Vault backup removed')
     })
   }
 

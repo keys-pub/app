@@ -19,8 +19,7 @@ import {TransitionProps} from '@material-ui/core/transitions'
 import {DialogTitle} from '../../components'
 import KeyView from './view'
 
-import {goBack, push} from 'connected-react-router'
-import {store} from '../../store'
+import {styles} from '../../components'
 
 import {key, keyRemove, pull} from '../../rpc/keys'
 import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
@@ -30,7 +29,7 @@ type Props = {
   close: (snack: string) => void
   kid: string
   source: 'search' | 'keys'
-  refresh: () => void
+  reload: () => void
 }
 
 type State = {
@@ -65,7 +64,7 @@ export default class KeyDialog extends React.Component<Props, State> {
     }
   }
 
-  loadKey = (update: boolean, propsRefresh: boolean) => {
+  loadKey = (update: boolean, reload: boolean) => {
     if (!this.props.kid) {
       this.setState({key: null})
       return
@@ -86,8 +85,8 @@ export default class KeyDialog extends React.Component<Props, State> {
       } else {
         this.setState({error: 'Key not found', loading: false})
       }
-      if (propsRefresh) {
-        this.props.refresh()
+      if (reload) {
+        this.props.reload()
       }
     })
   }
@@ -126,7 +125,9 @@ export default class KeyDialog extends React.Component<Props, State> {
         <DialogContent dividers style={{minHeight: 161}}>
           {/*TODO: Better error display*/}
           {this.state.error && (
-            <Typography style={{color: 'red', paddingBottom: 20}}>{this.state.error}</Typography>
+            <Typography style={{...styles.mono, ...styles.breakWords, color: 'red', paddingBottom: 20}}>
+              {this.state.error}
+            </Typography>
           )}
           {this.state.key && <KeyView value={this.state.key} refresh={this.refresh} />}
         </DialogContent>

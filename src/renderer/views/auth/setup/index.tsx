@@ -29,7 +29,7 @@ export default class AuthSetupView extends React.Component<Props, State> {
 
         <Box style={{paddingTop: 10}}>
           <Typography style={{width: 550, marginTop: 10, textAlign: 'center'}}>
-            Or do you want to{' '}
+            Do you want to{' '}
             <Link span onClick={this.connect}>
               connect to an existing vault
             </Link>

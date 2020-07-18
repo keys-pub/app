@@ -7,6 +7,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -22,11 +23,10 @@ import {
   EventNote as NoteIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
-  Publish as ExportIcon,
-  DataUsage as GenerateKeyIcon,
-  ArrowDownward as ImportKeyIcon,
-  Search as SearchIcon,
+  Sync as SyncIcon,
 } from '@material-ui/icons'
+
+import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
 import {styles} from '../../components'
 
@@ -40,10 +40,18 @@ import SecretContentView from './content'
 
 import {directionString, flipDirection} from '../helper'
 
-import {secrets} from '../../rpc/keys'
-import {RPCError, Secret, SortDirection, SecretType, SecretsRequest, SecretsResponse} from '../../rpc/keys.d'
+import {secrets, vaultUpdate} from '../../rpc/keys'
+import {
+  RPCError,
+  Secret,
+  SortDirection,
+  SecretType,
+  SecretsRequest,
+  SecretsResponse,
+  VaultUpdateRequest,
+  VaultUpdateResponse,
+} from '../../rpc/keys.d'
 import {AppState} from '../../reducers/app'
-import {throws} from 'assert'
 
 type Props = {
   intro: boolean
@@ -65,6 +73,9 @@ type State = {
   isNew: boolean
   openRemove: Secret
   selected: Secret
+  snack: string
+  snackSeverity: string
+  syncing: boolean
 }
 
 class SecretsView extends React.Component<Props, State> {
@@ -79,14 +90,29 @@ class SecretsView extends React.Component<Props, State> {
     isNew: false,
     openRemove: null,
     selected: null,
+    snack: '',
+    snackSeverity: '',
+    syncing: false,
   }
 
   componentDidMount() {
-    this.refresh()
+    this.reload()
   }
 
-  refresh = () => {
+  reload = () => {
     this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+  }
+
+  sync = () => {
+    this.setState({syncing: true})
+    const req: VaultUpdateRequest = {}
+    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
+      this.setState({syncing: false})
+      if (err) {
+        this.setState({snack: err.details, snackSeverity: 'error'})
+      }
+      this.reload()
+    })
   }
 
   list = (query: string, sortField: string, sortDirection: SortDirection) => {
@@ -114,7 +140,7 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   onChange = () => {
-    this.refresh()
+    this.reload()
   }
 
   select = (secret: Secret) => {
@@ -160,7 +186,7 @@ class SecretsView extends React.Component<Props, State> {
 
   closeRemove = (removed: boolean) => {
     this.setState({openRemove: null, selected: null})
-    this.refresh()
+    this.reload()
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -185,7 +211,7 @@ class SecretsView extends React.Component<Props, State> {
 
   secretChanged = (changed: Secret) => {
     this.setState({isNew: false, editing: null, selected: changed})
-    this.refresh()
+    this.reload()
   }
 
   renderHeader() {
@@ -210,10 +236,18 @@ class SecretsView extends React.Component<Props, State> {
           size="small"
           onClick={this.newSecret}
           disabled={!!this.state.editing}
-          style={{marginTop: 2, marginRight: 10}}
-          // startIcon={<AddIcon />}
+          style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
         >
-          New
+          <AddIcon />
+        </Button>
+        <Button
+          onClick={this.sync}
+          size="small"
+          variant="outlined"
+          style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
+          disabled={this.state.syncing}
+        >
+          <SyncIcon />
         </Button>
       </Box>
     )
@@ -296,6 +330,16 @@ class SecretsView extends React.Component<Props, State> {
           value={this.state.openRemove}
           close={this.closeRemove}
         />
+        <Snackbar
+          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+          open={!!this.state.snack}
+          autoHideDuration={4000}
+          onClose={() => this.setState({snack: ''})}
+        >
+          <Alert severity={(this.state.snackSeverity || 'success') as AlertColor}>
+            <Typography>{this.state.snack}</Typography>
+          </Alert>
+        </Snackbar>
       </Box>
     )
   }

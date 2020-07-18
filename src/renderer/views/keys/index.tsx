@@ -7,6 +7,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -24,7 +25,10 @@ import {
   DataUsage as GenerateKeyIcon,
   ArrowDownward as ImportKeyIcon,
   Search as SearchIcon,
+  Sync as SyncIcon,
 } from '@material-ui/icons'
+
+import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
 import {styles} from '../../components'
 import UserLabel from '../user/label'
@@ -44,8 +48,17 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeyType, SortDirection, KeysRequest, KeysResponse} from '../../rpc/keys.d'
+import {keys, vaultUpdate} from '../../rpc/keys'
+import {
+  RPCError,
+  Key,
+  KeyType,
+  SortDirection,
+  KeysRequest,
+  KeysResponse,
+  VaultUpdateRequest,
+  VaultUpdateResponse,
+} from '../../rpc/keys.d'
 import {AppState} from '../../reducers/app'
 
 type Props = {
@@ -71,6 +84,9 @@ type State = {
   openRemove: Key
   openSearch: boolean
   selected: string
+  snack: string
+  snackSeverity: string
+  syncing: boolean
 }
 
 class KeysView extends React.Component<Props, State> {
@@ -88,14 +104,29 @@ class KeysView extends React.Component<Props, State> {
     openRemove: null,
     openSearch: false,
     selected: '',
+    snack: '',
+    snackSeverity: '',
+    syncing: false,
   }
 
   componentDidMount() {
-    this.refresh()
+    this.reload()
   }
 
-  refresh = () => {
+  reload = () => {
     this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+  }
+
+  sync = () => {
+    this.setState({syncing: true})
+    const req: VaultUpdateRequest = {}
+    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
+      this.setState({syncing: false})
+      if (err) {
+        this.setState({snack: err.details, snackSeverity: 'error'})
+      }
+      this.reload()
+    })
   }
 
   list = (query: string, sortField: string, sortDirection: SortDirection) => {
@@ -123,7 +154,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   onChange = () => {
-    this.refresh()
+    this.reload()
   }
 
   select = (key: Key) => {
@@ -192,7 +223,7 @@ class KeysView extends React.Component<Props, State> {
 
   closeImport = (imported: boolean) => {
     this.setState({openImport: false})
-    this.refresh()
+    this.reload()
   }
 
   searchKey = () => {
@@ -202,12 +233,12 @@ class KeysView extends React.Component<Props, State> {
 
   closeSearch = () => {
     this.setState({openSearch: false})
-    this.refresh()
+    this.reload()
   }
 
   closeRemove = (removed: boolean) => {
     this.setState({openRemove: null, selected: ''})
-    this.refresh()
+    this.reload()
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -232,7 +263,7 @@ class KeysView extends React.Component<Props, State> {
           size="small"
           onClick={this.keyGen}
           style={{marginTop: 2, minWidth: 90}}
-          // startIcon={<AddIcon />}
+          startIcon={<AddIcon />}
         >
           New
         </Button>
@@ -243,7 +274,7 @@ class KeysView extends React.Component<Props, State> {
           size="small"
           onClick={this.importKey}
           style={{marginTop: 2, minWidth: 90}}
-          // startIcon={<ImportKeyIcon />}
+          startIcon={<ImportKeyIcon />}
         >
           Import
         </Button>
@@ -254,9 +285,19 @@ class KeysView extends React.Component<Props, State> {
           size="small"
           onClick={this.searchKey}
           style={{marginTop: 2, minWidth: 90}}
-          // startIcon={<SearchIcon />}
+          startIcon={<SearchIcon />}
         >
           Search
+        </Button>
+        <Box paddingLeft={1} />
+        <Button
+          onClick={this.sync}
+          size="small"
+          variant="outlined"
+          style={{marginTop: 2, minWidth: 'auto'}}
+          disabled={this.state.syncing}
+        >
+          <SyncIcon />
         </Button>
         <Box display="flex" flexDirection="row" flexGrow={1} />
         <TextField
@@ -390,8 +431,18 @@ class KeysView extends React.Component<Props, State> {
           close={() => this.setState({openKey: '', selected: ''})}
           kid={this.state.openKey}
           source="keys"
-          refresh={this.refresh}
+          reload={this.reload}
         />
+        <Snackbar
+          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+          open={!!this.state.snack}
+          autoHideDuration={4000}
+          onClose={() => this.setState({snack: ''})}
+        >
+          <Alert severity={(this.state.snackSeverity || 'success') as AlertColor}>
+            <Typography>{this.state.snack}</Typography>
+          </Alert>
+        </Snackbar>
       </Box>
     )
   }

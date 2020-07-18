@@ -52,6 +52,9 @@ const theme = createMuiTheme({
       sizeLarge: {
         fontSize: 16,
       },
+      startIcon: {
+        marginRight: 4,
+      },
       outlinedPrimary: {
         'not($disabled)': {
           backgroundColor: fade('#2196f3', 0.05),

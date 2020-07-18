@@ -71,7 +71,6 @@ export default class VaultView extends React.Component<Props, State> {
 
   status = () => {
     const req: VaultStatusRequest = {}
-    this.setState({status: null})
     vaultStatus(req, (err: RPCError, resp: VaultStatusResponse) => {
       if (err) {
         store.dispatch({type: 'ERROR', payload: {error: err}})
@@ -120,136 +119,161 @@ export default class VaultView extends React.Component<Props, State> {
     })
   }
 
-  render() {
-    const syncEnabled = !!this.state?.status?.kid
-    console.log('Sync enabled:', syncEnabled)
+  renderEnable() {
+    return (
+      <Box>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
+          Vault Backup &amp; Sync
+        </Typography>
+        <Typography style={{paddingBottom: 6}}>
+          Enabling sync backs up your vault to the server and allows you to sync with other devices.
+          <br /> Vault items are encrypted when stored on the keys.pub server.
+          <br /> For more details visit{' '}
+          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
+            keys.pub/docs/vault
+          </Link>
+          .
+        </Typography>
+        <Button
+          color="primary"
+          variant="outlined"
+          onClick={this.sync}
+          disabled={this.state.loading}
+          size="small"
+        >
+          Enable Backup &amp; Sync
+        </Button>
+      </Box>
+    )
+  }
 
+  renderInfo() {
+    return (
+      <Box>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
+          Vault Backup &amp; Sync
+        </Typography>
+        <Typography>
+          <span style={{display: 'inline-block', width: 100}}>Vault Key ID:</span>
+          <span style={{...styles.mono}}>{this.state?.status?.kid}</span>
+        </Typography>
+        <Typography style={{paddingBottom: 6}}>
+          <span style={{display: 'inline-block', width: 100}}>Last Sync: </span>
+          {dateString(this.state?.status?.syncedAt)}
+        </Typography>
+
+        <Button
+          color="primary"
+          variant="outlined"
+          onClick={this.sync}
+          disabled={this.state.loading}
+          size="small"
+        >
+          Sync Now
+        </Button>
+      </Box>
+    )
+  }
+
+  renderDelete() {
+    return (
+      <Box>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
+          Delete from the Server
+        </Typography>
+        <Typography style={{paddingBottom: 10}}>
+          Removing the backup and sync will delete the encrypted vault from the server.
+          <br />
+          Other devices that sync with this vault will stop syncing.
+          <br />
+          For more details visit{' '}
+          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
+            keys.pub/docs/vault
+          </Link>
+          .
+        </Typography>
+        <Button
+          color="secondary"
+          variant="outlined"
+          onClick={this.openDisable}
+          disabled={this.state.loading}
+          size="small"
+        >
+          Remove Backup and Disable Sync
+        </Button>
+      </Box>
+    )
+  }
+
+  renderAuth() {
+    return (
+      <Box>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
+          Connect another Device
+        </Typography>
+        {this.state.phrase && (
+          <Box flex={1} flexDirection="column">
+            <Typography style={{paddingBottom: 10, maxWidth: 500}}>
+              This is a vault auth phrase that allows another device to sync with this vault.
+              <br />
+              This will expire in 5 minutes.
+            </Typography>
+            <Typography style={{...styles.mono, paddingBottom: 5, width: 500}}>
+              {this.state.phrase}
+            </Typography>
+            <Link onClick={this.vaultAuthClear}>Clear</Link>
+          </Box>
+        )}
+        {!this.state.phrase && (
+          <Box flex={1} flexDirection="column">
+            <Typography style={{paddingBottom: 10, maxWidth: 500}}>
+              Creating an vault auth phrase allows another device to sync to this vault. <br />A generated
+              auth phrase expires after 5 minutes and can only be used once.
+              <br /> For more details visit{' '}
+              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
+                keys.pub/docs/vault
+              </Link>
+              .
+            </Typography>
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={this.vaultAuth}
+              disabled={this.state.loading}
+              size="small"
+            >
+              Generate Vault Auth Phrase
+            </Button>
+          </Box>
+        )}
+        {this.state.phraseError && (
+          <Typography style={{color: 'red', paddingBottom: 10}}>{this.state.phraseError}</Typography>
+        )}
+      </Box>
+    )
+  }
+
+  render() {
+    if (!this.state?.status) return null
+
+    const syncEnabled = !!this.state?.status?.kid
     return (
       <Box display="flex" flex={1} flexDirection="column">
         <Divider />
         {!this.state.loading && <Box style={{marginBottom: 4}} />}
         {this.state.loading && <LinearProgress />}
 
-        <Box display="flex" flexDirection="column" paddingLeft={3} style={{marginTop: 6}}>
-          <Typography variant="h6" style={{paddingBottom: 6}}>
-            Vault Backup &amp; Sync
-          </Typography>
-
-          {!syncEnabled && (
-            <Box>
-              <Typography style={{paddingBottom: 10}}>
-                Enabling sync backs up your vault to the server and allows you to sync with other devices.
-                <br /> Vault items are encrypted when stored on the keys.pub server.
-                <br /> For more details visit{' '}
-                <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-                  keys.pub/docs/vault
-                </Link>
-                .
-              </Typography>
-              <Button
-                color="primary"
-                variant="outlined"
-                onClick={this.sync}
-                disabled={this.state.loading}
-                size="small"
-              >
-                Enable Backup &amp; Sync
-              </Button>
-            </Box>
-          )}
-          {syncEnabled && (
-            <Box>
-              <Box style={{paddingBottom: 10}}>
-                <Typography>
-                  <span style={{display: 'inline-block', width: 100}}>Vault Key ID:</span>
-                  <span style={{...styles.mono}}>{this.state?.status?.kid}</span>
-                </Typography>
-                <Typography paragraph>
-                  <span style={{display: 'inline-block', width: 100}}>Last Sync: </span>
-                  {dateString(this.state?.status?.syncedAt)}
-                </Typography>
-
-                <Typography style={{marginBottom: 6}}>
-                  Syncing will happen automatically, or you can sync manually.
-                </Typography>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={this.sync}
-                  disabled={this.state.loading}
-                  size="small"
-                >
-                  Sync Now
-                </Button>
-              </Box>
-
-              <Typography style={{paddingBottom: 10}}>
-                Removing the backup and sync will delete the vault from the server.
-                <br />
-                Other devices that sync with this vault will also stop syncing.
-                <br />
-                For more details visit{' '}
-                <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-                  keys.pub/docs/vault
-                </Link>
-                .
-              </Typography>
-              <Button
-                color="secondary"
-                variant="outlined"
-                onClick={this.openDisable}
-                disabled={this.state.loading}
-                size="small"
-                style={{marginBottom: 10}}
-              >
-                Remove Backup and Disable Sync
-              </Button>
-            </Box>
-          )}
-        </Box>
-
+        {!syncEnabled && (
+          <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderEnable()}</Box>
+        )}
         {syncEnabled && (
           <Box>
-            <Box display="flex" flexDirection="column" paddingTop={1} paddingLeft={3} paddingBottom={2}>
-              <Typography variant="h6" style={{paddingBottom: 6}}>
-                Auth
-              </Typography>
-              {this.state.phrase && (
-                <Box flex={1} flexDirection="column">
-                  <Typography style={{paddingBottom: 10, maxWidth: 500}}>
-                    This is a vault auth phrase that allows another device to sync with this vault.
-                    <br />
-                    This will expire in 5 minutes.
-                  </Typography>
-                  <Typography style={{...styles.mono, paddingBottom: 5, width: 500}}>
-                    {this.state.phrase}
-                  </Typography>
-                  <Link onClick={this.vaultAuthClear}>Clear</Link>
-                </Box>
-              )}
-              {!this.state.phrase && (
-                <Box flex={1} flexDirection="column">
-                  <Typography style={{paddingBottom: 10, maxWidth: 500}}>
-                    A vault auth phrase allows another device to sync to this vault. <br />A generated auth
-                    phrase expires after 5 minutes and can only be used once.
-                  </Typography>
-                  <Button
-                    color="primary"
-                    variant="outlined"
-                    onClick={this.vaultAuth}
-                    disabled={this.state.loading}
-                    size="small"
-                  >
-                    Generate Vault Auth Phrase
-                  </Button>
-                </Box>
-              )}
-              {this.state.phraseError && (
-                <Typography style={{color: 'red', paddingBottom: 20}}>{this.state.phraseError}</Typography>
-              )}
-            </Box>
+            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderInfo()}</Box>
+            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderAuth()}</Box>
+            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderDelete()}</Box>
           </Box>
         )}
+
         <DisableDialog open={this.state.openDisable} close={(snack) => this.closeDisable(snack)} />
         <Snackbar
           anchorOrigin={{vertical: 'top', horizontal: 'right'}}

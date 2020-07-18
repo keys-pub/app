@@ -8,6 +8,9 @@ import createRootReducer from '../reducers'
 import {ipcRenderer} from 'electron'
 import {push} from 'connected-react-router'
 
+import {runtimeStatus} from '../rpc/keys'
+import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
+
 const history = createHashHistory()
 const rootReducer = createRootReducer(history)
 
@@ -59,6 +62,7 @@ ipcRenderer.on('unavailable', (event, message) => {
 
 ipcRenderer.on('focus', (event, message) => {
   // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
+  focused()
 })
 
 ipcRenderer.on('blur', (event, message) => {
@@ -82,5 +86,17 @@ ipcRenderer.on('responsive', (event, message) => {
     },
   })
 })
+
+const focused = () => {
+  // TODO: Refresh currently selected screen
+
+  const req: RuntimeStatusRequest = {}
+  runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+    if (err) {
+      console.log('Status err:', err)
+      return
+    }
+  })
+}
 
 export {history, store}

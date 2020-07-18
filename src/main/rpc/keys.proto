@@ -94,10 +94,11 @@ service Keys {
   rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
   rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse) {}
   
-  rpc VaultSync(VaultSyncRequest) returns (VaultSyncResponse) {}
   rpc VaultAuth(VaultAuthRequest) returns (VaultAuthResponse) {}
+  rpc VaultSync(VaultSyncRequest) returns (VaultSyncResponse) {}  
   rpc VaultUnsync(VaultUnsyncRequest) returns (VaultUnsyncResponse) {}
-  rpc VaultStatus(VaultStatusRequest) returns (VaultStatusResponse) {}
+  rpc VaultStatus(VaultStatusRequest) returns (VaultStatusResponse) {}  
+  rpc VaultUpdate(VaultUpdateRequest) returns (VaultUpdateResponse) {}  
 
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
@@ -643,7 +644,7 @@ enum SortDirection {
 
 message KeysRequest {
   string query = 1;
-  repeated KeyType types = 2;
+  repeated KeyType types = 2;  
   
   string sortField = 10;
   SortDirection sortDirection = 11;  
@@ -704,6 +705,7 @@ message SecretRemoveResponse {}
 
 message SecretsRequest {
   string query = 1;
+  bool sync = 3;
 
   string sortField = 10;
   SortDirection sortDirection = 11;  
@@ -890,6 +892,9 @@ message VaultStatusResponse {
   string kid = 1 [(gogoproto.customname) = "KID"];
   int64 syncedAt = 2;
 }
+
+message VaultUpdateRequest {}
+message VaultUpdateResponse {}
 
 message WormholeInput {  
   string sender = 1;
