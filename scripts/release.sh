@@ -20,7 +20,7 @@ yarn install
 yarn_ver=`yarn run -s version`
 
 if [ ! "$ver" = "$yarn_ver" ]; then
-    echo "Version doesn't match package version"
+    echo "Version doesn't match package version $ver != $yarn_ver"
     exit 1
 fi
 
