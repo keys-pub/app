@@ -166,7 +166,7 @@
     "google-protobuf": "^3.5.0",
     "history": "^4.7.2",
     "immutable": "^4.0.0-rc.9",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.19",
     "match-sorter": "^4.0.2",
     "node-emoji": "^1.10.0",
     "query-string": "^6.8.3",
