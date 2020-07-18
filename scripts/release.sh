@@ -5,19 +5,29 @@ set -e -u -o pipefail # Fail on error
 dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $dir/..
 
-# TODO: git pull & check dirty?
+ver=$1
 
-yarn install
+if [ "$ver" = "" ]; then
+    echo "Specify version"
+    exit 1
+fi
 
 if [[ -d release ]]; then
     rm -rf release
+fi
+
+yarn install
+yarn_ver=`yarn run -s version`
+
+if [ ! "$ver" = "$yarn_ver" ]; then
+    echo "Version doesn't match package version"
+    exit 1
 fi
 
 # Install release tool
 ./scripts/release-tool.sh
 release_bin="$HOME/go/bin/release"
 
-ver=`yarn run -s version`
 $release_bin download-extra -version $ver -out bin
 
 yarn dist
