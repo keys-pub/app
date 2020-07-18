@@ -5,10 +5,10 @@ set -e -u -o pipefail # Fail on error
 dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $dir/..
 
-ver=$1
+tag=$1
 
-if [ "$ver" = "" ]; then
-    echo "Specify version"
+if [ "$tag" = "" ]; then
+    echo "Specify version (tag)"
     exit 1
 fi
 
@@ -17,10 +17,10 @@ if [[ -d release ]]; then
 fi
 
 yarn install
-yarn_ver=`yarn run -s version`
+ver=`yarn run -s version`
 
-if [ ! "$ver" = "$yarn_ver" ]; then
-    echo "Version doesn't match package version $ver != $yarn_ver"
+if [ ! "$tag" = "v$ver" ]; then
+    echo "Version doesn't match package version $tag != v$ver"
     exit 1
 fi
 
