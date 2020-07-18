@@ -20,7 +20,7 @@ jobs:
         env:
           APPLEID: ${{ secrets.APPLEID }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sh ./scripts/release.sh
   release-linux:
@@ -32,6 +32,6 @@ jobs:
         uses: actions/setup-go@v2
       - name: Build
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           bash ./scripts/release.sh
