@@ -88,7 +88,7 @@ export default class SettingsView extends React.Component<Props, State> {
                       style={{paddingTop: 0, paddingBottom: 0}}
                     />
                   }
-                  label="Use preleases"
+                  label="Use prereleases"
                 />
               </TableCell>
             </TableRow>
