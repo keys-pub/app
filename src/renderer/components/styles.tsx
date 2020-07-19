@@ -1,6 +1,6 @@
 import purple from '@material-ui/core/colors/purple'
 
-import {CSSProperties} from '@material-ui/styles'
+import {CSSProperties} from 'react'
 
 import {fade} from '@material-ui/core/styles/colorManipulator'
 

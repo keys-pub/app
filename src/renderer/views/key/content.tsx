@@ -1,10 +1,10 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
 import {Skeleton} from '@material-ui/lab'
 
-import {CSSProperties} from '@material-ui/styles'
 import {shell} from 'electron'
 
 import {Key, KeyType, User} from '../../rpc/keys.d'

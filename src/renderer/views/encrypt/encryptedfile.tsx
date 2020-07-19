@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {Button, Divider, Input, Box, Snackbar, SnackbarContent, Typography} from '@material-ui/core'
 
@@ -8,7 +9,6 @@ import {shell} from 'electron'
 import {dirname} from 'path'
 
 import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
-import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   fileOut: string

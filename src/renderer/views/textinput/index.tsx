@@ -1,9 +1,9 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {styles} from '../../components'
 
 import {Box, Button, CircularProgress, Divider, Input} from '@material-ui/core'
-import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   defaultValue: string

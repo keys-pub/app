@@ -1,12 +1,11 @@
 import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
-import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   onClick: () => any
   children: any
-  style?: CSSProperties
+  style?: React.CSSProperties
   inline?: boolean
   span?: boolean
   color?: string
@@ -22,7 +21,7 @@ const Link = (props: Props) => {
   const on = () => setHover(true)
   const off = () => setHover(false)
 
-  const style: CSSProperties = {...defaultStyles, ...(props.style || {})}
+  const style: React.CSSProperties = {...defaultStyles, ...(props.style || {})}
   if (hover) {
     style.textDecoration = hover ? 'underline' : 'none'
   }

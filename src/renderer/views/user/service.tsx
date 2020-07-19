@@ -1,8 +1,7 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {FormControl, MenuItem, Select, Typography} from '@material-ui/core'
-
-import {CSSProperties} from '@material-ui/styles'
 
 type Props = {
   service: string

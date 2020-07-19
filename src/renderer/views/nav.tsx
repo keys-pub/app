@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {
   Box,
@@ -37,7 +38,6 @@ import {push} from 'connected-react-router'
 import {connect} from 'react-redux'
 
 import {routesMap} from './routes'
-import {CSSProperties} from '@material-ui/styles'
 
 import {runtimeStatus} from '../rpc/keys'
 import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'

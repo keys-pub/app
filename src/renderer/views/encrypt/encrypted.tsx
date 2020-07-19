@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {connect} from 'react-redux'
 
@@ -23,7 +24,6 @@ import {clipboard} from 'electron'
 
 import {encrypt} from '../../rpc/keys'
 import {RPCError, Key, EncryptRequest, EncryptResponse} from '../../rpc/keys.d'
-import {CSSProperties} from '@material-ui/styles'
 
 export type Props = {
   value: string
