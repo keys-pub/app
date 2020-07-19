@@ -50,7 +50,7 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
         version = process.env.VERSION
       }
     }
-    console.log('Version:', version)
+    console.log('Update, app version:', version)
     let updaterPath = binPath('updater')
     if (process.env.UPDATER_BIN) {
       updaterPath = process.env.UPDATER_BIN

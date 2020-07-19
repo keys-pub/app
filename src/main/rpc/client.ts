@@ -18,7 +18,7 @@ const creds = (): any => {
   const certPath = path.join(appSupportPath(), 'ca.pem')
   console.log('Loading cert', certPath)
   const cert = fs.readFileSync(certPath, 'ascii')
-  console.log('Using cert:', cert)
+  // console.log('Using cert:', cert)
   const callCreds = grpc.credentials.createFromMetadataGenerator(auth)
   const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
   const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)
@@ -93,7 +93,7 @@ export const fido2 = () => {
   return fido2Client
 }
 
-export const client = (service: string) => {
+export const client = (service: string): any => {
   switch (service) {
     case 'Keys':
       return keys()

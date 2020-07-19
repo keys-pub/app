@@ -9,7 +9,7 @@ export const appResourcesPath = (): string => {
   if (path.extname(resourcesPath) === '.asar') {
     resourcesPath = path.dirname(resourcesPath)
   }
-  console.log('Resources path:', resourcesPath)
+  // console.log('Resources path:', resourcesPath)
   return resourcesPath
 }
 
@@ -64,8 +64,8 @@ export const appPath = (): string => {
 // Path to an executable
 export const binPath = (name: string): string => {
   const resourcesPath = appResourcesPath()
-  if (os.platform() == "win32") {
-    name = name + ".exe"
+  if (os.platform() == 'win32') {
+    name = name + '.exe'
   }
   return path.join(resourcesPath, 'bin', name)
 }

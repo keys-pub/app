@@ -168,6 +168,14 @@ ipcMain.on('reload-app', (event, arg) => {
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
+      console.log('keysd started')
+
+      rpcRegister(
+        (): BrowserWindow => {
+          return mainWindow
+        }
+      )
+
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {
@@ -212,9 +220,3 @@ ipcMain.on('update-force', (event, arg) => {
       event.sender.send('update-apply-err', err)
     })
 })
-
-rpcRegister(
-  (): BrowserWindow => {
-    return mainWindow
-  }
-)

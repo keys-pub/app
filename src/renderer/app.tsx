@@ -47,9 +47,10 @@ ipcRenderer.on('keys-started', (event, err) => {
     alert('Oops, exec error: ' + err.toString())
     remote.app.exit(2)
   }
+
   init()
+
+  // Update check
+  updateCheck()
 })
 ipcRenderer.send('keys-start')
-
-// Update check
-updateCheck()
