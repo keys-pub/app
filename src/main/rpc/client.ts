@@ -18,6 +18,7 @@ const creds = (): any => {
   const certPath = path.join(appSupportPath(), 'ca.pem')
   console.log('Loading cert', certPath)
   const cert = fs.readFileSync(certPath, 'ascii')
+  console.log('Using cert:', cert)
   const callCreds = grpc.credentials.createFromMetadataGenerator(auth)
   const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
   const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)
