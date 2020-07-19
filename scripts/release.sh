@@ -38,6 +38,6 @@ yarn dist
 $release_bin fix-build -version $ver -in release -out release
 $release_bin latest-yaml -version $ver -in release -out release
 $release_bin publish -version $ver -in release
-$release_bin cask -version $ver
+# $release_bin cask -version $ver
 
 echo "Release finished, see https://github.com/keys-pub/app/releases"
