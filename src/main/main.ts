@@ -159,16 +159,18 @@ app.on('ready', async () => {
   menuBuilder.buildMenu()
 })
 
+ipcMain.removeAllListeners('reload-app')
 ipcMain.on('reload-app', (event, arg) => {
   reloadApp(mainWindow)
 })
 
 // TODO: stop keysd on app exit?
 
+ipcMain.removeAllListeners('keys-start')
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
-      console.log('keysd started')
+      console.log('Start...')
 
       rpcRegister(
         (): BrowserWindow => {
@@ -183,6 +185,7 @@ ipcMain.on('keys-start', (event, arg) => {
     })
 })
 
+ipcMain.removeAllListeners('update-check')
 ipcMain.on('update-check', (event, arg) => {
   update('', false)
     .then((res: UpdateResult) => {
@@ -193,6 +196,7 @@ ipcMain.on('update-check', (event, arg) => {
     })
 })
 
+ipcMain.removeAllListeners('update-apply')
 ipcMain.on('update-apply', (event, arg) => {
   update('', true)
     .then((res: UpdateResult) => {
@@ -207,6 +211,7 @@ ipcMain.on('update-apply', (event, arg) => {
     })
 })
 
+ipcMain.removeAllListeners('update-force')
 ipcMain.on('update-force', (event, arg) => {
   update('0.0.1', true)
     .then((res: UpdateResult) => {

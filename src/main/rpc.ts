@@ -67,6 +67,7 @@ export const reportErr = (currentWindow: () => BrowserWindow, err: RPCError) => 
 }
 
 export const rpcRegister = (currentWindow: () => BrowserWindow) => {
+  ipcMain.removeAllListeners('rpc')
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
     const cl = await client(arg.service)
@@ -81,10 +82,12 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
     event.reply(f.reply, out)
   })
 
+  ipcMain.removeAllListeners('authToken')
   ipcMain.on('authToken', (event, arg) => {
     setAuthToken(arg.authToken)
   })
 
+  ipcMain.removeAllListeners('rpc-stream')
   ipcMain.on('rpc-stream', async (event, arg) => {
     const f = arg as RPC
     const cl = await client(arg.service)
