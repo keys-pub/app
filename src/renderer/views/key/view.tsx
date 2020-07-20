@@ -5,25 +5,8 @@ import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@m
 import KeyContentView from './content'
 import UserSignDialog from '../user/dialog'
 import UserRevokeDialog from '../user/revoke'
-import KeyRemoveDialog from './remove'
-import KeyExportDialog from '../export'
 
-import {goBack, push} from 'connected-react-router'
-
-import {store} from '../../store'
-
-import {key, keyRemove, pull} from '../../rpc/keys'
-import {
-  RPCError,
-  Key,
-  KeyRequest,
-  KeyResponse,
-  KeyRemoveRequest,
-  KeyRemoveResponse,
-  PullRequest,
-  PullResponse,
-  KeyType,
-} from '../../rpc/keys.d'
+import {Key} from '../../rpc/keys.d'
 
 type Props = {
   value: Key

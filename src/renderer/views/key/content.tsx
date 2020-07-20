@@ -58,7 +58,12 @@ const UserRow = (props: Props) => {
               )}
             </Box>
             {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
-            <Link onClick={() => shell.openExternal(user.url)}>{user.url}</Link>
+            <Link
+              onClick={() => shell.openExternal(user.url)}
+              style={{maxWidth: 480, textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+            >
+              {user.url}
+            </Link>
           </Box>
         </TableCell>
       </TableRow>

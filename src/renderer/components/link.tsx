@@ -9,13 +9,13 @@ export type Props = {
   inline?: boolean
   span?: boolean
   color?: string
+  wordBreak?: boolean
+  ellipsis?: boolean
 }
 
 const defaultStyles = {
   textDecoration: 'none',
   cursor: 'pointer',
-  wordWrap: 'break-word',
-  wordBreak: 'break-all',
 }
 
 const Link = (props: Props) => {
@@ -23,7 +23,7 @@ const Link = (props: Props) => {
   const on = () => setHover(true)
   const off = () => setHover(false)
 
-  const style: React.CSSProperties = {...defaultStyles, ...(props.style || {})}
+  const style = {...defaultStyles, ...(props.style || {})}
   if (hover) {
     style.textDecoration = hover ? 'underline' : 'none'
   }
@@ -34,6 +34,15 @@ const Link = (props: Props) => {
     style.color = '#f50057'
   } else {
     style.color = '#2196f3'
+  }
+  if (props.wordBreak) {
+    style.wordBreak = 'break-all'
+    style.wordWrap = 'break-word'
+  }
+  if (props.ellipsis) {
+    style.textOverflow = 'ellipsis'
+    style.whiteSpace = 'nowrap'
+    style.overflow = 'hidden'
   }
   if (props.span) {
     return (

@@ -110,7 +110,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
     let keyDesc = ''
     switch (this.state.type) {
       case KeyType.EDX25519:
-        keyDesc = `An EdX25519 key is the default key capable of signing (Ed25519) and encryption (X25519). This is the recommended key.`
+        keyDesc = `An EdX25519 key is the default key capable of signing (Ed25519) and encryption (X25519).`
         break
       case KeyType.X25519:
         keyDesc = 'An X25519 key only provides public key authenticated encryption.'
@@ -143,8 +143,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
               </Select>
             </FormControl>
             <Box marginBottom={2} />
-            <Typography style={{display: 'inline'}}>{keyDesc}</Typography>
-            <Typography style={{display: 'inline'}}>&nbsp;For more details, see </Typography>
+            <Typography style={{display: 'inline'}}>{keyDesc} For more details, see </Typography>
             <Link inline onClick={() => shell.openExternal('https://keys.pub/docs/specs/keys.html')}>
               keys.pub/docs/specs/keys
             </Link>
