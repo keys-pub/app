@@ -61,8 +61,8 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   close = () => {
-    this.reset()
     this.props.close()
+    setTimeout(this.reset, 0)
   }
 
   closeUser = (added: boolean) => {

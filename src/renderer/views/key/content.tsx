@@ -68,7 +68,7 @@ const UserRow = (props: Props) => {
   if (signable && !user) {
     return (
       <TableRow>
-        <TableCell style={{...cstyles.cell, verticalAlign: 'center'}}>
+        <TableCell style={{...cstyles.cell, paddingTop: 6}}>
           <Typography align="right">User</Typography>
         </TableCell>
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>

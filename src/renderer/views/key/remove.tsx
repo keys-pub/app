@@ -62,10 +62,12 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   renderPrivateKey() {
     return (
       <Box>
-        <Typography style={{paddingBottom: 20}}>
+        <Typography style={{paddingBottom: 10}}>
           Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
         </Typography>
-        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.value?.id}</Typography>
+        <Typography style={{...styles.mono, paddingBottom: 10, fontWeight: 600}}>
+          {this.props.value?.id}
+        </Typography>
         <Typography>
           <span style={{fontWeight: 600}}>
             If you haven't backed up the key, you won't be able to recover it.
@@ -78,8 +80,8 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   renderPublicKey() {
     return (
       <Box>
-        <Typography style={{paddingBottom: 20}}>Do you want to delete this public key?</Typography>
-        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.value?.id}</Typography>
+        <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
+        <Typography style={{...styles.mono}}>{this.props.value?.id}</Typography>
       </Box>
     )
   }
