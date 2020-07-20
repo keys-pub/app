@@ -47,8 +47,8 @@ export default class KeyImportDialog extends React.Component<Props, State> {
 
   close = () => {
     const added = this.state.imported != ''
-    this.reset()
     this.props.close(added)
+    setTimeout(this.reset, 0)
   }
 
   importKey = async () => {
@@ -80,8 +80,8 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   renderImport() {
     return (
       <Box display="flex" flexDirection="column">
-        <Typography style={{paddingBottom: 20}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
-        <FormControl error={this.state.error !== ''} style={{marginBottom: 20}}>
+        <Typography style={{paddingBottom: 16}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
+        <FormControl error={this.state.error !== ''} style={{marginBottom: 10}}>
           <TextField
             multiline
             autoFocus
@@ -91,12 +91,13 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             placeholder={''}
             onChange={this.onInputChange}
             value={this.state.in}
-            InputProps={{
+            inputProps={{
+              spellCheck: false,
               style: {...styles.mono, fontSize: 12},
             }}
           />
         </FormControl>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={this.state.error !== ''} style={{marginBottom: -10}}>
           <TextField
             label="Password"
             variant="outlined"
@@ -104,7 +105,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             onChange={this.onPasswordInputChange}
             value={this.state.password}
           />
-          <FormHelperText id="component-error-text">{this.state.error}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )
