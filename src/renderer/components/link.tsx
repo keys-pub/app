@@ -14,6 +14,8 @@ export type Props = {
 const defaultStyles = {
   textDecoration: 'none',
   cursor: 'pointer',
+  wordWrap: 'break-word',
+  wordBreak: 'break-all',
 }
 
 const Link = (props: Props) => {
