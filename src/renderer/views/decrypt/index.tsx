@@ -129,6 +129,7 @@ class DecryptView extends React.Component<Props, State> {
                 value={this.state.value}
                 disableUnderline
                 inputProps={{
+                  spellCheck: 'false',
                   ref: this.inputRef,
                   style: {
                     ...styles.mono,
