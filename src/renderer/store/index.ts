@@ -88,8 +88,6 @@ ipcRenderer.on('responsive', (event, message) => {
 })
 
 const focused = () => {
-  // TODO: Refresh currently selected screen
-
   const req: RuntimeStatusRequest = {}
   runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
     if (err) {

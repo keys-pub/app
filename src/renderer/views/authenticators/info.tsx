@@ -33,12 +33,12 @@ type Props = {
 }
 
 type State = {
+  clientPin: string
   info: DeviceInfo
   loading: boolean
   error: string
   openReset: boolean
   openSetPin: boolean
-  clientPin: string
   openSnack: string
 }
 

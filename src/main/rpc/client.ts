@@ -6,8 +6,6 @@ import * as protoLoader from '@ln-zap/proto-loader'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as os from 'os'
-import {app} from 'electron'
 import {appResourcesPath, appSupportPath} from '../paths'
 
 let keysClient: any = null
