@@ -45,7 +45,7 @@ export default class DisableDialog extends React.Component<Props, State> {
     this.props.close(snack)
   }
 
-  disable = () => {
+  vaultDelete = () => {
     this.setState({loading: true, error: ''})
     const req: VaultUnsyncRequest = {}
     vaultUnsync(req, (err: RPCError, resp: VaultUnsyncResponse) => {
@@ -54,7 +54,7 @@ export default class DisableDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.close('Vault backup removed')
+      this.close('')
     })
   }
 
@@ -69,17 +69,17 @@ export default class DisableDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Remove Backup &amp; Disable Sync</DialogTitle>
+        <DialogTitle loading={this.state.loading}>Delete from Server</DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography style={{fontWeight: 600}}>
               Are you sure you want to remove the vault backup from the server and disable syncing?
             </Typography>
             <Typography>
-              Disabling sync will permanently delete the vault from the server. Other devices that sync with
-              this vault will also stop. For more details visit{' '}
-              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-                keys.pub/docs/vault
+              This will permanently delete the vault from the server. Other devices that sync with this vault
+              will also stop. For more details, see{' '}
+              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
+                keys.pub/docs/specs/vault
               </Link>
               .
             </Typography>
@@ -91,8 +91,8 @@ export default class DisableDialog extends React.Component<Props, State> {
             Cancel
           </Button>
           <Box flexGrow={1} />
-          <Button color="secondary" onClick={this.disable} disabled={this.state.loading}>
-            Disable
+          <Button color="secondary" onClick={this.vaultDelete} disabled={this.state.loading}>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

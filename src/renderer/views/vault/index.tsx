@@ -123,14 +123,14 @@ export default class VaultView extends React.Component<Props, State> {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
-          Vault Backup &amp; Sync
+          Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 6}}>
-          Enabling sync backs up your vault to the server and allows you to sync with other devices.
+          Enabling sync saves your vault to the server and allows you to sync with other devices.
           <br /> Vault items are encrypted when stored on the keys.pub server.
-          <br /> For more details visit{' '}
-          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-            keys.pub/docs/vault
+          <br /> For more details, see{' '}
+          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
+            keys.pub/docs/specs/vault
           </Link>
           .
         </Typography>
@@ -141,7 +141,7 @@ export default class VaultView extends React.Component<Props, State> {
           disabled={this.state.loading}
           size="small"
         >
-          Enable Backup &amp; Sync
+          Enable Sync
         </Button>
       </Box>
     )
@@ -151,10 +151,10 @@ export default class VaultView extends React.Component<Props, State> {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
-          Vault Backup &amp; Sync
+          Vault Sync
         </Typography>
         <Typography>
-          <span style={{display: 'inline-block', width: 100}}>Vault Key ID:</span>
+          <span style={{display: 'inline-block', width: 100}}>Vault API Key:</span>
           <span style={{...styles.mono}}>{this.state?.status?.kid}</span>
         </Typography>
         <Typography style={{paddingBottom: 6}}>
@@ -182,13 +182,11 @@ export default class VaultView extends React.Component<Props, State> {
           Delete from the Server
         </Typography>
         <Typography style={{paddingBottom: 10}}>
-          Removing the backup and sync will delete the encrypted vault from the server.
-          <br />
           Other devices that sync with this vault will stop syncing.
           <br />
-          For more details visit{' '}
-          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-            keys.pub/docs/vault
+          For more details, see{' '}
+          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
+            keys.pub/docs/specs/vault
           </Link>
           .
         </Typography>
@@ -199,7 +197,7 @@ export default class VaultView extends React.Component<Props, State> {
           disabled={this.state.loading}
           size="small"
         >
-          Remove Backup and Disable Sync
+          Delete Vault from Server
         </Button>
       </Box>
     )
@@ -229,9 +227,9 @@ export default class VaultView extends React.Component<Props, State> {
             <Typography style={{paddingBottom: 10, maxWidth: 500}}>
               Creating an vault auth phrase allows another device to sync to this vault. <br />A generated
               auth phrase expires after 5 minutes and can only be used once.
-              <br /> For more details visit{' '}
-              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/vault')}>
-                keys.pub/docs/vault
+              <br /> For more details, see{' '}
+              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
+                keys.pub/docs/specs/vault
               </Link>
               .
             </Typography>

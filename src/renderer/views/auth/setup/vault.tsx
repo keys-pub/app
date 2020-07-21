@@ -59,7 +59,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
         <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
           Enter in a vault auth phrase to connect to your vault.
           <br />
-          You can generate an auth phrase from any of your devices (in Vault settings).
+          You can generate an auth phrase from any of your other devices (in Vault settings).
         </Typography>
         <Box marginBottom={1}>{this.renderServerSelect()}</Box>
         <FormControl error={this.state.error !== ''}>
