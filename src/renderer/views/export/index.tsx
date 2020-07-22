@@ -43,21 +43,23 @@ export default class KeyExportDialog extends React.Component<Props, State> {
   export = async () => {
     const password = this.state.password
     const confirm = this.state.passwordConfirm
-    if (password !== confirm) {
+    if (password != confirm) {
       this.setState({
         error: "Passwords don't match",
       })
       return
     }
-    if (password === '') {
-      this.setState({
-        error: 'Oops, password is empty',
-      })
-      return
+    let noPassword = false
+    if (!password) {
+      noPassword = true
     }
 
     this.setState({error: ''})
-    const req: KeyExportRequest = {kid: this.props.kid, password: this.state.password}
+    const req: KeyExportRequest = {
+      kid: this.props.kid,
+      password: this.state.password,
+      noPassword: noPassword,
+    }
     keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
       if (err) {
         this.setState({error: err.details})
