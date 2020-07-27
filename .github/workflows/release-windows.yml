@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - v0*
-name: Release
+name: Release (windows)
 jobs:
   release-windows:
     runs-on: windows-latest
