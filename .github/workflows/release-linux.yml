@@ -7,12 +7,12 @@ jobs:
   release-linux:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v2
-    - name: Install Go
+      - name: Install Go
         uses: actions/setup-go@v2
-    - name: Build
+      - name: Build
         env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-        bash ./scripts/release.sh ${GITHUB_REF##*/}
+          bash ./scripts/release.sh ${GITHUB_REF##*/}
