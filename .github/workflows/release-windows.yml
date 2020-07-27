@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - v0*
+name: Release (windows)
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+      - name: Build
+        env:
+          WIN_CERT_PFX: ${{ secrets.WIN_CERT_PFX }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $env:WIN_CERT_PFX > "$HOME/cert.b64"
+          certutil -decode "$HOME/cert.b64" "$HOME/cert.pfx"
+          $env:CSC_LINK="$HOME/cert.pfx"
+          $env:CSC_LINK
+          $branch = (git branch --show-current)
+          sh ./scripts/release.sh $branch
