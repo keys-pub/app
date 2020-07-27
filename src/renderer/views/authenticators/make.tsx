@@ -133,7 +133,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
   renderCredential() {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
-        <Typography style={labelStyle}>ClientDataHash</Typography>}
+        <Typography style={labelStyle}>ClientDataHash</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'clientDataHash')}
           value={this.state.credential.clientDataHash}
