@@ -36,7 +36,6 @@ service Keys {
   rpc Verify(VerifyRequest) returns (VerifyResponse) {}
   rpc VerifyFile(stream VerifyFileInput) returns (stream VerifyFileOutput) {}
   rpc VerifyStream(stream VerifyInput) returns (stream VerifyOutput) {}  
-  rpc VerifyArmoredStream(stream VerifyInput) returns (stream VerifyOutput) {}  
   rpc VerifyDetached(VerifyDetachedRequest) returns (VerifyDetachedResponse) {}
   rpc VerifyDetachedFile(stream VerifyDetachedFileInput) returns (VerifyDetachedResponse) {}
   rpc VerifyDetachedStream(stream VerifyDetachedInput) returns (VerifyDetachedResponse) {}  
@@ -45,12 +44,9 @@ service Keys {
   rpc EncryptStream(stream EncryptInput) returns (stream EncryptOutput) {}  
   rpc EncryptFile(stream EncryptFileInput) returns (stream EncryptFileOutput) {}
   
-  rpc Decrypt(DecryptRequest) returns (DecryptResponse) {}
-  rpc DecryptFile(stream DecryptFileInput) returns (stream DecryptFileOutput) {}
+  rpc Decrypt(DecryptRequest) returns (DecryptResponse) {}  
   rpc DecryptStream(stream DecryptInput) returns (stream DecryptOutput) {}
-  rpc DecryptArmoredStream(stream DecryptInput) returns (stream DecryptOutput) {}  
-  rpc SigncryptOpenStream(stream DecryptInput) returns (stream DecryptOutput) {}
-  rpc SigncryptOpenArmoredStream(stream DecryptInput) returns (stream DecryptOutput) {}  
+  rpc DecryptFile(stream DecryptFileInput) returns (stream DecryptFileOutput) {}
 
   rpc Sigchain(SigchainRequest) returns (SigchainResponse) {}
   rpc Statement(StatementRequest) returns (StatementResponse) {}
@@ -156,11 +152,6 @@ message SignFileOutput {
 message VerifyRequest {
   // Data is verified output.
   bytes data = 1;
-  
-  // Armored, if true, output will be armored.
-  bool armored = 10;
-  // Detached signature.
-  bool detached = 11;
 }
 message VerifyResponse {
   // Data (if out is not specified in request).
@@ -171,10 +162,7 @@ message VerifyResponse {
 message VerifyDetachedRequest {
   // Data to verify.
   bytes data = 1;
-  bytes sig = 2;
-  
-  // Armored, if true, sig is armored.
-  bool armored = 10;
+  bytes sig = 2;  
 }
 message VerifyDetachedResponse {
   Key signer = 1;
@@ -195,8 +183,6 @@ message VerifyFileInput {
   string in = 1;
   // Out is output file path.
   string out = 2;
-  // Armored, if true, sig is armored.
-  bool armored = 10;
 }
 message VerifyFileOutput {
   Key signer = 1;
@@ -208,8 +194,6 @@ message VerifyDetachedFileInput {
   string in = 1;
   // Signature (detached).
   bytes sig = 2;
-  // Armored, if true, sig is armored.
-  bool armored = 10;
 }
 
 message VerifyDetachedInput {
@@ -217,8 +201,6 @@ message VerifyDetachedInput {
   bytes data = 1;
   // Signature (detached).
   bytes sig = 2;
-  // Armored, if true, sig is armored.
-  bool armored = 10;
 }
 
 message Statement {
@@ -302,9 +284,9 @@ enum EncryptMode {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_customname) = "EncryptMode";
   
-  DEFAULT_ENCRYPT_MODE = 0 [(gogoproto.enumvalue_customname) = "DefaultEncryptMode"];
-  ENCRYPT_V2 = 1 [(gogoproto.enumvalue_customname) = "EncryptV2"];
-  SIGNCRYPT_V1 = 2 [(gogoproto.enumvalue_customname) = "SigncryptV1"];
+  DEFAULT_ENCRYPT = 0 [(gogoproto.enumvalue_customname) = "DefaultEncrypt"];
+  SALTPACK_ENCRYPT = 1 [(gogoproto.enumvalue_customname) = "SaltpackEncrypt"];
+  SALTPACK_SIGNCRYPT = 3 [(gogoproto.enumvalue_customname) = "SaltpackSigncrypt"];  
 }
 
 message EncryptRequest {
@@ -313,9 +295,9 @@ message EncryptRequest {
   // Armored, if true will return armored string output.
   bool armored = 10;
   // Recipients to encrypt to.
-  repeated string recipients = 11;  
+  repeated string recipients = 11;
   // Sender, or empty, if anonymous.
-  string sender = 12;  
+  string sender = 12;
   // Mode is the encryption mode.
   EncryptMode mode = 13;
 }
@@ -330,10 +312,11 @@ message EncryptFileInput {
   string out = 2;
   // Armored, if true will return armored string output.
   bool armored = 10;
+  
   // Recipients to encrypt to.
   repeated string recipients = 11;  
   // Sender, or empty, if anonymous.
-  string sender = 12;  
+  string sender = 12;
   // Mode is the encryption mode.
   EncryptMode mode = 13;
 }
@@ -363,34 +346,31 @@ message EncryptOutput {
 
 message DecryptRequest {
   // Data to decrypt.
-  bytes data = 1;
-  // Armored, if true, expects data to be armored.
-  bool armored = 10;
-  // Mode is the encryption mode.
-  EncryptMode mode = 13;
+  bytes data = 1;  
 }
 message DecryptResponse {
   // Data decrypted.
   bytes data = 1;
   // Sender (if not anonymous)
   Key sender = 2;
+  // Mode is the encryption mode for the data.
+  EncryptMode mode = 5;
 }
 
 message DecryptFileInput {
   // In is the input encrypted file path. 
   string in = 1;
   // Out is the output decrypted file path.
-  string out = 2;
-  // Armored, if true, expects file to be armored.
-  bool armored = 10;
-  // Mode is the encryption mode.
-  EncryptMode mode = 13;
+  string out = 2;  
 }
 message DecryptFileOutput {
   Key sender = 1;
   string out = 2;
   int32 bytes = 3;
   int32 total = 4;
+  
+  // Mode is the encryption mode we detected.
+  EncryptMode mode = 5;
 }
 
 message DecryptInput {
@@ -400,7 +380,10 @@ message DecryptInput {
 message DecryptOutput {
   // Data, decrypted. If empty, is EOF.
   bytes data = 1;
+  // Sender (if not anonymous)
   Key sender = 2;
+  // Mode is the encryption mode for the data.
+  EncryptMode mode = 5;
 }
 
 message RuntimeStatusRequest {}

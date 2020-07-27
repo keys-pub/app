@@ -45,7 +45,6 @@ export default class VerifiedView extends React.Component<Props, State> {
     const data = new TextEncoder().encode(this.props.value)
     const req: VerifyRequest = {
       data: data,
-      armored: true,
     }
     verify(req, (err: RPCError, resp: VerifyResponse) => {
       if (err) {

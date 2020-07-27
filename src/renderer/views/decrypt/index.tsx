@@ -17,12 +17,13 @@ import {remote} from 'electron'
 
 import {DecryptState} from '../../reducers/decrypt'
 import {decryptFile} from '../../rpc/keys'
-import {Key, RPCError, DecryptFileInput, DecryptFileOutput} from '../../rpc/keys.d'
+import {Key, EncryptMode, RPCError, DecryptFileInput, DecryptFileOutput} from '../../rpc/keys.d'
 
 export type Props = {
   defaultValue: string
   file: string
   fileOut: string
+  fileMode: EncryptMode
   fileSender: Key
 }
 
@@ -75,7 +76,10 @@ class DecryptView extends React.Component<Props, State> {
         return
       }
       if (resp) {
-        store.dispatch({type: 'DECRYPT_FILE_OUT', payload: {fileOut: resp.out, fileSender: resp.sender}})
+        store.dispatch({
+          type: 'DECRYPT_FILE_OUT',
+          payload: {fileOut: resp.out, fileSender: resp.sender, fileMode: resp.mode},
+        })
       }
       if (done) {
         this.setState({loading: false})
@@ -177,6 +181,7 @@ class DecryptView extends React.Component<Props, State> {
             <DecryptedFileView
               fileOut={this.props.fileOut}
               sender={this.props.fileSender}
+              mode={this.props.fileMode}
               error={this.state.fileError}
             />
           )}

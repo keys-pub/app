@@ -9,12 +9,12 @@ import SignerView from '../verify/signer'
 import {shell} from 'electron'
 import {dirname} from 'path'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
-import {CSSProperties} from '@material-ui/styles'
+import {Key, EncryptMode} from '../../rpc/keys.d'
 
 export type Props = {
   fileOut: string
   sender: Key
+  mode: EncryptMode
   error: string
 }
 
@@ -39,7 +39,7 @@ export default class DecryptedFileView extends React.Component<Props, State> {
         )}
         {!this.props.error && (
           <Box>
-            <SignerView signer={this.props.sender} unsigned={unsigned} />
+            <SignerView signer={this.props.sender} mode={this.props.mode} unsigned={unsigned} />
             <Divider />
 
             <Box style={{paddingLeft: 10, paddingTop: 10}}>

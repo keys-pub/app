@@ -151,6 +151,7 @@ class SignView extends React.Component<Props, State> {
                 disableUnderline
                 inputProps={{
                   ref: this.inputRef,
+                  spellCheck: 'false',
                   style: {
                     height: '100%',
                     overflow: 'auto',

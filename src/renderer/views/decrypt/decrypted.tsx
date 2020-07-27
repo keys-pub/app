@@ -10,7 +10,7 @@ import SignerView from '../verify/signer'
 import {clipboard} from 'electron'
 import {debounce} from 'lodash'
 
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
+import {Key, EncryptMode, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
 
 export type Props = {
   value: string
@@ -21,6 +21,7 @@ type State = {
   sender: Key
   error: string
   openSnack: boolean
+  mode: EncryptMode
 }
 
 export default class DecryptedView extends React.Component<Props, State> {
@@ -28,6 +29,7 @@ export default class DecryptedView extends React.Component<Props, State> {
     decrypted: '',
     error: '',
     sender: null,
+    mode: EncryptMode.DEFAULT_ENCRYPT,
     openSnack: false,
   }
 
@@ -51,7 +53,6 @@ export default class DecryptedView extends React.Component<Props, State> {
     const data = new TextEncoder().encode(this.props.value)
     const req: DecryptRequest = {
       data: data,
-      armored: true,
     }
     decrypt(req, (err: RPCError, resp: DecryptResponse) => {
       if (err) {
@@ -59,7 +60,7 @@ export default class DecryptedView extends React.Component<Props, State> {
         return
       }
       const decrypted = new TextDecoder().decode(resp.data)
-      this.setState({error: '', sender: resp.sender, decrypted: decrypted})
+      this.setState({error: '', sender: resp.sender, mode: resp.mode, decrypted: decrypted})
     })
   }
 
@@ -85,7 +86,7 @@ export default class DecryptedView extends React.Component<Props, State> {
 
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.state.sender} unsigned={unsigned} />
+        <SignerView signer={this.state.sender} mode={this.state.mode} unsigned={unsigned} />
         <Divider />
         <Input
           multiline

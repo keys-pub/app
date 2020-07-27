@@ -65,7 +65,7 @@ export default class SignKeySelectView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box style={{paddingRight: 2, paddingBottom: 4}}>
+      <Box style={{overflow: 'hidden', marginRight: 8, paddingBottom: 4}}>
         <Select
           onChange={this.onChange}
           value={this.state.selected || ''}
