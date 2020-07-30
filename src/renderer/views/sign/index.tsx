@@ -68,12 +68,9 @@ class SignView extends React.Component<Props, State> {
   }
 
   signFile = async () => {
-    const fileOut = this.props.file + '.signed'
-
     const req: SignFileInput = {
       signer: this.props.signer,
       in: this.props.file,
-      out: fileOut,
     }
 
     console.log('Signing...')
@@ -88,7 +85,7 @@ class SignView extends React.Component<Props, State> {
         return
       }
       if (resp) {
-        store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut}})
+        store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut: resp.out}})
       }
       if (done) {
         this.setState({loading: false})

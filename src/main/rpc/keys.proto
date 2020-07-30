@@ -145,8 +145,9 @@ message SignFileInput {
 }
 message SignFileOutput {
   string kid = 1 [(gogoproto.customname) = "KID"];  
-  int32 bytes = 2;
-  int32 total = 3;
+  string out = 2;
+  int32 bytes = 10;
+  int32 total = 11;
 }
 
 message VerifyRequest {

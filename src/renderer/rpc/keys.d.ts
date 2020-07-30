@@ -111,6 +111,7 @@ export interface SignFileInput {
 
 export interface SignFileOutput {
     kid?: string;
+    out?: string;
     bytes?: number;
     total?: number;
 }
