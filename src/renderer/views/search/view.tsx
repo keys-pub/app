@@ -104,7 +104,7 @@ export default class SearchView extends React.Component<Props, State> {
             variant="outlined"
             value={this.state.input}
             onChange={this.onInputChange}
-            inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+            inputProps={{style: {paddingTop: 8, paddingBottom: 8}, spellCheck: 'false'}}
             fullWidth={true}
             style={{marginTop: 2}}
           />
