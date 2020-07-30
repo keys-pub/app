@@ -225,8 +225,8 @@ export default class VaultView extends React.Component<Props, State> {
         {!this.state.phrase && (
           <Box flex={1} flexDirection="column">
             <Typography style={{paddingBottom: 10, maxWidth: 500}}>
-              Creating an vault auth phrase allows another device to sync to this vault. <br />A generated
-              auth phrase expires after 5 minutes and can only be used once.
+              Creating a vault auth phrase allows another device to sync to this vault. <br />A generated auth
+              phrase expires after 5 minutes and can only be used once.
               <br /> For more details, see{' '}
               <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
                 keys.pub/docs/specs/vault
