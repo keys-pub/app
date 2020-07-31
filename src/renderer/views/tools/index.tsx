@@ -93,11 +93,12 @@ export default class ToolsView extends React.Component<Props, State> {
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem button style={{height: 42}} onClick={onClick} key={nav.id}>
-      <Tooltip title={nav.name} arrow>
-        <ListItemIcon style={{minWidth: 0}}>
+      <ListItemIcon style={{minWidth: 0}}>
+        <Tooltip title={nav.name} placement="left">
           <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
-        </ListItemIcon>
-      </Tooltip>
+        </Tooltip>
+      </ListItemIcon>
+
       {/* <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}} /> */}
     </ListItem>
   )
