@@ -1,22 +1,12 @@
-import * as React from 'react'
-
-import {connect} from 'react-redux'
-
-import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material-ui/core'
-
-import Alert from '@material-ui/lab/Alert'
-
-import {Link, styles} from '../../components'
-import {shell} from 'electron'
-
-import {WormholeState, WormholeMessage, WormholeMessageType} from '../../reducers/wormhole'
+import {WormholeMessage, WormholeMessageType} from '../../reducers/wormhole'
 
 export const welcomeStatus = () => {
   // TODO: Make messages are only available for the life of the connection (+1 minute?).
   return {
     id: 'welcome',
     severity: 'info',
-    text: 'A wormhole is an encrypted tunnel between 2 computers using these keys. For more details, see ',
+    text:
+      'A wormhole is an encrypted tunnel between 2 computers using the specified keys. For more details, see ',
     type: WormholeMessageType.Status,
     link: 'keys.pub/docs/specs/wormhole',
   }
