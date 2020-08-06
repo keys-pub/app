@@ -27,6 +27,8 @@ import {styles} from '../../components'
 import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/keys.d'
 import {search} from '../../rpc/keys'
 
+import {debounce, throttle} from 'lodash'
+
 type Props = {
   select: (k: Key) => void
 }
@@ -49,6 +51,8 @@ export default class SearchView extends React.Component<Props, State> {
     query: '',
     keys: [],
   }
+
+  debounceSearch = debounce((q: string) => this.search(q), 100)
 
   componentDidMount() {
     this.refresh()
@@ -82,7 +86,7 @@ export default class SearchView extends React.Component<Props, State> {
     this.setState({
       input: target.value,
     })
-    this.search(target.value)
+    this.debounceSearch(target.value)
   }
 
   select = (k: Key) => {

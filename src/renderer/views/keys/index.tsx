@@ -7,7 +7,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -30,7 +29,7 @@ import {
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {styles} from '../../components'
+import {styles, Snack, SnackOpts} from '../../components'
 import UserLabel from '../user/label'
 import {IDView} from '../key/content'
 
@@ -81,12 +80,16 @@ type State = {
   openExport: string
   openImport: boolean
   openKey: string
-  openRemove: Key
+  openRemove: OpenRemove
   openSearch: boolean
+  openSnack: SnackOpts
   selected: string
-  snack: string
-  snackSeverity: string
   syncing: boolean
+}
+
+type OpenRemove = {
+  open: boolean
+  key: Key
 }
 
 class KeysView extends React.Component<Props, State> {
@@ -101,11 +104,10 @@ class KeysView extends React.Component<Props, State> {
     openExport: '',
     openImport: false,
     openKey: '',
-    openRemove: null,
+    openRemove: {open: false, key: null},
     openSearch: false,
+    openSnack: null,
     selected: '',
-    snack: '',
-    snackSeverity: '',
     syncing: false,
   }
 
@@ -123,7 +125,7 @@ class KeysView extends React.Component<Props, State> {
     vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
       this.setState({syncing: false})
       if (err) {
-        this.setState({snack: err.details, snackSeverity: 'error'})
+        this.setState({openSnack: {message: err.details, alert: 'error'}})
       }
       this.reload()
     })
@@ -188,7 +190,7 @@ class KeysView extends React.Component<Props, State> {
       return this.state.selected == k.id
     })
 
-    this.setState({contextPosition: null, openRemove: key})
+    this.setState({contextPosition: null, openRemove: {open: true, key}})
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {
@@ -237,7 +239,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   closeRemove = (removed: boolean) => {
-    this.setState({openRemove: null, selected: ''})
+    this.setState({openRemove: {open: false, key: this.state.openRemove.key}, selected: ''})
     this.reload()
   }
 
@@ -417,8 +419,8 @@ class KeysView extends React.Component<Props, State> {
         />
         <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
         <KeyRemoveDialog
-          open={this.state.openRemove != null}
-          value={this.state.openRemove}
+          open={this.state.openRemove.open}
+          keyRemove={this.state.openRemove.key}
           close={this.closeRemove}
         />
         <KeyExportDialog
@@ -430,19 +432,15 @@ class KeysView extends React.Component<Props, State> {
           open={this.state.openKey != ''}
           close={() => this.setState({openKey: '', selected: ''})}
           kid={this.state.openKey}
-          source="keys"
           reload={this.reload}
         />
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-          open={!!this.state.snack}
-          autoHideDuration={4000}
-          onClose={() => this.setState({snack: ''})}
-        >
-          <Alert severity={(this.state.snackSeverity || 'success') as AlertColor}>
-            <Typography>{this.state.snack}</Typography>
-          </Alert>
-        </Snackbar>
+        <Snack
+          open={!!this.state.openSnack}
+          onClose={() => this.setState({openSnack: null})}
+          message={this.state.openSnack?.message}
+          alert={this.state.openSnack?.alert}
+          duration={this.state.openSnack?.duration}
+        />
       </Box>
     )
   }

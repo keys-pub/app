@@ -1,24 +1,14 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Divider,
-  Snackbar,
-  SnackbarContent,
-  Tabs,
-  Tab,
-  TextField,
-  Typography,
-} from '@material-ui/core'
+import {Box, Button, Divider, Tabs, Tab, TextField, Typography} from '@material-ui/core'
 
-import Alert from '@material-ui/lab/Alert'
-
-import {Device} from '../../rpc/fido2.d'
 import {toHex} from '../helper'
+import {Snack} from '../../components'
 
 import Info from './info'
 import Credentials from './credentials'
+
+import {Device} from '../../rpc/fido2.d'
 
 type Props = {
   device: Device
@@ -28,7 +18,6 @@ type State = {
   tab: number
   loading: boolean
   error: string
-  openSnack: string
 }
 
 export default class DeviceContentView extends React.Component<Props, State> {
@@ -36,7 +25,6 @@ export default class DeviceContentView extends React.Component<Props, State> {
     tab: 0,
     loading: false,
     error: '',
-    openSnack: '',
   }
 
   tabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -63,17 +51,6 @@ export default class DeviceContentView extends React.Component<Props, State> {
           {this.state.tab == 0 && <Info device={this.props.device} />}
           {this.state.tab == 1 && <Credentials device={this.props.device} />}
         </Box>
-
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-          open={!!this.state.openSnack}
-          autoHideDuration={4000}
-          onClose={() => this.setState({openSnack: ''})}
-        >
-          <Alert severity="success">
-            <Typography>{this.state.openSnack}</Typography>
-          </Alert>
-        </Snackbar>
       </Box>
     )
   }

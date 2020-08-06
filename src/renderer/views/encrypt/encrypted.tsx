@@ -3,18 +3,9 @@ import {CSSProperties} from 'react'
 
 import {connect} from 'react-redux'
 
-import {
-  Button,
-  Divider,
-  LinearProgress,
-  Input,
-  Typography,
-  Snackbar,
-  SnackbarContent,
-  Box,
-} from '@material-ui/core'
+import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
 
-import {styles} from '../../components'
+import {styles, Snack} from '../../components'
 
 import {store} from '../../store'
 
@@ -34,7 +25,7 @@ export type Props = {
 type State = {
   encrypted: string
   error: string
-  openSnack: boolean
+  openSnack: string
 }
 
 // TODO: drag and drop file
@@ -43,7 +34,7 @@ export default class EncryptedView extends React.Component<Props, State> {
   state = {
     encrypted: '',
     error: '',
-    openSnack: false,
+    openSnack: '',
   }
 
   debounceEncrypt = debounce(() => this.encrypt(), 10)
@@ -88,7 +79,7 @@ export default class EncryptedView extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.encrypted)
-    this.setState({openSnack: true})
+    this.setState({openSnack: 'Copied to Clipboard'})
   }
 
   render() {
@@ -138,21 +129,12 @@ export default class EncryptedView extends React.Component<Props, State> {
             Copy to Clipboard
           </Button>
         </Box>
-        <Snackbar
-          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-          open={this.state.openSnack}
-          autoHideDuration={2000}
-          onClose={() =>
-            this.setState({
-              openSnack: false,
-            })
-          }
-        >
-          <SnackbarContent
-            aria-describedby="client-snackbar"
-            message={<span id="client-snackbar">Copied to Clipboard</span>}
-          />
-        </Snackbar>
+        <Snack
+          open={!!this.state.openSnack}
+          message={this.state.openSnack}
+          duration={2000}
+          onClose={() => this.setState({openSnack: ''})}
+        />
       </Box>
     )
   }

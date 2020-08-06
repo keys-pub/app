@@ -8,7 +8,7 @@ import {secretRemove} from '../../rpc/keys'
 import {RPCError, Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
-  value: Secret
+  secret: Secret
   open: boolean
   close: (removed: boolean) => void
 }
@@ -23,7 +23,7 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
   }
 
   remove = () => {
-    const req: SecretRemoveRequest = {id: this.props.value.id}
+    const req: SecretRemoveRequest = {id: this.props.secret.id}
     secretRemove(req, (err: RPCError, resp: SecretRemoveResponse) => {
       if (err) {
         this.setState({error: err.details})
@@ -34,7 +34,7 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
   }
 
   renderDialog(open: boolean) {
-    const secret = this.props.value
+    const secret = this.props.secret
 
     return (
       <Dialog
@@ -46,14 +46,14 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle>Delete Secret</DialogTitle>
+        <DialogTitle onClose={() => this.props.close(false)}>Delete Secret</DialogTitle>
         <DialogContent dividers>
           <Box>
             <Typography style={{paddingBottom: 20}}>Do you want to delete this secret?</Typography>
-            <Typography style={{...styles.mono, paddingBottom: 10}}>{this.props.value?.name}</Typography>
-            {this.props.value?.username && (
+            <Typography style={{...styles.mono, paddingBottom: 10}}>{this.props.secret?.name}</Typography>
+            {this.props.secret?.username && (
               <Typography style={{...styles.mono, paddingBottom: 10}}>
-                {this.props.value?.username}
+                {this.props.secret?.username}
               </Typography>
             )}
           </Box>

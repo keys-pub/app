@@ -610,8 +610,13 @@ message Key {
 }
 
 message KeyRequest {
-  string identity = 1;
-  bool update = 5;
+  // Key can be kid or user@service.
+  string key = 1;
+  
+  // Search, if true, will search for the key on the server.
+  bool search = 4;
+  // Update, if true, will update the sigchain from the server.
+  bool update = 5;  
 }
 
 message KeyResponse {
@@ -751,14 +756,14 @@ message RandPasswordResponse {
 }
 
 message PullRequest {
-  string identity = 1;  
+  string key = 1;  
 }
 message PullResponse {
   repeated string kids = 1 [(gogoproto.customname) = "KIDs"];
 }
 
 message PushRequest {
-  string identity = 1;
+  string key = 1;
   bool remoteCheck = 2;
 }
 message PushResponse {

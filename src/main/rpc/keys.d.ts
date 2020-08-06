@@ -548,7 +548,11 @@ export interface Key {
 }
 
 export interface KeyRequest {
-    identity?: string;
+    // Key can be kid or user@service.
+    key?: string;
+    // Search, if true, will search for the key on the server.
+    search?: boolean;
+    // Update, if true, will update the sigchain from the server.
     update?: boolean;
 }
 
@@ -658,7 +662,7 @@ export interface RandPasswordResponse {
 }
 
 export interface PullRequest {
-    identity?: string;
+    key?: string;
 }
 
 export interface PullResponse {
@@ -666,7 +670,7 @@ export interface PullResponse {
 }
 
 export interface PushRequest {
-    identity?: string;
+    key?: string;
     remoteCheck?: boolean;
 }
 

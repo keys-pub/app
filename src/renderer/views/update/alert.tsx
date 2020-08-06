@@ -70,18 +70,37 @@ export default class UpdateAlert extends React.Component<Props, State> {
 
   render() {
     return (
-      <Snackbar
+      <UpdateAlertView
         open={this.state.open}
-        onClose={() => {}} // Alert must be closed manually (not via clickaway or timeout)
-        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
-      >
-        <Alert onClose={this.close} severity="info">
-          <Box>
-            <Typography>There is a an update available ({this.state.version}).</Typography>
-            <Link onClick={this.apply}>Download &amp; Restart</Link>
-          </Box>
-        </Alert>
-      </Snackbar>
+        close={this.close}
+        version={this.state.version}
+        apply={this.apply}
+      />
     )
   }
 }
+
+const UpdateAlertView = (props: {open: boolean; close: () => void; version: string; apply: () => void}) => {
+  return (
+    <Snackbar
+      open={props.open}
+      onClose={() => {}} // Alert must be closed manually (not via clickaway or timeout)
+      anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+    >
+      <Alert
+        onClose={props.close}
+        severity="info"
+        elevation={3}
+        // variant="filled"
+        style={{paddingTop: 5, paddingBottom: 3}}
+      >
+        <Box>
+          <Typography>There is a an update available ({props.version}).</Typography>
+          <Link onClick={props.apply}>Download &amp; Restart</Link>
+        </Box>
+      </Alert>
+    </Snackbar>
+  )
+}
+
+export {UpdateAlertView}

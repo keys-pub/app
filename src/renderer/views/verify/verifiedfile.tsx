@@ -1,26 +1,24 @@
 import * as React from 'react'
 import {CSSProperties} from 'react'
 
-import {Button, Divider, Input, Box, Snackbar, SnackbarContent, Typography} from '@material-ui/core'
+import {Button, Divider, Input, Box, Typography} from '@material-ui/core'
 
 import {styles, Link} from '../../components'
 
+import {store} from '../../store'
 import SignerView from '../verify/signer'
 
 import {shell} from 'electron'
-import {dirname} from 'path'
-
-import {Key, DecryptRequest, DecryptResponse} from '../../rpc/keys.d'
+import {Key} from '../../rpc/keys.d'
 
 export type Props = {
   fileOut: string
   signer: Key
   error: string
+  reloadKey: () => void
 }
 
-type State = {}
-
-export default class VerifiedFileView extends React.Component<Props, State> {
+export default class VerifiedFileView extends React.Component<Props, {}> {
   openFolder = () => {
     shell.showItemInFolder(this.props.fileOut)
   }
@@ -39,7 +37,7 @@ export default class VerifiedFileView extends React.Component<Props, State> {
         )}
         {!this.props.error && (
           <Box>
-            <SignerView signer={this.props.signer} unsigned={unsigned} />
+            <SignerView signer={this.props.signer} unsigned={unsigned} reload={this.props.reloadKey} />
             <Divider />
 
             <Box style={{paddingLeft: 10, paddingTop: 10}}>

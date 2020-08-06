@@ -8,7 +8,7 @@ import {keyRemove} from '../../rpc/keys'
 import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
-  value: Key
+  keyRemove: Key
   open: boolean
   close: (removed: boolean) => void
 }
@@ -23,7 +23,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   }
 
   removeKey = () => {
-    const req: KeyRemoveRequest = {kid: this.props.value.id}
+    const req: KeyRemoveRequest = {kid: this.props.keyRemove.id}
     keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
       if (err) {
         this.setState({error: err.details})
@@ -34,7 +34,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   }
 
   renderDialog(open: boolean) {
-    const key = this.props.value
+    const key = this.props.keyRemove
     const isPrivate = key?.type == KeyType.X25519 || key?.type == KeyType.EDX25519
 
     return (
@@ -47,7 +47,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle>Delete Key</DialogTitle>
+        <DialogTitle onClose={() => this.props.close(false)}>Delete Key</DialogTitle>
         <DialogContent dividers>{isPrivate ? this.renderPrivateKey() : this.renderPublicKey()}</DialogContent>
         <DialogActions>
           <Button onClick={() => this.props.close(false)}>Cancel</Button>
@@ -66,7 +66,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
           Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
         </Typography>
         <Typography style={{...styles.mono, paddingBottom: 10, fontWeight: 600}}>
-          {this.props.value?.id}
+          {this.props.keyRemove?.id}
         </Typography>
         <Typography>
           <span style={{fontWeight: 600}}>
@@ -81,7 +81,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
     return (
       <Box>
         <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
-        <Typography style={{...styles.mono}}>{this.props.value?.id}</Typography>
+        <Typography style={{...styles.mono}}>{this.props.keyRemove?.id}</Typography>
       </Box>
     )
   }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {Store} from '../../store/pull'
 
 import {
   Box,
@@ -29,56 +30,52 @@ import {
 
 type Props = {}
 
-type State = {
-  selected: string // 'encrypt' | 'decrypt' | 'sign' | 'verify'
-}
-
 type Nav = {
   name: string
   id: string
   icon: any
 }
 
-const navs: Array<Nav> = [
-  {name: 'Encrypt', icon: EncryptIcon, id: 'encrypt'},
-  {name: 'Decrypt', icon: DecryptIcon, id: 'decrypt'},
-  {name: 'Sign', icon: SignIcon, id: 'sign'},
-  {name: 'Verify', icon: VerifyIcon, id: 'verify'},
-]
-
 // TODO: hover
 
-export default class ToolsView extends React.Component<Props, State> {
-  state = {
-    selected: 'encrypt',
-  }
+export default (props: Props) => {
+  const navs: Array<Nav> = [
+    {name: 'Encrypt', icon: EncryptIcon, id: 'encrypt'},
+    {name: 'Decrypt', icon: DecryptIcon, id: 'decrypt'},
+    {name: 'Sign', icon: SignIcon, id: 'sign'},
+    {name: 'Verify', icon: VerifyIcon, id: 'verify'},
+  ]
 
-  render() {
-    return (
-      <Box display="flex" flexDirection="column" flex={1}>
-        <Divider />
-        <Box display="flex" flexGrow={1} flexDirection="row">
-          <List
-            style={{
-              height: '100%',
-              padding: 0,
-            }}
-          >
-            {navs.map((nav, index) =>
-              row(nav, index, this.state.selected == nav.id, () => this.setState({selected: nav.id}))
-            )}
-          </List>
-          <Divider orientation="vertical" />
-          <Box display="flex" flexDirection="column" flex={1}>
-            {this.state.selected == 'encrypt' && <EncryptView />}
-            {this.state.selected == 'decrypt' && <DecryptView />}
-            {this.state.selected == 'sign' && <SignView />}
-            {this.state.selected == 'verify' && <VerifyView />}
-          </Box>
+  const selected = Store.useState((s) => s.selectedTool)
+
+  return (
+    <Box display="flex" flexDirection="column" flex={1}>
+      <Divider />
+      <Box display="flex" flexGrow={1} flexDirection="row">
+        <List
+          style={{
+            height: '100%',
+            padding: 0,
+          }}
+        >
+          {navs.map((nav, index) =>
+            row(nav, index, selected == nav.id, () =>
+              Store.update((s) => {
+                s.selectedTool = nav.id
+              })
+            )
+          )}
+        </List>
+        <Divider orientation="vertical" />
+        <Box display="flex" flexDirection="column" flex={1}>
+          {selected == 'encrypt' && <EncryptView />}
+          {selected == 'decrypt' && <DecryptView />}
+          {selected == 'sign' && <SignView />}
+          {selected == 'verify' && <VerifyView />}
         </Box>
       </Box>
-    )
-  }
+    </Box>
+  )
 }
 
 // const LightTooltip = withStyles((theme: Theme) => ({
@@ -93,12 +90,11 @@ export default class ToolsView extends React.Component<Props, State> {
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem button style={{height: 42}} onClick={onClick} key={nav.id}>
-      <ListItemIcon style={{minWidth: 0}}>
-        <Tooltip title={nav.name} placement="left">
+      <Tooltip title={nav.name} placement="left">
+        <ListItemIcon style={{minWidth: 0}}>
           <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
-        </Tooltip>
-      </ListItemIcon>
-
+        </ListItemIcon>
+      </Tooltip>
       {/* <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}} /> */}
     </ListItem>
   )

@@ -1,26 +1,23 @@
 import * as React from 'react'
 
-import {Button, Divider, Input, Box, Snackbar, SnackbarContent, Typography} from '@material-ui/core'
+import {Button, Divider, Input, Box, Typography} from '@material-ui/core'
 
 import {styles, Link} from '../../components'
 
 import SignerView from '../verify/signer'
 
 import {shell} from 'electron'
-import {dirname} from 'path'
-
 import {Key, EncryptMode} from '../../rpc/keys.d'
 
 export type Props = {
   fileOut: string
-  sender: Key
-  mode: EncryptMode
+  sender?: Key
+  mode?: EncryptMode
   error: string
+  reloadKey: () => void
 }
 
-type State = {}
-
-export default class DecryptedFileView extends React.Component<Props, State> {
+export default class DecryptedFileView extends React.Component<Props, {}> {
   openFolder = () => {
     shell.showItemInFolder(this.props.fileOut)
   }
@@ -39,7 +36,12 @@ export default class DecryptedFileView extends React.Component<Props, State> {
         )}
         {!this.props.error && (
           <Box>
-            <SignerView signer={this.props.sender} mode={this.props.mode} unsigned={unsigned} />
+            <SignerView
+              signer={this.props.sender}
+              mode={this.props.mode}
+              unsigned={unsigned}
+              reload={this.props.reloadKey}
+            />
             <Divider />
 
             <Box style={{paddingLeft: 10, paddingTop: 10}}>

@@ -1,14 +1,12 @@
 import * as React from 'react'
 
-import {Box, Button, Divider, Snackbar, SnackbarContent, TextField, Typography} from '@material-ui/core'
+import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
-import {styles} from '../../components'
+import {styles, Snack} from '../../components'
 import {dateString} from '../helper'
 
 import SetPinDialog from './setpin'
 import ResetDialog from './reset'
-
-import Alert from '@material-ui/lab/Alert'
 
 import {store} from '../../store'
 
@@ -230,16 +228,13 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         {this.state.error && this.renderError()}
         {!this.state.error && this.renderInfo()}
 
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        <Snack
           open={!!this.state.openSnack}
-          autoHideDuration={4000}
           onClose={() => this.setState({openSnack: ''})}
-        >
-          <Alert severity="success">
-            <Typography>{this.state.openSnack}</Typography>
-          </Alert>
-        </Snackbar>
+          message={this.state.openSnack}
+          duration={4000}
+          alert="success"
+        />
       </Box>
     )
   }

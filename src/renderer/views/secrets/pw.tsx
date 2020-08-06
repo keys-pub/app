@@ -1,8 +1,9 @@
 import * as React from 'react'
 
-import {Box, Button, Snackbar, SnackbarContent, TextField, Typography} from '@material-ui/core'
+import {Box, Button, TextField, Typography} from '@material-ui/core'
 
 import {clipboard} from 'electron'
+import {Snack} from '../../components'
 
 type Props = {
   password: string
@@ -53,17 +54,12 @@ export default (props: Props) => {
           Gen
         </Button>
       )}
-      <Snackbar
-        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+      <Snack
         open={openSnack}
-        autoHideDuration={2000}
         onClose={() => setSnackOpen(false)}
-      >
-        <SnackbarContent
-          aria-describedby="client-snackbar"
-          message={<span id="client-snackbar">Copied to Clipboard</span>}
-        />
-      </Snackbar>
+        message="Copied to Clipboard"
+        duration={2000}
+      />
     </Box>
   )
 }

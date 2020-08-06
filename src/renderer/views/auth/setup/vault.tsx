@@ -7,8 +7,6 @@ import {
   FormHelperText,
   MenuItem,
   Select,
-  Snackbar,
-  SnackbarContent,
   TextField,
   Typography,
 } from '@material-ui/core'

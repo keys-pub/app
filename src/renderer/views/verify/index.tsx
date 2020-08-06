@@ -15,8 +15,8 @@ import * as grpc from '@grpc/grpc-js'
 import {remote} from 'electron'
 
 import {VerifyState} from '../../reducers/verify'
-import {verifyFile} from '../../rpc/keys'
-import {Key, RPCError, VerifyFileInput, VerifyFileOutput} from '../../rpc/keys.d'
+import {verifyFile, key} from '../../rpc/keys'
+import {Key, RPCError, VerifyFileInput, VerifyFileOutput, KeyRequest, KeyResponse} from '../../rpc/keys.d'
 
 export type Props = {
   defaultValue: string
@@ -81,6 +81,24 @@ class VerifyView extends React.Component<Props, State> {
       }
     })
     send(req, false)
+  }
+
+  reloadFileKey = () => {
+    const req: KeyRequest = {
+      key: this.props.fileSigner.id,
+    }
+    key(req, (err: RPCError, resp: KeyResponse) => {
+      if (err) {
+        // TODO: Show error
+        return
+      }
+      if (resp.key) {
+        store.dispatch({
+          type: 'VERIFY_FILE_OUT',
+          payload: {fileOut: this.props.fileOut, fileSigner: resp.key},
+        })
+      }
+    })
   }
 
   cancel = () => {
@@ -177,6 +195,7 @@ class VerifyView extends React.Component<Props, State> {
               fileOut={this.props.fileOut}
               signer={this.props.fileSigner}
               error={this.state.fileError}
+              reloadKey={this.reloadFileKey}
             />
           )}
           {!this.state.fileError && !this.props.fileOut && <VerifiedView value={this.state.value} />}

@@ -7,19 +7,15 @@ import {
   FormControl,
   FormHelperText,
   Paper,
-  Snackbar,
-  SnackbarContent,
   TextField,
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../../components'
+import {styles, Snack} from '../../components'
 import {dateString, pluralize} from '../helper'
 
 import SetPinDialog from './setpin'
 import ResetDialog from './reset'
-
-import Alert from '@material-ui/lab/Alert'
 
 import {store} from '../../store'
 
@@ -51,7 +47,6 @@ type Props = {
 type State = {
   loading: boolean
   error: string
-  openSnack: string
   pin: string
   pinInput: string
   credentials: Array<Credential>
@@ -65,7 +60,6 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
   state = {
     loading: false,
     error: '',
-    openSnack: '',
     pinInput: '',
     pin: '',
     credentials: [],
@@ -267,17 +261,6 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
           </Box>
         )}
         {!status && this.renderStep()}
-
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-          open={!!this.state.openSnack}
-          autoHideDuration={4000}
-          onClose={() => this.setState({openSnack: ''})}
-        >
-          <Alert severity="success">
-            <Typography>{this.state.openSnack}</Typography>
-          </Alert>
-        </Snackbar>
       </Box>
     )
   }

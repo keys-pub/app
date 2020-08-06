@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Link, styles} from '../../components'
+import {Link} from '../../components'
 import {remote} from 'electron'
 
 import {store} from '../../store'
@@ -114,6 +114,10 @@ export default class SettingsView extends React.Component<Props, State> {
                     <br />
                     <Link span onClick={this.forceUpdate}>
                       Force Update
+                    </Link>
+                    <br />
+                    <Link span onClick={() => store.dispatch(push('/style-guide'))}>
+                      Style Guide
                     </Link>
                     <br />
                   </Typography>

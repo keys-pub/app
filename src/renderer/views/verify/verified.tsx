@@ -1,9 +1,10 @@
 import * as React from 'react'
 
-import {Box, Divider, Input} from '@material-ui/core'
+import {Box, Button, Divider, Input} from '@material-ui/core'
 
-import {store} from '../../store'
+import {clipboard} from 'electron'
 
+import {Snack, SnackOpts} from '../../components'
 import SignerView from './signer'
 
 import {verify} from '../../rpc/keys'
@@ -17,6 +18,7 @@ type State = {
   verified: string
   signer: Key
   error: string
+  openSnack?: SnackOpts
 }
 
 export default class VerifiedView extends React.Component<Props, State> {
@@ -24,6 +26,7 @@ export default class VerifiedView extends React.Component<Props, State> {
     signer: null,
     verified: '',
     error: '',
+    openSnack: null,
   }
 
   componentDidMount() {
@@ -56,10 +59,16 @@ export default class VerifiedView extends React.Component<Props, State> {
     })
   }
 
+  copyToClipboard = () => {
+    clipboard.writeText(this.state.verified)
+    this.setState({openSnack: {message: 'Copied to Clipboard', duration: 2000}})
+  }
+
   render() {
+    const disabled = !this.state.verified
     return (
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
-        <SignerView signer={this.state.signer} />
+        <SignerView signer={this.state.signer} reload={this.verify} />
         <Divider />
         <Input
           multiline
@@ -80,6 +89,25 @@ export default class VerifiedView extends React.Component<Props, State> {
             height: '100%',
             width: '100%',
           }}
+        />
+        <Box style={{position: 'absolute', right: 20, bottom: 6}}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            disabled={disabled}
+            onClick={this.copyToClipboard}
+            style={{backgroundColor: 'white'}}
+          >
+            Copy to Clipboard
+          </Button>
+        </Box>
+        <Snack
+          open={!!this.state.openSnack}
+          message={this.state.openSnack?.message}
+          duration={this.state.openSnack?.duration}
+          alert={this.state.openSnack?.alert}
+          onClose={() => this.setState({openSnack: null})}
         />
       </Box>
     )

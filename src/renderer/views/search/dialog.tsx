@@ -10,14 +10,11 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
-  Snackbar,
   TextField,
   Typography,
 } from '@material-ui/core'
 
-import Alert from '@material-ui/lab/Alert'
-
-import {styles, DialogTitle} from '../../components'
+import {styles, DialogTitle, Snack} from '../../components'
 import SearchView from './view'
 
 import {RPCError, Key} from '../../rpc/keys.d'
@@ -51,7 +48,6 @@ export default class SearchDialog extends React.Component<Props, State> {
         open={this.props.open}
         maxWidth="xl"
         fullWidth
-        disableBackdropClick
         // TransitionComponent={transition}
         // keepMounted
       >
@@ -74,30 +70,18 @@ export default class SearchDialog extends React.Component<Props, State> {
           open={this.state.openKey != ''}
           close={(snack: string) => this.setState({openKey: '', openSnack: snack})}
           kid={this.state.openKey}
-          source="search"
+          update
+          import
           reload={() => {}}
         />
         <Snack
           open={this.state.openSnack != ''}
-          close={() => this.setState({openSnack: ''})}
-          description={this.state.openSnack}
+          onClose={() => this.setState({openSnack: ''})}
+          message={this.state.openSnack}
+          alert="success"
+          duration={4000}
         />
       </Dialog>
     )
   }
-}
-
-const Snack = (props: {description: string; open: boolean; close: () => void}) => {
-  return (
-    <Snackbar
-      anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-      open={props.open}
-      autoHideDuration={2000}
-      onClose={props.close}
-    >
-      <Alert severity="success">
-        <Typography>{props.description}</Typography>
-      </Alert>
-    </Snackbar>
-  )
 }

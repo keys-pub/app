@@ -3,8 +3,6 @@ import * as React from 'react'
 import {
   Box,
   Button,
-  Snackbar,
-  SnackbarContent,
   TableHead,
   TableBody,
   TableRow,

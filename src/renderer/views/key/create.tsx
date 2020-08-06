@@ -62,7 +62,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
 
   close = () => {
     this.props.close()
-    setTimeout(this.reset, 0)
+    setTimeout(this.reset, 200)
   }
 
   closeUser = (added: boolean) => {
@@ -127,7 +127,9 @@ export default class KeyCreateDialog extends React.Component<Props> {
         // TransitionComponent={transition}
         keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Generate Key</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={this.close}>
+          Generate Key
+        </DialogTitle>
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <FormControl variant="outlined">
@@ -188,7 +190,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         keepMounted
       >
         {/* TODO: This title? */}
-        <DialogTitle>Key Created</DialogTitle>
+        <DialogTitle onClose={this.close}>Key Created</DialogTitle>
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <Typography style={{paddingBottom: 10}}>We created and saved the key:</Typography>
@@ -227,7 +229,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         // TransitionComponent={transition}
         keepMounted
       >
-        <DialogTitle>Publish / Link Key</DialogTitle>
+        <DialogTitle onClose={this.close}>Publish / Link Key</DialogTitle>
         <DialogContent dividers>
           <Box style={{minHeight}}>
             <Typography>

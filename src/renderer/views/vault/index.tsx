@@ -1,23 +1,9 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  LinearProgress,
-  Snackbar,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@material-ui/core'
+import {Box, Button, Divider, LinearProgress, Typography} from '@material-ui/core'
 
-import Alert from '@material-ui/lab/Alert'
 import {shell} from 'electron'
-import {Link, styles} from '../../components'
+import {Link, styles, Snack, SnackOpts} from '../../components'
 
 // import EnableDialog from './enable'
 import DisableDialog from './disable'
@@ -40,10 +26,8 @@ type Props = {}
 
 type State = {
   loading: boolean
-  enableError: string
   openDisable: boolean
-  openSnack: string
-  phraseError: string
+  openSnack: SnackOpts
   phrase: string
   status: VaultStatusResponse
 }
@@ -51,11 +35,9 @@ type State = {
 export default class VaultView extends React.Component<Props, State> {
   state = {
     loading: false,
-    enableError: '',
     openDisable: false,
-    openSnack: '',
+    openSnack: null,
     phrase: '',
-    phraseError: '',
     status: null,
   }
 
@@ -73,7 +55,7 @@ export default class VaultView extends React.Component<Props, State> {
     const req: VaultStatusRequest = {}
     vaultStatus(req, (err: RPCError, resp: VaultStatusResponse) => {
       if (err) {
-        store.dispatch({type: 'ERROR', payload: {error: err}})
+        this.setState({openSnack: {message: err.details, alert: 'error'}})
         return
       }
       console.log('Vault status:', resp)
@@ -86,16 +68,16 @@ export default class VaultView extends React.Component<Props, State> {
   }
 
   closeDisable = (snack: string) => {
-    this.setState({openDisable: false, openSnack: snack})
+    this.setState({openDisable: false, openSnack: snack ? {message: snack} : null})
     this.status()
   }
 
   vaultAuth = () => {
     const req: VaultAuthRequest = {}
-    this.setState({loading: true, phraseError: ''})
+    this.setState({loading: true})
     vaultAuth(req, (err: RPCError, resp: VaultAuthResponse) => {
       if (err) {
-        this.setState({loading: false, phraseError: err.details})
+        this.setState({loading: false, openSnack: {message: err.details, alert: 'error'}})
         return
       }
       this.setState({loading: false, phrase: resp.phrase})
@@ -107,11 +89,11 @@ export default class VaultView extends React.Component<Props, State> {
   }
 
   sync = () => {
-    this.setState({loading: true, enableError: ''})
+    this.setState({loading: true})
     const req: VaultSyncRequest = {}
     vaultSync(req, (err: RPCError, resp: VaultSyncResponse) => {
       if (err) {
-        this.setState({loading: false, enableError: err.details})
+        this.setState({loading: false, openSnack: {message: err.details, alert: 'error'}})
         return
       }
       this.setState({loading: false})
@@ -244,9 +226,6 @@ export default class VaultView extends React.Component<Props, State> {
             </Button>
           </Box>
         )}
-        {this.state.phraseError && (
-          <Typography style={{color: 'red', paddingBottom: 10}}>{this.state.phraseError}</Typography>
-        )}
       </Box>
     )
   }
@@ -273,16 +252,13 @@ export default class VaultView extends React.Component<Props, State> {
         )}
 
         <DisableDialog open={this.state.openDisable} close={(snack) => this.closeDisable(snack)} />
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        <Snack
           open={!!this.state.openSnack}
-          autoHideDuration={4000}
-          onClose={() => this.setState({openSnack: ''})}
-        >
-          <Alert severity="success">
-            <Typography>{this.state.openSnack}</Typography>
-          </Alert>
-        </Snackbar>
+          onClose={() => this.setState({openSnack: null})}
+          message={this.state.openSnack?.message}
+          alert={this.state.openSnack?.alert}
+          duration={this.state.openSnack?.duration}
+        />
       </Box>
     )
   }

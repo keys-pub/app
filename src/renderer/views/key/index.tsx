@@ -1,18 +1,6 @@
 import * as React from 'react'
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  MenuItem,
-  Select,
-  Slide,
-  Typography,
-} from '@material-ui/core'
+import {Avatar, Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
 import {TransitionProps} from '@material-ui/core/transitions'
 
@@ -21,15 +9,17 @@ import KeyView from './view'
 
 import {styles} from '../../components'
 
-import {key, keyRemove, pull} from '../../rpc/keys'
+import {key, pull} from '../../rpc/keys'
 import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean
   close: (snack: string) => void
   kid: string
-  source: 'search' | 'keys'
-  reload: () => void
+  search?: boolean
+  update?: boolean
+  import?: boolean
+  reload?: () => void
 }
 
 type State = {
@@ -60,7 +50,7 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
     if (this.props.kid !== prevProps.kid) {
-      this.loadKey(this.props.source == 'search', false)
+      this.loadKey(this.props.update, false)
     }
   }
 
@@ -72,7 +62,8 @@ export default class KeyDialog extends React.Component<Props, State> {
 
     this.setState({loading: true, error: ''})
     const req: KeyRequest = {
-      identity: this.props.kid,
+      key: this.props.kid,
+      search: this.props.search,
       update: update,
     }
     key(req, (err: RPCError, resp: KeyResponse) => {
@@ -85,7 +76,7 @@ export default class KeyDialog extends React.Component<Props, State> {
       } else {
         this.setState({error: 'Key not found', loading: false})
       }
-      if (reload) {
+      if (reload && this.props.reload) {
         this.props.reload()
       }
     })
@@ -98,7 +89,7 @@ export default class KeyDialog extends React.Component<Props, State> {
   import = () => {
     this.setState({loading: true, error: ''})
     const req: PullRequest = {
-      identity: this.props.kid,
+      key: this.props.kid,
     }
     pull(req, (err: RPCError, resp: PullResponse) => {
       if (err) {
@@ -106,7 +97,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         return
       }
       this.setState({loading: false})
-      this.close('Imported')
+      this.close('Imported key')
     })
   }
 
@@ -121,7 +112,9 @@ export default class KeyDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Key</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={() => this.close('')}>
+          Key
+        </DialogTitle>
         <DialogContent dividers style={{minHeight: 161}}>
           {/*TODO: Better error display*/}
           {this.state.error && (
@@ -132,7 +125,7 @@ export default class KeyDialog extends React.Component<Props, State> {
           {this.state.key && <KeyView value={this.state.key} refresh={this.refresh} />}
         </DialogContent>
         <DialogActions>
-          {this.props.source == 'search' && (
+          {this.props.import && (
             <Box display="flex" flexDirection="row">
               <Button onClick={() => this.close('')}>Close</Button>
               <Button color="primary" onClick={this.import} disabled={this.state.loading}>
@@ -140,7 +133,7 @@ export default class KeyDialog extends React.Component<Props, State> {
               </Button>
             </Box>
           )}
-          {this.props.source != 'search' && <Button onClick={() => this.close('')}>Close</Button>}
+          {!this.props.import && <Button onClick={() => this.close('')}>Close</Button>}
         </DialogActions>
       </Dialog>
     )

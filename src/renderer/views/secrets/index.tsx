@@ -7,7 +7,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -26,9 +25,9 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
-import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
+import {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {styles} from '../../components'
+import {styles, Snack} from '../../components'
 
 import {store} from '../../store'
 
@@ -71,11 +70,16 @@ type State = {
   newKeyMenuEl: HTMLButtonElement
   editing: Secret
   isNew: boolean
-  openRemove: Secret
+  openRemove: OpenRemove
   selected: Secret
-  snack: string
-  snackSeverity: string
+  openSnack: string
+  openSnackAlert: string
   syncing: boolean
+}
+
+type OpenRemove = {
+  open: boolean
+  secret: Secret
 }
 
 class SecretsView extends React.Component<Props, State> {
@@ -88,10 +92,10 @@ class SecretsView extends React.Component<Props, State> {
     newKeyMenuEl: null,
     editing: null,
     isNew: false,
-    openRemove: null,
+    openRemove: {open: false, secret: null},
     selected: null,
-    snack: '',
-    snackSeverity: '',
+    openSnack: '',
+    openSnackAlert: '',
     syncing: false,
   }
 
@@ -109,7 +113,7 @@ class SecretsView extends React.Component<Props, State> {
     vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
       this.setState({syncing: false})
       if (err) {
-        this.setState({snack: err.details, snackSeverity: 'error'})
+        this.setState({openSnack: err.details, openSnackAlert: 'error'})
       }
       this.reload()
     })
@@ -170,7 +174,7 @@ class SecretsView extends React.Component<Props, State> {
       return this.state.selected?.id == s.id
     })
 
-    this.setState({contextPosition: null, openRemove: secret})
+    this.setState({contextPosition: null, openRemove: {open: true, secret}})
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {
@@ -185,7 +189,7 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   closeRemove = (removed: boolean) => {
-    this.setState({openRemove: null, selected: null})
+    this.setState({openRemove: {open: false, secret: this.state.openRemove.secret}, selected: null})
     this.reload()
   }
 
@@ -326,20 +330,17 @@ class SecretsView extends React.Component<Props, State> {
           </Box>
         </Box>
         <SecretRemoveDialog
-          open={this.state.openRemove != null}
-          value={this.state.openRemove}
+          open={this.state.openRemove.open}
+          secret={this.state.openRemove.secret}
           close={this.closeRemove}
         />
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-          open={!!this.state.snack}
-          autoHideDuration={4000}
-          onClose={() => this.setState({snack: ''})}
-        >
-          <Alert severity={(this.state.snackSeverity || 'success') as AlertColor}>
-            <Typography>{this.state.snack}</Typography>
-          </Alert>
-        </Snackbar>
+        <Snack
+          open={!!this.state.openSnack}
+          message={this.state.openSnack}
+          alert={this.state.openSnackAlert as AlertColor}
+          onClose={() => this.setState({openSnack: ''})}
+          duration={4000}
+        />
       </Box>
     )
   }

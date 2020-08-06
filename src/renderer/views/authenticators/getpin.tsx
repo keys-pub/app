@@ -78,7 +78,9 @@ export default class GetPinDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>PIN</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={this.cancel}>
+          PIN
+        </DialogTitle>
         <DialogContent dividers>{this.renderPinChange()}</DialogContent>
         <DialogActions>
           <Button onClick={this.cancel}>Cancel</Button>

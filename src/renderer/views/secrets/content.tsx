@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box, Button, Divider, Snackbar, SnackbarContent, TextField, Typography} from '@material-ui/core'
+import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
 import {Visibility as PasswordVisibleIcon} from '@material-ui/icons'
 

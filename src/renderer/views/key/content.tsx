@@ -142,7 +142,7 @@ export default (props: Props) => {
               </TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
-                  {dateString(key.user.verifiedAt) || '-'}&nbsp;&nbsp;
+                  {key.user.verifiedAt && dateString(key.user.verifiedAt) + '  '}
                   <Button size="small" color="primary" variant="outlined" onClick={props.update}>
                     Update
                   </Button>

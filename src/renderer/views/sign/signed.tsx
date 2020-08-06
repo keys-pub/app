@@ -1,17 +1,10 @@
 import * as React from 'react'
 
-import {Button, Input, Box, Snackbar, SnackbarContent} from '@material-ui/core'
-
-import {styles} from '../../components'
-
-import {store} from '../../store'
-
+import {Button, Input, Box} from '@material-ui/core'
+import {styles, Snack} from '../../components'
 import {clipboard} from 'electron'
-
 import {debounce} from 'lodash'
-
 import {sign} from '../../rpc/keys'
-
 import {RPCError, SignRequest, SignResponse} from '../../rpc/keys.d'
 
 export type Props = {
@@ -109,21 +102,12 @@ export default class SignedView extends React.Component<Props, State> {
             Copy to Clipboard
           </Button>
         </Box>
-        <Snackbar
-          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+        <Snack
           open={this.state.openSnack}
-          autoHideDuration={2000}
-          onClose={() =>
-            this.setState({
-              openSnack: false,
-            })
-          }
-        >
-          <SnackbarContent
-            aria-describedby="client-snackbar"
-            message={<span id="client-snackbar">Copied to Clipboard</span>}
-          />
-        </Snackbar>
+          duration={2000}
+          onClose={() => this.setState({openSnack: false})}
+          message="Copied to Clipboard"
+        />
       </Box>
     )
   }

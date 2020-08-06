@@ -8,15 +8,13 @@ import {
   DialogContent,
   FormControl,
   FormHelperText,
-  Snackbar,
-  SnackbarContent,
   TextField,
   Typography,
 } from '@material-ui/core'
 
 import {clipboard, shell} from 'electron'
 
-import {styles, DialogTitle} from '../../components'
+import {styles, DialogTitle, Snack} from '../../components'
 
 import {userAdd, userSign} from '../../rpc/keys'
 import {RPCError, UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
@@ -306,21 +304,12 @@ export default class UserSignDialog extends React.Component<Props, State> {
         )}
         {!urlLabel && <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error}</Typography>}
 
-        <Snackbar
-          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+        <Snack
           open={this.state.openSnack}
-          autoHideDuration={2000}
-          onClose={() =>
-            this.setState({
-              openSnack: false,
-            })
-          }
-        >
-          <SnackbarContent
-            aria-describedby="client-snackbar"
-            message={<span id="client-snackbar">Copied to Clipboard</span>}
-          />
-        </Snackbar>
+          duration={2000}
+          onClose={() => this.setState({openSnack: false})}
+          message="Copied to Clipboard"
+        />
       </Box>
     )
   }
@@ -355,7 +344,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>{title}</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={() => this.close(false)}>
+          {title}
+        </DialogTitle>
         <DialogContent dividers>
           {this.state.step == 'name' && this.renderName()}
           {this.state.step == 'sign' && this.renderSign()}

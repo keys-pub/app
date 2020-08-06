@@ -48,7 +48,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   close = () => {
     const added = this.state.imported != ''
     this.props.close(added)
-    setTimeout(this.reset, 0)
+    setTimeout(this.reset, 200)
   }
 
   importKey = async () => {
@@ -133,7 +133,9 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Import Key</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={() => this.props.close(false)}>
+          Import Key
+        </DialogTitle>
         <DialogContent dividers>
           {!this.state.imported && this.renderImport()}
           {this.state.imported && this.renderImported()}

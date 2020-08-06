@@ -69,7 +69,9 @@ export default class DisableDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Delete from Server</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
+          Delete from Server
+        </DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography style={{fontWeight: 600}}>

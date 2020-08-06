@@ -153,7 +153,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle>Export Key</DialogTitle>
+        <DialogTitle onClose={this.props.close}>Export Key</DialogTitle>
         <DialogContent dividers>
           {this.state.export == '' && this.renderExport()}
           {this.state.export !== '' && this.renderExported()}

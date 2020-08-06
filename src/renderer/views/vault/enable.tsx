@@ -69,7 +69,9 @@ export default class EnableDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading}>Sync</DialogTitle>
+        <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
+          Sync
+        </DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography>Are you sure you want to enable sync?</Typography>

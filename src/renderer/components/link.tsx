@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
-export type Props = {
+type Props = {
   onClick: () => any
   children: any
   style?: React.CSSProperties
