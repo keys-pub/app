@@ -164,8 +164,9 @@ export default class VaultView extends React.Component<Props, State> {
           Delete Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 10}}>
-          This action will remove the vault backup from the server and disable syncing. Other devices that
-          sync with this vault will stop syncing.
+          This action will remove the vault backup from the server and disable syncing.
+          <br />
+          Other devices that sync with this vault will stop syncing.
           <br />
           For more details, see{' '}
           <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
@@ -180,7 +181,7 @@ export default class VaultView extends React.Component<Props, State> {
           disabled={this.state.loading}
           size="small"
         >
-          Delete Vault from Server
+          Delete Vault Sync
         </Button>
       </Box>
     )
