@@ -59,27 +59,12 @@ class Nav extends React.Component<Props, State> {
   }
   private experimentRef = React.createRef<HTMLButtonElement>()
 
-  // componentDidMount() {
-  //   this.status()
-  // }
-
   toggleDrawer = () => {
     store.dispatch({
       type: 'NAV_MINIMIZE',
       payload: {navMinimize: !this.props.navMinimize},
     })
   }
-
-  // status = () => {
-  //   const req: RuntimeStatusRequest = {}
-  //   runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-  //     if (err) {
-  //       store.dispatch({type: 'ERROR', payload: {error: err}})
-  //       return
-  //     }
-  //     this.setState({fido2: resp.fido2})
-  //   })
-  // }
 
   openExperimental = (event: React.MouseEvent<HTMLButtonElement>) => {
     this.setState({openExperimental: true})
@@ -153,7 +138,7 @@ class Nav extends React.Component<Props, State> {
     return (
       <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
         <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
-          <Box height={38} style={{backgroundColor: backgroundColor}}></Box>
+          <Box height={33} style={{backgroundColor: backgroundColor}} />
           <List style={{minWidth: width, height: '100%', padding: 0}}>
             {navs.map((nav, index) =>
               row(

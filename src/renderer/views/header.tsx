@@ -57,7 +57,7 @@ export default (props: Props) => {
   }
 
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" style={{height: 28}}>
       <Box display="flex" flexDirection="row">
         {props.back && (
           <Box display="flex" flexDirection="row">
