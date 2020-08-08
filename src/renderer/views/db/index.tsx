@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Divider,
+  Drawer,
   Paper,
   Table,
   TableBody,
@@ -84,75 +85,47 @@ export default class DBView extends React.Component<Props, State> {
   render() {
     const {collections, documents} = this.state
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
-        <Divider />
-        <Box display="flex" flexDirection="row" flex={1}>
-          <Box display="flex" flexDirection="column" style={{width: 110}}>
-            <Table size="small">
-              {/*<TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography style={{...styles.mono}}>Path</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              */}
-              <TableBody>
-                {collections.map((col, index) => (
-                  <TableRow hover onClick={(event) => this.selectCollection(col)} key={col.path}>
-                    <TableCell style={{paddingLeft: 8}}>
-                      <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-          <Divider orientation="vertical" />
-          <Box display="flex" flexDirection="column" flex={1}>
-            <Table size="small">
-              {/*<TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography style={{...styles.mono}}></Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography style={{...styles.mono}}></Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              */}
-              <TableBody>
-                {documents.map((doc: Document, index: number) => (
-                  <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                    <TableCell style={{width: '25%', verticalAlign: 'top', paddingRight: 0, paddingLeft: 8}}>
-                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                        {doc.path}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                      >
-                        {doc.value}
-                      </Typography>
-                      <Typography
-                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                      >
-                        {dateString(doc.createdAt)}
-                      </Typography>
-                      <Typography
-                        style={{...styles.mono, fontSize: 11, verticalAlign: 'top', wordBreak: 'break-all'}}
-                      >
-                        {dateString(doc.updatedAt)}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-        </Box>
+      <Box display="flex" flexDirection="row" style={{position: 'relative', height: '100%'}}>
+        <Table size="small" style={{position: 'sticky', left: 0, top: 30, width: 100}}>
+          <TableBody>
+            {collections.map((col, index) => (
+              <TableRow
+                hover
+                onClick={(event) => this.selectCollection(col)}
+                key={col.path}
+                style={{cursor: 'pointer'}}
+              >
+                <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
+                  <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Divider orientation="vertical" />
+        <Table size="small">
+          <TableBody>
+            {documents.map((doc: Document, index: number) => (
+              <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
+                <Box style={{paddingLeft: 8, paddingTop: 8, paddingBottom: 8}}>
+                  <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}>
+                    {doc.path}
+                  </Typography>
+                  <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                    {doc.value}
+                  </Typography>
+                  <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                    {dateString(doc.createdAt)}
+                  </Typography>
+                  <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                    {dateString(doc.updatedAt)}
+                  </Typography>
+                </Box>
+                <Divider />
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Box>
     )
   }
