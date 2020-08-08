@@ -1,14 +1,16 @@
 import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
+import {shell} from 'electron'
 
 type Props = {
-  onClick: () => any
+  onClick?: () => any
   children: any
   style?: React.CSSProperties
   inline?: boolean
   span?: boolean
   color?: string
+  href?: string
 }
 
 const defaultStyles = {
@@ -33,16 +35,22 @@ const Link = (props: Props) => {
   } else {
     style.color = '#2196f3'
   }
+
+  let onClick = props.onClick
+  if (props.href) {
+    onClick = () => shell.openExternal(props.href)
+  }
+
   if (props.span) {
     return (
-      <span onClick={props.onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+      <span onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
         {props.children}
       </span>
     )
   }
 
   return (
-    <Typography onClick={props.onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+    <Typography onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
       {props.children}
     </Typography>
   )

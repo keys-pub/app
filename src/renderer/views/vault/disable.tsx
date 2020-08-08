@@ -70,17 +70,17 @@ export default class DisableDialog extends React.Component<Props, State> {
         // keepMounted
       >
         <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
-          Delete from Server
+          Delete Vault Sync
         </DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
-            <Typography style={{fontWeight: 600}}>
-              Are you sure you want to remove the vault backup from the server and disable syncing?
-            </Typography>
             <Typography>
+              <span style={{fontWeight: 600}}>
+                Are you sure you want to remove the vault backup from the server and disable syncing?&nbsp;
+              </span>
               This will permanently delete the vault from the server. Other devices that sync with this vault
               will also stop. For more details, see{' '}
-              <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/vault.html')}>
+              <Link span href="https://keys.pub/docs/specs/vault.html">
                 keys.pub/docs/specs/vault
               </Link>
               .
