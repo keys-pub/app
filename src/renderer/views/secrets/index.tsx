@@ -39,7 +39,7 @@ import SecretContentView from './content'
 
 import {directionString, flipDirection} from '../helper'
 
-import {secrets, vaultUpdate} from '../../rpc/keys'
+import {secrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
   RPCError,
   Secret,
@@ -47,6 +47,8 @@ import {
   SecretType,
   SecretsRequest,
   SecretsResponse,
+  RuntimeStatusRequest,
+  RuntimeStatusResponse,
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
@@ -74,6 +76,7 @@ type State = {
   selected: Secret
   openSnack: string
   openSnackAlert: string
+  syncEnabled: boolean
   syncing: boolean
 }
 
@@ -96,6 +99,7 @@ class SecretsView extends React.Component<Props, State> {
     selected: null,
     openSnack: '',
     openSnackAlert: '',
+    syncEnabled: false,
     syncing: false,
   }
 
@@ -104,7 +108,14 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   reload = () => {
-    this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+    const req: RuntimeStatusRequest = {}
+    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+      if (err) {
+        return
+      }
+      this.setState({syncEnabled: resp.sync})
+      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+    })
   }
 
   sync = () => {
@@ -232,7 +243,7 @@ class SecretsView extends React.Component<Props, State> {
           value={this.state.input}
           onChange={this.onInputChange}
           inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, marginRight: 10}}
+          style={{marginTop: 2, width: '100%', marginRight: 10}}
         />
         <Button
           color="primary"
@@ -244,15 +255,17 @@ class SecretsView extends React.Component<Props, State> {
         >
           <AddIcon />
         </Button>
-        <Button
-          onClick={this.sync}
-          size="small"
-          variant="outlined"
-          style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
-          disabled={this.state.syncing}
-        >
-          <SyncIcon />
-        </Button>
+        {this.state.syncEnabled && (
+          <Button
+            onClick={this.sync}
+            size="small"
+            variant="outlined"
+            style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
+            disabled={this.state.syncing}
+          >
+            <SyncIcon />
+          </Button>
+        )}
       </Box>
     )
   }
@@ -260,6 +273,13 @@ class SecretsView extends React.Component<Props, State> {
   render() {
     const {sortField, sortDirection} = this.state
     const direction = directionString(sortDirection)
+
+    // If filtering, selected might not be visible, but we don't want to clear
+    // selected when filtering so we check to see if it's in the list before
+    // showing.
+    const selected: Secret = this.state.secrets.find((s: Secret) => {
+      return this.state.selected?.id == s.id
+    })
 
     return (
       <Box>
@@ -326,7 +346,9 @@ class SecretsView extends React.Component<Props, State> {
                 cancel={this.cancelEdit}
               />
             )}
-            {!this.state.editing && <SecretContentView secret={this.state.selected} edit={this.edit} />}
+            {!this.state.editing && selected && (
+              <SecretContentView secret={this.state.selected} edit={this.edit} />
+            )}
           </Box>
         </Box>
         <SecretRemoveDialog

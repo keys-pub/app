@@ -5,6 +5,8 @@ import {routerMiddleware} from 'connected-react-router'
 import {createLogger} from 'redux-logger'
 import createRootReducer from '../reducers'
 
+import {Store} from '../store/pull'
+
 import {ipcRenderer} from 'electron'
 import {push} from 'connected-react-router'
 

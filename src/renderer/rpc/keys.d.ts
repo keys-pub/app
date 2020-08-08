@@ -362,8 +362,10 @@ export interface RuntimeStatusResponse {
     appName?: string;
     // Exe is the service executable path.
     exe?: string;
-    // AuthStatus is status of auth.
+    // AuthStatus is the status of auth.
     authStatus?: AuthStatus;
+    // SyncStatus is the status of vault sync.
+    sync?: boolean;
     // FIDO2 available.
     fido2?: boolean;
 }

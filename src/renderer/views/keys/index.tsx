@@ -47,7 +47,7 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys, vaultUpdate} from '../../rpc/keys'
+import {keys, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
   RPCError,
   Key,
@@ -55,6 +55,8 @@ import {
   SortDirection,
   KeysRequest,
   KeysResponse,
+  RuntimeStatusRequest,
+  RuntimeStatusResponse,
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
@@ -84,6 +86,7 @@ type State = {
   openSearch: boolean
   openSnack: SnackOpts
   selected: string
+  syncEnabled: boolean
   syncing: boolean
 }
 
@@ -108,6 +111,7 @@ class KeysView extends React.Component<Props, State> {
     openSearch: false,
     openSnack: null,
     selected: '',
+    syncEnabled: false,
     syncing: false,
   }
 
@@ -116,7 +120,15 @@ class KeysView extends React.Component<Props, State> {
   }
 
   reload = () => {
-    this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+    const req: RuntimeStatusRequest = {}
+    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
+      if (err) {
+        this.setState({openSnack: {message: err.details, alert: 'error'}})
+        return
+      }
+      this.setState({syncEnabled: resp.sync})
+      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+    })
   }
 
   sync = () => {
@@ -252,6 +264,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   renderHeader() {
+    const buttonWidth = 80
     return (
       <Box
         display="flex"
@@ -264,8 +277,8 @@ class KeysView extends React.Component<Props, State> {
           variant="outlined"
           size="small"
           onClick={this.keyGen}
-          style={{marginTop: 2, minWidth: 90}}
-          startIcon={<AddIcon />}
+          style={{marginTop: 2, minWidth: buttonWidth}}
+          // startIcon={<AddIcon />}
         >
           New
         </Button>
@@ -275,8 +288,8 @@ class KeysView extends React.Component<Props, State> {
           variant="outlined"
           size="small"
           onClick={this.importKey}
-          style={{marginTop: 2, minWidth: 90}}
-          startIcon={<ImportKeyIcon />}
+          style={{marginTop: 2, minWidth: buttonWidth}}
+          // startIcon={<ImportKeyIcon />}
         >
           Import
         </Button>
@@ -286,21 +299,23 @@ class KeysView extends React.Component<Props, State> {
           variant="outlined"
           size="small"
           onClick={this.searchKey}
-          style={{marginTop: 2, minWidth: 90}}
-          startIcon={<SearchIcon />}
+          style={{marginTop: 2, minWidth: buttonWidth}}
+          // startIcon={<SearchIcon />}
         >
           Search
         </Button>
         <Box paddingLeft={1} />
-        <Button
-          onClick={this.sync}
-          size="small"
-          variant="outlined"
-          style={{marginTop: 2, minWidth: 'auto'}}
-          disabled={this.state.syncing}
-        >
-          <SyncIcon />
-        </Button>
+        {this.state.syncEnabled && (
+          <Button
+            onClick={this.sync}
+            size="small"
+            variant="outlined"
+            style={{marginTop: 2, minWidth: 'auto'}}
+            disabled={this.state.syncing}
+          >
+            <SyncIcon />
+          </Button>
+        )}
         <Box display="flex" flexDirection="row" flexGrow={1} />
         <TextField
           placeholder="Filter"

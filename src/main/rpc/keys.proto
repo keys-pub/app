@@ -395,8 +395,10 @@ message RuntimeStatusResponse {
   string appName = 2;
   // Exe is the service executable path.
   string exe = 4;
-  // AuthStatus is status of auth.
+  // AuthStatus is the status of auth.
   AuthStatus authStatus = 5;
+  // SyncStatus is the status of vault sync.
+  bool sync = 6;
   // FIDO2 available.
   bool fido2 = 20 [(gogoproto.customname) = "FIDO2"];
 }
