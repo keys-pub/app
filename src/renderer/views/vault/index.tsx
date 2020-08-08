@@ -237,7 +237,6 @@ export default class VaultView extends React.Component<Props, State> {
     const syncEnabled = !!this.state?.status?.kid
     return (
       <Box display="flex" flex={1} flexDirection="column">
-        <Divider />
         {!this.state.loading && <Box style={{marginBottom: 4}} />}
         {this.state.loading && <LinearProgress />}
 

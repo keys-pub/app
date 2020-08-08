@@ -171,7 +171,6 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
             <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
           </MenuItem>
         </Menu>
-        <Divider />
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
           <Box style={{width: 200}}>
             {this.renderHeader()}

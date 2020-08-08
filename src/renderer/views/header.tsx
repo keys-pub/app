@@ -24,6 +24,7 @@ type Props = {
   lock?: boolean
   back?: boolean
   navMinimize?: boolean
+  noDivider?: boolean
 }
 
 export default (props: Props) => {
@@ -55,44 +56,46 @@ export default (props: Props) => {
     setMaximized(!win.isMaximized())
     win.isMaximized() ? win.unmaximize() : win.maximize()
   }
-
   return (
-    <Box display="flex" flexDirection="column" style={{height: 28}}>
-      <Box display="flex" flexDirection="row">
-        {props.back && (
-          <Box display="flex" flexDirection="row">
-            <Box style={{width: props.navMinimize ? 68 : 140}} className="drag" />
-            <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-              <ChevronLeft />
+    <Box display="flex" flexDirection="column">
+      <Box display="flex" flexDirection="column" style={{height: 28}}>
+        <Box display="flex" flexDirection="row">
+          {props.back && (
+            <Box display="flex" flexDirection="row">
+              <Box style={{width: props.navMinimize ? 68 : 140}} className="drag" />
+              <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+                <ChevronLeft />
+              </IconButton>
+            </Box>
+          )}
+          <Box display="flex" flexGrow={1} className="drag" />
+          {props.lock && (
+            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+              <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
             </IconButton>
-          </Box>
-        )}
-        <Box display="flex" flexGrow={1} className="drag" />
-        {props.lock && (
-          <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-            <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
-          </IconButton>
-        )}
-        {showSystemButtons && (
-          <Box>
-            <IconButton onClick={minimize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-              <MinimizeIcon fontSize="small" style={{color: '#666'}} />
-            </IconButton>
-            <IconButton onClick={maximize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-              {!maximized && <MaximizeIcon fontSize="small" style={{color: '#666'}} />}
-              {maximized && <UnmaximizeIcon fontSize="small" style={{color: '#666'}} />}
-            </IconButton>
-            <IconButton
-              color="secondary"
-              onClick={close}
-              style={{marginTop: -6, marginBottom: -2, height: 41}}
-            >
-              <CloseIcon fontSize="small" style={{color: '#666'}} />
-            </IconButton>
-          </Box>
-        )}
-        {!showSystemButtons && <Box style={{marginTop: -6, marginBottom: -2, height: 41}} />}
+          )}
+          {showSystemButtons && (
+            <Box>
+              <IconButton onClick={minimize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+                <MinimizeIcon fontSize="small" style={{color: '#666'}} />
+              </IconButton>
+              <IconButton onClick={maximize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+                {!maximized && <MaximizeIcon fontSize="small" style={{color: '#666'}} />}
+                {maximized && <UnmaximizeIcon fontSize="small" style={{color: '#666'}} />}
+              </IconButton>
+              <IconButton
+                color="secondary"
+                onClick={close}
+                style={{marginTop: -6, marginBottom: -2, height: 41}}
+              >
+                <CloseIcon fontSize="small" style={{color: '#666'}} />
+              </IconButton>
+            </Box>
+          )}
+          {!showSystemButtons && <Box style={{marginTop: -6, marginBottom: -2, height: 41}} />}
+        </Box>
       </Box>
+      {!props.noDivider && <Divider />}
     </Box>
   )
 }

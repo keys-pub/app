@@ -322,7 +322,6 @@ class WormholeView extends React.Component<Props, State> {
 
     return (
       <Box style={{height: '100%', overflowX: 'hidden', overflowY: 'hidden', position: 'relative'}}>
-        <Divider />
         <Box display="flex" flexDirection="row">
           <Box display="flex" flexDirection="column" flex={1}>
             <Box

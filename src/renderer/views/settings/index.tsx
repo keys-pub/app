@@ -61,8 +61,7 @@ export default class SettingsView extends React.Component<Props, State> {
     const labelWidth = 60
     return (
       <Box display="flex" flex={1} flexDirection="column">
-        <Divider />
-        <Box paddingTop={2} />
+        <Box paddingTop={1} />
         <Table size="small">
           <TableBody>
             <TableRow>
@@ -88,7 +87,7 @@ export default class SettingsView extends React.Component<Props, State> {
                       style={{paddingTop: 0, paddingBottom: 0}}
                     />
                   }
-                  label="Use prereleases"
+                  label="Prereleases"
                 />
               </TableCell>
             </TableRow>
@@ -134,7 +133,7 @@ export default class SettingsView extends React.Component<Props, State> {
 const cstyles = {
   cell: {
     borderBottom: 0,
-    paddingBottom: 20,
+    paddingBottom: 10,
     verticalAlign: 'top',
   },
 }

@@ -86,7 +86,9 @@ class Main extends React.Component<Props> {
 
     return (
       <Box display="flex" flexDirection="column" flex={1}>
-        <Header navMinimize={this.props.navMinimize} lock={!isCover} back={!isCover} />
+        <Box style={{position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 100}}>
+          <Header navMinimize={this.props.navMinimize} lock={!isCover} back={!isCover} noDivider={isCover} />
+        </Box>
         {view}
         <UpdateAlert />
         <ErrorsDialog error={this.props.error} clearError={this.clearError} />

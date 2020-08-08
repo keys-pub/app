@@ -372,7 +372,6 @@ class KeysView extends React.Component<Props, State> {
             <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
           </MenuItem>
         </Menu>
-        <Divider />
         {this.renderHeader()}
         <Divider />
         <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>

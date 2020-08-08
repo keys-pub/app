@@ -49,30 +49,27 @@ export default (props: Props) => {
   const selected = Store.useState((s) => s.selectedTool)
 
   return (
-    <Box display="flex" flexDirection="column" flex={1}>
-      <Divider />
-      <Box display="flex" flexGrow={1} flexDirection="row">
-        <List
-          style={{
-            height: '100%',
-            padding: 0,
-          }}
-        >
-          {navs.map((nav, index) =>
-            row(nav, index, selected == nav.id, () =>
-              Store.update((s) => {
-                s.selectedTool = nav.id
-              })
-            )
-          )}
-        </List>
-        <Divider orientation="vertical" />
-        <Box display="flex" flexDirection="column" flex={1}>
-          {selected == 'encrypt' && <EncryptView />}
-          {selected == 'decrypt' && <DecryptView />}
-          {selected == 'sign' && <SignView />}
-          {selected == 'verify' && <VerifyView />}
-        </Box>
+    <Box display="flex" flexGrow={1} flexDirection="row">
+      <List
+        style={{
+          height: '100%',
+          padding: 0,
+        }}
+      >
+        {navs.map((nav, index) =>
+          row(nav, index, selected == nav.id, () =>
+            Store.update((s) => {
+              s.selectedTool = nav.id
+            })
+          )
+        )}
+      </List>
+      <Divider orientation="vertical" />
+      <Box display="flex" flexDirection="column" flex={1}>
+        {selected == 'encrypt' && <EncryptView />}
+        {selected == 'decrypt' && <DecryptView />}
+        {selected == 'sign' && <SignView />}
+        {selected == 'verify' && <VerifyView />}
       </Box>
     </Box>
   )
