@@ -1,216 +1,277 @@
 import * as React from 'react'
 
-import {connect} from 'react-redux'
-
-import {Divider, Input, Box, LinearProgress, Typography} from '@material-ui/core'
-
-import {debounce} from 'lodash'
+import {Divider, Button, Box, Input, LinearProgress, Typography} from '@material-ui/core'
 
 import VerifiedView from './verified'
 import VerifiedFileView from './verifiedfile'
-import {store} from '../../store'
 
 import {styles, Link} from '../../components'
-import * as grpc from '@grpc/grpc-js'
 import {remote} from 'electron'
+import * as grpc from '@grpc/grpc-js'
 
-import {VerifyState} from '../../reducers/verify'
-import {verifyFile, key} from '../../rpc/keys'
-import {Key, RPCError, VerifyFileInput, VerifyFileOutput, KeyRequest, KeyResponse} from '../../rpc/keys.d'
+import {verify, verifyFile, key} from '../../rpc/keys'
+import {
+  Key,
+  EncryptMode,
+  RPCError,
+  KeyRequest,
+  KeyResponse,
+  VerifyFileInput,
+  VerifyFileOutput,
+  VerifyRequest,
+  VerifyResponse,
+} from '../../rpc/keys.d'
 
-export type Props = {
-  defaultValue: string
-  file: string
-  fileOut: string
-  fileSigner: Key
-}
+import {VerifyStore as Store} from '../../store/pull'
 
-type State = {
-  fileError: string
-  loading: boolean
-  value: string
-}
-
-class VerifyView extends React.Component<Props, State> {
-  state = {
-    fileError: '',
-    loading: false,
-    value: this.props.defaultValue,
+const openFile = async () => {
+  clearOut()
+  const win = remote.getCurrentWindow()
+  const open = await remote.dialog.showOpenDialog(win, {})
+  if (open.canceled) {
+    return
   }
-  inputRef: any = React.createRef()
+  if (open.filePaths.length == 1) {
+    const file = open.filePaths[0]
 
-  debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
-
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({value: target.value || '', fileError: ''})
-    this.debounceDefaultValue(target.value || '')
-  }
-
-  setDefaultValue = (v: string) => {
-    store.dispatch({type: 'VERIFY_VALUE', payload: {value: v}})
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.file != prevProps.file && this.props.file) {
-      this.verifyFile()
-    }
-  }
-
-  verifyFile = async () => {
-    const req: VerifyFileInput = {
-      in: this.props.file,
-    }
-    console.log('Verifying...')
-    this.setState({loading: true, fileError: ''})
-
-    const send = verifyFile((err: RPCError, resp: VerifyFileOutput, done: boolean) => {
-      if (err) {
-        if (err.code == grpc.status.CANCELLED) {
-          this.setState({loading: false})
-        } else {
-          this.setState({loading: false, fileError: err.details})
-        }
-        return
-      }
-      if (resp) {
-        store.dispatch({type: 'VERIFY_FILE_OUT', payload: {fileOut: resp.out, fileSigner: resp.signer}})
-      }
-      if (done) {
-        this.setState({loading: false})
-      }
-    })
-    send(req, false)
-  }
-
-  reloadFileKey = () => {
-    const req: KeyRequest = {
-      key: this.props.fileSigner.id,
-    }
-    key(req, (err: RPCError, resp: KeyResponse) => {
-      if (err) {
-        // TODO: Show error
-        return
-      }
-      if (resp.key) {
-        store.dispatch({
-          type: 'VERIFY_FILE_OUT',
-          payload: {fileOut: this.props.fileOut, fileSigner: resp.key},
-        })
-      }
+    Store.update((s) => {
+      s.fileIn = file
     })
   }
+}
 
-  cancel = () => {
-    // TODO: stream cancel
+const clear = () => {
+  // TODO: Stream cancel?
+  Store.update((s) => {
+    s.input = ''
+    s.output = ''
+    s.fileIn = ''
+    s.fileOut = ''
+    s.signer = null
+    s.error = ''
+  })
+}
+
+const clearOut = () => {
+  Store.update((s) => {
+    s.output = ''
+    s.fileOut = ''
+    s.signer = null
+    s.error = ''
+  })
+}
+
+const reloadSigner = (kid: string) => {
+  const req: KeyRequest = {
+    key: kid,
   }
-
-  openFile = async () => {
-    this.setState({fileError: ''})
-    const win = remote.getCurrentWindow()
-    const open = await remote.dialog.showOpenDialog(win, {})
-    if (open.canceled) {
+  key(req, (err: RPCError, resp: KeyResponse) => {
+    if (err) {
+      Store.update((s) => {
+        s.error = err.details
+      })
       return
     }
-    if (open.filePaths.length == 1) {
-      const file = open.filePaths[0]
-      store.dispatch({type: 'VERIFY_FILE', payload: {file}})
+    if (resp.key) {
+      Store.update((s) => {
+        s.signer = resp.key
+      })
     }
+  })
+}
+
+const verifyInput = (input: string) => {
+  if (input == '') {
+    clearOut()
+    return
   }
 
-  clearFile = () => {
-    this.cancel()
-    this.setState({fileError: ''})
-    store.dispatch({type: 'VERIFY_FILE', payload: {file: ''}})
-    store.dispatch({type: 'VERIFY_FILE_OUT', payload: {fileOut: '', fileSigner: null}})
+  console.log('Verifying...')
+  const data = new TextEncoder().encode(input)
+  const req: VerifyRequest = {
+    data: data,
   }
+  verify(req, (err: RPCError, resp: VerifyResponse) => {
+    if (err) {
+      Store.update((s) => {
+        s.error = err.details
+      })
+      return
+    }
+    const verified = new TextDecoder().decode(resp.data)
+    Store.update((s) => {
+      s.signer = resp.signer
+      s.error = ''
+      s.output = verified
+      s.fileOut = ''
+    })
+  })
+}
 
-  render() {
-    return (
-      <Box display="flex" flex={1} flexDirection="column" style={{overflow: 'hidden'}}>
-        <Box style={{position: 'relative', height: '40%'}}>
-          {this.props.file && (
-            <Box style={{height: '50%', paddingTop: 8, paddingLeft: 8}}>
-              <Typography style={{...styles.mono, display: 'inline'}}>{this.props.file}&nbsp;</Typography>
-              <Link inline onClick={this.clearFile}>
-                Clear
-              </Link>
-            </Box>
-          )}
-          {!this.props.file && (
-            <Box style={{height: '100%'}}>
-              <Input
-                multiline
-                autoFocus
-                onChange={this.onInputChange}
-                value={this.state.value}
-                disableUnderline
-                inputProps={{
-                  ref: this.inputRef,
-                  spellCheck: 'false',
-                  style: {
-                    ...styles.mono,
-                    height: '100%',
-                    overflow: 'auto',
-                    paddingTop: 8,
-                    paddingLeft: 8,
-                    paddingBottom: 0,
-                    paddingRight: 0,
-                  },
-                }}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                }}
-              />
-              {!this.state.value && (
-                <Box style={{position: 'absolute', top: 6, left: 8}}>
-                  <Typography
-                    style={{display: 'inline', color: '#a2a2a2'}}
-                    onClick={() => this.inputRef.current.focus()}
-                  >
-                    Enter signed text or{' '}
-                  </Typography>
-                  <Link inline onClick={this.openFile}>
-                    select a file
-                  </Link>
-                  <Typography style={{display: 'inline'}}>.</Typography>
-                </Box>
-              )}
-            </Box>
-          )}
-          <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
-            {!this.state.loading && <Divider />}
-            {this.state.loading && <LinearProgress />}
+const verifyFileIn = (fileIn: string, dir: string) => {
+  clearOut()
+
+  if (fileIn == '') return
+
+  const req: VerifyFileInput = {
+    in: fileIn,
+    out: dir,
+  }
+  console.log('Verifying file...')
+  Store.update((s) => {
+    s.loading = true
+  })
+  const send = verifyFile((err: RPCError, resp: VerifyFileOutput, done: boolean) => {
+    if (err) {
+      if (err.code == grpc.status.CANCELLED) {
+        Store.update((s) => {
+          s.loading = false
+        })
+      } else {
+        Store.update((s) => {
+          s.error = err.details
+          s.loading = false
+        })
+      }
+      return
+    }
+    if (resp) {
+      Store.update((s) => {
+        s.fileOut = resp.out
+        s.signer = resp.signer
+        s.error = ''
+        s.output = ''
+      })
+    }
+    if (done) {
+      Store.update((s) => {
+        s.loading = false
+      })
+    }
+  })
+  send(req, false)
+}
+
+const verifyFileTo = async (fileIn: string) => {
+  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+    properties: ['openDirectory'],
+  })
+  if (open.canceled) {
+    return
+  }
+  if (open.filePaths.length == 1) {
+    const dir = open.filePaths[0]
+    verifyFileIn(fileIn, dir)
+  }
+}
+
+const VerifyToButton = (props: {onClick: () => void; disabled: boolean}) => (
+  <Box style={{marginLeft: 10, marginTop: 10}}>
+    <Button color="primary" variant="outlined" disabled={props.disabled} onClick={props.onClick}>
+      Verify to
+    </Button>
+  </Box>
+)
+
+export default (props: {}) => {
+  const inputRef = React.useRef<HTMLInputElement>()
+
+  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    Store.update((s) => {
+      s.input = target.value || ''
+    })
+  }, [])
+
+  const {input, output, fileIn, fileOut, error, signer, loading} = Store.useState()
+
+  React.useEffect(() => {
+    if (fileIn == '') {
+      verifyInput(input)
+    }
+  }, [input])
+
+  const showVerifyFileButton = fileIn && !fileOut
+
+  return (
+    <Box display="flex" flex={1} flexDirection="column" style={{overflow: 'hidden'}}>
+      <Box style={{position: 'relative', height: '40%'}}>
+        {fileIn && (
+          <Box style={{paddingTop: 8, paddingLeft: 8}}>
+            <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
+            <Link inline onClick={clear}>
+              Clear
+            </Link>
           </Box>
-        </Box>
-        <Box
-          style={{
-            height: '60%',
-            width: '100%',
-          }}
-        >
-          {(this.state.fileError || this.props.fileOut) && (
-            <VerifiedFileView
-              fileOut={this.props.fileOut}
-              signer={this.props.fileSigner}
-              error={this.state.fileError}
-              reloadKey={this.reloadFileKey}
+        )}
+        {!fileIn && (
+          <Box style={{height: '100%'}}>
+            <Input
+              multiline
+              autoFocus
+              onChange={onInputChange}
+              value={input}
+              disableUnderline
+              inputProps={{
+                spellCheck: 'false',
+                ref: inputRef,
+                style: {
+                  ...styles.mono,
+                  height: '100%',
+                  overflow: 'auto',
+                  paddingTop: 8,
+                  paddingLeft: 8,
+                  paddingBottom: 0,
+                  paddingRight: 0,
+                },
+              }}
+              style={{
+                height: '100%',
+                width: '100%',
+              }}
             />
-          )}
-          {!this.state.fileError && !this.props.fileOut && <VerifiedView value={this.state.value} />}
+            {!input && (
+              <Box style={{position: 'absolute', top: 6, left: 8}}>
+                <Typography
+                  style={{display: 'inline', color: '#a2a2a2'}}
+                  onClick={() => inputRef.current.focus()}
+                >
+                  Enter signed text or{' '}
+                </Typography>
+                <Link inline onClick={openFile}>
+                  select a file
+                </Link>
+                <Typography style={{display: 'inline'}}>.</Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
+          {!loading && <Divider />}
+          {loading && <LinearProgress />}
         </Box>
       </Box>
-    )
-  }
+      <Box
+        style={{
+          height: '60%',
+          width: '100%',
+        }}
+      >
+        {error && (
+          <Box style={{paddingLeft: 10, paddingTop: 10}}>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error}&nbsp;</Typography>
+          </Box>
+        )}
+        {!error && showVerifyFileButton && (
+          <VerifyToButton onClick={() => verifyFileTo(fileIn)} disabled={loading} />
+        )}
+        {!error && !showVerifyFileButton && fileOut && (
+          <VerifiedFileView fileOut={fileOut} signer={signer} reloadKey={() => reloadSigner(signer.id)} />
+        )}
+        {!error && !showVerifyFileButton && !fileOut && (
+          <VerifiedView value={output} signer={signer} reloadSigner={() => reloadSigner(signer.id)} />
+        )}
+      </Box>
+    </Box>
+  )
 }
-
-const mapStateToProps = (state: {verify: VerifyState; router: any}, ownProps: any) => {
-  return {
-    defaultValue: state.verify.value || '',
-    file: state.verify.file || '',
-    fileOut: state.verify.fileOut || '',
-    fileSigner: state.verify.fileSigner || null,
-  }
-}
-export default connect(mapStateToProps)(VerifyView)

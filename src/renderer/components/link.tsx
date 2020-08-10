@@ -11,11 +11,7 @@ type Props = {
   span?: boolean
   color?: string
   href?: string
-}
-
-const defaultStyles = {
-  textDecoration: 'none',
-  cursor: 'pointer',
+  disabled?: boolean
 }
 
 const Link = (props: Props) => {
@@ -23,10 +19,14 @@ const Link = (props: Props) => {
   const on = () => setHover(true)
   const off = () => setHover(false)
 
-  const style = {...defaultStyles, ...(props.style || {})}
-  if (hover) {
-    style.textDecoration = hover ? 'underline' : 'none'
+  const style = props.style || {}
+  if (hover && !props.disabled) {
+    style.textDecoration = 'underline'
+    style.cursor = 'pointer'
+  } else {
+    style.cursor = 'default'
   }
+
   if (props.inline) {
     style.display = 'inline'
   }
@@ -39,6 +39,10 @@ const Link = (props: Props) => {
   let onClick = props.onClick
   if (props.href) {
     onClick = () => shell.openExternal(props.href)
+  }
+  if (props.disabled) {
+    onClick = null
+    style.color = '#666'
   }
 
   if (props.span) {

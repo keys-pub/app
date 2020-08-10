@@ -151,7 +151,7 @@ export interface VerifyOutput {
 export interface VerifyFileInput {
     // In is input file path.  
     in?: string;
-    // Out is output file path.
+    // Out is the output file name or directory to save to.
     out?: string;
 }
 
@@ -286,6 +286,8 @@ export interface EncryptFileInput {
 }
 
 export interface EncryptFileOutput {
+    // Out is the output decrypted file path.
+    out?: string;
     bytes?: number;
     total?: number;
 }
@@ -325,12 +327,13 @@ export interface DecryptResponse {
 export interface DecryptFileInput {
     // In is the input encrypted file path. 
     in?: string;
-    // Out is the output decrypted file path.
+    // Out is the output file name or directory to save to.
     out?: string;
 }
 
 export interface DecryptFileOutput {
     sender?: Key;
+    // Out is the output file path.
     out?: string;
     bytes?: number;
     total?: number;

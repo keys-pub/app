@@ -14,15 +14,13 @@ type Props = {
   duration?: number
 }
 
-type SnackOpts = {
+export type SnackOpts = {
   message: string
   alert?: string
   duration?: number
 }
 
-export {SnackOpts}
-
-const Snack = (props: Props) => {
+export const Snack = (props: Props) => {
   if (!!props.alert) {
     return <SnackAlert {...props} />
   }
@@ -68,5 +66,3 @@ const SnackAlert = (props: Props) => {
     </Snackbar>
   )
 }
-
-export default Snack

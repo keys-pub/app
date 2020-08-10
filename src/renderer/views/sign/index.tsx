@@ -1,214 +1,270 @@
 import * as React from 'react'
 
-import {connect} from 'react-redux'
-
 import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
 
 import {styles, Link} from '../../components'
 
 import {remote} from 'electron'
-import {store} from '../../store'
-import {query} from '../state'
-import {debounce} from 'lodash'
 import * as grpc from '@grpc/grpc-js'
+import * as path from 'path'
 
 import SignedView from './signed'
 import SignFileView from './signedfile'
 import SignKeySelectView from '../keys/select'
 
-import {SignState} from '../../reducers/sign'
-import {signFile} from '../../rpc/keys'
-import {RPCError, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
+import {sign, signFile} from '../../rpc/keys'
+import {Key, RPCError, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
 
-export type Props = {
-  signer: string
-  defaultValue: string
-  file: string
-  fileOut: string
-}
+import {SignStore as Store} from '../../store/pull'
 
-type State = {
-  fileError: string
-  loading: boolean
-  value: string
-}
-
-class SignView extends React.Component<Props, State> {
-  state = {
-    fileError: '',
-    loading: false,
-    value: this.props.defaultValue,
+const openFile = async () => {
+  clearOut()
+  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {})
+  if (open.canceled) {
+    return
   }
-  inputRef: any = React.createRef()
+  if (open.filePaths.length == 1) {
+    const file = open.filePaths[0]
 
-  debounceDefaultValue = debounce((v: string) => this.setDefaultValue(v), 1000)
-
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({value: target.value || '', fileError: ''})
-    this.debounceDefaultValue(target.value || '')
-  }
-
-  setDefaultValue = (v: string) => {
-    store.dispatch({type: 'SIGN_VALUE', payload: {value: v}})
-  }
-
-  setSigner = (kid: string) => {
-    store.dispatch({type: 'SIGN_SIGNER', payload: {signer: kid}})
-  }
-
-  canSignFile = () => {
-    return this.props.file && this.props.signer
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if ((this.props.file != prevProps.file || this.props.signer != prevProps.signer) && this.canSignFile()) {
-      this.signFile()
-    }
-  }
-
-  signFile = async () => {
-    const req: SignFileInput = {
-      signer: this.props.signer,
-      in: this.props.file,
-    }
-
-    console.log('Signing...')
-    this.setState({loading: true, fileError: ''})
-    const send = signFile((err: RPCError, resp: SignFileOutput, done: boolean) => {
-      if (err) {
-        if (err.code == grpc.status.CANCELLED) {
-          this.setState({loading: false})
-        } else {
-          this.setState({loading: false, fileError: err.details})
-        }
-        return
-      }
-      if (resp) {
-        store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut: resp.out}})
-      }
-      if (done) {
-        this.setState({loading: false})
-      }
+    Store.update((s) => {
+      s.fileIn = file || ''
     })
-    send(req, false)
+  }
+}
+
+const clear = () => {
+  // TODO: Stream cancel?
+  Store.update((s) => {
+    s.input = ''
+    s.output = ''
+    s.fileIn = ''
+    s.fileOut = ''
+    s.error = ''
+    s.loading = false
+  })
+}
+
+const clearOut = () => {
+  Store.update((s) => {
+    s.output = ''
+    s.fileOut = ''
+    s.error = ''
+  })
+}
+
+const signInput = (input: string, signer: Key) => {
+  if (!input || !signer) {
+    clearOut()
+    return
   }
 
-  cancel = () => {
-    // TODO: Stream cancel?
+  console.log('Signing...')
+  const data = new TextEncoder().encode(input)
+  const req: SignRequest = {
+    data: data,
+    armored: true,
+    signer: signer?.id,
   }
-
-  openFile = async () => {
-    this.setState({fileError: ''})
-    const win = remote.getCurrentWindow()
-    const open = await remote.dialog.showOpenDialog(win, {})
-    if (open.canceled) {
+  sign(req, (err: RPCError, resp: SignResponse) => {
+    if (err) {
+      Store.update((s) => {
+        s.error = err.details
+      })
       return
     }
-    if (open.filePaths.length == 1) {
-      const file = open.filePaths[0]
-      store.dispatch({type: 'SIGN_FILE', payload: {file}})
+    const signed = new TextDecoder().decode(resp.data)
+    Store.update((s) => {
+      s.output = signed
+      s.fileOut = ''
+      s.error = ''
+    })
+  })
+}
+
+const signFileIn = (fileIn: string, dir: string, signer: Key) => {
+  clearOut()
+  if (fileIn == '' || !signer) {
+    return
+  }
+
+  const baseOut = path.basename(fileIn)
+  const fileOut = path.join(dir, baseOut + '.signed')
+
+  const req = {
+    in: fileIn,
+    out: fileOut,
+    signer: signer?.id,
+  }
+
+  console.log('Signing file...')
+  Store.update((s) => {
+    s.loading = true
+  })
+  const send = signFile((err: RPCError, resp: SignFileOutput, done: boolean) => {
+    if (err) {
+      if (err.code == grpc.status.CANCELLED) {
+        Store.update((s) => {
+          s.loading = false
+        })
+      } else {
+        Store.update((s) => {
+          s.error = err.details
+          s.loading = false
+        })
+      }
+      return
     }
-  }
+    if (resp) {
+      Store.update((s) => {
+        s.output = ''
+        s.fileOut = resp.out
+        s.error = ''
+      })
+    }
+    if (done) {
+      Store.update((s) => {
+        s.loading = false
+      })
+    }
+  })
+  send(req, false)
+}
 
-  clearFile = () => {
-    this.cancel()
-    this.setState({fileError: ''})
-    store.dispatch({type: 'SIGN_FILE', payload: {file: ''}})
-    store.dispatch({type: 'SIGN_FILE_OUT', payload: {fileOut: ''}})
+const signFileTo = async (fileIn: string, signer: Key) => {
+  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+    properties: ['openDirectory'],
+  })
+  if (open.canceled) {
+    return
   }
+  if (open.filePaths.length == 1) {
+    const dir = open.filePaths[0]
+    signFileIn(fileIn, dir, signer)
+  }
+}
 
-  render() {
-    return (
-      <Box display="flex" flex={1} flexDirection="column" style={{height: '100%'}}>
-        <SignKeySelectView
-          defaultValue={this.props.signer}
-          onChange={this.setSigner}
-          placeholder="Signer"
-          placeholderDisabled
-          itemLabel="Signed by"
-        />
-        <Divider />
-        <Box style={{position: 'relative', height: '47%'}}>
-          {this.props.file && (
-            <Box style={{paddingTop: 6, paddingLeft: 8}}>
-              <Typography style={{...styles.mono, display: 'inline'}}>{this.props.file}&nbsp;</Typography>
-              <Link inline onClick={this.clearFile}>
-                Clear
-              </Link>
-            </Box>
-          )}
-          {!this.props.file && (
-            <Box style={{height: '100%'}}>
-              <Input
-                multiline
-                autoFocus
-                onChange={this.onInputChange}
-                value={this.state.value}
-                disableUnderline
-                inputProps={{
-                  ref: this.inputRef,
-                  spellCheck: 'false',
-                  style: {
-                    height: '100%',
-                    overflow: 'auto',
-                    paddingTop: 8,
-                    paddingLeft: 8,
-                    paddingBottom: 0,
-                    paddingRight: 0,
-                  },
-                }}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                }}
-              />
-              {!this.state.value && (
-                <Box style={{position: 'absolute', top: 6, left: 8}}>
-                  <Typography
-                    style={{display: 'inline', color: '#a2a2a2'}}
-                    onClick={() => this.inputRef.current.focus()}
-                  >
-                    Type text or{' '}
-                  </Typography>
-                  <Link inline onClick={this.openFile}>
-                    select a file
-                  </Link>
-                  <Typography style={{display: 'inline'}}>.</Typography>
-                </Box>
-              )}
-            </Box>
-          )}
-          <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
-            {!this.state.loading && <Divider />}
-            {this.state.loading && <LinearProgress />}
+const SignToButton = (props: {onClick: () => void; disabled: boolean}) => (
+  <Box style={{marginLeft: 10, marginTop: 10}}>
+    <Button color="primary" variant="outlined" disabled={props.disabled} onClick={props.onClick}>
+      Sign to
+    </Button>
+  </Box>
+)
+
+type Props = {}
+
+export default (props: Props) => {
+  const inputRef = React.useRef<HTMLInputElement>()
+
+  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    Store.update((s) => {
+      s.input = target.value || ''
+    })
+  }, [])
+
+  const {input, output, fileIn, fileOut, error, signer, loading} = Store.useState()
+
+  React.useEffect(() => {
+    if (fileIn == '') {
+      signInput(input, signer)
+    }
+  }, [input, signer])
+
+  const canSign = fileIn && signer
+  const showButton = canSign && fileIn && !fileOut
+
+  return (
+    <Box
+      display="flex"
+      flex={1}
+      flexDirection="column"
+      // style={{height: '100%', position: 'relative', overflow: 'hidden'}}
+    >
+      <SignKeySelectView
+        value={signer}
+        onChange={(k: Key) => {
+          Store.update((s) => {
+            s.signer = k
+          })
+        }}
+        placeholder="Signer"
+        placeholderDisabled
+        itemLabel="Signed by"
+      />
+      <Divider />
+      <Box style={{position: 'relative', height: '47%'}}>
+        {fileIn && (
+          <Box style={{paddingTop: 6, paddingLeft: 8}}>
+            <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
+            <Link inline onClick={clear}>
+              Clear
+            </Link>
           </Box>
-        </Box>
-        <Box
-          style={{
-            height: '53%',
-            width: '100%',
-          }}
-        >
-          {this.state.fileError ||
-            (this.props.fileOut && (
-              <SignFileView fileOut={this.props.fileOut} error={this.state.fileError} />
-            ))}
-          {!this.state.fileError && !this.props.fileOut && (
-            <SignedView signer={this.props.signer} value={this.state.value} />
-          )}
+        )}
+        {!fileIn && (
+          <Box style={{height: '100%'}}>
+            <Input
+              multiline
+              autoFocus
+              onChange={onInputChange}
+              value={input}
+              disableUnderline
+              inputProps={{
+                ref: inputRef,
+                spellCheck: 'false',
+                style: {
+                  height: '100%',
+                  overflow: 'auto',
+                  paddingTop: 8,
+                  paddingLeft: 8,
+                  paddingBottom: 0,
+                  paddingRight: 0,
+                },
+              }}
+              style={{
+                height: '100%',
+                width: '100%',
+              }}
+            />
+            {!input && (
+              <Box style={{position: 'absolute', top: 6, left: 8}}>
+                <Typography
+                  style={{display: 'inline', color: '#a2a2a2'}}
+                  onClick={() => inputRef.current.focus()}
+                >
+                  Type text or{' '}
+                </Typography>
+                <Link inline onClick={openFile}>
+                  select a file
+                </Link>
+                <Typography style={{display: 'inline'}}>.</Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
+          {!loading && <Divider />}
+          {loading && <LinearProgress />}
         </Box>
       </Box>
-    )
-  }
+      <Box
+        style={{
+          height: '53%',
+          width: '100%',
+        }}
+      >
+        {error && (
+          <Box style={{paddingLeft: 10, paddingTop: 10}}>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error}&nbsp;</Typography>
+          </Box>
+        )}
+        {!error && showButton && (
+          <SignToButton onClick={() => signFileTo(fileIn, signer)} disabled={loading} />
+        )}
+        {!error && !showButton && fileOut && <SignFileView fileOut={fileOut} />}
+        {!error && !showButton && !fileOut && <SignedView value={output} />}
+      </Box>
+    </Box>
+  )
 }
-
-const mapStateToProps = (state: {sign: SignState; router: any}, ownProps: any) => {
-  return {
-    signer: state.sign.signer || '',
-    defaultValue: state.sign.value || '',
-    file: state.sign.file || '',
-    fileOut: state.sign.fileOut || '',
-  }
-}
-export default connect(mapStateToProps)(SignView)

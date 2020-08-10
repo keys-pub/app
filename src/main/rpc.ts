@@ -70,7 +70,7 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
   ipcMain.removeAllListeners('rpc')
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
-    const cl = await client(arg.service)
+    const cl = await client(f.service)
     console.log('rpc', f.reply)
     const out: RPCReply = await rpc(cl, f)
     if (out.err) {
@@ -95,13 +95,13 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
 
     const stream = streams.get(f.reply)
     if (!!stream) {
-      console.log('found stream', f.reply)
+      console.log('found rpc-stream', f.reply)
       if (f.args) {
-        console.log('stream write', f.reply)
+        console.log('rpc-stream write', f.reply)
         stream.write(f.args)
       }
       if (f.end) {
-        console.log('stream end', f.reply)
+        console.log('rpc-stream end', f.reply)
         stream.end()
         streams.delete(f.reply)
       }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
 
 import {Button, Divider, Input, Box, IconButton, Typography} from '@material-ui/core'
 
@@ -11,7 +10,7 @@ import {clipboard} from 'electron'
 import {Key, EncryptMode} from '../../rpc/keys.d'
 
 export type Props = {
-  decrypted: string
+  value: string
   sender?: Key
   mode?: EncryptMode
   reloadSender: () => void
@@ -21,11 +20,11 @@ export default (props: Props) => {
   const [snack, setSnack] = React.useState({message: ''} as SnackOpts)
 
   const copyToClipboard = () => {
-    clipboard.writeText(this.state.decrypted)
+    clipboard.writeText(props.value)
     setSnack({message: 'Copied to Clipboard', duration: 2000} as SnackOpts)
   }
 
-  const disabled = !props.decrypted
+  const disabled = !props.value
   const unsigned = !disabled && !props.sender
 
   return (
@@ -35,7 +34,7 @@ export default (props: Props) => {
       <Input
         multiline
         readOnly
-        value={props.decrypted}
+        value={props.value}
         disableUnderline
         inputProps={{
           style: {
@@ -69,7 +68,7 @@ export default (props: Props) => {
         message={snack.message}
         duration={snack.duration}
         alert={snack.alert}
-        onClose={() => setSnack({message: '', alert: null, duration: null})}
+        onClose={() => setSnack({message: ''})}
       />
     </Box>
   )

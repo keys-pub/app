@@ -182,8 +182,8 @@ message VerifyOutput {
 message VerifyFileInput {
   // In is input file path.  
   string in = 1;
-  // Out is output file path.
-  string out = 2;
+  // Out is the output file name or directory to save to.
+  string out = 2;  
 }
 message VerifyFileOutput {
   Key signer = 1;
@@ -323,8 +323,10 @@ message EncryptFileInput {
 }
 
 message EncryptFileOutput {
-  int32 bytes = 1;
-  int32 total = 2;
+  // Out is the output decrypted file path.
+  string out = 2;
+  int32 bytes = 10;
+  int32 total = 11;
 }
 
 message EncryptInput {
@@ -361,14 +363,16 @@ message DecryptResponse {
 message DecryptFileInput {
   // In is the input encrypted file path. 
   string in = 1;
-  // Out is the output decrypted file path.
-  string out = 2;  
+  // Out is the output file name or directory to save to.
+  string out = 2;
 }
 message DecryptFileOutput {
   Key sender = 1;
+  // Out is the output file path.
   string out = 2;
-  int32 bytes = 3;
-  int32 total = 4;
+  
+  int32 bytes = 10;
+  int32 total = 11;
   
   // Mode is the encryption mode we detected.
   EncryptMode mode = 5;

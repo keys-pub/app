@@ -1,141 +1,66 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
-
-import {connect} from 'react-redux'
 
 import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
 
-import {styles, Snack} from '../../components'
-
-import {store} from '../../store'
-
-import {debounce} from 'lodash'
+import {styles, Snack, SnackOpts} from '../../components'
 
 import {clipboard} from 'electron'
 
-import {encrypt} from '../../rpc/keys'
-import {RPCError, Key, EncryptRequest, EncryptResponse} from '../../rpc/keys.d'
-
 export type Props = {
   value: string
-  recipients: string[]
-  sender: string
 }
 
-type State = {
-  encrypted: string
-  error: string
-  openSnack: string
-}
+export default (props: Props) => {
+  const [snack, setSnack] = React.useState({message: ''} as SnackOpts)
 
-// TODO: drag and drop file
-
-export default class EncryptedView extends React.Component<Props, State> {
-  state = {
-    encrypted: '',
-    error: '',
-    openSnack: '',
+  const copyToClipboard = () => {
+    clipboard.writeText(props.value)
+    setSnack({message: 'Copied to Clipboard', duration: 2000} as SnackOpts)
   }
+  const disabled = !props.value
 
-  debounceEncrypt = debounce(() => this.encrypt(), 10)
-
-  componentDidMount() {
-    this.encrypt()
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      this.props.value != prevProps.value ||
-      this.props.sender != prevProps.sender ||
-      this.props.recipients != prevProps.recipients
-    ) {
-      this.debounceEncrypt()
-    }
-  }
-
-  encrypt = async () => {
-    this.setState({error: '', encrypted: ''})
-
-    if (this.props.recipients.length == 0 || this.props.value == '') {
-      return
-    }
-
-    const data = new TextEncoder().encode(this.props.value)
-    const req: EncryptRequest = {
-      data: data,
-      armored: true,
-      recipients: this.props.recipients,
-      sender: this.props.sender,
-    }
-    encrypt(req, (err: RPCError, resp: EncryptResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
-      const encrypted = new TextDecoder().decode(resp.data)
-      this.setState({error: '', encrypted: encrypted})
-    })
-  }
-
-  copyToClipboard = () => {
-    clipboard.writeText(this.state.encrypted)
-    this.setState({openSnack: 'Copied to Clipboard'})
-  }
-
-  render() {
-    let value = ''
-    let stylesInput: CSSProperties = {}
-    const disabled = !this.state.encrypted
-    if (this.state.error) {
-      value = this.state.error
-      stylesInput.color = 'red'
-    } else {
-      value = this.state.encrypted
-    }
-
-    return (
-      <Box style={{width: '100%', height: '100%', position: 'relative'}}>
-        <Input
-          multiline
-          readOnly
-          value={value}
-          disableUnderline
-          inputProps={{
-            style: {
-              ...styles.mono,
-              ...stylesInput,
-              height: '100%',
-              overflow: 'auto',
-              paddingTop: 0,
-              paddingLeft: 8,
-              paddingBottom: 0,
-              paddingRight: 0,
-            },
-          }}
-          style={{
+  return (
+    <Box style={{width: '100%', height: '100%', position: 'relative'}}>
+      <Input
+        multiline
+        readOnly
+        value={props.value}
+        disableUnderline
+        inputProps={{
+          style: {
+            ...styles.mono,
             height: '100%',
-            width: '100%',
-          }}
-        />
-        <Box style={{position: 'absolute', right: 20, bottom: 6}}>
-          <Button
-            size="small"
-            variant="outlined"
-            color="primary"
-            disabled={disabled}
-            onClick={this.copyToClipboard}
-            style={{backgroundColor: 'white'}}
-          >
-            Copy to Clipboard
-          </Button>
-        </Box>
-        <Snack
-          open={!!this.state.openSnack}
-          message={this.state.openSnack}
-          duration={2000}
-          onClose={() => this.setState({openSnack: ''})}
-        />
+            overflow: 'auto',
+            paddingTop: 0,
+            paddingLeft: 8,
+            paddingBottom: 0,
+            paddingRight: 0,
+          },
+        }}
+        style={{
+          height: '100%',
+          width: '100%',
+        }}
+      />
+      <Box style={{position: 'absolute', right: 20, bottom: 6}}>
+        <Button
+          size="small"
+          variant="outlined"
+          color="primary"
+          disabled={disabled}
+          onClick={copyToClipboard}
+          style={{backgroundColor: 'white'}}
+        >
+          Copy to Clipboard
+        </Button>
       </Box>
-    )
-  }
+      <Snack
+        open={!!snack.message}
+        message={snack.message}
+        duration={snack.duration}
+        alert={snack.alert}
+        onClose={() => setSnack({message: ''})}
+      />
+    </Box>
+  )
 }
