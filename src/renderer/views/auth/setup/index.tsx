@@ -3,12 +3,10 @@ import * as React from 'react'
 import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
 import Logo from '../../logo'
-import {Link} from '../../../components'
+import Link from '../../../components/link'
 
-import {push} from 'connected-react-router'
-import {store} from '../../../store'
-import AuthSetupPasswordView from './password'
 import AuthVaultView from './vault'
+import AuthSetupPasswordView from './password'
 
 type Props = {
   refresh: () => void
@@ -33,7 +31,6 @@ export default class AuthSetupView extends React.Component<Props, State> {
             <Link span onClick={this.connect}>
               connect to an existing vault
             </Link>
-            ?
           </Typography>
         </Box>
       </Box>
@@ -46,7 +43,6 @@ export default class AuthSetupView extends React.Component<Props, State> {
         return this.renderIntro()
       case 'vault':
         return <AuthVaultView back={this.clear} setup={this.props.refresh} />
-        break
     }
   }
 

@@ -14,10 +14,10 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle, Snack} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import SearchView from './view'
 
-import {RPCError, Key} from '../../rpc/keys.d'
+import {Key} from '../../rpc/keys.d'
 
 import KeyDialog from '../key'
 
@@ -28,17 +28,16 @@ type Props = {
 
 type State = {
   openKey: string
-  openSnack: string
+  openSnack?: SnackProps
 }
 
 export default class SearchDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     openKey: '',
-    openSnack: '',
   }
 
   select = (k: Key) => {
-    this.setState({openKey: k.id})
+    this.setState({openKey: k.id || ''})
   }
 
   render() {
@@ -68,19 +67,18 @@ export default class SearchDialog extends React.Component<Props, State> {
         </DialogActions>
         <KeyDialog
           open={this.state.openKey != ''}
-          close={(snack: string) => this.setState({openKey: '', openSnack: snack})}
+          close={(snack: string) =>
+            this.setState({
+              openKey: '',
+              openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+            })
+          }
           kid={this.state.openKey}
           update
           import
           reload={() => {}}
         />
-        <Snack
-          open={this.state.openSnack != ''}
-          onClose={() => this.setState({openSnack: ''})}
-          message={this.state.openSnack}
-          alert="success"
-          duration={4000}
-        />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Dialog>
     )
   }

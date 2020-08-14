@@ -15,10 +15,10 @@ import UserLabel from '../user/label'
 import {keyDescription, dateString} from '../helper'
 
 export const IDView = (props: {id: string; owner?: boolean}) => {
-  const styl = {}
-  if (props.owner) styl['fontWeight'] = 600
+  const style: CSSProperties = {}
+  if (props.owner) style.fontWeight = 600
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...styl}}>{props.id}</Typography>
+  return <Typography style={{...styles.mono, ...style}}>{props.id}</Typography>
 }
 
 export const KeyDescriptionView = (props: {value: Key}) => {
@@ -26,14 +26,14 @@ export const KeyDescriptionView = (props: {value: Key}) => {
 }
 
 type Props = {
-  value: Key
+  k: Key
   revoke: () => void
   userSign: (service: string) => void
   update: () => void
 }
 
 const UserRow = (props: Props) => {
-  const key = props.value
+  const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
   const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
@@ -49,7 +49,7 @@ const UserRow = (props: Props) => {
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
             <Box display="flex" flexDirection="row">
-              <UserLabel kid={user.kid} user={user} />
+              <UserLabel kid={user.kid!} user={user} />
               <Box style={{marginLeft: 10}} />
               {isPrivate && (
                 <Link color="secondary" style={{marginTop: -1}} onClick={props.revoke}>
@@ -59,7 +59,7 @@ const UserRow = (props: Props) => {
             </Box>
             {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
             <Link
-              onClick={() => shell.openExternal(user.url)}
+              onClick={() => shell.openExternal(user.url!)}
               style={{maxWidth: 480, textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
             >
               {user.url}
@@ -106,8 +106,8 @@ const UserRow = (props: Props) => {
 }
 
 export default (props: Props) => {
-  const key: Key = props.value
-  const kid = key.id
+  const key: Key = props.k
+  const kid = key.id!
 
   const sigchainURL = 'https://keys.pub/sigchain/' + key.id
   const openSigchain = () => shell.openExternal(sigchainURL)
@@ -142,7 +142,7 @@ export default (props: Props) => {
               </TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
-                  {key.user.verifiedAt && dateString(key.user.verifiedAt) + '  '}
+                  {key?.user?.verifiedAt && dateString(key.user.verifiedAt) + '  '}
                   <Button size="small" color="primary" variant="outlined" onClick={props.update}>
                     Update
                   </Button>
@@ -162,7 +162,7 @@ export default (props: Props) => {
               </TableCell>
             </TableRow>
           )}
-          {key.sigchainLength > 0 && (
+          {key?.sigchainLength && key.sigchainLength > 0 && (
             <TableRow>
               <TableCell style={{...cstyles.cell}}>
                 <Typography align="right">Sigchain</Typography>

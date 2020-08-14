@@ -29,15 +29,12 @@ import {
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {styles, Snack, SnackOpts} from '../../components'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 import {IDView} from '../key/content'
 
-import {store} from '../../store'
-
-import {push} from 'connected-react-router'
-
-import {connect} from 'react-redux'
+import Header from '../header'
 
 import KeyCreateDialog from '../key/create'
 import KeyImportDialog from '../import'
@@ -49,7 +46,6 @@ import {directionString, flipDirection} from '../helper'
 
 import {keys, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
-  RPCError,
   Key,
   KeyType,
   SortDirection,
@@ -60,10 +56,9 @@ import {
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
-import {AppState} from '../../reducers/app'
 
 type Props = {
-  intro: boolean
+  intro?: boolean
 }
 
 type Position = {
@@ -72,44 +67,33 @@ type Position = {
 }
 
 type State = {
-  contextPosition: Position
-  keys: Array<Key>
-  sortField: string
-  sortDirection: SortDirection
+  contextPosition?: Position
+  keys: Key[]
+  sortField?: string
+  sortDirection?: SortDirection
   input: string
-  newKeyMenuEl: HTMLButtonElement
+  keyMenuRef?: HTMLButtonElement
   openCreate: string // '' | 'NEW' | 'INTRO'
   openExport: string
   openImport: boolean
   openKey: string
-  openRemove: OpenRemove
+  openRemove?: Key
   openSearch: boolean
-  openSnack: SnackOpts
+  openSnack?: SnackProps
   selected: string
   syncEnabled: boolean
   syncing: boolean
 }
 
-type OpenRemove = {
-  open: boolean
-  key: Key
-}
-
-class KeysView extends React.Component<Props, State> {
-  state = {
-    contextPosition: null,
+export default class KeysView extends React.Component<Props, State> {
+  state: State = {
     keys: [],
-    sortField: '',
-    sortDirection: 'ASC' as SortDirection,
     input: '',
-    newKeyMenuEl: null,
     openCreate: '',
     openExport: '',
     openImport: false,
     openKey: '',
-    openRemove: {open: false, key: null},
     openSearch: false,
-    openSnack: null,
     selected: '',
     syncEnabled: false,
     syncing: false,
@@ -119,52 +103,55 @@ class KeysView extends React.Component<Props, State> {
     this.reload()
   }
 
+  snackErr = (err: Error) => {
+    this.setState({openSnack: {message: err.message, alert: 'error'}})
+  }
+
   reload = () => {
     const req: RuntimeStatusRequest = {}
-    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-      if (err) {
-        this.setState({openSnack: {message: err.details, alert: 'error'}})
-        return
-      }
-      this.setState({syncEnabled: resp.sync})
-      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
-    })
+    runtimeStatus(req)
+      .then((resp: RuntimeStatusResponse) => {
+        this.setState({syncEnabled: !!resp.sync})
+        this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+      })
+      .catch(this.snackErr)
   }
 
   sync = () => {
     this.setState({syncing: true})
     const req: VaultUpdateRequest = {}
-    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
-      this.setState({syncing: false})
-      if (err) {
-        this.setState({openSnack: {message: err.details, alert: 'error'}})
-      }
-      this.reload()
-    })
+    vaultUpdate(req)
+      .then((resp: VaultUpdateResponse) => {
+        this.reload()
+      })
+      .finally(() => {
+        this.setState({syncing: false})
+      })
+      .catch(this.snackErr)
   }
 
-  list = (query: string, sortField: string, sortDirection: SortDirection) => {
+  list = (query: string, sortField?: string, sortDirection?: SortDirection) => {
     console.log('List keys', query, sortField, sortDirection)
     const req: KeysRequest = {
       query: query,
       sortField: sortField,
       sortDirection: sortDirection,
+      types: [],
     }
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
-      this.setState({
-        keys: resp.keys,
-        sortField: resp.sortField,
-        sortDirection: resp.sortDirection,
+    keys(req)
+      .then((resp: KeysResponse) => {
+        const keys = resp.keys || []
+        this.setState({
+          keys,
+          sortField: resp.sortField,
+          sortDirection: resp.sortDirection,
+        })
+        // If we don't have keys and intro, then show create dialog
+        if (keys.length == 0 && this.props.intro) {
+          this.setState({openCreate: 'INTRO'})
+        }
       })
-      // If we don't have keys and intro, then show create dialog
-      if (resp.keys.length == 0 && this.props.intro) {
-        this.setState({openCreate: 'INTRO'})
-      }
-    })
+      .catch(this.snackErr)
   }
 
   onChange = () => {
@@ -172,12 +159,11 @@ class KeysView extends React.Component<Props, State> {
   }
 
   select = (key: Key) => {
-    //store.dispatch(push('/keys/key/index?kid=' + key.id))
-    this.setState({openKey: key.id, selected: key.id})
+    this.setState({openKey: key.id!, selected: key.id!})
   }
 
-  isSelected = (kid: string) => {
-    return this.state.selected == kid
+  isSelected = (kid?: string): boolean => {
+    return !!kid && this.state.selected == kid
   }
 
   onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -190,26 +176,26 @@ class KeysView extends React.Component<Props, State> {
   }
 
   closeContext = () => {
-    this.setState({contextPosition: null, selected: ''})
+    this.setState({contextPosition: undefined, selected: ''})
   }
 
   export = () => {
-    this.setState({contextPosition: null, openExport: this.state.selected})
+    this.setState({contextPosition: undefined, openExport: this.state.selected})
   }
 
   delete = () => {
-    const key: Key = this.state.keys.find((k: Key) => {
+    const key = this.state.keys.find((k: Key) => {
       return this.state.selected == k.id
     })
 
-    this.setState({contextPosition: null, openRemove: {open: true, key}})
+    this.setState({contextPosition: undefined, openRemove: key})
   }
 
-  sort = (sortField: string, field: string, sortDirection: SortDirection) => {
+  sort = (field: string, sortField?: string, sortDirection?: SortDirection) => {
     const active = sortField === field
-    let direction: SortDirection = sortDirection
+    let direction: SortDirection = sortDirection || SortDirection.ASC
     if (active) {
-      direction = flipDirection(sortDirection)
+      direction = flipDirection(direction)
     } else {
       direction = SortDirection.ASC
     }
@@ -217,11 +203,11 @@ class KeysView extends React.Component<Props, State> {
   }
 
   openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    this.setState({newKeyMenuEl: event.currentTarget})
+    this.setState({keyMenuRef: event.currentTarget})
   }
 
   closeMenu = () => {
-    this.setState({newKeyMenuEl: null})
+    this.setState({keyMenuRef: undefined})
   }
 
   keyGen = () => {
@@ -232,7 +218,6 @@ class KeysView extends React.Component<Props, State> {
   importKey = () => {
     this.closeMenu()
     this.setState({openImport: true})
-    //store.dispatch(push('/keys/key/import'))
   }
 
   closeImport = (imported: boolean) => {
@@ -251,7 +236,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   closeRemove = (removed: boolean) => {
-    this.setState({openRemove: {open: false, key: this.state.openRemove.key}, selected: ''})
+    this.setState({selected: ''})
     this.reload()
   }
 
@@ -266,82 +251,86 @@ class KeysView extends React.Component<Props, State> {
   renderHeader() {
     const buttonWidth = 80
     return (
-      <Box
-        display="flex"
-        flexDirection="row"
-        flex={1}
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
-      >
-        <Button
-          color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.keyGen}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<AddIcon />}
+      <Box display="flex" flexDirection="column">
+        <Header />
+
+        <Box
+          display="flex"
+          flexDirection="row"
+          flex={1}
+          style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
         >
-          New
-        </Button>
-        <Box paddingLeft={1} />
-        <Button
-          // color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.importKey}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<ImportKeyIcon />}
-        >
-          Import
-        </Button>
-        <Box paddingLeft={1} />
-        <Button
-          // color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.searchKey}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<SearchIcon />}
-        >
-          Search
-        </Button>
-        <Box paddingLeft={1} />
-        {this.state.syncEnabled && (
           <Button
-            onClick={this.sync}
-            size="small"
+            color="primary"
             variant="outlined"
-            style={{marginTop: 2, minWidth: 'auto'}}
-            disabled={this.state.syncing}
+            size="small"
+            onClick={this.keyGen}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<AddIcon />}
           >
-            <SyncIcon />
+            New
           </Button>
-        )}
-        <Box display="flex" flexDirection="row" flexGrow={1} />
-        <TextField
-          placeholder="Filter"
-          variant="outlined"
-          value={this.state.input}
-          onChange={this.onInputChange}
-          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, width: 300, marginRight: 10}}
-        />
-        <Menu
-          id="new-key-menu"
-          anchorEl={this.state.newKeyMenuEl}
-          keepMounted
-          open={!!this.state.newKeyMenuEl}
-          onClose={this.closeMenu}
-        >
-          <MenuItem onClick={this.keyGen}>
-            <GenerateKeyIcon />
-            <Typography style={{marginLeft: 10}}>Generate Key</Typography>
-          </MenuItem>
-          <MenuItem onClick={this.importKey}>
-            <ImportKeyIcon />
-            <Typography style={{marginLeft: 10}}>Import Key</Typography>
-          </MenuItem>
-        </Menu>
-        <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
+          <Box paddingLeft={1} />
+          <Button
+            // color="primary"
+            variant="outlined"
+            size="small"
+            onClick={this.importKey}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<ImportKeyIcon />}
+          >
+            Import
+          </Button>
+          <Box paddingLeft={1} />
+          <Button
+            // color="primary"
+            variant="outlined"
+            size="small"
+            onClick={this.searchKey}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<SearchIcon />}
+          >
+            Search
+          </Button>
+          <Box paddingLeft={1} />
+          {this.state.syncEnabled && (
+            <Button
+              onClick={this.sync}
+              size="small"
+              variant="outlined"
+              style={{marginTop: 2, minWidth: 'auto'}}
+              disabled={this.state.syncing}
+            >
+              <SyncIcon />
+            </Button>
+          )}
+          <Box display="flex" flexDirection="row" flexGrow={1} />
+          <TextField
+            placeholder="Filter"
+            variant="outlined"
+            value={this.state.input}
+            onChange={this.onInputChange}
+            inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+            style={{marginTop: 2, width: 300, marginRight: 10}}
+          />
+          <Menu
+            id="new-key-menu"
+            anchorEl={this.state.keyMenuRef}
+            keepMounted
+            open={!!this.state.keyMenuRef}
+            onClose={this.closeMenu}
+          >
+            <MenuItem onClick={this.keyGen}>
+              <GenerateKeyIcon />
+              <Typography style={{marginLeft: 10}}>Generate Key</Typography>
+            </MenuItem>
+            <MenuItem onClick={this.importKey}>
+              <ImportKeyIcon />
+              <Typography style={{marginLeft: 10}}>Import Key</Typography>
+            </MenuItem>
+          </Menu>
+          <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
+        </Box>
       </Box>
     )
   }
@@ -351,14 +340,69 @@ class KeysView extends React.Component<Props, State> {
     const direction = directionString(sortDirection)
 
     return (
-      <Box>
+      <Box display="flex" flexDirection="column" flex={1}>
+        {this.renderHeader()}
+        <Divider />
+        <Box display="flex" flexDirection="column" style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField == 'user'}
+                    direction={direction}
+                    onClick={() => this.sort('user', sortField, sortDirection)}
+                  >
+                    <Typography style={{...styles.mono}}>User</Typography>
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField == 'kid'}
+                    direction={direction}
+                    onClick={() => this.sort('kid', sortField, sortDirection)}
+                  >
+                    <Typography style={{...styles.mono}}>Key</Typography>
+                  </TableSortLabel>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {this.state.keys.map((key, index) => {
+                return (
+                  <TableRow
+                    hover
+                    onClick={() => this.select(key)}
+                    key={key.id}
+                    style={{cursor: 'pointer'}}
+                    selected={this.isSelected(key.id)}
+                    component={(props: any) => {
+                      return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
+                    }}
+                  >
+                    <TableCell component="th" scope="row" style={{minWidth: 200}}>
+                      {key.user && <UserLabel kid={key.id!} user={key.user} />}
+                    </TableCell>
+                    <TableCell style={{verticalAlign: 'top'}}>
+                      <IDView
+                        id={key.id!}
+                        owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Box>
+
         <Menu
           keepMounted
           open={this.state.contextPosition !== null}
           onClose={this.closeContext}
           anchorReference="anchorPosition"
           anchorPosition={
-            this.state.contextPosition !== null
+            this.state.contextPosition
               ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
               : undefined
           }
@@ -372,71 +416,14 @@ class KeysView extends React.Component<Props, State> {
             <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
           </MenuItem>
         </Menu>
-        {this.renderHeader()}
-        <Divider />
-        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortField === 'user'}
-                    direction={direction}
-                    onClick={() => this.sort(sortField, 'user', sortDirection)}
-                  >
-                    <Typography style={{...styles.mono}}>User</Typography>
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortField === 'kid'}
-                    direction={direction}
-                    onClick={() => this.sort(sortField, 'kid', sortDirection)}
-                  >
-                    <Typography style={{...styles.mono}}>Key</Typography>
-                  </TableSortLabel>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.keys.map((key, index) => {
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => this.select(key)}
-                    key={key.id}
-                    style={{cursor: 'pointer'}}
-                    selected={this.isSelected(key.id)}
-                    component={(props: any) => {
-                      return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
-                    }}
-                  >
-                    <TableCell component="th" scope="row" style={{minWidth: 200}}>
-                      {key.user && <UserLabel kid={key.id} user={key.user} />}
-                    </TableCell>
-                    <TableCell style={{verticalAlign: 'top'}}>
-                      <IDView
-                        id={key.id}
-                        owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </Box>
+
         <KeyCreateDialog
           open={this.state.openCreate != ''}
           close={() => this.setState({openCreate: ''})}
           onChange={this.onChange}
         />
         <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
-        <KeyRemoveDialog
-          open={this.state.openRemove.open}
-          keyRemove={this.state.openRemove.key}
-          close={this.closeRemove}
-        />
+        <KeyRemoveDialog keyRemove={this.state.openRemove} close={this.closeRemove} />
         <KeyExportDialog
           open={this.state.openExport != ''}
           kid={this.state.openExport}
@@ -448,22 +435,8 @@ class KeysView extends React.Component<Props, State> {
           kid={this.state.openKey}
           reload={this.reload}
         />
-        <Snack
-          open={!!this.state.openSnack}
-          onClose={() => this.setState({openSnack: null})}
-          message={this.state.openSnack?.message}
-          alert={this.state.openSnack?.alert}
-          duration={this.state.openSnack?.duration}
-        />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Box>
     )
   }
 }
-
-const mapStateToProps = (state: {app: AppState}, ownProps: any) => {
-  return {
-    intro: state.app.intro,
-  }
-}
-
-export default connect(mapStateToProps)(KeysView)

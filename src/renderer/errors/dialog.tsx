@@ -16,43 +16,48 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
+import {Store} from '../store/pull'
+
 import {ipcRenderer} from 'electron'
 import ErrorView from './view'
 
-type Props = {
-  error: Error | void
-  clearError: () => void
+const restart = () => {
+  ipcRenderer.send('reload-app', {})
 }
 
-export default class ErrorsDialog extends React.Component<Props> {
-  restart = () => {
-    ipcRenderer.send('reload-app', {})
+export default (_: {}) => {
+  const {error} = Store.useState((s) => ({
+    error: s.error,
+  }))
+
+  const clearError = () => {
+    Store.update((s) => {
+      s.error = undefined
+    })
   }
 
-  render() {
-    return (
-      <Dialog
-        open={!!this.props.error}
-        maxWidth="xl"
-        fullWidth
-        disableBackdropClick
-        PaperProps={{
-          style: {height: 'calc(100% - 64px)'},
-        }}
-      >
-        <DialogTitle>Error</DialogTitle>
-        <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
-          <ErrorView error={this.props.error} />
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={this.props.clearError}>
-            Clear Error
-          </Button>
-          <Button color="secondary" onClick={this.restart}>
-            Restart
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
+  return (
+    <Dialog
+      open={!!error}
+      maxWidth="xl"
+      fullWidth
+      disableBackdropClick
+      PaperProps={{
+        style: {height: 'calc(100% - 64px)'},
+      }}
+    >
+      <DialogTitle>Error</DialogTitle>
+      <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
+        <ErrorView error={error} />
+      </DialogContent>
+      <DialogActions>
+        <Button color="primary" onClick={clearError}>
+          Clear Error
+        </Button>
+        <Button color="secondary" onClick={restart}>
+          Restart
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 }

@@ -37,12 +37,6 @@ service Auth {
     rpc HMACSecret(HMACSecretRequest) returns (HMACSecretResponse) {}
 }
 
-message RPCError {
-	int32 code = 1;
-	string message = 2;
-	string details = 3;
-}
-
 message Device {
     string path = 1;
 	int32 productId = 2 [(gogoproto.customname) = "ProductID"];
@@ -222,7 +216,7 @@ message HMACSecretRequest {
     string rpId = 10 [(gogoproto.customname) = "RPID"];
     bytes clientDataHash = 11;
     bytes credentialId = 12 [(gogoproto.customname) = "CredentialID"];
-    bytes salt = 13;      
+    bytes salt = 13;
 }
 message HMACSecretResponse {
     bytes hmacSecret = 1 [(gogoproto.customname) = "HMACSecret"];

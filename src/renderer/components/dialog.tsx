@@ -9,7 +9,7 @@ type Props = {
   onClose?: () => void
 }
 
-export default (props: Props) => {
+const DialogTitle = (props: Props) => {
   return (
     <Box display="flex" flexDirection="column">
       <Box display="flex" flexGrow={1} flexDirection="row">
@@ -34,3 +34,5 @@ export default (props: Props) => {
     </Box>
   )
 }
+
+export {DialogTitle}

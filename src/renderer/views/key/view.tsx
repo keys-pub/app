@@ -9,7 +9,7 @@ import UserRevokeDialog from '../user/revoke'
 import {Key} from '../../rpc/keys.d'
 
 type Props = {
-  value: Key
+  k: Key
   refresh: (update: boolean) => void
 }
 
@@ -19,13 +19,13 @@ type State = {
 }
 
 export default class KeyView extends React.Component<Props, State> {
-  state = {
+  state: State = {
     openRevoke: 0,
     openUserSign: '',
   }
 
   revoke = () => {
-    this.setState({openRevoke: this.props.value.user.seq})
+    this.setState({openRevoke: this.props.k?.user?.seq || 0})
   }
 
   closeRevoke = () => {
@@ -45,13 +45,13 @@ export default class KeyView extends React.Component<Props, State> {
   }
 
   render() {
-    const key: Key = this.props.value
-    const kid = key.id
+    const key: Key = this.props.k
+    const kid = key.id!
 
     return (
       <Box>
         <KeyContentView
-          value={key}
+          k={key}
           revoke={this.revoke}
           userSign={this.userSign}
           update={() => this.props.refresh(true)}

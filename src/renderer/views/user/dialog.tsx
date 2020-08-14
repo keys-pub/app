@@ -14,10 +14,12 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles, DialogTitle, Snack} from '../../components'
+import styles from '../../components/styles'
+import {DialogTitle} from '../../components/dialog'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {userAdd, userSign} from '../../rpc/keys'
-import {RPCError, UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
+import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
 
 type Props = {
   kid: string
@@ -28,27 +30,25 @@ type Props = {
 
 type State = {
   name: string
-  error: string
+  error?: Error
   loading: boolean
   signedMessage: string
-  openSnack: boolean
+  openSnack?: SnackProps
   url: string
   step: string
 }
 
 export default class UserSignDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     name: '',
-    error: '',
     signedMessage: '',
     loading: false,
-    openSnack: false,
     url: '',
     step: 'name',
   }
 
   clear = () => {
-    this.setState({name: '', error: '', signedMessage: '', loading: false, url: '', step: 'name'})
+    this.setState({name: '', error: undefined, signedMessage: '', loading: false, url: '', step: 'name'})
   }
 
   close = (changed: boolean) => {
@@ -58,46 +58,51 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   onNameChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({name: target ? target.value : '', error: ''})
+    this.setState({name: target ? target.value : '', error: undefined})
   }
 
   onURLChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({url: target ? target.value : '', error: ''})
+    this.setState({url: target ? target.value : '', error: undefined})
   }
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.signedMessage)
-    this.setState({openSnack: true})
+    this.setState({openSnack: {message: 'Copied to Clipboard', duration: 2000}})
   }
 
   userSign = () => {
     if (this.state.name === '') {
       this.setState({
-        error: 'Oops, name is empty',
+        error: new Error('Oops, name is empty'),
       })
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: UserSignRequest = {
       kid: this.props.kid,
       service: this.props.service,
       name: this.state.name,
     }
-    userSign(req, (err: RPCError, resp: UserSignResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
+    userSign(req)
+      .then((resp: UserSignResponse) => {
+        let url = ''
+        if (this.props.service == 'https') {
+          url = 'https://' + this.state.name + '/keyspub.txt'
+        }
 
-      let url = ''
-      if (this.props.service == 'https') {
-        url = 'https://' + this.state.name + '/keyspub.txt'
-      }
-
-      this.setState({loading: false, name: resp.name, url: url, signedMessage: resp.message, step: 'sign'})
-    })
+        this.setState({
+          loading: false,
+          name: resp.name || '',
+          url: url,
+          signedMessage: resp.message || '',
+          step: 'sign',
+        })
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   userAdd = () => {
@@ -108,26 +113,26 @@ export default class UserSignDialog extends React.Component<Props, State> {
       url: this.state.url,
       local: false,
     }
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
 
     // setTimeout(() => {
     //   this.props.dispatch(go(-2))
     //   this.setState({loading: false})
     // }, 2000)
 
-    userAdd(req, (err: RPCError, resp: UserAddResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close(true)
-    })
+    userAdd(req)
+      .then((resp: UserAddResponse) => {
+        this.setState({loading: false})
+        this.close(true)
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   back = () => {
     if (this.state.step == 'sign') {
-      this.setState({step: 'name', error: ''})
+      this.setState({step: 'name', error: undefined})
     } else {
       this.close(false)
     }
@@ -171,7 +176,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <Typography variant="subtitle1" style={{paddingBottom: 10}}>
           {question}
         </Typography>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             placeholder={placeholder}
@@ -179,7 +184,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             value={this.state.name}
             style={{minWidth: 300}}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
         <Typography variant="body1" style={{paddingBottom: 20}}>
           {next}
@@ -193,7 +198,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     let intro = 'Copy the signed message.'
     let instructions
     let openLabel = ''
-    let openAction = null
+    let openAction = () => {}
     let placeholder = ''
     let urlLabel = ''
     switch (service) {
@@ -290,7 +295,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
               <Typography variant="subtitle1">&bull; &nbsp;</Typography>
               <Typography variant="subtitle1">{urlLabel}</Typography>
             </Box>
-            <FormControl error={this.state.error !== ''} style={{marginLeft: 20}}>
+            <FormControl error={!!this.state.error} style={{marginLeft: 20}}>
               <TextField
                 placeholder={placeholder}
                 onChange={this.onURLChange}
@@ -298,18 +303,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
                 disabled={this.state.loading}
                 style={{width: 500}}
               />
-              <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+              <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
             </FormControl>
           </Box>
         )}
-        {!urlLabel && <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error}</Typography>}
+        {!urlLabel && (
+          <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error?.message}</Typography>
+        )}
 
-        <Snack
-          open={this.state.openSnack}
-          duration={2000}
-          onClose={() => this.setState({openSnack: false})}
-          message="Copied to Clipboard"
-        />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Box>
     )
   }

@@ -14,11 +14,8 @@ import {
 import Logo from '../../logo'
 import {styles} from '../../../components'
 
-import {push} from 'connected-react-router'
-import {store} from '../../../store'
-
 import {authVault} from '../../../rpc/keys'
-import {RPCError, AuthVaultRequest, AuthVaultResponse} from '../../../rpc/keys.d'
+import {AuthVaultRequest, AuthVaultResponse} from '../../../rpc/keys.d'
 
 type Props = {
   back: () => void
@@ -27,19 +24,18 @@ type Props = {
 type State = {
   loading: boolean
   phrase: string
-  error: string
+  error?: Error
 }
 
 export default class AuthVaultView extends React.Component<Props, State> {
-  state = {
+  state: State = {
     loading: false,
     phrase: '',
-    error: '',
   }
 
   onInputChangePhrase = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({phrase: target ? target.value : '', error: ''})
+    this.setState({phrase: target ? target.value : '', error: undefined})
   }
 
   renderServerSelect() {
@@ -60,7 +56,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
           You can generate an auth phrase from any of your other devices (in Vault settings).
         </Typography>
         <Box marginBottom={1}>{this.renderServerSelect()}</Box>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             label="Vault Phrase"
@@ -77,7 +73,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
               style: {...styles.mono, fontSize: 12, width: 450},
             }}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
           <Box display="flex" flexDirection="row" style={{width: 450, paddingTop: 6}}>
@@ -105,17 +101,20 @@ export default class AuthVaultView extends React.Component<Props, State> {
     }
   }
 
+  setError = (err: Error) => {
+    this.setState({error: err})
+  }
+
   authVault = async () => {
     const req: AuthVaultRequest = {
       phrase: this.state.phrase,
     }
-    this.setState({loading: true, error: ''})
-    authVault(req, (err: RPCError, resp: AuthVaultResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.props.setup()
-    })
+    this.setState({loading: true, error: undefined})
+    authVault(req)
+      .then((resp: AuthVaultResponse) => {
+        this.props.setup()
+      })
+      .catch(this.setError)
+      .finally(() => this.setState({loading: false}))
   }
 }

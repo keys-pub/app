@@ -14,10 +14,6 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {TransitionProps} from '@material-ui/core/transitions'
-
-import {store} from '../../store'
-
 import {styles, DialogTitle, Link} from '../../components'
 import UserSignDialog from '../user/dialog'
 import ServiceSelect from '../user/service'
@@ -25,7 +21,7 @@ import ServiceSelect from '../user/service'
 import {shell} from 'electron'
 
 import {keyGenerate} from '../../rpc/keys'
-import {RPCError, KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/keys.d'
+import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean
@@ -56,7 +52,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   reset = () => {
-    store.dispatch({type: 'INTRO', payload: false})
+    // store.dispatch({type: 'INTRO', payload: false})
     this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
   }
 
@@ -80,16 +76,15 @@ export default class KeyCreateDialog extends React.Component<Props> {
       const req: KeyGenerateRequest = {
         type: this.state.type,
       }
-      keyGenerate(req, (err: RPCError, resp: KeyGenerateResponse) => {
-        if (err) {
-          // TODO: error
+      keyGenerate(req)
+        .then((resp: KeyGenerateResponse) => {
+          this.props.onChange()
+          // store.dispatch({type: 'INTRO', payload: false})
+          this.setState({kid: resp.kid, step: 'CREATED', loading: false})
+        })
+        .catch((err: Error) => {
           this.setState({loading: false})
-          return
-        }
-        this.props.onChange()
-        store.dispatch({type: 'INTRO', payload: false})
-        this.setState({kid: resp.kid, step: 'CREATED', loading: false})
-      })
+        })
     }, 500)
   }
 

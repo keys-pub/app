@@ -1,15 +1,31 @@
 import * as React from 'react'
-import {Provider} from 'react-redux'
-import {ConnectedRouter, push} from 'connected-react-router'
 
 import {ThemeProvider} from '@material-ui/styles'
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade} from '@material-ui/core/styles/colorManipulator'
 import {backgroundSelectedColor} from '../components/styles'
+import {Router} from 'wouter'
 
-import Main from './main'
+import {Routes, routesMap} from './routes'
+import {useLocation} from 'wouter'
+import {Store} from '../store/pull'
+import {ipcRenderer, remote} from 'electron'
 
-import {store, history} from '../store/index'
+import Auth from './auth'
+import Nav from './nav'
+
+import {Box, Typography} from '@material-ui/core'
+import ErrorsDialog from '../errors/dialog'
+import UpdateAlert from './update/alert'
+import UpdateSplash from './update/splash'
+
+import {updateCheck} from './update'
+import * as grpc from '@grpc/grpc-js'
+
+import {setErrHandler, runtimeStatus} from '../rpc/keys'
+import {RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
+
+import './app.css'
 
 const theme = createMuiTheme({
   typography: {
@@ -104,33 +120,123 @@ const theme = createMuiTheme({
   },
 })
 
-export default class Root extends React.Component {
-  // unlisten: any
-  // componentDidMount() {
-  //   this.unlisten = history.listen((location, action) => {
-  //     // console.log('Listen:', location, action)
-  //     const route: RouteInfo | void = routesMap.get(location.pathname)
-  //     if (route && route.onLocationChange) {
-  //       route.onLocationChange(this.props.dispatch)
-  //     }
-  //   })
-  // }
-  // componentWillUnmount() {
-  //   if (this.unlisten) {
-  //     this.unlisten()
-  //     this.unlisten = null
-  //   }
-  // }
+// Returns the current hash location in a normalized form
+// (excluding the leading '#' symbol).
+const currentLocation = () => {
+  return window.location.hash.replace(/^#/, '') || '/'
+}
 
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <Provider store={store}>
-          <ConnectedRouter history={history}>
-            <Main />
-          </ConnectedRouter>
-        </Provider>
-      </ThemeProvider>
-    )
+const useHashLocation = (to: any): any => {
+  const [location, setLocation] = React.useState(currentLocation())
+
+  React.useEffect(() => {
+    const handler = () => setLocation(currentLocation())
+
+    // Subscribe to hash changes
+    window.addEventListener('hashchange', handler)
+    return () => window.removeEventListener('hashchange', handler)
+  }, [])
+
+  // Remember to wrap your function with `useCallback` hook
+  const navigate = React.useCallback((to) => (window.location.hash = to), [])
+
+  return [location, navigate]
+}
+
+// TODO: If service is disconnected, show disconnected UI...
+// {code: 14, message: "14 UNAVAILABLE: No connection established", details: "No connection established"}
+
+const App = (_: {}) => (
+  <Box display="flex" flexGrow={1} flexDirection="row">
+    <Nav />
+    <Routes />
+  </Box>
+)
+
+const Root = (_: {}) => {
+  const [location, setLocation] = useLocation()
+
+  const {navMinimized, unlocked, updating} = Store.useState((s) => ({
+    navMinimized: s.navMinimized,
+    unlocked: s.unlocked,
+    updating: s.updating,
+  }))
+
+  console.log('Location:', location)
+
+  ipcRenderer.removeAllListeners('preferences')
+  ipcRenderer.on('preferences', (event, message) => {
+    setLocation('/settings/index')
+  })
+
+  if (!unlocked) {
+    return <Auth />
   }
+
+  if (updating) {
+    return <UpdateSplash />
+  }
+
+  return <App />
+}
+
+export default (_: {}) => {
+  return (
+    <ThemeProvider theme={theme}>
+      <Router hook={useHashLocation}>
+        <Root />
+      </Router>
+    </ThemeProvider>
+  )
+}
+
+ipcRenderer.removeAllListeners('log')
+ipcRenderer.on('log', function (event, text) {
+  console.log('Main process:', text)
+})
+
+// Keys start
+ipcRenderer.removeAllListeners('keys-started')
+ipcRenderer.on('keys-started', (event, err) => {
+  if (err) {
+    alert('Oops, exec error: ' + err.toString())
+    remote.app.exit(2)
+  }
+
+  setErrHandler((err: {message: string; code: number}) => {
+    switch (err.code) {
+      case grpc.status.PERMISSION_DENIED:
+      case grpc.status.UNAVAILABLE:
+      case grpc.status.UNAUTHENTICATED:
+        Store.update((s) => {
+          s.unlocked = false
+        })
+        break
+    }
+  })
+
+  // Update check
+  updateCheck()
+})
+ipcRenderer.send('keys-start')
+
+const online = () => {
+  console.log('Online')
+  ping()
+}
+window.addEventListener('online', online)
+// window.addEventListener('offline', offlineFn)
+
+ipcRenderer.removeAllListeners('focus')
+ipcRenderer.on('focus', (event, message) => {
+  ping()
+})
+
+// ipcRenderer.on('unresponsive', (event, message) => {})
+
+// ipcRenderer.on('responsive', (event, message) => {})
+
+const ping = () => {
+  const req: RuntimeStatusRequest = {}
+  runtimeStatus(req).then((resp: RuntimeStatusResponse) => {})
 }

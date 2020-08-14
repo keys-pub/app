@@ -15,11 +15,6 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {makeStyles, useTheme} from '@material-ui/core/styles'
-
-import {AppState} from '../reducers/app'
-import {store} from '../store'
-
 import {
   VpnKeyOutlined as KeysIcon,
   ArrowLeft as LeftIcon,
@@ -34,164 +29,153 @@ import {
   Backup as VaultIcon,
 } from '@material-ui/icons'
 
-import {push} from 'connected-react-router'
-import {connect} from 'react-redux'
+import {useLocation} from 'wouter'
+import {Store} from '../store/pull'
 
-import {routesMap} from './routes'
-
-import {runtimeStatus} from '../rpc/keys'
-import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
-
-type Props = {
-  path: string
-  navMinimize: boolean
-}
-
-// TODO: Nav hover
-
-type State = {
-  openExperimental: boolean
-}
-
-class Nav extends React.Component<Props, State> {
-  state = {
-    openExperimental: false,
-  }
-  private experimentRef = React.createRef<HTMLButtonElement>()
-
-  toggleDrawer = () => {
-    store.dispatch({
-      type: 'NAV_MINIMIZE',
-      payload: {navMinimize: !this.props.navMinimize},
-    })
-  }
-
-  openExperimental = (event: React.MouseEvent<HTMLButtonElement>) => {
-    this.setState({openExperimental: true})
-  }
-
-  closeExperimental = () => {
-    this.setState({openExperimental: false})
-  }
-
-  wormhole = () => {
-    store.dispatch(push('/wormhole/index'))
-    this.closeExperimental()
-  }
-
-  authenticators = () => {
-    store.dispatch(push('/authenticators/index'))
-    this.closeExperimental()
-  }
-
-  render() {
-    const route = routesMap.get(this.props.path)
-    if (!route) return null
-
-    const open = !this.props.navMinimize
-    console.log('Drawer open:', open)
-    const width = open ? 140 : 68
-    const drawerStyles: CSSProperties = open
-      ? {width, border: 0, height: '100%'}
-      : {
-          width,
-          border: 0,
-          height: '100%',
-          flexShrink: 0,
-          overflowX: 'hidden',
-        }
-
-    let navs = [
-      {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
-      {
-        name: 'Secrets',
-        icon: SecretsIcon,
-        route: '/secrets/index',
-        prefix: '/secrets',
-      },
-      {
-        name: 'Tools',
-        icon: ToolsIcon,
-        route: '/tools/index',
-        prefix: '/tools',
-      },
-      {
-        name: 'Vault',
-        icon: VaultIcon,
-        route: '/vault/index',
-        prefix: '/vault',
-      },
-      {
-        name: 'Settings',
-        icon: SettingsIcon,
-        route: '/settings/index',
-        prefix: '/settings',
-      },
-      {
-        name: 'Experiments',
-        icon: ExpermimentalIcon,
-        onClick: this.openExperimental,
-        anchorRef: this.experimentRef,
-      },
-    ]
-
-    return (
-      <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
-        <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
-          <Box height={33} style={{backgroundColor: backgroundColor}} />
-          <List style={{minWidth: width, height: '100%', padding: 0}}>
-            {navs.map((nav, index) =>
-              row(
-                nav,
-                index,
-                route?.path.startsWith(nav.prefix),
-                open,
-                nav.onClick ? nav.onClick : () => store.dispatch(push(nav.route)),
-                nav.anchorRef
-              )
-            )}
-          </List>
-          <Box display="flex" flexDirection="row">
-            {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
-            </Typography> */}
-            <Box display="flex" flexGrow={1} />
-            <IconButton onClick={this.toggleDrawer} style={{color: 'white', alignSelf: 'flex-end'}}>
-              {open && <LeftIcon />}
-              {!open && <RightIcon />}
-            </IconButton>
-          </Box>
-        </Box>
-        <Menu
-          id="experimental-menu"
-          anchorEl={this.experimentRef.current}
-          keepMounted
-          open={this.state.openExperimental}
-          onClose={this.closeExperimental}
-          anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
-          getContentAnchorEl={null}
-        >
-          <MenuItem onClick={this.wormhole}>
-            <WormholeIcon />
-            <Typography style={{marginLeft: 10}}>Wormhole</Typography>
-          </MenuItem>
-          <MenuItem onClick={this.authenticators}>
-            <AuthenticatorsIcon />
-            <Typography style={{marginLeft: 10}}>Authenticators</Typography>
-          </MenuItem>
-        </Menu>
-      </Drawer>
-    )
-  }
+type NavRoute = {
+  name: string
+  icon: React.ReactNode
+  route: string
+  prefix: string
+  onClick?: () => void
+  anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
 }
 
 const backgroundColor = '#2f2f2f'
 const backgroundColorSelected = '#1a1a1a'
 
-const row = (nav: any, index: number, selected: boolean, open: boolean, onClick: any, anchorRef: any) => {
+// TODO: Nav hover
+
+export default (props: {}) => {
+  const [location, setLocation] = useLocation()
+  const [openExperimental, setOpenExperimental] = React.useState(false)
+
+  const {navMinimized} = Store.useState((s) => ({
+    navMinimized: s.navMinimized,
+  }))
+
+  const toggleDrawer = () => {
+    Store.update((s) => {
+      s.navMinimized = !navMinimized
+    })
+  }
+
+  const experimentRef = React.useRef<HTMLDivElement>()
+  const openExperiment = (route: string) => {
+    setLocation(route)
+    setOpenExperimental(false)
+  }
+
+  const open = !navMinimized
+  const width = open ? 140 : 68
+  const drawerStyles: CSSProperties = open
+    ? {width, border: 0, height: '100%'}
+    : {
+        width,
+        border: 0,
+        height: '100%',
+        flexShrink: 0,
+        overflowX: 'hidden',
+      }
+
+  let navs: NavRoute[] = [
+    {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
+    {
+      name: 'Secrets',
+      icon: SecretsIcon,
+      route: '/secrets/index',
+      prefix: '/secrets',
+    },
+    {
+      name: 'Tools',
+      icon: ToolsIcon,
+      route: '/tools/index',
+      prefix: '/tools',
+    },
+    {
+      name: 'Vault',
+      icon: VaultIcon,
+      route: '/vault/index',
+      prefix: '/vault',
+    },
+    {
+      name: 'Settings',
+      icon: SettingsIcon,
+      route: '/settings/index',
+      prefix: '/settings',
+    },
+    {
+      name: 'Experiments',
+      icon: ExpermimentalIcon,
+      route: '/experiments/index',
+      prefix: '/experiments',
+      onClick: () => setOpenExperimental(true),
+      anchorRef: experimentRef,
+    },
+  ]
+
+  // TODO: Drawer transitions
+
+  return (
+    <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
+      <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
+        <Box height={33} style={{backgroundColor: backgroundColor}} />
+        <List style={{minWidth: width, height: '100%', padding: 0}}>
+          {navs.map((nav, index) =>
+            row(
+              nav,
+              index,
+              location.startsWith(nav.prefix),
+              open,
+              nav.onClick ? nav.onClick : () => setLocation(nav.route),
+              nav.anchorRef
+            )
+          )}
+        </List>
+        <Box display="flex" flexDirection="row">
+          {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
+            </Typography> */}
+          <Box display="flex" flexGrow={1} />
+          <IconButton onClick={toggleDrawer} style={{color: 'white', alignSelf: 'flex-end'}}>
+            {open && <LeftIcon />}
+            {!open && <RightIcon />}
+          </IconButton>
+        </Box>
+      </Box>
+      <Menu
+        id="experimental-menu"
+        anchorEl={experimentRef.current}
+        keepMounted
+        open={openExperimental}
+        onClose={() => setOpenExperimental(false)}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+        getContentAnchorEl={null}
+      >
+        <MenuItem onClick={() => openExperiment('/wormhole/index')}>
+          <WormholeIcon />
+          <Typography style={{marginLeft: 10}}>Wormhole</Typography>
+        </MenuItem>
+        <MenuItem onClick={() => openExperiment('/authenticators/index')}>
+          <AuthenticatorsIcon />
+          <Typography style={{marginLeft: 10}}>Authenticators</Typography>
+        </MenuItem>
+      </Menu>
+    </Drawer>
+  )
+}
+
+const row = (
+  nav: any,
+  index: number,
+  selected: boolean,
+  open: boolean,
+  onClick?: () => void,
+  anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
+) => {
   return (
     <ListItem
       button
-      ref={anchorRef}
+      ref={anchorRef as React.RefObject<HTMLDivElement>}
       style={{
         height: 40,
         backgroundColor: selected ? backgroundColorSelected : backgroundColor,
@@ -219,12 +203,3 @@ const row = (nav: any, index: number, selected: boolean, open: boolean, onClick:
     </ListItem>
   )
 }
-
-const mapStateToProps = (state: {app: AppState; router: any}, ownProps: any) => {
-  return {
-    path: state.router.location.pathname,
-    navMinimize: state.app.navMinimize,
-  }
-}
-
-export default connect(mapStateToProps)(Nav)

@@ -9,7 +9,7 @@ import {dateString} from '../helper'
 
 import PasswordOptions from './pw'
 
-import {RPCError, Secret, SecretType} from '../../rpc/keys.d'
+import {Secret, SecretType} from '../../rpc/keys.d'
 
 type Props = {
   secret: Secret
@@ -66,7 +66,7 @@ export default class SecretContentView extends React.Component<Props, State> {
           )}
           <Box style={{position: 'absolute', right: 10, top: -22}}>
             <PasswordOptions
-              password={this.props.secret.password}
+              password={this.props.secret?.password || ''}
               visible={this.state.passwordVisible}
               setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
             />

@@ -25,13 +25,12 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
+import Header from '../header'
+
 import {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {styles, Snack} from '../../components'
-
-import {store} from '../../store'
-
-import {connect} from 'react-redux'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import SecretRemoveDialog from './remove'
 import SecretEditView from './edit'
@@ -41,7 +40,6 @@ import {directionString, flipDirection} from '../helper'
 
 import {secrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
-  RPCError,
   Secret,
   SortDirection,
   SecretType,
@@ -52,10 +50,9 @@ import {
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
-import {AppState} from '../../reducers/app'
 
 type Props = {
-  intro: boolean
+  intro?: boolean
 }
 
 type Position = {
@@ -64,41 +61,28 @@ type Position = {
 }
 
 type State = {
-  contextPosition: Position
-  secrets: Array<Secret>
+  contextPosition?: Position
+  secrets: Secret[]
   sortField: string
   sortDirection: SortDirection
   input: string
-  newKeyMenuEl: HTMLButtonElement
-  editing: Secret
+  keyMenuElement?: HTMLButtonElement
+  editing?: Secret
   isNew: boolean
-  openRemove: OpenRemove
-  selected: Secret
-  openSnack: string
-  openSnackAlert: string
+  openRemove?: Secret
+  selected?: Secret
+  openSnack?: SnackProps
   syncEnabled: boolean
   syncing: boolean
 }
 
-type OpenRemove = {
-  open: boolean
-  secret: Secret
-}
-
-class SecretsView extends React.Component<Props, State> {
-  state = {
-    contextPosition: null,
+export default class SecretsView extends React.Component<Props, State> {
+  state: State = {
     secrets: [],
     sortField: '',
-    sortDirection: 'ASC' as SortDirection,
+    sortDirection: SortDirection.ASC,
     input: '',
-    newKeyMenuEl: null,
-    editing: null,
     isNew: false,
-    openRemove: {open: false, secret: null},
-    selected: null,
-    openSnack: '',
-    openSnackAlert: '',
     syncEnabled: false,
     syncing: false,
   }
@@ -109,25 +93,27 @@ class SecretsView extends React.Component<Props, State> {
 
   reload = () => {
     const req: RuntimeStatusRequest = {}
-    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-      if (err) {
-        return
-      }
-      this.setState({syncEnabled: resp.sync})
-      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
-    })
+    runtimeStatus(req)
+      .then((resp: RuntimeStatusResponse) => {
+        this.setState({syncEnabled: !!resp.sync})
+        this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+      })
+      .catch(this.setError)
+  }
+
+  setError = (err: Error) => {
+    this.setState({openSnack: {message: err.message, alert: 'error'}})
   }
 
   sync = () => {
     this.setState({syncing: true})
     const req: VaultUpdateRequest = {}
-    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
-      this.setState({syncing: false})
-      if (err) {
-        this.setState({openSnack: err.details, openSnackAlert: 'error'})
-      }
-      this.reload()
-    })
+    vaultUpdate(req)
+      .then((res: VaultUpdateResponse) => {
+        this.setState({syncing: false})
+        this.reload()
+      })
+      .catch(this.setError)
   }
 
   list = (query: string, sortField: string, sortDirection: SortDirection) => {
@@ -137,21 +123,19 @@ class SecretsView extends React.Component<Props, State> {
       sortField: sortField,
       sortDirection: sortDirection,
     }
-    secrets(req, (err: RPCError, resp: SecretsResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
-      this.setState({
-        secrets: resp.secrets,
-        sortField: resp.sortField,
-        sortDirection: resp.sortDirection,
+    secrets(req)
+      .then((resp: SecretsResponse) => {
+        this.setState({
+          secrets: resp.secrets || [],
+          sortField: resp.sortField || '',
+          sortDirection: resp.sortDirection || SortDirection.ASC,
+        })
+        // If we don't have keys and intro, then show create dialog
+        //   if (resp.secrets.length == 0 && this.props.intro) {
+        //     this.setState({openCreate: 'INTRO'})
+        //   }
       })
-      // If we don't have keys and intro, then show create dialog
-      //   if (resp.secrets.length == 0 && this.props.intro) {
-      //     this.setState({openCreate: 'INTRO'})
-      //   }
-    })
+      .catch(this.setError)
   }
 
   onChange = () => {
@@ -177,15 +161,14 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   closeContext = () => {
-    this.setState({contextPosition: null, selected: null})
+    this.setState({contextPosition: undefined, selected: undefined})
   }
 
   delete = () => {
-    const secret: Secret = this.state.secrets.find((s: Secret) => {
+    const secret = this.state.secrets.find((s: Secret) => {
       return this.state.selected?.id == s.id
     })
-
-    this.setState({contextPosition: null, openRemove: {open: true, secret}})
+    this.setState({contextPosition: undefined, openRemove: secret})
   }
 
   sort = (sortField: string, field: string, sortDirection: SortDirection) => {
@@ -200,7 +183,7 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   closeRemove = (removed: boolean) => {
-    this.setState({openRemove: {open: false, secret: this.state.openRemove.secret}, selected: null})
+    this.setState({selected: undefined})
     this.reload()
   }
 
@@ -213,7 +196,20 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   newSecret = () => {
-    this.setState({isNew: true, editing: {type: SecretType.PASSWORD_SECRET}})
+    this.setState({
+      isNew: true,
+      editing: {
+        id: '',
+        name: '',
+        type: SecretType.PASSWORD_SECRET,
+        username: '',
+        password: '',
+        url: '',
+        notes: '',
+        createdAt: 0,
+        updatedAt: 0,
+      },
+    })
   }
 
   edit = () => {
@@ -221,11 +217,11 @@ class SecretsView extends React.Component<Props, State> {
   }
 
   cancelEdit = () => {
-    this.setState({isNew: false, editing: null})
+    this.setState({isNew: false, editing: undefined})
   }
 
   secretChanged = (changed: Secret) => {
-    this.setState({isNew: false, editing: null, selected: changed})
+    this.setState({isNew: false, editing: undefined, selected: changed})
     this.reload()
   }
 
@@ -277,28 +273,13 @@ class SecretsView extends React.Component<Props, State> {
     // If filtering, selected might not be visible, but we don't want to clear
     // selected when filtering so we check to see if it's in the list before
     // showing.
-    const selected: Secret = this.state.secrets.find((s: Secret) => {
+    const selected = this.state.secrets.find((s: Secret) => {
       return this.state.selected?.id == s.id
     })
 
     return (
-      <Box>
-        <Menu
-          keepMounted
-          open={this.state.contextPosition !== null}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition !== null
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem color="secondary" onClick={this.delete}>
-            <DeleteIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
-          </MenuItem>
-        </Menu>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Header />
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
           <Box style={{width: 250}}>
             {this.renderHeader()}
@@ -317,10 +298,10 @@ class SecretsView extends React.Component<Props, State> {
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => this.select(secret)}
+                        onClick={() => this.select(secret)}
                         key={secret.id}
                         style={{cursor: 'pointer'}}
-                        selected={this.isSelected(secret.id)}
+                        selected={this.isSelected(secret.id || '')}
                         component={(props: any) => {
                           return <tr onContextMenu={this.onContextMenu} {...props} id={secret.id} />
                         }}
@@ -345,23 +326,31 @@ class SecretsView extends React.Component<Props, State> {
                 cancel={this.cancelEdit}
               />
             )}
-            {!this.state.editing && selected && (
+            {!this.state.editing && selected && this.state.selected && (
               <SecretContentView secret={this.state.selected} edit={this.edit} />
             )}
           </Box>
         </Box>
-        <SecretRemoveDialog
-          open={this.state.openRemove.open}
-          secret={this.state.openRemove.secret}
-          close={this.closeRemove}
-        />
-        <Snack
-          open={!!this.state.openSnack}
-          message={this.state.openSnack}
-          alert={this.state.openSnackAlert as AlertColor}
-          onClose={() => this.setState({openSnack: ''})}
-          duration={4000}
-        />
+
+        <Menu
+          keepMounted
+          open={this.state.contextPosition !== null}
+          onClose={this.closeContext}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            !!this.state.contextPosition
+              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
+              : undefined
+          }
+        >
+          <MenuItem color="secondary" onClick={this.delete}>
+            <DeleteIcon />
+            <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
+          </MenuItem>
+        </Menu>
+
+        <SecretRemoveDialog secret={this.state.openRemove} close={this.closeRemove} />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Box>
     )
   }
@@ -413,11 +402,3 @@ const NoteCell = (props: {secret: Secret}) => {
     </Box>
   )
 }
-
-const mapStateToProps = (state: {app: AppState}, ownProps: any) => {
-  return {
-    intro: state.app.intro,
-  }
-}
-
-export default connect(mapStateToProps)(SecretsView)

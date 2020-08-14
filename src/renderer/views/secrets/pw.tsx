@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Button, TextField, Typography} from '@material-ui/core'
 
 import {clipboard} from 'electron'
-import {Snack} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 type Props = {
   password: string
@@ -13,11 +13,11 @@ type Props = {
 }
 
 export default (props: Props) => {
-  const [openSnack, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
 
   const copyPassword = () => {
     clipboard.writeText(props.password)
-    setSnackOpen(true)
+    setSnack({message: 'Copied to Clipboard', duration: 2000})
   }
 
   const buttonStyle = {
@@ -54,12 +54,7 @@ export default (props: Props) => {
           Gen
         </Button>
       )}
-      <Snack
-        open={openSnack}
-        onClose={() => setSnackOpen(false)}
-        message="Copied to Clipboard"
-        duration={2000}
-      />
+      <Snack snack={snack} onClose={() => setSnack(undefined)} />
     </Box>
   )
 }

@@ -2,8 +2,6 @@ import * as React from 'react'
 
 import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
-import {connect} from 'react-redux'
-
 type Props = {}
 
 type State = {

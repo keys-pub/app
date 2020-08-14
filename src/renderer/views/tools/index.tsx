@@ -49,7 +49,7 @@ export default (props: Props) => {
   const selected = Store.useState((s) => s.selectedTool)
 
   return (
-    <Box display="flex" flexGrow={1} flexDirection="row">
+    <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
       <List
         style={{
           height: '100%',

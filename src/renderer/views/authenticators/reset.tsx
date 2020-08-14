@@ -18,7 +18,6 @@ import {styles, DialogTitle} from '../../components'
 
 import {reset} from '../../rpc/fido2'
 import {
-  RPCError,
   Device,
   DeviceInfo,
   Option,
@@ -36,18 +35,17 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
 }
 
 export default class ResetDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     loading: false,
   }
 
   clear = () => {
-    this.setState({error: '', loading: false})
+    this.setState({error: undefined, loading: false})
   }
 
   close = (snack: string) => {
@@ -56,18 +54,18 @@ export default class ResetDialog extends React.Component<Props, State> {
   }
 
   reset = () => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: ResetRequest = {
       device: this.props.device.path,
     }
-    reset(req, (err: RPCError, resp: ResetResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close('Device was reset')
-    })
+    reset(req)
+      .then((resp: ResetResponse) => {
+        this.setState({loading: false})
+        this.close('Device was reset')
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   renderContent() {
@@ -82,7 +80,7 @@ export default class ResetDialog extends React.Component<Props, State> {
           issued later than 5 seconds after power-up or if the user fails to confirm the reset by touching the
           key within 30 seconds.
         </Typography>
-        <Typography style={{color: 'red'}}>{this.state.error}&nbsp;</Typography>
+        <Typography style={{color: 'red'}}>{this.state.error?.message}&nbsp;</Typography>
       </Box>
     )
   }

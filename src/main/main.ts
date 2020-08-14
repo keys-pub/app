@@ -8,9 +8,6 @@ import {app, BrowserWindow, ipcMain, BrowserWindowConstructorOptions} from 'elec
 
 import MenuBuilder from './menu'
 
-import * as path from 'path'
-import * as url from 'url'
-
 const windowStateKeeper = require('electron-window-state')
 
 import {MenuActionType} from './menu'
@@ -21,27 +18,7 @@ import {update, UpdateResult} from './updater'
 import {rpcRegister} from './rpc'
 import {reloadApp} from './app'
 
-let mainWindow = null
-
-// if (process.env.NODE_ENV === 'production') {
-//   const sourceMapSupport = require('source-map-support')
-//   sourceMapSupport.install()
-// }
-
-// if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-//   require('electron-debug')
-// }
-
-// const installExtensions = () => {
-//   const installer = require('electron-devtools-installer')
-//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS
-//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
-//   return Promise.all(extensions.map(name => installer.default(installer[name], forceDownload))).catch(
-//     console.log
-//   )
-// }
-
-// TODO: On service crash handle restart if no stream request is active
+let mainWindow: BrowserWindow | null = null
 
 app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') {
@@ -56,10 +33,6 @@ app.on('window-all-closed', () => {
 // })
 
 app.on('ready', async () => {
-  // if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-  //   installExtensions()
-  // }
-
   let ws = windowStateKeeper({
     defaultWidth: 920,
     defaultHeight: 600,
@@ -94,7 +67,7 @@ app.on('ready', async () => {
   ws.manage(mainWindow)
 
   if (process.env.NODE_ENV !== 'production') {
-    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
+    // process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
     let port = process.env.DEV_PORT
     if (!port) {
       port = '2003'
@@ -102,13 +75,7 @@ app.on('ready', async () => {
     console.log('Using dev port', port)
     mainWindow.loadURL(`http://localhost:` + port)
   } else {
-    mainWindow.loadURL(
-      url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true,
-      })
-    )
+    mainWindow.loadFile('index.html')
   }
 
   // @TODO: Use 'ready-to-show' event
@@ -161,7 +128,7 @@ app.on('ready', async () => {
 
 ipcMain.removeAllListeners('reload-app')
 ipcMain.on('reload-app', (event, arg) => {
-  reloadApp(mainWindow)
+  if (mainWindow) reloadApp(mainWindow)
 })
 
 // TODO: stop keysd on app exit?
@@ -171,13 +138,7 @@ ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
       console.log('Start...')
-
-      rpcRegister(
-        (): BrowserWindow => {
-          return mainWindow
-        }
-      )
-
+      rpcRegister()
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {

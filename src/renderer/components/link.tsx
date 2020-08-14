@@ -38,10 +38,10 @@ const Link = (props: Props) => {
 
   let onClick = props.onClick
   if (props.href) {
-    onClick = () => shell.openExternal(props.href)
+    onClick = () => shell.openExternal(props.href || '')
   }
   if (props.disabled) {
-    onClick = null
+    onClick = undefined
     style.color = '#666'
   }
 

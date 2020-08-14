@@ -1,7 +1,7 @@
 import emoji from 'node-emoji'
 
 import {rand} from '../rpc/keys'
-import {Key, KeyType, Encoding, RPCError, RandRequest, RandResponse, SortDirection} from '../rpc/keys.d'
+import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '../rpc/keys.d'
 
 import * as Long from 'long'
 
@@ -30,9 +30,9 @@ var dateOptions = {
   timeZoneName: 'short',
 }
 
-export const dateString = (ms): string => {
+export const dateString = (ms?: number): string => {
   if (!ms) return ''
-  const s = new Long(ms.low, ms.high, ms.unsigned).toString()
+  const s = ms.toString()
   const n = parseInt(s)
   if (n === 0) {
     return ''
@@ -43,18 +43,14 @@ export const dateString = (ms): string => {
 }
 
 export const generateID = (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    rand({numBytes: 32, encoding: Encoding.BASE62}, (err: RPCError, resp: RandResponse) => {
-      if (err) {
-        reject(err)
-        return
-      }
+  return new Promise((resolve) => {
+    rand({numBytes: 32, encoding: Encoding.BASE62}).then((resp: RandResponse) => {
       resolve(resp.data)
     })
   })
 }
 
-export const directionString = (d: SortDirection): 'asc' | 'desc' => {
+export const directionString = (d?: SortDirection): 'asc' | 'desc' => {
   switch (d) {
     case 'ASC':
       return 'asc'
@@ -76,7 +72,6 @@ export const flipDirection = (d: SortDirection): SortDirection => {
     case SortDirection.DESC:
       return SortDirection.ASC
   }
-  return SortDirection.ASC
 }
 
 export const deepCopy = (o: any) => {

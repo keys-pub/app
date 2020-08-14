@@ -6,7 +6,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import {keysStopSync} from './service'
-import * as Store from 'electron-store'
+import ElectronStore from 'electron-store'
 
 export type Asset = {
   name: string
@@ -98,7 +98,7 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
     let args = '-github ' + repo + ' -app-name ' + appName + ' -current ' + version
 
     // Check for prerelease
-    const localStore = new Store()
+    const localStore = new ElectronStore()
     if (localStore.get('prerelease') == '1') {
       args = args + ' -prerelease'
     }

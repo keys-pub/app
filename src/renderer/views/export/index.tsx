@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core'
 
 import {styles, DialogTitle} from '../../components'
-import {Key, KeyExportRequest, KeyExportResponse, RPCError} from '../../rpc/keys.d'
+import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../../rpc/keys.d'
 
 import {keyExport} from '../../rpc/keys'
 
@@ -29,15 +29,14 @@ type State = {
   export: string
   password: string
   passwordConfirm: string
-  error: string
+  error?: Error
 }
 
 export default class KeyExportDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     export: '',
     password: '',
     passwordConfirm: '',
-    error: '',
   }
 
   export = async () => {
@@ -45,7 +44,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     const confirm = this.state.passwordConfirm
     if (password != confirm) {
       this.setState({
-        error: "Passwords don't match",
+        error: new Error("Passwords don't match"),
       })
       return
     }
@@ -54,35 +53,37 @@ export default class KeyExportDialog extends React.Component<Props, State> {
       noPassword = true
     }
 
-    this.setState({error: ''})
+    this.setState({error: undefined})
     const req: KeyExportRequest = {
       kid: this.props.kid,
       password: this.state.password,
       noPassword: noPassword,
+      public: false,
+      type: ExportType.DEFAULT_EXPORT_TYPE,
     }
-    keyExport(req, (err: RPCError, resp: KeyExportResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
-      const out = new TextDecoder().decode(resp.export)
-      this.setState({password: '', passwordConfirm: '', export: out})
-    })
+    keyExport(req)
+      .then((resp: KeyExportResponse) => {
+        const out = new TextDecoder().decode(resp.export)
+        this.setState({password: '', passwordConfirm: '', export: out})
+      })
+      .catch((err: Error) => {
+        this.setState({error: err})
+      })
   }
 
   close = () => {
     this.props.close()
-    this.setState({password: '', passwordConfirm: '', export: '', error: ''})
+    this.setState({password: '', passwordConfirm: '', export: '', error: undefined})
   }
 
   onInputChangePassword = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({password: target ? target.value : '', error: ''})
+    this.setState({password: target ? target.value : '', error: undefined})
   }
 
   onInputChangeConfirm = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({passwordConfirm: target ? target.value : '', error: ''})
+    this.setState({passwordConfirm: target ? target.value : '', error: undefined})
   }
 
   renderExport() {
@@ -91,7 +92,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" style={{height: 200}}>
         <Typography style={{paddingBottom: 10}}>Export a key encrypted with a password.</Typography>
         <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             label="Password"
@@ -108,7 +109,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
             onChange={this.onInputChangeConfirm}
             value={this.state.passwordConfirm}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

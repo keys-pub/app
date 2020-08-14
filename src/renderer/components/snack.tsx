@@ -6,34 +6,31 @@ import {Close as CloseIcon} from '@material-ui/icons'
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-type Props = {
-  open: boolean
+export type SnackProps = {
   message: string
+  alert?: string
+  duration?: number
+}
+
+export type Props = {
+  snack?: SnackProps
   onClose: () => void
-  alert?: string
-  duration?: number
 }
 
-export type SnackOpts = {
-  message: string
-  alert?: string
-  duration?: number
-}
-
-export const Snack = (props: Props) => {
-  if (!!props.alert) {
+export default (props: Props) => {
+  if (!!props.snack?.alert) {
     return <SnackAlert {...props} />
   }
 
   return (
     <Snackbar
       // anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-      open={props.open}
+      open={!!props.snack}
       onClose={props.onClose}
-      autoHideDuration={props.duration}
+      autoHideDuration={props.snack?.duration}
     >
       <SnackbarContent
-        message={props.message}
+        message={props.snack?.message}
         style={{fontSize: '0.857rem'}}
         action={
           <React.Fragment>
@@ -49,15 +46,17 @@ export const Snack = (props: Props) => {
 
 const SnackAlert = (props: Props) => {
   return (
-    <Snackbar open={props.open} onClose={props.onClose} autoHideDuration={props.duration}>
+    <Snackbar open={!!props.snack} onClose={props.onClose} autoHideDuration={props.snack?.duration}>
       <Alert
-        severity={props.alert as AlertColor}
+        severity={props.snack?.alert as AlertColor}
         elevation={3}
         // variant="filled"
         style={{paddingTop: 5, paddingBottom: 3}}
       >
         <Box display="flex" flexDirection="row" alignItems="flex-start">
-          <Typography style={{paddingRight: 10, minWidth: 200, paddingTop: 1}}>{props.message}</Typography>
+          <Typography style={{paddingRight: 10, minWidth: 200, paddingTop: 1}}>
+            {props.snack?.message}
+          </Typography>
           <IconButton size="small" aria-label="close" color="inherit" onClick={props.onClose}>
             <CloseIcon fontSize="small" />
           </IconButton>

@@ -1,4 +1,4 @@
-import {WormholeMessage, WormholeMessageType} from '../../reducers/wormhole'
+import {WormholeMessage, WormholeMessageType} from '../../store/pull'
 
 export const welcomeStatus = () => {
   // TODO: Make messages are only available for the life of the connection (+1 minute?).

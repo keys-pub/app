@@ -23,20 +23,19 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   pin: string
   loading: boolean
 }
 
 export default class GetPinDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     pin: '',
     loading: false,
   }
 
   reset = () => {
-    this.setState({error: '', pin: '', loading: false})
+    this.setState({error: undefined, pin: '', loading: false})
   }
 
   cancel = () => {
@@ -52,16 +51,16 @@ export default class GetPinDialog extends React.Component<Props, State> {
 
   onPinChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({pin: target.value, error: ''})
+    this.setState({pin: target.value, error: undefined})
   }
 
   renderPinChange() {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={{paddingBottom: 20}}>Enter the PIN.</Typography>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField variant="outlined" label="PIN" onChange={this.onPinChange} value={this.state.pin} />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

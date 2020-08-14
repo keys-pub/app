@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {RPCError, Device, Credential} from '../../rpc/fido2.d'
+import {Device, Credential} from '../../rpc/fido2.d'
 import {toHex} from '../helper'
 
 import {SortDirection} from '../../rpc/keys.d'
@@ -22,7 +22,7 @@ import {styles} from '../../components'
 import {directionString, flipDirection} from '../helper'
 
 type Props = {
-  credentials: Array<Credential>
+  credentials: Credential[]
 }
 
 export default (props: Props) => {
@@ -45,7 +45,7 @@ export default (props: Props) => {
             <TableSortLabel
               active={sortField == 'id'}
               direction={direction}
-              onClick={() => this.sort(sortField, 'id', sortDirection)}
+              // onClick={() => this.sort(sortField, 'id', sortDirection)}
             >
               <Typography style={{...styles.mono}}>RP</Typography>
             </TableSortLabel>
@@ -54,7 +54,7 @@ export default (props: Props) => {
             <TableSortLabel
               active={sortField == 'name'}
               direction={direction}
-              onClick={() => this.sort(sortField, '???', sortDirection)}
+              // onClick={() => this.sort(sortField, '???', sortDirection)}
             >
               <Typography style={{...styles.mono}}>User</Typography>
             </TableSortLabel>
@@ -63,12 +63,11 @@ export default (props: Props) => {
       </TableHead>
       <TableBody>
         {props.credentials.map((cred: Credential, index) => {
-          const id = toHex(cred.id)
-          console.log('cred:', cred)
+          const id = toHex(cred.id || new Uint8Array())
           return (
             <TableRow
               hover
-              onClick={(event) => select(cred)}
+              onClick={() => select(cred)}
               key={id}
               style={{cursor: 'pointer'}}
               selected={isSelected(cred)}
@@ -78,16 +77,16 @@ export default (props: Props) => {
             >
               <TableCell component="th" scope="row" style={{minWidth: 200}}>
                 <Typography style={{...styles.mono, ...styles.breakWords}}>
-                  {cred.rp.id}
+                  {cred.rp!.id}
                   <br />
-                  {cred.rp.name}
+                  {cred.rp!.name}
                 </Typography>
               </TableCell>
               <TableCell style={{verticalAlign: 'top', minWidth: 200}}>
                 <Typography style={{...styles.mono, ...styles.breakWords}}>
-                  {cred.user.name}
+                  {cred.user!.name}
 
-                  {cred.user.displayName && <span>({cred.user.displayName})</span>}
+                  {cred.user!.displayName && <span>({cred.user!.displayName})</span>}
                 </Typography>
               </TableCell>
             </TableRow>

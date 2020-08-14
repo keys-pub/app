@@ -5,42 +5,40 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 import {DialogTitle, styles} from '../../components'
 
 import {keyRemove} from '../../rpc/keys'
-import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
+import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
-  keyRemove: Key
-  open: boolean
+  keyRemove?: Key
   close: (removed: boolean) => void
 }
 
 type State = {
-  error: string
+  error?: Error
 }
 
 export default class KeyRemoveDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  setError = (err: Error) => {
+    this.setState({error: err})
   }
 
   removeKey = () => {
+    if (!this.props.keyRemove) return
     const req: KeyRemoveRequest = {kid: this.props.keyRemove.id}
-    keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
-      this.props.close(true)
-    })
+    keyRemove(req)
+      .then((resp: KeyRemoveResponse) => {
+        this.props.close(true)
+      })
+      .catch(this.setError)
   }
 
-  renderDialog(open: boolean) {
+  renderDialog() {
     const key = this.props.keyRemove
     const isPrivate = key?.type == KeyType.X25519 || key?.type == KeyType.EDX25519
 
     return (
       <Dialog
         onClose={() => this.props.close(false)}
-        open={open}
+        open={!!key}
         maxWidth="sm"
         fullWidth
         disableBackdropClick
@@ -87,7 +85,7 @@ export default class KeyRemoveDialog extends React.Component<Props, State> {
   }
 
   render() {
-    return this.renderDialog(this.props.open)
+    return this.renderDialog()
     /* <Step
         title="Delete Key"
         prev={{label: 'Cancel', action: this.props.close}}

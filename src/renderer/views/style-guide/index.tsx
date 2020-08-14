@@ -2,7 +2,8 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, Input, Typography} from '@material-ui/core'
 
-import {Link, Snack, SnackOpts} from '../../components'
+import {Link} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {UpdateAlertView} from '../update/alert'
 
@@ -11,18 +12,17 @@ import {ipcMain} from 'electron'
 type Props = {}
 
 type State = {
-  openSnack: SnackOpts
+  openSnack?: SnackProps
   openUpdateAlert: boolean
 }
 
 export default class StyleGuide extends React.Component<Props, State> {
-  state = {
-    openSnack: null,
+  state: State = {
     openUpdateAlert: false,
   }
 
   closeSnack = () => {
-    this.setState({openSnack: null})
+    this.setState({openSnack: undefined})
   }
 
   updateAlert = () => {
@@ -130,13 +130,7 @@ export default class StyleGuide extends React.Component<Props, State> {
             Snack Test (alert, error)
           </Link>
           <br />
-          <Snack
-            open={!!this.state.openSnack}
-            onClose={this.closeSnack}
-            message={this.state.openSnack?.message}
-            alert={this.state.openSnack?.alert}
-            duration={this.state.openSnack?.duration}
-          />
+          <Snack snack={this.state.openSnack} onClose={this.closeSnack} />
         </Box>
 
         <Box>

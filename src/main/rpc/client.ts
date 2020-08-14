@@ -30,7 +30,7 @@ const resolveProtoPath = (name: string): string => {
   return './src/main/rpc/' + name
 }
 
-const auth = (serviceUrl, callback) => {
+const auth = (serviceUrl: string, callback: (params: {} | null, metadata: grpc.Metadata) => void) => {
   const metadata = new grpc.Metadata()
   metadata.set('authorization', authToken)
   callback(null, metadata)
@@ -48,7 +48,7 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
   console.log('Proto path:', protoPath)
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})
-  const protoDescriptor = grpc.loadPackageDefinition(packageDefinition)
+  const protoDescriptor: any = grpc.loadPackageDefinition(packageDefinition)
   if (!protoDescriptor[packageName]) {
     throw new Error('proto descriptor should have package ' + packageName)
   }

@@ -12,8 +12,8 @@ import SignedView from './signed'
 import SignFileView from './signedfile'
 import SignKeySelectView from '../keys/select'
 
-import {sign, signFile} from '../../rpc/keys'
-import {Key, RPCError, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
+import {sign, signFile, SignFileEvent} from '../../rpc/keys'
+import {Key, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
 
 import {SignStore as Store} from '../../store/pull'
 
@@ -39,7 +39,8 @@ const clear = () => {
     s.output = ''
     s.fileIn = ''
     s.fileOut = ''
-    s.error = ''
+    s.signer = undefined
+    s.error = undefined
     s.loading = false
   })
 }
@@ -48,11 +49,17 @@ const clearOut = () => {
   Store.update((s) => {
     s.output = ''
     s.fileOut = ''
-    s.error = ''
+    s.error = undefined
   })
 }
 
-const signInput = (input: string, signer: Key) => {
+const setError = (err: Error) => {
+  Store.update((s) => {
+    s.error = err
+  })
+}
+
+const signInput = (input: string, signer?: Key) => {
   if (!input || !signer) {
     clearOut()
     return
@@ -64,43 +71,38 @@ const signInput = (input: string, signer: Key) => {
     data: data,
     armored: true,
     signer: signer?.id,
+    detached: false,
   }
-  sign(req, (err: RPCError, resp: SignResponse) => {
-    if (err) {
+  sign(req)
+    .then((resp: SignResponse) => {
+      const signed = new TextDecoder().decode(resp.data)
       Store.update((s) => {
-        s.error = err.details
+        s.output = signed
+        s.fileOut = ''
+        s.error = undefined
       })
-      return
-    }
-    const signed = new TextDecoder().decode(resp.data)
-    Store.update((s) => {
-      s.output = signed
-      s.fileOut = ''
-      s.error = ''
     })
-  })
+    .catch(setError)
 }
 
 const signFileIn = (fileIn: string, dir: string, signer: Key) => {
-  clearOut()
-  if (fileIn == '' || !signer) {
-    return
-  }
-
   const baseOut = path.basename(fileIn)
   const fileOut = path.join(dir, baseOut + '.signed')
 
-  const req = {
+  const req: SignFileInput = {
     in: fileIn,
     out: fileOut,
     signer: signer?.id,
+    armored: false,
+    detached: false,
   }
 
   console.log('Signing file...')
   Store.update((s) => {
     s.loading = true
   })
-  const send = signFile((err: RPCError, resp: SignFileOutput, done: boolean) => {
+  const send = signFile((event: SignFileEvent) => {
+    const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
         Store.update((s) => {
@@ -108,17 +110,17 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
         })
       } else {
         Store.update((s) => {
-          s.error = err.details
+          s.error = err
           s.loading = false
         })
       }
       return
     }
-    if (resp) {
+    if (res) {
       Store.update((s) => {
         s.output = ''
-        s.fileOut = resp.out
-        s.error = ''
+        s.fileOut = res?.out || ''
+        s.error = undefined
       })
     }
     if (done) {
@@ -130,7 +132,12 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
   send(req, false)
 }
 
-const signFileTo = async (fileIn: string, signer: Key) => {
+const signFileTo = async (fileIn: string, signer?: Key) => {
+  clearOut()
+  if (fileIn == '' || !signer) {
+    return
+  }
+
   const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
   })
@@ -183,7 +190,7 @@ export default (props: Props) => {
     >
       <SignKeySelectView
         value={signer}
-        onChange={(k: Key) => {
+        onChange={(k) => {
           Store.update((s) => {
             s.signer = k
           })
@@ -231,7 +238,7 @@ export default (props: Props) => {
               <Box style={{position: 'absolute', top: 6, left: 8}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
-                  onClick={() => inputRef.current.focus()}
+                  onClick={() => inputRef.current?.focus()}
                 >
                   Type text or{' '}
                 </Typography>

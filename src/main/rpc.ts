@@ -1,6 +1,5 @@
 import {ipcMain, BrowserWindow} from 'electron'
 
-import {RPCError} from './rpc/keys.d'
 import {client, setAuthToken, close} from './rpc/client'
 
 type RPC = {
@@ -11,29 +10,24 @@ type RPC = {
   end: boolean
 }
 
+interface Error {
+  code: number
+  message: string
+  details: string
+}
+
 type RPCReply = {
-  err: RPCError
+  err: Error
   resp: any
 }
 
 type RPCStreamReply = {
   resp?: any
-  err?: RPCError
+  err?: Error
   done?: boolean
 }
 
-const convertErr = (err: any): RPCError => {
-  if (!err) return null
-  // Need to convert err to an object type.
-  // TODO: what if source err is not RPCError?
-  return {
-    code: err.code,
-    message: err.message,
-    details: err.details,
-  }
-}
-
-const rpc = (cl, f): Promise<RPCReply> => {
+const rpc = (cl: any, f: RPC): Promise<RPCReply> => {
   return new Promise((resolve, reject) => {
     if (typeof cl[f.method] !== 'function') {
       console.log('rpc not found', f.reply)
@@ -41,32 +35,21 @@ const rpc = (cl, f): Promise<RPCReply> => {
       resolve({err: notFound(f.method)} as RPCReply)
       return
     }
-    cl[f.method](f.args, (err: any, resp: any) => {
-      resolve({err: convertErr(err), resp: resp})
+    cl[f.method](f.args, (err: Error, resp: any) => {
+      resolve({err: err, resp: resp})
     })
   })
 }
 
 let streams: Map<string, any> = new Map()
 
-export const reportErr = (currentWindow: () => BrowserWindow, err: RPCError) => {
-  const mainWindow = currentWindow()
-  switch (err.code) {
-    case 16:
-      if (mainWindow) {
-        mainWindow.webContents.send('unauthenticated', err)
-      }
-      break
-    case 14:
-      if (mainWindow) {
-        mainWindow.webContents.send('unavailable', err)
-      }
-      rpcReload()
-      break
+export const handleErr = (err: Error) => {
+  if (err.code == 14) {
+    rpcReload()
   }
 }
 
-export const rpcRegister = (currentWindow: () => BrowserWindow) => {
+export const rpcRegister = () => {
   ipcMain.removeAllListeners('rpc')
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
@@ -75,7 +58,7 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
     const out: RPCReply = await rpc(cl, f)
     if (out.err) {
       console.error('rpc err', f.reply, out.err)
-      reportErr(currentWindow, out.err)
+      handleErr(out.err)
     } else {
       console.log('rpc reply', f.reply)
     }
@@ -118,14 +101,14 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
 
     streams.set(f.reply, newStream)
 
-    newStream.on('data', (resp) => {
+    newStream.on('data', (resp: any) => {
       console.log('rpc-stream data', f.reply)
       event.reply(f.reply, {resp: resp} as RPCStreamReply)
     })
-    newStream.on('error', (err) => {
+    newStream.on('error', (err: Error) => {
       console.log('rpc-stream err', f.reply, err)
-      reportErr(currentWindow, err)
-      event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
+      handleErr(err)
+      event.reply(f.reply, {err: err} as RPCStreamReply)
       streams.delete(f.reply)
     })
     newStream.on('end', () => {
@@ -142,7 +125,7 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
   })
 }
 
-const notFound = (method: string): RPCError => {
+const notFound = (method: string): Error => {
   return {
     code: 0,
     message: method + ' not found',

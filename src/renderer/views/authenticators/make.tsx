@@ -22,7 +22,7 @@ import {styles, DialogTitle} from '../../components'
 import {deepCopy, fromHex} from '../helper'
 
 import {makeCredential, credentials} from '../../rpc/fido2'
-import {RPCError, Device, MakeCredentialRequest, MakeCredentialResponse} from '../../rpc/fido2.d'
+import {Device, MakeCredentialRequest, MakeCredentialResponse} from '../../rpc/fido2.d'
 
 type Props = {
   device: Device
@@ -40,20 +40,20 @@ type Credential = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
-  credential: Credential
+  credential?: Credential
 }
 
 export default class MakeCredentialView extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     loading: false,
-    credential: {} as Credential,
   }
 
-  save = async () => {
-    this.setState({loading: true, error: ''})
+  save = () => {
+    if (!this.state.credential) return
+
+    this.setState({loading: true, error: undefined})
     const req: MakeCredentialRequest = {
       device: this.props.device.path,
       clientDataHash: fromHex(this.state.credential.clientDataHash),
@@ -64,24 +64,28 @@ export default class MakeCredentialView extends React.Component<Props, State> {
       user: {
         id: fromHex(this.state.credential.userID),
         name: this.state.credential.userName,
+        displayName: '',
+        icon: '',
       },
       type: this.state.credential.type,
+      pin: '',
+      extensions: [],
+      rk: '',
+      uv: '',
     }
-    makeCredential(req, (err: RPCError, resp: MakeCredentialResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.props.onChange()
-    })
+    makeCredential(req)
+      .then((resp: MakeCredentialResponse) => {
+        this.setState({loading: false})
+        this.props.onChange()
+      })
+      .catch((err: Error) => this.setState({loading: false, error: err}))
   }
 
   onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {
     const value = e.target.value as string
     const credential = deepCopy(this.state.credential)
     credential[fieldName] = value
-    const state = {error: '', credential}
+    const state: State = {loading: false, error: undefined, credential: credential as Credential}
     this.setState(state)
   }
 
@@ -121,7 +125,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         labelId="secret-type-label"
         id="secret-type-select"
         variant="outlined"
-        value={this.state.credential.type}
+        value={this.state.credential?.type}
         onChange={(e) => this.onChange(e, 'type')}
         style={{width: 200, height: 32}}
       >
@@ -136,7 +140,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <Typography style={labelStyle}>ClientDataHash</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'clientDataHash')}
-          value={this.state.credential.clientDataHash}
+          value={this.state.credential?.clientDataHash}
           InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 20}}
@@ -144,7 +148,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <Typography style={labelStyle}>Relying Party ID</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
-          value={this.state.credential.rpID}
+          value={this.state.credential?.rpID}
           InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
@@ -152,7 +156,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <Typography style={labelStyle}>Relying Party Name</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
-          value={this.state.credential.rpID}
+          value={this.state.credential?.rpID}
           InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
@@ -160,7 +164,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <Typography style={labelStyle}>User ID</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
-          value={this.state.credential.rpID}
+          value={this.state.credential?.rpID}
           InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
@@ -168,7 +172,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <Typography style={labelStyle}>User Name</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
-          value={this.state.credential.rpID}
+          value={this.state.credential?.rpID}
           InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
@@ -198,7 +202,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         >
           {this.state.error && (
             <Box marginBottom={2}>
-              <Alert severity="error">{this.state.error}</Alert>
+              <Alert severity="error">{this.state.error?.message}</Alert>
             </Box>
           )}
           <Box display="flex" flexDirection="column" marginLeft={1} marginRight={1}>

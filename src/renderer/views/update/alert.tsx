@@ -6,18 +6,28 @@ import {Link} from '../../components'
 
 import Alert from '@material-ui/lab/Alert'
 
-import {store} from '../../store'
-import {push} from 'connected-react-router'
-
+import {Store} from '../../store/pull'
 import {ipcRenderer} from 'electron'
 
-type Props = {}
+export default (props: {}) => {
+  const setUpdating = () => {
+    Store.update((s) => {
+      s.updating = true
+    })
+  }
+  return <UpdateAlert setUpdating={setUpdating} />
+}
+
+type Props = {
+  setUpdating: () => void
+}
+
 type State = {
   open: boolean
   version: string
 }
 
-export default class UpdateAlert extends React.Component<Props, State> {
+class UpdateAlert extends React.Component<Props, State> {
   state = {
     open: false,
     version: '',
@@ -64,8 +74,7 @@ export default class UpdateAlert extends React.Component<Props, State> {
       version: '',
     })
     ipcRenderer.send('update-apply')
-    // TODO: Splash for update
-    store.dispatch({type: 'UPDATING'})
+    this.props.setUpdating()
   }
 
   render() {

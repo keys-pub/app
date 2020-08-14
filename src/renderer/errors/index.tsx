@@ -5,10 +5,9 @@ import {Box, Button, Typography} from '@material-ui/core'
 import ErrorView from './view'
 
 import {ipcRenderer} from 'electron'
-import {store} from '../store'
 
 type Props = {
-  error: Error | void
+  error: Error
 }
 
 export default class ErrorsView extends React.Component<Props> {
@@ -24,7 +23,7 @@ export default class ErrorsView extends React.Component<Props> {
         flexGrow={1}
         style={{
           backgroundColor: 'white',
-          height: 'calc(100vh - 50px)',
+          height: '100%',
         }}
       >
         <Typography variant="h5" style={{marginBottom: 10, textAlign: 'center'}}>

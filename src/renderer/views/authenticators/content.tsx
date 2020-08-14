@@ -2,9 +2,6 @@ import * as React from 'react'
 
 import {Box, Button, Divider, Tabs, Tab, TextField, Typography} from '@material-ui/core'
 
-import {toHex} from '../helper'
-import {Snack} from '../../components'
-
 import Info from './info'
 import Credentials from './credentials'
 
@@ -32,8 +29,6 @@ export default class DeviceContentView extends React.Component<Props, State> {
   }
 
   render() {
-    if (!this.props.device) return null
-
     return (
       <Box style={{width: '100%'}}>
         <Tabs

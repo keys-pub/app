@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {statementRevoke} from '../../rpc/keys'
-import {RPCError, StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/keys.d'
+import {StatementRevokeRequest, StatementRevokeResponse} from '../../rpc/keys.d'
 
 type Props = {
   kid: string
@@ -23,13 +23,12 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
 }
 
 export default class UserRevokeDialog extends React.Component<Props, State> {
-  state = {
-    error: null,
+  state: State = {
     loading: false,
   }
 
@@ -73,19 +72,19 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
   }
 
   revoke = (event: any) => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: StatementRevokeRequest = {
       kid: this.props.kid,
       seq: this.props.seq,
       local: false,
     }
-    statementRevoke(req, (err: RPCError, resp: StatementRevokeResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.props.close()
-      this.setState({loading: false})
-    })
+    statementRevoke(req)
+      .then((resp: StatementRevokeResponse) => {
+        this.props.close()
+        this.setState({loading: false})
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 }

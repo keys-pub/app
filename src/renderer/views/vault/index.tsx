@@ -3,17 +3,16 @@ import * as React from 'react'
 import {Box, Button, Divider, LinearProgress, Typography} from '@material-ui/core'
 
 import {shell} from 'electron'
-import {Link, styles, Snack, SnackOpts} from '../../components'
+import {Link, styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 // import EnableDialog from './enable'
 import DisableDialog from './disable'
-import {store} from '../../store'
 
 import {dateString} from '../helper'
 
 import {vaultAuth, vaultStatus, vaultSync} from '../../rpc/keys'
 import {
-  RPCError,
   VaultAuthRequest,
   VaultAuthResponse,
   VaultSyncRequest,
@@ -27,25 +26,23 @@ type Props = {}
 type State = {
   loading: boolean
   openDisable: boolean
-  openSnack: SnackOpts
+  openSnack?: SnackProps
   phrase: string
-  status: VaultStatusResponse
+  status?: VaultStatusResponse
 }
 
 export default class VaultView extends React.Component<Props, State> {
-  state = {
+  state: State = {
     loading: false,
     openDisable: false,
-    openSnack: null,
     phrase: '',
-    status: null,
   }
 
   componentDidMount() {
     this.status()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props != prevProps) {
       this.status()
     }
@@ -53,14 +50,14 @@ export default class VaultView extends React.Component<Props, State> {
 
   status = () => {
     const req: VaultStatusRequest = {}
-    vaultStatus(req, (err: RPCError, resp: VaultStatusResponse) => {
-      if (err) {
-        this.setState({openSnack: {message: err.details, alert: 'error'}})
-        return
-      }
-      console.log('Vault status:', resp)
-      this.setState({status: resp})
-    })
+    vaultStatus(req)
+      .then((resp: VaultStatusResponse) => {
+        console.log('Vault status:', resp)
+        this.setState({status: resp})
+      })
+      .catch((err: Error) => {
+        this.setState({openSnack: {message: err.message, alert: 'error'}})
+      })
   }
 
   openDisable = () => {
@@ -68,20 +65,20 @@ export default class VaultView extends React.Component<Props, State> {
   }
 
   closeDisable = (snack: string) => {
-    this.setState({openDisable: false, openSnack: snack ? {message: snack} : null})
+    this.setState({openDisable: false, openSnack: snack ? {message: snack} : undefined})
     this.status()
   }
 
   vaultAuth = () => {
     const req: VaultAuthRequest = {}
     this.setState({loading: true})
-    vaultAuth(req, (err: RPCError, resp: VaultAuthResponse) => {
-      if (err) {
-        this.setState({loading: false, openSnack: {message: err.details, alert: 'error'}})
-        return
-      }
-      this.setState({loading: false, phrase: resp.phrase})
-    })
+    vaultAuth(req)
+      .then((resp: VaultAuthResponse) => {
+        this.setState({loading: false, phrase: resp.phrase || ''})
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, openSnack: {message: err.message, alert: 'error'}})
+      })
   }
 
   vaultAuthClear = () => {
@@ -91,14 +88,14 @@ export default class VaultView extends React.Component<Props, State> {
   sync = () => {
     this.setState({loading: true})
     const req: VaultSyncRequest = {}
-    vaultSync(req, (err: RPCError, resp: VaultSyncResponse) => {
-      if (err) {
-        this.setState({loading: false, openSnack: {message: err.details, alert: 'error'}})
-        return
-      }
-      this.setState({loading: false})
-      this.status()
-    })
+    vaultSync(req)
+      .then((resp: VaultSyncResponse) => {
+        this.setState({loading: false})
+        this.status()
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, openSnack: {message: err.message, alert: 'error'}})
+      })
   }
 
   renderEnable() {
@@ -253,13 +250,7 @@ export default class VaultView extends React.Component<Props, State> {
         )}
 
         <DisableDialog open={this.state.openDisable} close={(snack) => this.closeDisable(snack)} />
-        <Snack
-          open={!!this.state.openSnack}
-          onClose={() => this.setState({openSnack: null})}
-          message={this.state.openSnack?.message}
-          alert={this.state.openSnack?.alert}
-          duration={this.state.openSnack?.duration}
-        />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Box>
     )
   }

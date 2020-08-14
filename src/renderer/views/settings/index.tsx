@@ -14,24 +14,35 @@ import {
 } from '@material-ui/core'
 
 import {Link} from '../../components'
-import {remote} from 'electron'
+import {ipcRenderer, remote} from 'electron'
 
-import {store} from '../../store'
-import {push} from 'connected-react-router'
-import {ipcRenderer} from 'electron'
+import ElectronStore from 'electron-store'
+import {Store} from '../../store/pull'
+import {useLocation} from 'wouter'
 
-import * as Store from 'electron-store'
-
-type Props = {}
+type Props = {
+  setUpdating: () => void
+  setLocation: (path: string) => void
+}
 
 type State = {
   prerelease: boolean
 }
 
 const version = remote.app.getVersion()
-const localStore = new Store()
+const localStore = new ElectronStore()
 
-export default class SettingsView extends React.Component<Props, State> {
+export default (props: {}) => {
+  const [location, setLocation] = useLocation()
+  const setUpdating = () => {
+    Store.update((s) => {
+      s.updating = true
+    })
+  }
+  return <SettingsView setUpdating={setUpdating} setLocation={setLocation} />
+}
+
+class SettingsView extends React.Component<Props, State> {
   state = {
     prerelease: localStore.get('prerelease') == '1',
   }
@@ -42,9 +53,8 @@ export default class SettingsView extends React.Component<Props, State> {
   }
 
   forceUpdate = () => {
-    // TODO: Test this (if there is no update to force?)
     ipcRenderer.send('update-force')
-    store.dispatch({type: 'UPDATING'})
+    this.props.setUpdating()
   }
 
   onPrereleaseChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,11 +109,11 @@ export default class SettingsView extends React.Component<Props, State> {
               <TableCell style={cstyles.cell}>
                 <Box display="flex" flexDirection="column">
                   <Typography>
-                    <Link span onClick={() => store.dispatch(push('/db/service'))}>
+                    <Link span onClick={() => this.props.setLocation('/db/service')}>
                       DB (service)
                     </Link>
                     <br />
-                    <Link span onClick={() => store.dispatch(push('/db/vault'))}>
+                    <Link span onClick={() => this.props.setLocation('/db/vault')}>
                       DB (vault)
                     </Link>
                     <br />
@@ -115,7 +125,7 @@ export default class SettingsView extends React.Component<Props, State> {
                       Force Update
                     </Link>
                     <br />
-                    <Link span onClick={() => store.dispatch(push('/style-guide'))}>
+                    <Link span onClick={() => this.props.setLocation('/style-guide')}>
                       Style Guide
                     </Link>
                     <br />

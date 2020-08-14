@@ -2,17 +2,15 @@ import * as React from 'react'
 
 import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
-import {styles, Snack} from '../../components'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import {dateString} from '../helper'
 
 import SetPinDialog from './setpin'
 import ResetDialog from './reset'
 
-import {store} from '../../store'
-
 import {deviceInfo, relyingParties} from '../../rpc/fido2'
 import {
-  RPCError,
   Device,
   DeviceInfo,
   Option,
@@ -32,22 +30,19 @@ type Props = {
 
 type State = {
   clientPin: string
-  info: DeviceInfo
+  info?: DeviceInfo
   loading: boolean
-  error: string
+  error?: Error
   openReset: boolean
   openSetPin: boolean
-  openSnack: string
+  openSnack?: SnackProps
 }
 
 export default class DeviceInfoView extends React.Component<Props, State> {
-  state = {
+  state: State = {
     loading: false,
-    error: '',
-    info: null,
     openReset: false,
     openSetPin: false,
-    openSnack: '',
     clientPin: '',
   }
 
@@ -55,7 +50,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
     this.info()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.device != prevProps.device) {
       this.info()
     }
@@ -63,43 +58,48 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 
   info = () => {
     if (!this.props.device) {
-      this.setState({info: null, error: '', loading: false})
+      this.setState({info: undefined, error: undefined, loading: false})
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: DeviceInfoRequest = {
       device: this.props.device.path,
     }
-    deviceInfo(req, (err: RPCError, resp: DeviceInfoResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
+    deviceInfo(req)
+      .then((resp: DeviceInfoResponse) => {
+        let clientPin = ''
+        const optClientPin = (resp.info?.options || []).find((opt: Option) => {
+          return opt.name == 'clientPin'
+        })
+        if (optClientPin) {
+          clientPin = optClientPin.value || ''
+        }
 
-      let clientPin = ''
-      const optClientPin = resp.info.options.find((opt: Option) => {
-        return opt.name == 'clientPin'
+        this.setState({
+          info: resp.info,
+          loading: false,
+          clientPin,
+        })
       })
-      if (optClientPin) {
-        clientPin = optClientPin.value
-      }
-
-      this.setState({
-        info: resp.info,
-        loading: false,
-        clientPin,
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
       })
-    })
   }
 
   closePin = (snack: string) => {
-    this.setState({openSetPin: false, openSnack: snack})
+    this.setState({
+      openSetPin: false,
+      openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+    })
     this.info()
   }
 
   closeReset = (snack: string) => {
-    this.setState({openReset: false, openSnack: snack})
+    this.setState({
+      openReset: false,
+      openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+    })
     this.info()
   }
 
@@ -191,7 +191,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
   renderError() {
     return (
       <Box marginLeft={2} marginTop={2}>
-        <Typography style={{color: 'red'}}>{this.state.error}</Typography>
+        <Typography style={{color: 'red'}}>{this.state.error?.message}</Typography>
       </Box>
     )
   }
@@ -218,8 +218,6 @@ export default class DeviceInfoView extends React.Component<Props, State> {
   }
 
   render() {
-    if (!this.props.device) return null
-
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         {/* {this.renderActions()}
@@ -228,13 +226,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         {this.state.error && this.renderError()}
         {!this.state.error && this.renderInfo()}
 
-        <Snack
-          open={!!this.state.openSnack}
-          onClose={() => this.setState({openSnack: ''})}
-          message={this.state.openSnack}
-          duration={4000}
-          alert="success"
-        />
+        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
       </Box>
     )
   }

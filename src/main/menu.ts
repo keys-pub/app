@@ -1,4 +1,4 @@
-import {app, Menu, shell, BrowserWindow} from 'electron'
+import {app, Menu, MenuItemConstructorOptions, shell, BrowserWindow} from 'electron'
 import {reloadApp} from './app'
 
 export enum MenuActionType {
@@ -21,7 +21,7 @@ export default class MenuBuilder {
       this.setupDevelopmentEnvironment()
     }
 
-    let template
+    let template: MenuItemConstructorOptions[]
 
     if (process.platform === 'darwin') {
       template = this.buildDarwinTemplate()
@@ -57,7 +57,7 @@ export default class MenuBuilder {
     })
   }
 
-  buildDarwinTemplate() {
+  buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout = {
       label: 'Keys',
       submenu: [
@@ -85,7 +85,8 @@ export default class MenuBuilder {
           },
         },
       ],
-    }
+    } as MenuItemConstructorOptions
+
     const subMenuEdit = {
       label: 'Edit',
       submenu: [
@@ -97,7 +98,8 @@ export default class MenuBuilder {
         {label: 'Paste', accelerator: 'Command+V', selector: 'paste:'},
         {label: 'Select All', accelerator: 'Command+A', selector: 'selectAll:'},
       ],
-    }
+    } as MenuItemConstructorOptions
+
     const subMenuView = {
       label: 'View',
       submenu: [
@@ -123,7 +125,8 @@ export default class MenuBuilder {
           },
         },
       ],
-    }
+    } as MenuItemConstructorOptions
+
     const subMenuWindow = {
       label: 'Window',
       submenu: [
@@ -132,7 +135,8 @@ export default class MenuBuilder {
         {type: 'separator'},
         {label: 'Bring All to Front', selector: 'arrangeInFront:'},
       ],
-    }
+    } as MenuItemConstructorOptions
+
     const subMenuHelp = {
       label: 'Help',
       submenu: [
@@ -143,12 +147,12 @@ export default class MenuBuilder {
           },
         },
       ],
-    }
+    } as MenuItemConstructorOptions
 
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp]
   }
 
-  buildDefaultTemplate() {
+  buildDefaultTemplate(): MenuItemConstructorOptions[] {
     const subMenuView = [
       {
         label: '&Reload',

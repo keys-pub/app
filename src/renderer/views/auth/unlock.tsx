@@ -4,35 +4,36 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 
 import Logo from '../logo'
 
-import {push} from 'connected-react-router'
-
 import {ipcRenderer} from 'electron'
-import {store} from '../../store'
 
 import {authUnlock} from '../../rpc/keys'
-import {RPCError, AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
+import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
+import {useLocation} from 'wouter'
 
-type Props = {}
+import {Store} from '../../store/pull'
+
+type Props = {
+  unlock: () => void
+}
 
 type State = {
   password: string
   loading: boolean
   progress: boolean
-  error: string
+  error?: Error
 }
 
-export default class AuthUnlockView extends React.Component<Props, State> {
-  state = {
+class AuthUnlockView extends React.Component<Props, State> {
+  state: State = {
     password: '',
     loading: false,
     progress: false,
-    error: '',
   }
   private inputRef = React.createRef<HTMLInputElement>()
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({password: target ? target.value : '', error: ''})
+    this.setState({password: target ? target.value : '', error: undefined})
   }
 
   render() {
@@ -42,7 +43,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
         <Typography style={{paddingTop: 10, paddingBottom: 20}}>
           The keyring is locked. Enter your password to continue.
         </Typography>
-        <FormControl error={this.state.error !== ''} style={{marginBottom: 10}}>
+        <FormControl error={!!this.state.error} style={{marginBottom: 10}}>
           <TextField
             autoFocus
             label="Password"
@@ -58,7 +59,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
             style={{fontSize: 48, width: 400}}
             disabled={this.state.loading}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
           <Button
@@ -85,7 +86,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
     const password = this.state.password
     if (!password) {
       this.setState({
-        error: 'Oops, password is empty',
+        error: new Error('Oops, password is empty'),
       })
       this.inputRef?.current?.focus()
       return
@@ -97,7 +98,7 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       this.setState({progress: true})
     }, 2000)
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     // TODO: Use config app name for client name
     const req: AuthUnlockRequest = {
       secret: this.state.password,
@@ -105,22 +106,33 @@ export default class AuthUnlockView extends React.Component<Props, State> {
       client: 'app',
     }
     console.log('Auth unlock')
-    authUnlock(req, (err: RPCError, resp: AuthUnlockResponse) => {
-      clearTimeout(timeout)
-      if (err) {
-        this.setState({loading: false, progress: false, error: err.details})
+    authUnlock(req)
+      .then((resp: AuthUnlockResponse) => {
+        clearTimeout(timeout)
+        console.log('Auth unlocking...')
+        ipcRenderer.send('authToken', {authToken: resp.authToken})
+        this.props.unlock()
+      })
+      .catch((err: Error) => {
+        this.setState({error: err})
         this.inputRef.current?.focus()
         this.inputRef.current?.select()
-        return
-      }
-
-      console.log('Auth unlocking...')
-      ipcRenderer.send('authToken', {authToken: resp.authToken})
-      setTimeout(() => {
+      })
+      .finally(() => {
         this.setState({loading: false, progress: false})
-        store.dispatch({type: 'UNLOCK'})
-        store.dispatch(push('/keys/index'))
-      }, 100)
+      })
+  }
+}
+
+export default (_: {}) => {
+  const [location, setLocation] = useLocation()
+
+  const unlock = () => {
+    Store.update((s) => {
+      s.unlocked = true
+      setLocation('/keys/index')
     })
   }
+
+  return <AuthUnlockView unlock={unlock} />
 }

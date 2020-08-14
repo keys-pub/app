@@ -25,7 +25,6 @@ import PasswordOptions from './pw'
 
 import {randPassword} from '../../rpc/keys'
 import {
-  RPCError,
   Secret,
   SecretSaveRequest,
   SecretSaveResponse,
@@ -44,23 +43,20 @@ type Props = {
 }
 
 type State = {
-  error: string
-  errorName: string
+  errorName?: Error
   loading: boolean
   secret: Secret
   passwordVisible: boolean
 }
 
 export default class SecretEditView extends React.Component<Props, State> {
-  state = {
-    error: '',
-    errorName: '',
+  state: State = {
     loading: false,
     passwordVisible: false,
     secret: deepCopy(this.props.secret),
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.secret != prevProps.secret) {
       this.setState({secret: deepCopy(this.props.secret)})
     }
@@ -68,41 +64,36 @@ export default class SecretEditView extends React.Component<Props, State> {
 
   save = async () => {
     if (!this.state.secret.name?.trim()) {
-      this.setState({errorName: 'Name is required'})
+      this.setState({errorName: new Error('Name is required')})
       return
     }
 
-    this.setState({loading: true, error: '', errorName: ''})
+    this.setState({loading: true, errorName: undefined})
     const req: SecretSaveRequest = {
       secret: this.state.secret,
     }
-    secretSave(req, (err: RPCError, resp: SecretSaveResponse) => {
-      if (err) {
-        // TODO: Error field name
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false, secret: resp.secret})
-      this.props.onChange(resp.secret)
-    })
+    secretSave(req)
+      .then((resp: SecretSaveResponse) => {
+        this.setState({loading: false, secret: resp.secret!})
+        this.props.onChange(resp.secret!)
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false})
+      })
   }
 
   onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {
     const value = e.target.value as string
     const secret = deepCopy(this.state.secret)
     secret[fieldName] = value
-    const state = {error: '', errorName: '', secret}
+    const state = {errorName: undefined, secret: secret} as State
     this.setState(state)
   }
 
   generatePassword = () => {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
-    randPassword({length: 14}, (err: RPCError, resp: RandPasswordResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
+    randPassword({length: 14}).then((resp: RandPasswordResponse) => {
       const secret = deepCopy(this.state.secret)
       secret.password = resp.password
       this.setState({secret})
@@ -163,7 +154,7 @@ export default class SecretEditView extends React.Component<Props, State> {
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
-            <span style={errStyle}>{this.state.errorName}</span>
+            <span style={errStyle}>{this.state.errorName.message}</span>
           </Typography>
         )}
         <TextField
@@ -197,7 +188,7 @@ export default class SecretEditView extends React.Component<Props, State> {
           </Box>
           <Box style={{position: 'absolute', right: 0}}>
             <PasswordOptions
-              password={this.state.secret.password}
+              password={this.state.secret.password!}
               visible={this.state.passwordVisible}
               setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
               generate={this.generatePassword}
@@ -237,7 +228,7 @@ export default class SecretEditView extends React.Component<Props, State> {
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
-            <span style={errStyle}>{this.state.errorName}</span>
+            <span style={errStyle}>{this.state.errorName.message}</span>
           </Typography>
         )}
         <TextField
@@ -283,11 +274,6 @@ export default class SecretEditView extends React.Component<Props, State> {
             paddingRight: 10,
           }}
         >
-          {this.state.error && (
-            <Box marginBottom={2}>
-              <Alert severity="error">{this.state.error}</Alert>
-            </Box>
-          )}
           {this.props.isNew && (
             <FormControl style={{marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
           )}

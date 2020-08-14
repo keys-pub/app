@@ -17,7 +17,7 @@ import {
 import {styles, DialogTitle} from '../../components'
 
 import {vaultSync} from '../../rpc/keys'
-import {RPCError, VaultSyncRequest, VaultSyncResponse} from '../../rpc/keys.d'
+import {VaultSyncRequest, VaultSyncResponse} from '../../rpc/keys.d'
 import {toHex} from '../helper'
 
 type Props = {
@@ -26,18 +26,17 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
 }
 
 export default class EnableDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     loading: false,
   }
 
   clear = () => {
-    this.setState({error: '', loading: false})
+    this.setState({error: undefined, loading: false})
   }
 
   close = (snack: string) => {
@@ -46,16 +45,16 @@ export default class EnableDialog extends React.Component<Props, State> {
   }
 
   enable = () => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: VaultSyncRequest = {}
-    vaultSync(req, (err: RPCError, resp: VaultSyncResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close('Sync enabled')
-    })
+    vaultSync(req)
+      .then((resp: VaultSyncResponse) => {
+        this.setState({loading: false})
+        this.close('Sync enabled')
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   render() {

@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../../components'
 
-import {RPCError, Device, SetPINRequest, SetPINResponse} from '../../rpc/fido2.d'
+import {Device, SetPINRequest, SetPINResponse} from '../../rpc/fido2.d'
 import {setPIN} from '../../rpc/fido2'
 
 type Props = {
@@ -27,7 +27,7 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   oldPin: string
   pin: string
   confirmPin: string
@@ -35,8 +35,7 @@ type State = {
 }
 
 export default class SetPinDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     oldPin: '',
     pin: '',
     confirmPin: '',
@@ -44,7 +43,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
   }
 
   reset = () => {
-    this.setState({error: '', oldPin: '', pin: '', confirmPin: '', loading: false})
+    this.setState({error: undefined, oldPin: '', pin: '', confirmPin: '', loading: false})
   }
 
   close = (snack: string) => {
@@ -54,45 +53,45 @@ export default class SetPinDialog extends React.Component<Props, State> {
 
   setPin = async () => {
     if (this.state.pin != this.state.confirmPin) {
-      this.setState({error: "PINs don't match"})
+      this.setState({error: new Error("PINs don't match")})
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: SetPINRequest = {
       device: this.props.device.path,
       oldPin: this.state.oldPin,
       pin: this.state.pin,
     }
-    setPIN(req, (err: RPCError, resp: SetPINResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close('PIN successfully set')
-    })
+    setPIN(req)
+      .then((resp: SetPINResponse) => {
+        this.setState({loading: false})
+        this.close('PIN successfully set')
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   onPinChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({pin: target.value, error: ''})
+    this.setState({pin: target.value, error: undefined})
   }
 
   onPinOldChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({oldPin: target.value, error: ''})
+    this.setState({oldPin: target.value, error: undefined})
   }
 
   onPinConfirmChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({confirmPin: target.value, error: ''})
+    this.setState({confirmPin: target.value, error: undefined})
   }
 
   renderCreate() {
     return (
       <Box display="flex" flexDirection="column">
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             variant="outlined"
@@ -103,7 +102,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
           />
           <FormHelperText id="component-error-text"> </FormHelperText>
         </FormControl>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             variant="outlined"
             label="Confirm PIN"
@@ -111,7 +110,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinConfirmChange}
             value={this.state.confirmPin}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )
@@ -140,7 +139,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
           />
           <FormHelperText id="component-error-text"> </FormHelperText>
         </FormControl>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             variant="outlined"
             label="Confirm PIN"
@@ -148,7 +147,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinConfirmChange}
             value={this.state.confirmPin}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

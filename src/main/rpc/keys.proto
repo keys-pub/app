@@ -110,12 +110,6 @@ service Keys {
   rpc Messages(MessagesRequest) returns (MessagesResponse) {}
 }
 
-message RPCError {
-	int32 code = 1;
-	string message = 2;
-	string details = 3;
-}
-
 message SignRequest {
   bytes data = 1;
   
@@ -699,9 +693,7 @@ message SecretRemoveRequest {
 message SecretRemoveResponse {}
 
 message SecretsRequest {
-  string query = 1;
-  bool sync = 3;
-
+  string query = 1;  
   string sortField = 10;
   SortDirection sortDirection = 11;  
 }

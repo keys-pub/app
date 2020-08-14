@@ -12,7 +12,7 @@ import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 
 import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/keys.d'
+import {Key, KeysRequest, KeysResponse, SortDirection} from '../../rpc/keys.d'
 
 export type Props = {
   keys: Key[]
@@ -26,11 +26,11 @@ export type Props = {
 const createOptions = (options: Key[], searchOption: boolean, importOption: boolean): Key[] => {
   if (searchOption) {
     options = options.filter((k: Key) => k.id != 'search')
-    options.push({id: 'search'})
+    options.push({id: 'search'} as Key)
   }
   if (importOption) {
     options = options.filter((k: Key) => k.id != 'import')
-    options.push({id: 'import'})
+    options.push({id: 'import'} as Key)
   }
   return options
 }
@@ -44,7 +44,7 @@ const renderOption = (option: Key) => {
   }
   return (
     <React.Fragment>
-      <UserLabel kid={option.id} user={option.user} />
+      <UserLabel kid={option.id!} user={option.user} />
     </React.Fragment>
   )
 }
@@ -57,13 +57,13 @@ const getOptionLabel = (option: Key): string => {
   if (option.id == 'search' || option.id == 'import') {
     return ''
   }
-  return ((<UserLabel kid={option.id} user={option.user} />) as unknown) as string
+  return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
 }
 
 export default (props: Props) => {
-  const filterOptions = (options, {inputValue}) => {
+  const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
     const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
-    return createOptions(filter, props.searchOption, props.importOption)
+    return createOptions(filter, !!props.searchOption, !!props.importOption)
   }
 
   const [open, setOpen] = React.useState(false)
@@ -83,14 +83,11 @@ export default (props: Props) => {
   }, [])
 
   const search = (q: string) => {
-    const req: KeysRequest = {query: q}
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
-        // TODO: Set error
-        return
-      }
-
-      const keys = createOptions(resp.keys, props.searchOption, props.importOption)
+    const req: KeysRequest = {
+      query: q,
+    }
+    keys(req).then((resp: KeysResponse) => {
+      const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
       setOptions(keys || [])
     })
   }

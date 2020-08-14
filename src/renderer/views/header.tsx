@@ -4,6 +4,10 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, IconButton, Typography} from '@material-ui/core'
 
+import {Store} from '../store/pull'
+import {ipcRenderer} from 'electron'
+import {platform} from 'os'
+
 import {
   ChevronLeft,
   NotInterested as ScreenLockIcon,
@@ -13,28 +17,30 @@ import {
   Crop75 as UnmaximizeIcon,
 } from '@material-ui/icons'
 
-import {goBack} from 'connected-react-router'
-
-import {store} from '../store'
-
 import {remote} from 'electron'
-import {lock} from './state'
 
 type Props = {
-  lock?: boolean
-  back?: boolean
-  navMinimize?: boolean
-  noDivider?: boolean
+  noLock?: boolean
 }
 
 export default (props: Props) => {
   const win = remote.getCurrentWindow()
   const [maximized, setMaximized] = React.useState(win.isMaximized())
 
-  const back = () => store.dispatch(goBack())
+  // TODO: Back
+  const back = () => {}
+
+  const lock = () => {
+    ipcRenderer.send('authToken', {authToken: ''})
+    Store.update((s) => {
+      s.unlocked = false
+    })
+  }
+
+  const osname = platform()
 
   let showSystemButtons = true
-  if (process.platform == 'darwin') {
+  if (osname == 'darwin') {
     showSystemButtons = false
   }
 
@@ -60,16 +66,13 @@ export default (props: Props) => {
     <Box display="flex" flexDirection="column">
       <Box display="flex" flexDirection="column" style={{height: 28}}>
         <Box display="flex" flexDirection="row">
-          {props.back && (
-            <Box display="flex" flexDirection="row">
-              <Box style={{width: props.navMinimize ? 68 : 140}} className="drag" />
-              <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-                <ChevronLeft />
-              </IconButton>
-            </Box>
-          )}
+          <Box display="flex" flexDirection="row">
+            <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+              <ChevronLeft />
+            </IconButton>
+          </Box>
           <Box display="flex" flexGrow={1} className="drag" />
-          {props.lock && (
+          {!props.noLock && (
             <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
               <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
             </IconButton>
@@ -95,7 +98,6 @@ export default (props: Props) => {
           {!showSystemButtons && <Box style={{marginTop: -6, marginBottom: -2, height: 41}} />}
         </Box>
       </Box>
-      {!props.noDivider && <Divider />}
     </Box>
   )
 }

@@ -18,7 +18,7 @@ import {styles, DialogTitle, Link} from '../../components'
 import {shell} from 'electron'
 
 import {vaultUnsync} from '../../rpc/keys'
-import {RPCError, VaultUnsyncRequest, VaultUnsyncResponse} from '../../rpc/keys.d'
+import {VaultUnsyncRequest, VaultUnsyncResponse} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean
@@ -26,18 +26,17 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
 }
 
 export default class DisableDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     loading: false,
   }
 
   clear = () => {
-    this.setState({error: '', loading: false})
+    this.setState({error: undefined, loading: false})
   }
 
   close = (snack: string) => {
@@ -46,16 +45,16 @@ export default class DisableDialog extends React.Component<Props, State> {
   }
 
   vaultDelete = () => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: VaultUnsyncRequest = {}
-    vaultUnsync(req, (err: RPCError, resp: VaultUnsyncResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close('')
-    })
+    vaultUnsync(req)
+      .then((resp: VaultUnsyncResponse) => {
+        this.setState({loading: false})
+        this.close('')
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   render() {
