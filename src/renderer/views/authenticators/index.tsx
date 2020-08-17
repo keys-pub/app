@@ -27,6 +27,7 @@ import {
   Search as SearchIcon,
 } from '@material-ui/icons'
 
+import Header from '../header'
 import {styles} from '../../components'
 import {pluralize} from '../helper'
 
@@ -151,23 +152,9 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box>
-        <Menu
-          keepMounted
-          open={this.state.contextPosition !== null}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem onClick={() => {}}>
-            <ExportIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
-          </MenuItem>
-        </Menu>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Header />
+        <Divider />
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
           <Box style={{width: 200}}>
             {this.renderHeader()}
@@ -226,6 +213,22 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
             {!this.state.error && this.state.selected && <DeviceContentView device={this.state.selected} />}
           </Box>
         </Box>
+        <Menu
+          keepMounted
+          open={!!this.state.contextPosition}
+          onClose={this.closeContext}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            this.state.contextPosition
+              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
+              : undefined
+          }
+        >
+          <MenuItem onClick={() => {}}>
+            <ExportIcon />
+            <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
+          </MenuItem>
+        </Menu>
       </Box>
     )
   }

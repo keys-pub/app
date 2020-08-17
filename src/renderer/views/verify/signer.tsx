@@ -19,10 +19,15 @@ type Props = {
 
 type State = {
   openKey?: string
-  openSnack?: SnackProps
+  snack?: SnackProps
+  snackOpen: boolean
 }
 
 export default class SignerView extends React.Component<Props, State> {
+  state: State = {
+    snackOpen: false,
+  }
+
   openKey = () => {
     this.setState({openKey: this.props.signer?.id})
   }
@@ -30,7 +35,8 @@ export default class SignerView extends React.Component<Props, State> {
   closeKey = (snack: string) => {
     this.setState({
       openKey: '',
-      openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+      snack: {message: snack, alert: 'success', duration: 4000},
+      snackOpen: !!snack,
     })
     this.props.reload()
   }
@@ -57,7 +63,11 @@ export default class SignerView extends React.Component<Props, State> {
           update
           import
         />
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Box>
     )
   }

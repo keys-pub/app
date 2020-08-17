@@ -25,18 +25,21 @@ yarn install
 ### Run
 
 ```shell
-yarn start-dev
+# Start keysd
+keysd
+
+# Start app
+yarn server
+yarn start
 ```
 
-You can start using a different app name, which is convienient for running multiple instances of the app.
+You can run multiple instances by specifying a different app name and port:
 
 ```shell
-# Start app for Keys2
-KEYS_APP=Keys2 KEYS_PORT=22406 DEV_PORT=2004 yarn start-dev
+# Start keysd (Keys2)
+keysd -app Keys2 -port 22406
 
-# Set port for Keys2
-keys -app Keys2 config set port 22406
-
-# Start keysd for Keys2
-keysd -app Keys2
+# Start app (Keys2)
+yarn server
+KEYS_APP=Keys2 KEYS_PORT=22406 yarn start
 ```

@@ -16,45 +16,36 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {Store} from '../store/pull'
+import {Store, Error} from '../store/pull'
 
-import {ipcRenderer} from 'electron'
 import ErrorView from './view'
 
-const restart = () => {
-  ipcRenderer.send('reload-app', {})
+type Props = {
+  error: Error
+  clear: () => void
+  restart: () => void
 }
 
-export default (_: {}) => {
-  const {error} = Store.useState((s) => ({
-    error: s.error,
-  }))
-
-  const clearError = () => {
-    Store.update((s) => {
-      s.error = undefined
-    })
-  }
-
+export default (props: Props) => {
   return (
     <Dialog
-      open={!!error}
+      open={!!props.error}
       maxWidth="xl"
       fullWidth
       disableBackdropClick
       PaperProps={{
-        style: {height: 'calc(100% - 64px)'},
+        style: {height: '100%'},
       }}
     >
       <DialogTitle>Error</DialogTitle>
       <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
-        <ErrorView error={error} />
+        {props.error && <ErrorView error={props.error} />}
       </DialogContent>
       <DialogActions>
-        <Button color="primary" onClick={clearError}>
+        <Button color="primary" onClick={props.clear}>
           Clear Error
         </Button>
-        <Button color="secondary" onClick={restart}>
+        <Button color="secondary" onClick={props.restart}>
           Restart
         </Button>
       </DialogActions>

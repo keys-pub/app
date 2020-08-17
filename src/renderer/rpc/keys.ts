@@ -149,9 +149,8 @@ export const keyGenerate = (req: KeyGenerateRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.KeyGenerate):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.KeyGenerate) done')
 			}
@@ -169,9 +168,8 @@ export const keys = (req: KeysRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Keys):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Keys) done')
 			}
@@ -189,9 +187,8 @@ export const key = (req: KeyRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Key):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Key) done')
 			}
@@ -209,9 +206,8 @@ export const keyImport = (req: KeyImportRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.KeyImport):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.KeyImport) done')
 			}
@@ -229,9 +225,8 @@ export const keyExport = (req: KeyExportRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.KeyExport):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.KeyExport) done')
 			}
@@ -249,9 +244,8 @@ export const keyRemove = (req: KeyRemoveRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.KeyRemove):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.KeyRemove) done')
 			}
@@ -269,9 +263,8 @@ export const sign = (req: SignRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Sign):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Sign) done')
 			}
@@ -293,7 +286,7 @@ export const signFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.SignFile):', arg.err)
+	  console.error('RPC-stream error (Keys.SignFile):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -327,7 +320,7 @@ export const signStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.SignStream):', arg.err)
+	  console.error('RPC-stream error (Keys.SignStream):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -357,9 +350,8 @@ export const verify = (req: VerifyRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Verify):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Verify) done')
 			}
@@ -381,7 +373,7 @@ export const verifyFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.VerifyFile):', arg.err)
+	  console.error('RPC-stream error (Keys.VerifyFile):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -415,7 +407,7 @@ export const verifyStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.VerifyStream):', arg.err)
+	  console.error('RPC-stream error (Keys.VerifyStream):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -445,9 +437,8 @@ export const verifyDetached = (req: VerifyDetachedRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VerifyDetached):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VerifyDetached) done')
 			}
@@ -465,9 +456,8 @@ export const verifyDetachedFile = (req: VerifyDetachedFileInput) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VerifyDetachedFile):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VerifyDetachedFile) done')
 			}
@@ -485,9 +475,8 @@ export const verifyDetachedStream = (req: VerifyDetachedInput) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VerifyDetachedStream):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VerifyDetachedStream) done')
 			}
@@ -505,9 +494,8 @@ export const encrypt = (req: EncryptRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Encrypt):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Encrypt) done')
 			}
@@ -529,7 +517,7 @@ export const encryptStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.EncryptStream):', arg.err)
+	  console.error('RPC-stream error (Keys.EncryptStream):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -563,7 +551,7 @@ export const encryptFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.EncryptFile):', arg.err)
+	  console.error('RPC-stream error (Keys.EncryptFile):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -593,9 +581,8 @@ export const decrypt = (req: DecryptRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Decrypt):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Decrypt) done')
 			}
@@ -617,7 +604,7 @@ export const decryptStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.DecryptStream):', arg.err)
+	  console.error('RPC-stream error (Keys.DecryptStream):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -651,7 +638,7 @@ export const decryptFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.DecryptFile):', arg.err)
+	  console.error('RPC-stream error (Keys.DecryptFile):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -681,9 +668,8 @@ export const sigchain = (req: SigchainRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Sigchain):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Sigchain) done')
 			}
@@ -701,9 +687,8 @@ export const statement = (req: StatementRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Statement):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Statement) done')
 			}
@@ -721,9 +706,8 @@ export const statementCreate = (req: StatementCreateRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.StatementCreate):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.StatementCreate) done')
 			}
@@ -741,9 +725,8 @@ export const statementRevoke = (req: StatementRevokeRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.StatementRevoke):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.StatementRevoke) done')
 			}
@@ -761,9 +744,8 @@ export const user = (req: UserRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.User):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.User) done')
 			}
@@ -781,9 +763,8 @@ export const userSearch = (req: UserSearchRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.UserSearch):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.UserSearch) done')
 			}
@@ -801,9 +782,8 @@ export const userService = (req: UserServiceRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.UserService):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.UserService) done')
 			}
@@ -821,9 +801,8 @@ export const userSign = (req: UserSignRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.UserSign):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.UserSign) done')
 			}
@@ -841,9 +820,8 @@ export const userAdd = (req: UserAddRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.UserAdd):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.UserAdd) done')
 			}
@@ -861,9 +839,8 @@ export const search = (req: SearchRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Search):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Search) done')
 			}
@@ -881,9 +858,8 @@ export const secret = (req: SecretRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Secret):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Secret) done')
 			}
@@ -901,9 +877,8 @@ export const secretSave = (req: SecretSaveRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.SecretSave):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.SecretSave) done')
 			}
@@ -921,9 +896,8 @@ export const secretRemove = (req: SecretRemoveRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.SecretRemove):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.SecretRemove) done')
 			}
@@ -941,9 +915,8 @@ export const secrets = (req: SecretsRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Secrets):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Secrets) done')
 			}
@@ -961,9 +934,8 @@ export const item = (req: ItemRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Item):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Item) done')
 			}
@@ -981,9 +953,8 @@ export const items = (req: ItemsRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Items):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Items) done')
 			}
@@ -1001,9 +972,8 @@ export const pull = (req: PullRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Pull):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Pull) done')
 			}
@@ -1021,9 +991,8 @@ export const push = (req: PushRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Push):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Push) done')
 			}
@@ -1045,7 +1014,7 @@ export const wormhole = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.Wormhole):', arg.err)
+	  console.error('RPC-stream error (Keys.Wormhole):', arg.err)	  
 	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
       errHandler(err)
     }
@@ -1075,9 +1044,8 @@ export const authSetup = (req: AuthSetupRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthSetup):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthSetup) done')
 			}
@@ -1095,9 +1063,8 @@ export const authVault = (req: AuthVaultRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthVault):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthVault) done')
 			}
@@ -1115,9 +1082,8 @@ export const authUnlock = (req: AuthUnlockRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthUnlock):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthUnlock) done')
 			}
@@ -1135,9 +1101,8 @@ export const authLock = (req: AuthLockRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthLock):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthLock) done')
 			}
@@ -1155,9 +1120,8 @@ export const runtimeStatus = (req: RuntimeStatusRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.RuntimeStatus):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.RuntimeStatus) done')
 			}
@@ -1175,9 +1139,8 @@ export const rand = (req: RandRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Rand):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Rand) done')
 			}
@@ -1195,9 +1158,8 @@ export const randPassword = (req: RandPasswordRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.RandPassword):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.RandPassword) done')
 			}
@@ -1215,9 +1177,8 @@ export const authProvision = (req: AuthProvisionRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthProvision):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthProvision) done')
 			}
@@ -1235,9 +1196,8 @@ export const authDeprovision = (req: AuthDeprovisionRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthDeprovision):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthDeprovision) done')
 			}
@@ -1255,9 +1215,8 @@ export const authProvisions = (req: AuthProvisionsRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AuthProvisions):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AuthProvisions) done')
 			}
@@ -1275,9 +1234,8 @@ export const passwordChange = (req: PasswordChangeRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.PasswordChange):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.PasswordChange) done')
 			}
@@ -1295,9 +1253,8 @@ export const vaultAuth = (req: VaultAuthRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VaultAuth):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VaultAuth) done')
 			}
@@ -1315,9 +1272,8 @@ export const vaultSync = (req: VaultSyncRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VaultSync):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VaultSync) done')
 			}
@@ -1335,9 +1291,8 @@ export const vaultUnsync = (req: VaultUnsyncRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VaultUnsync):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VaultUnsync) done')
 			}
@@ -1355,9 +1310,8 @@ export const vaultStatus = (req: VaultStatusRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VaultStatus):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VaultStatus) done')
 			}
@@ -1375,9 +1329,8 @@ export const vaultUpdate = (req: VaultUpdateRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.VaultUpdate):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.VaultUpdate) done')
 			}
@@ -1395,9 +1348,8 @@ export const collections = (req: CollectionsRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Collections):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Collections) done')
 			}
@@ -1415,9 +1367,8 @@ export const documents = (req: DocumentsRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Documents):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Documents) done')
 			}
@@ -1435,9 +1386,8 @@ export const documentDelete = (req: DocumentDeleteRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.DocumentDelete):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.DocumentDelete) done')
 			}
@@ -1455,9 +1405,8 @@ export const adminSignURL = (req: AdminSignURLRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AdminSignURL):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AdminSignURL) done')
 			}
@@ -1475,9 +1424,8 @@ export const adminCheck = (req: AdminCheckRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.AdminCheck):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.AdminCheck) done')
 			}
@@ -1495,9 +1443,8 @@ export const messagePrepare = (req: MessagePrepareRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.MessagePrepare):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.MessagePrepare) done')
 			}
@@ -1515,9 +1462,8 @@ export const messageCreate = (req: MessageCreateRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.MessageCreate):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.MessageCreate) done')
 			}
@@ -1535,9 +1481,8 @@ export const messages = (req: MessagesRequest) => {
 			ipcRenderer.removeAllListeners(reply)
 			if (arg.err) {
 				console.error('RPC error (Keys.Messages):', arg.err)
-				const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-				reject(err)
-				errHandler(err)
+				reject(arg.err)
+				errHandler(arg.err)
 			} else {
 				console.log('RPC (Keys.Messages) done')
 			}

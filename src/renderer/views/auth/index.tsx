@@ -12,9 +12,11 @@ export default (props: {}) => {
 
   const refresh = () => {
     const req: RuntimeStatusRequest = {}
-    runtimeStatus(req).then((resp: RuntimeStatusResponse) => {
-      setStatus(resp.authStatus!)
-    })
+    runtimeStatus(req)
+      .then((resp: RuntimeStatusResponse) => {
+        setStatus(resp.authStatus!)
+      })
+      .catch((err: Error) => {})
   }
 
   React.useEffect(() => {

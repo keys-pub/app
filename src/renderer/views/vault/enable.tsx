@@ -74,7 +74,7 @@ export default class EnableDialog extends React.Component<Props, State> {
         <DialogContent dividers>
           <Box display="flex" flexDirection="column">
             <Typography>Are you sure you want to enable sync?</Typography>
-            <Typography style={{color: 'red'}}>{this.state.error}&nbsp;</Typography>
+            <Typography style={{color: 'red'}}>{this.state.error.message}</Typography>
           </Box>
         </DialogContent>
         <DialogActions>

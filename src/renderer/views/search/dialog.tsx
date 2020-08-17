@@ -28,12 +28,14 @@ type Props = {
 
 type State = {
   openKey: string
-  openSnack?: SnackProps
+  snack?: SnackProps
+  snackOpen: boolean
 }
 
 export default class SearchDialog extends React.Component<Props, State> {
   state: State = {
     openKey: '',
+    snackOpen: false,
   }
 
   select = (k: Key) => {
@@ -70,7 +72,8 @@ export default class SearchDialog extends React.Component<Props, State> {
           close={(snack: string) =>
             this.setState({
               openKey: '',
-              openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+              snack: {message: snack, alert: 'success', duration: 4000},
+              snackOpen: true,
             })
           }
           kid={this.state.openKey}
@@ -78,7 +81,11 @@ export default class SearchDialog extends React.Component<Props, State> {
           import
           reload={() => {}}
         />
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Dialog>
     )
   }

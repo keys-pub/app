@@ -62,7 +62,7 @@ export default class SecretEditView extends React.Component<Props, State> {
     }
   }
 
-  save = async () => {
+  save = () => {
     if (!this.state.secret.name?.trim()) {
       this.setState({errorName: new Error('Name is required')})
       return
@@ -257,8 +257,6 @@ export default class SecretEditView extends React.Component<Props, State> {
   }
 
   render() {
-    if (!this.state.secret) return null
-
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderEditActions()}

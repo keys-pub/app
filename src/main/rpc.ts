@@ -1,6 +1,8 @@
 import {ipcMain, BrowserWindow} from 'electron'
 
 import {client, setAuthToken, close} from './rpc/client'
+import {Error} from '@material-ui/icons'
+import * as grpc from '@grpc/grpc-js'
 
 type RPC = {
   service: string
@@ -13,12 +15,12 @@ type RPC = {
 interface Error {
   code: number
   message: string
-  details: string
+  name: string
 }
 
 type RPCReply = {
-  err: Error
-  resp: any
+  err?: Error
+  resp?: any
 }
 
 type RPCStreamReply = {
@@ -32,22 +34,16 @@ const rpc = (cl: any, f: RPC): Promise<RPCReply> => {
     if (typeof cl[f.method] !== 'function') {
       console.log('rpc not found', f.reply)
       // console.log('methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(cl)))
-      resolve({err: notFound(f.method)} as RPCReply)
+      resolve({err: notFound(f.method)})
       return
     }
     cl[f.method](f.args, (err: Error, resp: any) => {
-      resolve({err: err, resp: resp})
+      resolve({err: convertErr(err), resp: resp})
     })
   })
 }
 
 let streams: Map<string, any> = new Map()
-
-export const handleErr = (err: Error) => {
-  if (err.code == 14) {
-    rpcReload()
-  }
-}
 
 export const rpcRegister = () => {
   ipcMain.removeAllListeners('rpc')
@@ -108,7 +104,7 @@ export const rpcRegister = () => {
     newStream.on('error', (err: Error) => {
       console.log('rpc-stream err', f.reply, err)
       handleErr(err)
-      event.reply(f.reply, {err: err} as RPCStreamReply)
+      event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
       streams.delete(f.reply)
     })
     newStream.on('end', () => {
@@ -127,12 +123,25 @@ export const rpcRegister = () => {
 
 const notFound = (method: string): Error => {
   return {
-    code: 0,
+    code: grpc.status.NOT_FOUND,
     message: method + ' not found',
-    details: method + ' not found',
+    name: 'NotFoundError',
   }
 }
 
-export const rpcReload = () => {
-  close()
+export const handleErr = (err: Error) => {
+  if (err.code == grpc.status.UNAVAILABLE) {
+    // Close RPC (will re-open next call)
+    close()
+  }
+}
+
+const convertErr = (err: any): Error | undefined => {
+  if (!err) return undefined
+  // Need to convert err to an object type.
+  return {
+    code: err?.code || grpc.status.UNKNOWN,
+    message: err?.details || err?.message || 'unknown error',
+    name: err?.name || 'Error',
+  }
 }

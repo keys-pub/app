@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
+import Header from '../header'
 import {styles} from '../../components'
 import {dateString} from '../helper'
 import {collections, documents} from '../../rpc/keys'
@@ -75,50 +76,56 @@ export default class DBView extends React.Component<Props, State> {
   render() {
     const {collections, documents} = this.state
     return (
-      <Box display="flex" flexDirection="row" style={{height: '100%'}}>
-        <Box>
-          <Table size="small">
-            <TableBody>
-              {(collections as Collection[]).map((col, index) => (
-                <TableRow
-                  hover
-                  onClick={(event) => this.selectCollection(col)}
-                  key={col.path}
-                  style={{cursor: 'pointer'}}
-                >
-                  <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
-                    <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-        <Divider orientation="vertical" />
-        <Box style={{overflowY: 'auto', width: '100%', height: '100%'}}>
-          <Table size="small">
-            <TableBody>
-              {documents.map((doc: Document, index: number) => (
-                <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                  <Box style={{paddingLeft: 8, paddingTop: 8, paddingBottom: 8}}>
-                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}>
-                      {doc.path}
-                    </Typography>
-                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                      {doc.value}
-                    </Typography>
-                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                      {dateString(doc.createdAt)}
-                    </Typography>
-                    <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                      {dateString(doc.updatedAt)}
-                    </Typography>
-                  </Box>
-                  <Divider />
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Header />
+        <Divider />
+        <Box display="flex" flexDirection="row" style={{height: 'calc(100% - 29px)'}}>
+          <Box>
+            <Table size="small">
+              <TableBody>
+                {(collections as Collection[]).map((col, index) => (
+                  <TableRow
+                    hover
+                    onClick={(event) => this.selectCollection(col)}
+                    key={col.path}
+                    style={{cursor: 'pointer'}}
+                  >
+                    <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
+                      <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+          <Divider orientation="vertical" />
+          <Box style={{overflowY: 'auto'}}>
+            <Table size="small">
+              <TableBody>
+                {documents.map((doc: Document, index: number) => (
+                  <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
+                    <Box style={{paddingLeft: 8, paddingTop: 8, paddingBottom: 8}}>
+                      <Typography
+                        style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}
+                      >
+                        {doc.path}
+                      </Typography>
+                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        {doc.value}
+                      </Typography>
+                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        {dateString(doc.createdAt)}
+                      </Typography>
+                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        {dateString(doc.updatedAt)}
+                      </Typography>
+                    </Box>
+                    <Divider />
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
         </Box>
       </Box>
     )

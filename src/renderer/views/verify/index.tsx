@@ -263,7 +263,7 @@ export default (props: {}) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error}&nbsp;</Typography>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
           </Box>
         )}
         {!error && showVerifyFileButton && (

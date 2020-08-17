@@ -1,10 +1,10 @@
 import {app, BrowserWindow} from 'electron'
-import {rpcReload} from './rpc'
+import {close} from './rpc/client'
 
 export const reloadApp = (window: BrowserWindow) => {
   console.log('Reload!')
   if (process.env.NODE_ENV === 'development') {
-    rpcReload()
+    close()
     if (window) {
       window.webContents.reload()
     }

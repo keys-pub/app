@@ -1,16 +1,21 @@
 import {Store as PullStateStore} from 'pullstate'
 import {Key, EncryptMode} from '../rpc/keys.d'
 
+export interface Error {
+  message: string
+  details?: string
+  code?: number
+  name?: string
+}
+
 export type State = {
   error?: Error
-  navMinimized: boolean
   selectedTool: string
   unlocked: boolean
   updating: boolean
 }
 
 export const Store = new PullStateStore<State>({
-  navMinimized: false,
   selectedTool: 'encrypt',
   unlocked: false,
   updating: false,

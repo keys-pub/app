@@ -21,6 +21,7 @@ import {remote} from 'electron'
 
 type Props = {
   noLock?: boolean
+  noBack?: boolean
 }
 
 export default (props: Props) => {
@@ -63,14 +64,16 @@ export default (props: Props) => {
     win.isMaximized() ? win.unmaximize() : win.maximize()
   }
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" style={{width: '100%'}}>
       <Box display="flex" flexDirection="column" style={{height: 28}}>
         <Box display="flex" flexDirection="row">
-          <Box display="flex" flexDirection="row">
-            <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-              <ChevronLeft />
-            </IconButton>
-          </Box>
+          {!props.noBack && (
+            <Box display="flex" flexDirection="row">
+              <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+                <ChevronLeft />
+              </IconButton>
+            </Box>
+          )}
           <Box display="flex" flexGrow={1} className="drag" />
           {!props.noLock && (
             <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>

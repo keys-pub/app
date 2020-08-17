@@ -30,9 +30,11 @@ var dateOptions = {
   timeZoneName: 'short',
 }
 
-export const dateString = (ms?: number): string => {
+export const dateString = (ms?: any): string => {
+  // ms can be a number or Long
   if (!ms) return ''
-  const s = ms.toString()
+  const l = ms.low ? Long.fromBits(ms.low, ms.high, ms.unsigned) : ms
+  const s = l.toString()
   const n = parseInt(s)
   if (n === 0) {
     return ''

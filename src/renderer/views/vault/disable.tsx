@@ -84,7 +84,7 @@ export default class DisableDialog extends React.Component<Props, State> {
               </Link>
               .
             </Typography>
-            <Typography style={{color: 'red'}}>{this.state.error}</Typography>
+            <Typography style={{color: 'red'}}>{this.state.error?.message || ' '}</Typography>
           </Box>
         </DialogContent>
         <DialogActions>

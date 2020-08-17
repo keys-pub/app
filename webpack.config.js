@@ -36,14 +36,15 @@ function createRenderConfig(isDev) {
     },
 
     output: {
-      filename: isDev ? '[name].js' : '[name].[hash].js',
       path: path.join(__dirname, 'dist'),
+      filename: isDev ? '[name].js' : '[name].[hash].js',
     },
 
     externals: {
       react: 'React',
       'react-dom': 'ReactDOM',
       fs: "require('fs')",
+      os: "require('os')",
       '@grpc/grpc-js': "require('@grpc/grpc-js')",
       electron: "require('electron')",
     },
@@ -173,6 +174,8 @@ function createMainConfig(isDev) {
 
     mode: isDev ? DEVELOPMENT : PRODUCTION,
 
+    devtool: isDev ? 'source-map' : 'none',
+
     entry: {
       main: './main/main.ts',
     },
@@ -191,6 +194,7 @@ function createMainConfig(isDev) {
             loader: 'babel-loader',
             options: {
               presets: ['@babel/preset-typescript', '@babel/preset-env'],
+              plugins: ['@babel/plugin-proposal-optional-chaining'],
             },
           },
         },

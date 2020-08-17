@@ -9,6 +9,8 @@ import Snack, {SnackProps} from '../../components/snack'
 // import EnableDialog from './enable'
 import DisableDialog from './disable'
 
+import Header from '../header'
+
 import {dateString} from '../helper'
 
 import {vaultAuth, vaultStatus, vaultSync} from '../../rpc/keys'
@@ -26,7 +28,8 @@ type Props = {}
 type State = {
   loading: boolean
   openDisable: boolean
-  openSnack?: SnackProps
+  snack?: SnackProps
+  snackOpen: boolean
   phrase: string
   status?: VaultStatusResponse
 }
@@ -36,6 +39,7 @@ export default class VaultView extends React.Component<Props, State> {
     loading: false,
     openDisable: false,
     phrase: '',
+    snackOpen: false,
   }
 
   componentDidMount() {
@@ -56,7 +60,7 @@ export default class VaultView extends React.Component<Props, State> {
         this.setState({status: resp})
       })
       .catch((err: Error) => {
-        this.setState({openSnack: {message: err.message, alert: 'error'}})
+        this.setState({snack: {message: err.message, alert: 'error'}, snackOpen: true})
       })
   }
 
@@ -65,7 +69,7 @@ export default class VaultView extends React.Component<Props, State> {
   }
 
   closeDisable = (snack: string) => {
-    this.setState({openDisable: false, openSnack: snack ? {message: snack} : undefined})
+    this.setState({openDisable: false, snack: {message: snack, duration: 4000}, snackOpen: !!snack})
     this.status()
   }
 
@@ -77,7 +81,7 @@ export default class VaultView extends React.Component<Props, State> {
         this.setState({loading: false, phrase: resp.phrase || ''})
       })
       .catch((err: Error) => {
-        this.setState({loading: false, openSnack: {message: err.message, alert: 'error'}})
+        this.setState({loading: false, snack: {message: err.message, alert: 'error'}, snackOpen: true})
       })
   }
 
@@ -94,7 +98,7 @@ export default class VaultView extends React.Component<Props, State> {
         this.status()
       })
       .catch((err: Error) => {
-        this.setState({loading: false, openSnack: {message: err.message, alert: 'error'}})
+        this.setState({loading: false, snack: {message: err.message, alert: 'error'}, snackOpen: true})
       })
   }
 
@@ -235,22 +239,25 @@ export default class VaultView extends React.Component<Props, State> {
     const syncEnabled = !!this.state?.status?.kid
     return (
       <Box display="flex" flex={1} flexDirection="column">
+        <Header />
         {!this.state.loading && <Box style={{marginBottom: 4}} />}
         {this.state.loading && <LinearProgress />}
 
-        {!syncEnabled && (
-          <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderEnable()}</Box>
-        )}
+        {!syncEnabled && <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderEnable()}</Box>}
         {syncEnabled && (
           <Box>
-            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderInfo()}</Box>
-            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderAuth()}</Box>
-            <Box style={{marginLeft: 20, marginTop: 10, marginBottom: 20}}>{this.renderDelete()}</Box>
+            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderInfo()}</Box>
+            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderAuth()}</Box>
+            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderDelete()}</Box>
           </Box>
         )}
 
         <DisableDialog open={this.state.openDisable} close={(snack) => this.closeDisable(snack)} />
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Box>
     )
   }

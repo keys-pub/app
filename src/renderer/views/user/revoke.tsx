@@ -58,7 +58,9 @@ export default class UserRevokeDialog extends React.Component<Props, State> {
             Are you sure you want to revoke this user statement?
           </DialogContentText>
           {this.state.error && (
-            <Typography style={{color: 'red', paddingBottom: 10}}>Error: {this.state.error}</Typography>
+            <Typography style={{color: 'red', paddingBottom: 10}}>
+              Error: {this.state.error.message}
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>

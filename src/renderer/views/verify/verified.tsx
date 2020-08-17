@@ -19,10 +19,12 @@ export type Props = {
 
 export default (props: Props) => {
   const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
     setSnack({message: 'Copied to Clipboard', duration: 2000})
+    setSnackOpen(true)
   }
 
   const disabled = !props.value
@@ -64,7 +66,7 @@ export default (props: Props) => {
           Copy to Clipboard
         </Button>
       </Box>
-      <Snack snack={snack} onClose={() => setSnack(undefined)} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

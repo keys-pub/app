@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 import {shell} from 'electron'
@@ -19,7 +20,7 @@ const Link = (props: Props) => {
   const on = () => setHover(true)
   const off = () => setHover(false)
 
-  const style = props.style || {}
+  let style: CSSProperties = {}
   if (hover && !props.disabled) {
     style.textDecoration = 'underline'
     style.cursor = 'pointer'
@@ -47,14 +48,14 @@ const Link = (props: Props) => {
 
   if (props.span) {
     return (
-      <span onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+      <span onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={{...props.style, ...style}}>
         {props.children}
       </span>
     )
   }
 
   return (
-    <Typography onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+    <Typography onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={{...props.style, ...style}}>
       {props.children}
     </Typography>
   )

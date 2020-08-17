@@ -33,18 +33,20 @@ type State = {
   error?: Error
   loading: boolean
   signedMessage: string
-  openSnack?: SnackProps
-  url: string
+  snack?: SnackProps
+  snackOpen: boolean
   step: string
+  url: string
 }
 
 export default class UserSignDialog extends React.Component<Props, State> {
   state: State = {
+    loading: false,
     name: '',
     signedMessage: '',
-    loading: false,
-    url: '',
+    snackOpen: false,
     step: 'name',
+    url: '',
   }
 
   clear = () => {
@@ -68,7 +70,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.signedMessage)
-    this.setState({openSnack: {message: 'Copied to Clipboard', duration: 2000}})
+    this.setState({snack: {message: 'Copied to Clipboard', duration: 2000}, snackOpen: true})
   }
 
   userSign = () => {
@@ -311,7 +313,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
           <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error?.message}</Typography>
         )}
 
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Box>
     )
   }

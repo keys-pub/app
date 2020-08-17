@@ -35,7 +35,8 @@ type State = {
   error?: Error
   openReset: boolean
   openSetPin: boolean
-  openSnack?: SnackProps
+  snack?: SnackProps
+  snackOpen: boolean
 }
 
 export default class DeviceInfoView extends React.Component<Props, State> {
@@ -44,6 +45,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
     openReset: false,
     openSetPin: false,
     clientPin: '',
+    snackOpen: false,
   }
 
   componentDidMount() {
@@ -90,7 +92,8 @@ export default class DeviceInfoView extends React.Component<Props, State> {
   closePin = (snack: string) => {
     this.setState({
       openSetPin: false,
-      openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+      snack: {message: snack, alert: 'success', duration: 4000},
+      snackOpen: !!snack,
     })
     this.info()
   }
@@ -98,7 +101,8 @@ export default class DeviceInfoView extends React.Component<Props, State> {
   closeReset = (snack: string) => {
     this.setState({
       openReset: false,
-      openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : undefined,
+      snack: {message: snack, alert: 'success', duration: 4000},
+      snackOpen: !!snack,
     })
     this.info()
   }
@@ -226,7 +230,11 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         {this.state.error && this.renderError()}
         {!this.state.error && this.renderInfo()}
 
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Box>
     )
   }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material-ui/core'
 
@@ -10,11 +11,10 @@ import Autocomplete from '../keys/autocomplete'
 import * as grpc from '@grpc/grpc-js'
 import {shell} from 'electron'
 
+import Header from '../header'
 import TextInputView from '../textinput'
 
 import {generateID} from '../helper'
-
-import {CSSProperties} from '@material-ui/styles'
 
 import {
   welcomeStatus,
@@ -288,7 +288,7 @@ class WormholeView extends React.Component<Props, State> {
       <Box
         display="flex"
         flexDirection="row"
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 6, paddingRight: 8}}
+        style={{paddingLeft: 8, paddingTop: 3, paddingBottom: 6, paddingRight: 8}}
       >
         {!loading && !connected && (
           <Button
@@ -311,20 +311,22 @@ class WormholeView extends React.Component<Props, State> {
   }
 
   render() {
-    const canStart = this.props.sender != '' && this.props.recipient != ''
     const {loading, connected} = this.state
 
     return (
       <Box display="flex" flexDirection="column" style={{height: '100%'}}>
+        <Header />
+        {!loading && <Divider style={{marginBottom: 3}} />}
+        {loading && <LinearProgress />}
         <Box display="flex" flexDirection="row">
           <Box display="flex" flexDirection="column" flex={1}>
             <Box
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 2, paddingRight: 2}}
             >
-              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 4, width: 40}} align="right">
                 To:
               </Typography>
               <Autocomplete
@@ -342,9 +344,9 @@ class WormholeView extends React.Component<Props, State> {
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 5, paddingRight: 2}}
             >
-              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 4, width: 40}} align="right">
                 From:
               </Typography>
               <Autocomplete
@@ -358,17 +360,12 @@ class WormholeView extends React.Component<Props, State> {
           </Box>
           {this.renderStartStop()}
         </Box>
-        {!loading && <Divider style={{marginBottom: 3}} />}
-        {loading && <LinearProgress />}
-        <div ref={this.listRef} style={{display: 'flex', minHeight: '100%', overflowY: 'scroll'}}>
+        <Divider />
+        <div ref={this.listRef} style={{height: 'calc(100vh - 137px)', overflowY: 'auto'}}>
           {this.state.rows.map((row, index) => this.renderItem(index, 'wormhole-row-' + index))}
         </div>
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          style={{position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'white'}}
-        >
+        <Box display="flex" flexDirection="column" style={{backgroundColor: 'white'}}>
           <Divider />
           <TextInputView
             defaultValue=""

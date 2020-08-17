@@ -1,12 +1,13 @@
 import * as React from 'react'
 
 import {Box} from '@material-ui/core'
+import {Error} from '../store/pull'
 
 import {Button, Typography} from '@material-ui/core'
 import {styles} from '../components'
 
 type Props = {
-  error: Error | void
+  error: Error
   errorInfo?: any
 }
 

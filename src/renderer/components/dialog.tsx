@@ -11,7 +11,7 @@ type Props = {
 
 const DialogTitle = (props: Props) => {
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" className="drag">
       <Box display="flex" flexGrow={1} flexDirection="row">
         <Typography
           id="alert-dialog-title"

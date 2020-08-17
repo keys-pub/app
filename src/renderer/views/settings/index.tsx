@@ -16,128 +16,110 @@ import {
 import {Link} from '../../components'
 import {ipcRenderer, remote} from 'electron'
 
+import Header from '../header'
 import ElectronStore from 'electron-store'
 import {Store} from '../../store/pull'
 import {useLocation} from 'wouter'
-
-type Props = {
-  setUpdating: () => void
-  setLocation: (path: string) => void
-}
-
-type State = {
-  prerelease: boolean
-}
 
 const version = remote.app.getVersion()
 const localStore = new ElectronStore()
 
 export default (props: {}) => {
+  const [prerelease, setPrerelease] = React.useState(localStore.get('prerelease') == '1')
+
   const [location, setLocation] = useLocation()
-  const setUpdating = () => {
-    Store.update((s) => {
-      s.updating = true
-    })
-  }
-  return <SettingsView setUpdating={setUpdating} setLocation={setLocation} />
-}
 
-class SettingsView extends React.Component<Props, State> {
-  state = {
-    prerelease: localStore.get('prerelease') == '1',
-  }
-
-  devTools = () => {
+  const devTools = () => {
     const win = remote.getCurrentWindow()
     win.webContents.toggleDevTools()
   }
 
-  forceUpdate = () => {
+  const forceUpdate = () => {
     ipcRenderer.send('update-force')
-    this.props.setUpdating()
+    Store.update((s) => {
+      s.updating = true
+    })
   }
 
-  onPrereleaseChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPrereleaseChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
-    this.setState({prerelease: checked})
+    setPrerelease(checked)
     if (checked) {
       localStore.set('prerelease', '1')
     } else {
       localStore.delete('prerelease')
     }
-  }
+  }, [])
 
-  render() {
-    const labelWidth = 60
-    return (
-      <Box display="flex" flex={1} flexDirection="column">
-        <Box paddingTop={1} />
-        <Table size="small">
-          <TableBody>
-            <TableRow>
-              <TableCell style={{...cstyles.cell, width: labelWidth}}>
-                <Typography align="right">Version</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <Typography>{version}</Typography>
-              </TableCell>
-            </TableRow>
+  const labelWidth = 60
+  return (
+    <Box display="flex" flex={1} flexDirection="column">
+      <Header />
+      <Table size="small">
+        <TableBody>
+          <TableRow>
+            <TableCell style={{...cstyles.cell, width: labelWidth}}>
+              <Typography align="right">Version</Typography>
+            </TableCell>
+            <TableCell style={cstyles.cell}>
+              <Typography>{version}</Typography>
+            </TableCell>
+          </TableRow>
 
-            <TableRow>
-              <TableCell style={{...cstyles.cell, width: labelWidth}}>
-                <Typography align="right">Updater</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={this.state.prerelease}
-                      color="primary"
-                      onChange={this.onPrereleaseChange}
-                      style={{paddingTop: 0, paddingBottom: 0}}
-                    />
-                  }
-                  label="Prereleases"
-                />
-              </TableCell>
-            </TableRow>
+          <TableRow>
+            <TableCell style={{...cstyles.cell, width: labelWidth}}>
+              <Typography align="right">Updater</Typography>
+            </TableCell>
+            <TableCell style={cstyles.cell}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={prerelease}
+                    color="primary"
+                    onChange={onPrereleaseChange}
+                    style={{paddingTop: 0, paddingBottom: 0}}
+                  />
+                }
+                label="Prereleases"
+              />
+            </TableCell>
+          </TableRow>
 
-            <TableRow>
-              <TableCell style={cstyles.cell}>
-                <Typography align="right">Debug</Typography>
-              </TableCell>
-              <TableCell style={cstyles.cell}>
-                <Box display="flex" flexDirection="column">
-                  <Typography>
-                    <Link span onClick={() => this.props.setLocation('/db/service')}>
-                      DB (service)
-                    </Link>
-                    <br />
-                    <Link span onClick={() => this.props.setLocation('/db/vault')}>
-                      DB (vault)
-                    </Link>
-                    <br />
-                    <Link span onClick={this.devTools}>
-                      Toggle Dev Tools
-                    </Link>
-                    <br />
-                    <Link span onClick={this.forceUpdate}>
-                      Force Update
-                    </Link>
-                    <br />
-                    <Link span onClick={() => this.props.setLocation('/style-guide')}>
-                      Style Guide
-                    </Link>
-                    <br />
-                  </Typography>
-                </Box>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Box>
-    )
-  }
+          <TableRow>
+            <TableCell style={cstyles.cell}>
+              <Typography align="right">Debug</Typography>
+            </TableCell>
+            <TableCell style={cstyles.cell}>
+              <Box display="flex" flexDirection="column">
+                <Typography>
+                  <Link span onClick={() => setLocation('/db/service')}>
+                    DB (service)
+                  </Link>
+                  <br />
+                  <Link span onClick={() => setLocation('/db/vault')}>
+                    DB (vault)
+                  </Link>
+                  <br />
+                  <Link span onClick={devTools}>
+                    Toggle Dev Tools
+                  </Link>
+                  <br />
+                  <Link span onClick={forceUpdate}>
+                    Force Update
+                  </Link>
+                  <br />
+                  <Link span onClick={() => setLocation('/style-guide')}>
+                    Style Guide
+                  </Link>
+                  <br />
+                </Typography>
+              </Box>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </Box>
+  )
 }
 
 const cstyles = {

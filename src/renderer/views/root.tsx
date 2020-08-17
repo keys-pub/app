@@ -8,14 +8,14 @@ import {Router} from 'wouter'
 
 import {Routes, routesMap} from './routes'
 import {useLocation} from 'wouter'
-import {Store} from '../store/pull'
+import {Store, Error} from '../store/pull'
 import {ipcRenderer, remote} from 'electron'
 
 import Auth from './auth'
 import Nav from './nav'
 
 import {Box, Typography} from '@material-ui/core'
-import ErrorsDialog from '../errors/dialog'
+import Errors from '../errors'
 import UpdateAlert from './update/alert'
 import UpdateSplash from './update/splash'
 
@@ -147,7 +147,7 @@ const useHashLocation = (to: any): any => {
 // {code: 14, message: "14 UNAVAILABLE: No connection established", details: "No connection established"}
 
 const App = (_: {}) => (
-  <Box display="flex" flexGrow={1} flexDirection="row">
+  <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
     <Nav />
     <Routes />
   </Box>
@@ -156,8 +156,7 @@ const App = (_: {}) => (
 const Root = (_: {}) => {
   const [location, setLocation] = useLocation()
 
-  const {navMinimized, unlocked, updating} = Store.useState((s) => ({
-    navMinimized: s.navMinimized,
+  const {unlocked, updating} = Store.useState((s) => ({
     unlocked: s.unlocked,
     updating: s.updating,
   }))
@@ -185,6 +184,7 @@ export default (_: {}) => {
     <ThemeProvider theme={theme}>
       <Router hook={useHashLocation}>
         <Root />
+        <Errors />
       </Router>
     </ThemeProvider>
   )
@@ -203,13 +203,18 @@ ipcRenderer.on('keys-started', (event, err) => {
     remote.app.exit(2)
   }
 
-  setErrHandler((err: {message: string; code: number}) => {
+  setErrHandler((err: Error) => {
     switch (err.code) {
       case grpc.status.PERMISSION_DENIED:
-      case grpc.status.UNAVAILABLE:
       case grpc.status.UNAUTHENTICATED:
         Store.update((s) => {
           s.unlocked = false
+        })
+        break
+      case grpc.status.UNAVAILABLE:
+        Store.update((s) => {
+          s.unlocked = false
+          s.error = err
         })
         break
     }
@@ -237,6 +242,9 @@ ipcRenderer.on('focus', (event, message) => {
 // ipcRenderer.on('responsive', (event, message) => {})
 
 const ping = () => {
-  const req: RuntimeStatusRequest = {}
-  runtimeStatus(req).then((resp: RuntimeStatusResponse) => {})
+  // console.log('Ping')
+  // const req: RuntimeStatusRequest = {}
+  // runtimeStatus(req)
+  //   .then((resp: RuntimeStatusResponse) => {})
+  //   .catch((err: Error) => {})
 }

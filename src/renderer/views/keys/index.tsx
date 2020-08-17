@@ -79,7 +79,8 @@ type State = {
   openKey: string
   openRemove?: Key
   openSearch: boolean
-  openSnack?: SnackProps
+  snack?: SnackProps
+  snackOpen: boolean
   selected: string
   syncEnabled: boolean
   syncing: boolean
@@ -94,6 +95,7 @@ export default class KeysView extends React.Component<Props, State> {
     openImport: false,
     openKey: '',
     openSearch: false,
+    snackOpen: false,
     selected: '',
     syncEnabled: false,
     syncing: false,
@@ -104,7 +106,7 @@ export default class KeysView extends React.Component<Props, State> {
   }
 
   snackErr = (err: Error) => {
-    this.setState({openSnack: {message: err.message, alert: 'error'}})
+    this.setState({snack: {message: err.message, alert: 'error'}, snackOpen: true})
   }
 
   reload = () => {
@@ -398,7 +400,7 @@ export default class KeysView extends React.Component<Props, State> {
 
         <Menu
           keepMounted
-          open={this.state.contextPosition !== null}
+          open={!!this.state.contextPosition}
           onClose={this.closeContext}
           anchorReference="anchorPosition"
           anchorPosition={
@@ -435,7 +437,11 @@ export default class KeysView extends React.Component<Props, State> {
           kid={this.state.openKey}
           reload={this.reload}
         />
-        <Snack snack={this.state.openSnack} onClose={() => this.setState({openSnack: undefined})} />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Box>
     )
   }

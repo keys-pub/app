@@ -8,6 +8,7 @@ import {secretRemove} from '../../rpc/keys'
 import {Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
+  open: boolean
   secret?: Secret
   close: (removed: boolean) => void
 }
@@ -29,7 +30,7 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
     return (
       <Dialog
         onClose={() => this.props.close(false)}
-        open={!!secret}
+        open={this.props.open}
         maxWidth="sm"
         fullWidth
         disableBackdropClick

@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
+import Header from '../header'
 import Logo from '../logo'
 
 import {ipcRenderer} from 'electron'
@@ -39,10 +40,9 @@ class AuthUnlockView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
+        <Header noLock noBack />
         <Logo loading={this.state.progress} top={60} />
-        <Typography style={{paddingTop: 10, paddingBottom: 20}}>
-          The keyring is locked. Enter your password to continue.
-        </Typography>
+        <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter your password to unlock.</Typography>
         <FormControl error={!!this.state.error} style={{marginBottom: 10}}>
           <TextField
             autoFocus
