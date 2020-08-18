@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box} from '@material-ui/core'
-import {Error} from '../store/pull'
+import {Error} from '../store'
 
 import {Button, Typography} from '@material-ui/core'
 import {styles} from '../components'

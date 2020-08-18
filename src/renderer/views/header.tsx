@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, IconButton, Typography} from '@material-ui/core'
 
-import {Store} from '../store/pull'
+import {Store} from '../store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 

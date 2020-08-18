@@ -19,7 +19,7 @@ import {
   DecryptResponse,
 } from '../../rpc/keys.d'
 
-import {DecryptStore as Store} from '../../store/pull'
+import {DecryptStore as Store} from '../../store'
 
 const openFile = async () => {
   clearOut()

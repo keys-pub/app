@@ -20,7 +20,7 @@ function createRenderConfig(isDev) {
   return {
     context: path.join(__dirname, 'src'),
 
-    target: 'web', // any other target value makes react-hot-loader stop working
+    target: 'electron-renderer',
 
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

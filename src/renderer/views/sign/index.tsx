@@ -15,7 +15,7 @@ import SignKeySelectView from '../keys/select'
 import {sign, signFile, SignFileEvent} from '../../rpc/keys'
 import {Key, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
 
-import {SignStore as Store} from '../../store/pull'
+import {SignStore as Store} from '../../store'
 
 const openFile = async () => {
   clearOut()

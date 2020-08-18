@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {Store} from '../store/pull'
+import {Store} from '../store'
 
 import {ipcRenderer} from 'electron'
 import ErrorDialog from './dialog'

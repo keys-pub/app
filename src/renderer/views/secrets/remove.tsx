@@ -25,8 +25,6 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
   }
 
   render() {
-    const secret = this.props.secret
-
     return (
       <Dialog
         onClose={() => this.props.close(false)}

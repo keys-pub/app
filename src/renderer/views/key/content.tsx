@@ -108,7 +108,6 @@ const UserRow = (props: Props) => {
 export default (props: Props) => {
   const key: Key = props.k
   const kid = key.id!
-
   const sigchainURL = 'https://keys.pub/sigchain/' + key.id
   const openSigchain = () => shell.openExternal(sigchainURL)
 
@@ -162,7 +161,7 @@ export default (props: Props) => {
               </TableCell>
             </TableRow>
           )}
-          {key?.sigchainLength && key.sigchainLength > 0 && (
+          {(key?.sigchainLength || 0) > 0 && (
             <TableRow>
               <TableCell style={{...cstyles.cell}}>
                 <Typography align="right">Sigchain</Typography>

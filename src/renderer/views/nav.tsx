@@ -30,7 +30,7 @@ import {
 } from '@material-ui/icons'
 
 import {useLocation} from 'wouter'
-import {Store} from '../store/pull'
+import {Store} from '../store'
 
 type NavRoute = {
   name: string
@@ -49,16 +49,7 @@ const backgroundColorSelected = '#1a1a1a'
 export default (props: {}) => {
   const [location, setLocation] = useLocation()
   const [openExperimental, setOpenExperimental] = React.useState(false)
-
-  const {navMinimized} = Store.useState((s) => ({
-    navMinimized: s.navMinimized,
-  }))
-
-  const toggleDrawer = () => {
-    Store.update((s) => {
-      s.navMinimized = !navMinimized
-    })
-  }
+  const [minimized, setMinimized] = React.useState(false)
 
   const experimentRef = React.useRef<HTMLDivElement>()
   const openExperiment = (route: string) => {
@@ -66,9 +57,8 @@ export default (props: {}) => {
     setOpenExperimental(false)
   }
 
-  const open = !navMinimized
-  const width = open ? 140 : 68
-  const drawerStyles: CSSProperties = open
+  const width = minimized ? 68 : 140
+  const drawerStyles: CSSProperties = !minimized
     ? {width, border: 0, height: '100%'}
     : {
         width,
@@ -117,7 +107,7 @@ export default (props: {}) => {
   // TODO: Drawer transitions
 
   return (
-    <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={open}>
+    <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={true}>
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
         <Box height={33} style={{backgroundColor: backgroundColor}} />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
@@ -126,7 +116,7 @@ export default (props: {}) => {
               nav,
               index,
               location.startsWith(nav.prefix),
-              open,
+              !minimized,
               nav.onClick ? nav.onClick : () => setLocation(nav.route),
               nav.anchorRef
             )
@@ -136,9 +126,12 @@ export default (props: {}) => {
           {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
             </Typography> */}
           <Box display="flex" flexGrow={1} />
-          <IconButton onClick={toggleDrawer} style={{color: 'white', alignSelf: 'flex-end'}}>
-            {open && <LeftIcon />}
-            {!open && <RightIcon />}
+          <IconButton
+            onClick={() => setMinimized(!minimized)}
+            style={{color: 'white', alignSelf: 'flex-end'}}
+          >
+            {minimized && <LeftIcon />}
+            {!minimized && <RightIcon />}
           </IconButton>
         </Box>
       </Box>
@@ -188,7 +181,7 @@ const row = (
           style={{
             fontSize: open ? 18 : 24,
             marginLeft: open ? -1 : 4,
-            color: selected ? 'white' : '#dfdfdf',
+            color: selected ? 'white' : '#999',
           }}
         />
       </ListItemIcon>

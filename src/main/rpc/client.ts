@@ -1,8 +1,6 @@
 import * as getenv from 'getenv'
 import * as grpc from '@grpc/grpc-js'
-// import * as protoLoader from '@grpc/proto-loader'
-// @ln-zap/proto-loader works in electron, see https://github.com/grpc/grpc-node/issues/969
-import * as protoLoader from '@ln-zap/proto-loader'
+import * as protoLoader from '@grpc/proto-loader'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -30,10 +28,12 @@ const resolveProtoPath = (name: string): string => {
   return './src/main/rpc/' + name
 }
 
-const auth = (serviceUrl: string, callback: (params: {} | null, metadata: grpc.Metadata) => void) => {
+type CallMetadataOptions = {service_url: string}
+
+const auth = (options: CallMetadataOptions, cb: (err: Error | null, metadata?: grpc.Metadata) => void) => {
   const metadata = new grpc.Metadata()
   metadata.set('authorization', authToken)
-  callback(null, metadata)
+  cb(null, metadata)
 }
 
 export const setAuthToken = (t: string) => {

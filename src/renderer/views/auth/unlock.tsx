@@ -11,7 +11,7 @@ import {authUnlock} from '../../rpc/keys'
 import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
 import {useLocation} from 'wouter'
 
-import {Store} from '../../store/pull'
+import {Store} from '../../store'
 
 type Props = {
   unlock: () => void
@@ -106,21 +106,19 @@ class AuthUnlockView extends React.Component<Props, State> {
       client: 'app',
     }
     console.log('Auth unlock')
-    authUnlock(req)
-      .then((resp: AuthUnlockResponse) => {
-        clearTimeout(timeout)
-        console.log('Auth unlocking...')
-        ipcRenderer.send('authToken', {authToken: resp.authToken})
-        this.props.unlock()
-      })
-      .catch((err: Error) => {
-        this.setState({error: err})
-        this.inputRef.current?.focus()
-        this.inputRef.current?.select()
-      })
-      .finally(() => {
-        this.setState({loading: false, progress: false})
-      })
+    try {
+      const resp = await authUnlock(req)
+      console.log('Auth unlocking...')
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
+      this.props.unlock()
+    } catch (err) {
+      this.setState({error: err})
+    } finally {
+      clearTimeout(timeout)
+      this.setState({loading: false, progress: false})
+      this.inputRef.current?.focus()
+      this.inputRef.current?.select()
+    }
   }
 }
 

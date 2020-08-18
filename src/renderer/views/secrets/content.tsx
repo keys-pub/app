@@ -102,7 +102,8 @@ export default class SecretContentView extends React.Component<Props, State> {
       <Box
         display="flex"
         flexDirection="column"
-        style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 18}}
+        flex={1}
+        style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 14}}
       >
         {secret.type == SecretType.PASSWORD_SECRET && this.renderPassword(secret)}
         {secret.type == SecretType.NOTE_SECRET && this.renderNote(secret)}
@@ -124,7 +125,10 @@ export default class SecretContentView extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderActions()}
         <Divider />
-        {this.props.secret && this.renderSecret(this.props.secret)}
+        <Box display="flex" flexDirection="row" flex={1}>
+          <Divider orientation="vertical" />
+          {this.props.secret && this.renderSecret(this.props.secret)}
+        </Box>
       </Box>
     )
   }

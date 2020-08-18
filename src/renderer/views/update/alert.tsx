@@ -6,7 +6,7 @@ import {Link} from '../../components'
 
 import Alert from '@material-ui/lab/Alert'
 
-import {Store} from '../../store/pull'
+import {Store} from '../../store'
 import {ipcRenderer} from 'electron'
 
 export default (props: {}) => {

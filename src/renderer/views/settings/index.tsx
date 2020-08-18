@@ -18,7 +18,7 @@ import {ipcRenderer, remote} from 'electron'
 
 import Header from '../header'
 import ElectronStore from 'electron-store'
-import {Store} from '../../store/pull'
+import {Store} from '../../store'
 import {useLocation} from 'wouter'
 
 const version = remote.app.getVersion()

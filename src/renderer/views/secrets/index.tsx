@@ -38,7 +38,7 @@ import SecretContentView from './content'
 
 import {directionString, flipDirection} from '../helper'
 
-import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
+//import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
   Secret,
   SortDirection,
@@ -50,6 +50,8 @@ import {
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
+
+import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 
 type Props = {}
 
@@ -118,6 +120,7 @@ export default (props: Props) => {
   }
 
   const snackError = (err: Error) => {
+    console.error(err)
     openSnack({message: err.message, alert: 'error'})
   }
 
@@ -125,41 +128,45 @@ export default (props: Props) => {
     reload()
   }, [])
 
-  const reload = () => {
-    const req: RuntimeStatusRequest = {}
-    runtimeStatus(req)
-      .then((resp: RuntimeStatusResponse) => {
-        setSyncEnabled(!!resp.sync)
-        list(input, sortField, sortDirection)
-      })
-      .catch(snackError)
+  const reload = async () => {
+    try {
+      const req: RuntimeStatusRequest = {}
+      const resp = await runtimeStatus(req)
+      setSyncEnabled(!!resp.sync)
+      list(input, sortField, sortDirection)
+    } catch (err) {
+      snackError(err)
+    }
   }
 
-  const sync = () => {
+  const sync = async () => {
     setSyncing(true)
-    const req: VaultUpdateRequest = {}
-    vaultUpdate(req)
-      .then((res: VaultUpdateResponse) => {
-        setSyncing(false)
-        reload()
-      })
-      .catch(snackError)
+    try {
+      const req: VaultUpdateRequest = {}
+      const resp = await vaultUpdate(req)
+      setSyncing(false)
+      reload()
+    } catch (err) {
+      snackError(err)
+    }
   }
 
-  const list = (query: string, sortField?: string, sortDirection?: SortDirection) => {
-    console.log('List secrets', query, sortField, sortDirection)
+  const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
+    console.log('List secrets', query)
     const req: SecretsRequest = {
       query: query,
       sortField: sortField,
       sortDirection: sortDirection,
     }
-    listSecrets(req)
-      .then((resp: SecretsResponse) => {
-        setSecrets(resp.secrets || [])
-        setSortField(sortField)
-        setSortDirection(resp.sortDirection)
-      })
-      .catch(snackError)
+
+    try {
+      const resp = await listSecrets(req)
+      setSecrets(resp.secrets || [])
+      setSortField(sortField)
+      setSortDirection(resp.sortDirection)
+    } catch (err) {
+      snackError(err)
+    }
   }
 
   // If filtering, selected might not be visible, but we don't want to clear
@@ -177,6 +184,14 @@ export default (props: Props) => {
     setIsNew(false)
     setEditing(undefined)
     setSelected(changed)
+
+    setSecrets(
+      secrets.map((secret: Secret) => {
+        if (secret.id == changed.id) return changed
+        return secret
+      })
+    )
+
     reload()
   }
 
@@ -289,7 +304,6 @@ export default (props: Props) => {
                   })}
                 </TableBody>
               </Table>
-              <Divider orientation="vertical" />
             </Box>
           </Box>
         </Box>

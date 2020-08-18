@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {Store, Error} from '../store/pull'
+import {Store, Error} from '../store'
 
 import ErrorView from './view'
 

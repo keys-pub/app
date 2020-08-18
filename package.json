@@ -7,14 +7,13 @@
     "build": "yarn webpack --env.NODE_ENV=development --env.target=render && yarn webpack --env.NODE_ENV=development --env.target=main",
     "build-prod": "yarn webpack --env.NODE_ENV=production --env.target=render && yarn webpack --env.NODE_ENV=production --env.target=main",
     "server": "yarn webpack-dev-server --env.NODE_ENV=development --env.target=render --hot",
-    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron ./dist/.",
-    "pack": "yarn run build-prod && yarn electron-packager ./dist --out ./pack --overwrite",
-    "dist": "yarn run build && electron-builder",
+    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron .",
+    "pack": "yarn run build-prod && electron-builder --dir",
+    "dist": "yarn run build-prod && electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "version": "cross-var echo $npm_package_version",
-    "release": "yarn run build && electron-builder --publish always"
+    "version": "cross-var echo $npm_package_version"
   },
-  "main": "./main.js",
+  "main": "./dist/main.js",
   "browserslist": [
     "last 1 Chrome version"
   ],
@@ -125,8 +124,6 @@
     "babel-loader": "^8.0.2",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.0.3",
-    "cross-env": "^7.0.0",
-    "cross-spawn": "^7.0.0",
     "cross-var": "^1.1.0",
     "css-loader": "^4.2.1",
     "electron": "^9.0.4",
@@ -148,7 +145,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.0.3",
-    "@ln-zap/proto-loader": "^0.5.1",
+    "@grpc/proto-loader": "^0.5.5",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.39",

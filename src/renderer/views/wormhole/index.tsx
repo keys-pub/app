@@ -25,7 +25,7 @@ import {
   errorStatus,
 } from './status'
 
-import {WormholeState, WormholeMessage, WormholeMessageType, WormholeStore as Store} from '../../store/pull'
+import {WormholeState, WormholeMessage, WormholeMessageType, WormholeStore as Store} from '../../store'
 import {wormhole, rand, WormholeEvent} from '../../rpc/keys'
 import {
   KeyType,

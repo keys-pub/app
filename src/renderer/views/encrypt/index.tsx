@@ -32,7 +32,7 @@ import {
   EncryptFileOutput,
 } from '../../rpc/keys.d'
 
-import {EncryptStore as Store} from '../../store/pull'
+import {EncryptStore as Store} from '../../store'
 
 // TODO: Option to include self/sender
 // TODO: Default sender

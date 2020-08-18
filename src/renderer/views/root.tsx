@@ -8,10 +8,11 @@ import {Router} from 'wouter'
 
 import {Routes, routesMap} from './routes'
 import {useLocation} from 'wouter'
-import {Store, Error} from '../store/pull'
+import {Store, Error} from '../store'
 import {ipcRenderer, remote} from 'electron'
 
 import Auth from './auth'
+import AuthSplash from './auth/splash'
 import Nav from './nav'
 
 import {Box, Typography} from '@material-ui/core'
@@ -156,7 +157,8 @@ const App = (_: {}) => (
 const Root = (_: {}) => {
   const [location, setLocation] = useLocation()
 
-  const {unlocked, updating} = Store.useState((s) => ({
+  const {ready, unlocked, updating} = Store.useState((s) => ({
+    ready: s.ready,
     unlocked: s.unlocked,
     updating: s.updating,
   }))
@@ -167,6 +169,10 @@ const Root = (_: {}) => {
   ipcRenderer.on('preferences', (event, message) => {
     setLocation('/settings/index')
   })
+
+  if (!ready) {
+    return <AuthSplash />
+  }
 
   if (!unlocked) {
     return <Auth />
@@ -218,6 +224,10 @@ ipcRenderer.on('keys-started', (event, err) => {
         })
         break
     }
+  })
+
+  Store.update((s) => {
+    s.ready = true
   })
 
   // Update check

@@ -3,7 +3,7 @@ import {execProc, spawnProc} from './run'
 
 const keysPath = (): string => {
   let path = ''
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV == 'production') {
     path = binPath('keys')
   }
   if (process.env.KEYS_BIN) {
