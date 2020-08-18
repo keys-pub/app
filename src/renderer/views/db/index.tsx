@@ -79,7 +79,7 @@ export default class DBView extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" flex={1}>
         <Header />
         <Divider />
-        <Box display="flex" flexDirection="row" style={{height: 'calc(100% - 29px)'}}>
+        <Box display="flex" flexDirection="row" flex={1} style={{height: 'calc(100% - 29px)'}}>
           <Box>
             <Table size="small">
               <TableBody>
@@ -99,7 +99,7 @@ export default class DBView extends React.Component<Props, State> {
             </Table>
           </Box>
           <Divider orientation="vertical" />
-          <Box style={{overflowY: 'auto'}}>
+          <Box display="flex" flexDirection="row" flex={1} style={{overflowY: 'auto'}}>
             <Table size="small">
               <TableBody>
                 {documents.map((doc: Document, index: number) => (

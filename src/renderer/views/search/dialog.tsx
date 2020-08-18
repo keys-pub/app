@@ -42,6 +42,14 @@ export default class SearchDialog extends React.Component<Props, State> {
     this.setState({openKey: k.id || ''})
   }
 
+  closeKey = (snack: string) => {
+    this.setState({
+      openKey: '',
+      snack: {message: snack, alert: 'success', duration: 4000},
+      snackOpen: !!snack,
+    })
+  }
+
   render() {
     return (
       <Dialog
@@ -69,13 +77,7 @@ export default class SearchDialog extends React.Component<Props, State> {
         </DialogActions>
         <KeyDialog
           open={this.state.openKey != ''}
-          close={(snack: string) =>
-            this.setState({
-              openKey: '',
-              snack: {message: snack, alert: 'success', duration: 4000},
-              snackOpen: true,
-            })
-          }
+          close={this.closeKey}
           kid={this.state.openKey}
           update
           import

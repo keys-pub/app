@@ -205,8 +205,9 @@ ipcRenderer.on('log', function (event, text) {
 ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {
-    alert('Oops, exec error: ' + err.toString())
-    remote.app.exit(2)
+    Store.update((s) => {
+      s.error = err
+    })
   }
 
   setErrHandler((err: Error) => {

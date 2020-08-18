@@ -9,6 +9,7 @@ export interface Error {
 }
 
 export type State = {
+  ready: boolean
   error?: Error
   selectedTool: string
   unlocked: boolean
@@ -16,6 +17,7 @@ export type State = {
 }
 
 export const Store = new PullStateStore<State>({
+  ready: false,
   selectedTool: 'encrypt',
   unlocked: false,
   updating: false,
