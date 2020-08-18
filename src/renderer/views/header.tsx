@@ -17,6 +17,7 @@ import {
   Crop75 as UnmaximizeIcon,
 } from '@material-ui/icons'
 
+import {history} from './router'
 import {remote} from 'electron'
 
 type Props = {
@@ -28,8 +29,9 @@ export default (props: Props) => {
   const win = remote.getCurrentWindow()
   const [maximized, setMaximized] = React.useState(win.isMaximized())
 
-  // TODO: Back
-  const back = () => {}
+  const back = () => {
+    history.back()
+  }
 
   const lock = () => {
     ipcRenderer.send('authToken', {authToken: ''})

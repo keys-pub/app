@@ -23,6 +23,7 @@ import UpdateSplash from './update/splash'
 import {updateCheck} from './update'
 import * as grpc from '@grpc/grpc-js'
 
+import {useHashLocation} from './router'
 import {setErrHandler, runtimeStatus} from '../rpc/keys'
 import {RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
 
@@ -121,32 +122,6 @@ const theme = createMuiTheme({
   },
 })
 
-// Returns the current hash location in a normalized form
-// (excluding the leading '#' symbol).
-const currentLocation = () => {
-  return window.location.hash.replace(/^#/, '') || '/'
-}
-
-const useHashLocation = (to: any): any => {
-  const [location, setLocation] = React.useState(currentLocation())
-
-  React.useEffect(() => {
-    const handler = () => setLocation(currentLocation())
-
-    // Subscribe to hash changes
-    window.addEventListener('hashchange', handler)
-    return () => window.removeEventListener('hashchange', handler)
-  }, [])
-
-  // Remember to wrap your function with `useCallback` hook
-  const navigate = React.useCallback((to) => (window.location.hash = to), [])
-
-  return [location, navigate]
-}
-
-// TODO: If service is disconnected, show disconnected UI...
-// {code: 14, message: "14 UNAVAILABLE: No connection established", details: "No connection established"}
-
 const App = (_: {}) => (
   <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
     <Nav />
@@ -163,8 +138,6 @@ const Root = (_: {}) => {
     updating: s.updating,
   }))
 
-  console.log('Location:', location)
-
   ipcRenderer.removeAllListeners('preferences')
   ipcRenderer.on('preferences', (event, message) => {
     setLocation('/settings/index')
@@ -174,7 +147,7 @@ const Root = (_: {}) => {
     return <AuthSplash />
   }
 
-  if (!unlocked) {
+  if (!unlocked || location == '/') {
     return <Auth />
   }
 
@@ -197,7 +170,7 @@ export default (_: {}) => {
 }
 
 ipcRenderer.removeAllListeners('log')
-ipcRenderer.on('log', function (event, text) {
+ipcRenderer.on('log', (event, text) => {
   console.log('Main process:', text)
 })
 
@@ -253,9 +226,9 @@ ipcRenderer.on('focus', (event, message) => {
 // ipcRenderer.on('responsive', (event, message) => {})
 
 const ping = () => {
-  // console.log('Ping')
-  // const req: RuntimeStatusRequest = {}
-  // runtimeStatus(req)
-  //   .then((resp: RuntimeStatusResponse) => {})
-  //   .catch((err: Error) => {})
+  console.log('Ping')
+  const req: RuntimeStatusRequest = {}
+  runtimeStatus(req)
+    .then((resp: RuntimeStatusResponse) => {})
+    .catch((err: Error) => {})
 }

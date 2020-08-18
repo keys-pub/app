@@ -107,7 +107,13 @@ export default (props: {}) => {
   // TODO: Drawer transitions
 
   return (
-    <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={true}>
+    <Drawer
+      variant="permanent"
+      style={drawerStyles}
+      PaperProps={{style: drawerStyles}}
+      open={true}
+      className="drag"
+    >
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
         <Box height={33} style={{backgroundColor: backgroundColor}} />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
