@@ -35,6 +35,7 @@ export default (props: Props) => {
     keys(req).then((resp: KeysResponse) => {
       setOptions(resp.keys || [])
     })
+    // TODO: Catch error
   }
   React.useEffect(() => {
     listKeys()

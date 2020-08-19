@@ -123,6 +123,7 @@ export default class MessagesListView extends React.Component<Props, State> {
       recipient: '',
     }
     console.log('Load rows, RPC messages:', req)
+    // TODO: Catch error
     messages(req).then((resp: MessagesResponse) => {
       if (this.listRef === null) {
         // console.error('No list ref')

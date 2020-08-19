@@ -22,6 +22,7 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
     secretRemove(req).then((resp: SecretRemoveResponse) => {
       this.props.close(true)
     })
+    // TODO: Catch error
   }
 
   render() {

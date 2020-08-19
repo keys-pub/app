@@ -10,11 +10,12 @@ import matchSorter from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {keys} from '../../rpc/keys'
 import {Key, KeysRequest, KeysResponse, SortDirection} from '../../rpc/keys.d'
 
-export type Props = {
+type Props = {
   keys: Key[]
   onChange: (value: Key[]) => void
   disabled?: boolean
@@ -69,8 +70,10 @@ export default (props: Props) => {
   const [open, setOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
   const [options, setOptions] = React.useState([] as Key[])
-  const [openSearch, setOpenSearch] = React.useState(false)
-  const [openImport, setOpenImport] = React.useState(false)
+  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [importOpen, setImportOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const openAutoComplete = () => {
     setOpen(true)
@@ -86,10 +89,15 @@ export default (props: Props) => {
     const req: KeysRequest = {
       query: q,
     }
-    keys(req).then((resp: KeysResponse) => {
-      const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
-      setOptions(keys || [])
-    })
+    keys(req)
+      .then((resp: KeysResponse) => {
+        const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
+        setOptions(keys || [])
+      })
+      .catch((err: Error) => {
+        setSnack({message: err.message, alert: 'error', duration: 4000})
+        setSnackOpen(true)
+      })
   }
 
   React.useEffect(() => {
@@ -101,10 +109,10 @@ export default (props: Props) => {
 
     keys.forEach((k: Key) => {
       if (k.id == 'search') {
-        setOpenSearch(true)
+        setSearchOpen(true)
       }
       if (k.id == 'import') {
-        setOpenImport(true)
+        setImportOpen(true)
       }
     })
 
@@ -152,8 +160,9 @@ export default (props: Props) => {
           />
         )}
       />
-      <SearchDialog open={openSearch} close={() => setOpenSearch(false)} />
-      <KeyImportDialog open={openImport} close={() => setOpenImport(false)} />
+      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} />
+      <KeyImportDialog open={importOpen} close={() => setImportOpen(false)} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

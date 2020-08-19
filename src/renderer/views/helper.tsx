@@ -45,10 +45,12 @@ export const dateString = (ms?: any): string => {
 }
 
 export const generateID = (): Promise<string> => {
-  return new Promise((resolve) => {
-    rand({numBytes: 32, encoding: Encoding.BASE62}).then((resp: RandResponse) => {
-      resolve(resp.data)
-    })
+  return new Promise((resolve, reject) => {
+    rand({numBytes: 32, encoding: Encoding.BASE62})
+      .then((resp: RandResponse) => {
+        resolve(resp.data)
+      })
+      .catch((err: Error) => reject(err))
   })
 }
 

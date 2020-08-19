@@ -98,6 +98,7 @@ export default class SecretEditView extends React.Component<Props, State> {
       secret.password = resp.password
       this.setState({secret})
     })
+    // TODO: Catch error
   }
 
   renderEditActions() {
