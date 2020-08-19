@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, IconButton, Typography} from '@material-ui/core'
 
-import {Store} from '../store'
+import {store} from '../store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 
@@ -35,7 +35,7 @@ export default (props: Props) => {
 
   const lock = () => {
     ipcRenderer.send('authToken', {authToken: ''})
-    Store.update((s) => {
+    store.update((s) => {
       s.unlocked = false
     })
   }

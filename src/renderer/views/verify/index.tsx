@@ -8,6 +8,7 @@ import VerifiedFileView from './verifiedfile'
 import {styles, Link} from '../../components'
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
+import {Store} from 'pullstate'
 
 import {verify, verifyFile, key, VerifyFileEvent} from '../../rpc/keys'
 import {
@@ -21,7 +22,23 @@ import {
   VerifyResponse,
 } from '../../rpc/keys.d'
 
-import {VerifyStore as Store} from '../../store'
+type State = {
+  input: string
+  output: string
+  fileIn: string
+  fileOut: string
+  signer?: Key
+  error?: Error
+  loading: boolean
+}
+
+const store = new Store<State>({
+  input: '',
+  output: '',
+  fileIn: '',
+  fileOut: '',
+  loading: false,
+})
 
 const openFile = async () => {
   clearOut()
@@ -33,7 +50,7 @@ const openFile = async () => {
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
 
-    Store.update((s) => {
+    store.update((s) => {
       s.fileIn = file
     })
   }
@@ -41,7 +58,7 @@ const openFile = async () => {
 
 const clear = () => {
   // TODO: Stream cancel?
-  Store.update((s) => {
+  store.update((s) => {
     s.input = ''
     s.output = ''
     s.fileIn = ''
@@ -52,7 +69,7 @@ const clear = () => {
 }
 
 const clearOut = () => {
-  Store.update((s) => {
+  store.update((s) => {
     s.output = ''
     s.fileOut = ''
     s.signer = undefined
@@ -61,14 +78,14 @@ const clearOut = () => {
 }
 
 const setError = (err: Error) => {
-  Store.update((s) => {
+  store.update((s) => {
     s.error = err
   })
 }
 
 const reloadSigner = (kid?: string) => {
   if (!kid) {
-    Store.update((s) => {
+    store.update((s) => {
       s.signer = undefined
     })
     return
@@ -80,7 +97,7 @@ const reloadSigner = (kid?: string) => {
   }
   key(req)
     .then((resp: KeyResponse) => {
-      Store.update((s) => {
+      store.update((s) => {
         s.signer = resp.key
       })
     })
@@ -101,7 +118,7 @@ const verifyInput = (input: string) => {
   verify(req)
     .then((resp: VerifyResponse) => {
       const verified = new TextDecoder().decode(resp.data)
-      Store.update((s) => {
+      store.update((s) => {
         s.signer = resp.signer
         s.error = undefined
         s.output = verified
@@ -121,18 +138,18 @@ const verifyFileIn = (fileIn: string, dir: string) => {
     out: dir,
   }
   console.log('Verifying file...')
-  Store.update((s) => {
+  store.update((s) => {
     s.loading = true
   })
   const send = verifyFile((event: VerifyFileEvent) => {
     const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
-        Store.update((s) => {
+        store.update((s) => {
           s.loading = false
         })
       } else {
-        Store.update((s) => {
+        store.update((s) => {
           s.error = err
           s.loading = false
         })
@@ -140,7 +157,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
       return
     }
     if (res) {
-      Store.update((s) => {
+      store.update((s) => {
         s.fileOut = res?.out || ''
         s.signer = res?.signer
         s.error = undefined
@@ -148,7 +165,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
       })
     }
     if (done) {
-      Store.update((s) => {
+      store.update((s) => {
         s.loading = false
       })
     }
@@ -182,12 +199,12 @@ export default (props: {}) => {
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    Store.update((s) => {
+    store.update((s) => {
       s.input = target.value || ''
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, signer, loading} = Store.useState()
+  const {input, output, fileIn, fileOut, error, signer, loading} = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {

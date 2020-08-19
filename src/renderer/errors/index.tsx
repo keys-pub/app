@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {Store} from '../store'
+import {store} from '../store'
 
 import {ipcRenderer} from 'electron'
 import ErrorDialog from './dialog'
@@ -26,12 +26,12 @@ const restart = () => {
 }
 
 export default (_: {}) => {
-  const {error} = Store.useState((s) => ({
+  const {error} = store.useState((s) => ({
     error: s.error,
   }))
 
   const clear = () => {
-    Store.update((s) => {
+    store.update((s) => {
       s.error = undefined
     })
   }

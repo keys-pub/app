@@ -15,6 +15,7 @@ import Header from '../header'
 import TextInputView from '../textinput'
 
 import {generateID} from '../helper'
+import {Store} from 'pullstate'
 
 import {
   welcomeStatus,
@@ -25,7 +26,6 @@ import {
   errorStatus,
 } from './status'
 
-import {WormholeState, WormholeMessage, WormholeMessageType, WormholeStore as Store} from '../../store'
 import {wormhole, rand, WormholeEvent} from '../../rpc/keys'
 import {
   KeyType,
@@ -35,6 +35,20 @@ import {
   WormholeInput,
   WormholeOutput,
 } from '../../rpc/keys.d'
+
+import {WormholeMessage, WormholeMessageType} from './types'
+
+type WormholeState = {
+  sender: string
+  recipient: string
+  messages: WormholeMessage[]
+}
+
+const store = new Store<WormholeState>({
+  sender: '',
+  recipient: '',
+  messages: [],
+})
 
 export type Props = {
   sender: string
@@ -408,25 +422,25 @@ const ownerStyle: CSSProperties = {
 }
 
 export default (props: {}) => {
-  const {sender, recipient, messages} = Store.useState((s) => ({
+  const {sender, recipient, messages} = store.useState((s) => ({
     sender: s.sender,
     recipient: s.recipient,
     messages: s.messages,
   }))
 
   const setRecipient = (recipient?: string) => {
-    Store.update((s) => {
+    store.update((s) => {
       s.recipient = recipient || ''
     })
   }
   const setSender = (sender?: string) => {
-    Store.update((s) => {
+    store.update((s) => {
       s.sender = sender || ''
     })
   }
 
   const setMessages = (messages: WormholeMessage[]) => {
-    Store.update((s) => {
+    store.update((s) => {
       s.messages = messages
     })
   }

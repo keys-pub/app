@@ -30,7 +30,6 @@ import {
 } from '@material-ui/icons'
 
 import {useLocation} from 'wouter'
-import {Store} from '../store'
 
 type NavRoute = {
   name: string

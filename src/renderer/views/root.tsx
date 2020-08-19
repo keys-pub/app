@@ -8,7 +8,7 @@ import {Router} from 'wouter'
 
 import {Routes, routesMap} from './routes'
 import {useLocation} from 'wouter'
-import {Store, Error} from '../store'
+import {store, Error} from '../store'
 import {ipcRenderer, remote} from 'electron'
 
 import Auth from './auth'
@@ -132,7 +132,7 @@ const App = (_: {}) => (
 const Root = (_: {}) => {
   const [location, setLocation] = useLocation()
 
-  const {ready, unlocked, updating} = Store.useState((s) => ({
+  const {ready, unlocked, updating} = store.useState((s) => ({
     ready: s.ready,
     unlocked: s.unlocked,
     updating: s.updating,
@@ -178,7 +178,7 @@ ipcRenderer.on('log', (event, text) => {
 ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {
-    Store.update((s) => {
+    store.update((s) => {
       s.error = err
     })
   }
@@ -187,12 +187,12 @@ ipcRenderer.on('keys-started', (event, err) => {
     switch (err.code) {
       case grpc.status.PERMISSION_DENIED:
       case grpc.status.UNAUTHENTICATED:
-        Store.update((s) => {
+        store.update((s) => {
           s.unlocked = false
         })
         break
       case grpc.status.UNAVAILABLE:
-        Store.update((s) => {
+        store.update((s) => {
           s.unlocked = false
           s.error = err
         })
@@ -200,7 +200,7 @@ ipcRenderer.on('keys-started', (event, err) => {
     }
   })
 
-  Store.update((s) => {
+  store.update((s) => {
     s.ready = true
   })
 

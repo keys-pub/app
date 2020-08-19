@@ -13,7 +13,7 @@ import {
 import {ipcRenderer} from 'electron'
 
 import {useLocation} from 'wouter'
-import {Store} from '../../../store'
+import {store} from '../../../store'
 
 type Props = {}
 
@@ -66,7 +66,7 @@ export default (props: Props) => {
       })
       .then((resp: AuthUnlockResponse) => {
         ipcRenderer.send('authToken', {authToken: resp.authToken})
-        Store.update((s) => {
+        store.update((s) => {
           s.unlocked = true
         })
         setLocation('/keys/index')

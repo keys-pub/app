@@ -6,12 +6,12 @@ import {Link} from '../../components'
 
 import Alert from '@material-ui/lab/Alert'
 
-import {Store} from '../../store'
+import {store} from '../../store'
 import {ipcRenderer} from 'electron'
 
 export default (props: {}) => {
   const setUpdating = () => {
-    Store.update((s) => {
+    store.update((s) => {
       s.updating = true
     })
   }

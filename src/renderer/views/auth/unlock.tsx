@@ -11,7 +11,7 @@ import {authUnlock} from '../../rpc/keys'
 import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
 import {useLocation} from 'wouter'
 
-import {Store} from '../../store'
+import {store} from '../../store'
 
 type Props = {
   unlock: () => void
@@ -126,7 +126,7 @@ export default (_: {}) => {
   const [location, setLocation] = useLocation()
 
   const unlock = () => {
-    Store.update((s) => {
+    store.update((s) => {
       s.unlocked = true
       setLocation('/keys/index')
     })

@@ -21,6 +21,7 @@ import SignKeySelectView from '../keys/select'
 
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
+import {Store, createAsyncAction, errorResult, successResult} from 'pullstate'
 
 import {encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
@@ -32,48 +33,66 @@ import {
   EncryptFileOutput,
 } from '../../rpc/keys.d'
 
-import {EncryptStore as Store} from '../../store'
+type State = {
+  input: string
+  output: string
+  fileIn: string
+  fileOut: string
+  recipients: Key[]
+  sender?: Key
+  error?: Error
+  loading: boolean
+  // includeSelf?: boolean
+}
+
+const initialState: State = {
+  input: '',
+  output: '',
+  fileIn: '',
+  fileOut: '',
+  recipients: [],
+  loading: false,
+}
+
+const store = new Store(initialState)
 
 // TODO: Option to include self/sender
 // TODO: Default sender
 
 const openFile = async () => {
-  clearOut()
+  clear(true)
   const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {})
   if (open.canceled) {
     return
   }
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
-    Store.update((s) => {
-      s.fileIn = file || ''
+    store.update((s) => (s.fileIn = file || ''))
+  }
+}
+
+const clear = (outOnly: boolean) => {
+  if (outOnly) {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = ''
+      s.error = undefined
+    })
+  } else {
+    store.update((s) => {
+      s.input = ''
+      s.output = ''
+      s.fileIn = ''
+      s.fileOut = ''
+      s.error = undefined
+      s.loading = false
     })
   }
 }
 
-const clear = () => {
-  // TODO: Stream cancel?
-  Store.update((s) => {
-    s.input = ''
-    s.output = ''
-    s.fileIn = ''
-    s.fileOut = ''
-    s.error = undefined
-    s.loading = false
-  })
-}
-
-const clearOut = () => {
-  Store.update((s) => {
-    s.output = ''
-    s.fileOut = ''
-    s.error = undefined
-  })
-}
-
-const encryptInput = (input: string, recipients: Key[], sender?: Key) => {
+const encryptInput = async (input: string, recipients: Key[], sender?: Key) => {
   if (!input || recipients.length == 0) {
-    clearOut()
+    clear(true)
     return
   }
 
@@ -88,24 +107,24 @@ const encryptInput = (input: string, recipients: Key[], sender?: Key) => {
     sender: sender?.id || '',
     mode: EncryptMode.DEFAULT_ENCRYPT,
   }
-  encrypt(req)
-    .then((resp: EncryptResponse) => {
-      const encrypted = new TextDecoder().decode(resp.data)
-      Store.update((s) => {
-        s.output = encrypted
-        s.fileOut = ''
-        s.error = undefined
-      })
+
+  try {
+    const resp = await encrypt(req)
+    const encrypted = new TextDecoder().decode(resp.data)
+    store.update((s) => {
+      s.output = encrypted
+      s.fileOut = ''
+      s.error = undefined
     })
-    .catch((err: Error) => {
-      Store.update((s) => {
-        s.error = err
-      })
+  } catch (err) {
+    store.update((s) => {
+      s.error = err
     })
+  }
 }
 
 const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: Key) => {
-  clearOut()
+  clear(true)
   if (fileIn == '' || recipients.length == 0) {
     return
   }
@@ -124,33 +143,33 @@ const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: 
   }
 
   console.log('Encrypting file...')
-  Store.update((s) => {
+  store.update((s) => {
     s.loading = true
   })
   const send = encryptFile((event: EncryptFileEvent) => {
     const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
-        Store.update((s) => {
+        store.update((s) => {
           s.loading = false
         })
       } else {
-        Store.update((s) => {
-          s.error = err
+        store.update((s) => {
           s.loading = false
+          s.error = err
         })
       }
       return
     }
     if (res) {
-      Store.update((s) => {
+      store.update((s) => {
         s.output = ''
         s.fileOut = res.out || ''
         s.error = undefined
       })
     }
     if (done) {
-      Store.update((s) => {
+      store.update((s) => {
         s.loading = false
       })
     }
@@ -186,7 +205,7 @@ export default (props: Props) => {
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    Store.update((s) => {
+    store.update((s) => {
       s.input = target.value || ''
     })
   }, [])
@@ -201,7 +220,7 @@ export default (props: Props) => {
     sender,
     // includeSelf,
     loading,
-  } = Store.useState()
+  } = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -222,9 +241,9 @@ export default (props: Props) => {
         <AutocompletesView
           keys={recipients}
           disabled={loading}
-          onChange={(r: Key[]) =>
-            Store.update((s) => {
-              s.recipients = r
+          onChange={(recipients: Key[]) =>
+            store.update((s) => {
+              s.recipients = recipients
             })
           }
           placeholder="Recipients"
@@ -237,11 +256,11 @@ export default (props: Props) => {
         <Box display="flex" flex={1}>
           <SignKeySelectView
             value={sender}
-            onChange={(sender?: Key) => {
-              Store.update((s) => {
+            onChange={(sender?: Key) =>
+              store.update((s) => {
                 s.sender = sender
               })
-            }}
+            }
             disabled={loading}
             placeholder="Anonymous"
             itemLabel="Signed by"
@@ -267,7 +286,7 @@ export default (props: Props) => {
         {fileIn && (
           <Box style={{paddingTop: 6, paddingLeft: 8}}>
             <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
-            <Link inline onClick={clear} disabled={loading}>
+            <Link inline onClick={() => clear(false)} disabled={loading}>
               Clear
             </Link>
           </Box>
@@ -305,7 +324,7 @@ export default (props: Props) => {
                 >
                   Type text to encrypt or{' '}
                 </Typography>
-                <Link inline onClick={openFile}>
+                <Link inline onClick={() => openFile()}>
                   select a file
                 </Link>
                 <Typography style={{display: 'inline'}}>.</Typography>

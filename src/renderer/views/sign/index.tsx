@@ -14,8 +14,25 @@ import SignKeySelectView from '../keys/select'
 
 import {sign, signFile, SignFileEvent} from '../../rpc/keys'
 import {Key, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
+import {Store} from 'pullstate'
 
-import {SignStore as Store} from '../../store'
+type State = {
+  input: string
+  output: string
+  fileIn: string
+  fileOut: string
+  signer?: Key
+  error?: Error
+  loading: boolean
+}
+
+const store = new Store<State>({
+  input: '',
+  output: '',
+  fileIn: '',
+  fileOut: '',
+  loading: false,
+})
 
 const openFile = async () => {
   clearOut()
@@ -26,7 +43,7 @@ const openFile = async () => {
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
 
-    Store.update((s) => {
+    store.update((s) => {
       s.fileIn = file || ''
     })
   }
@@ -34,7 +51,7 @@ const openFile = async () => {
 
 const clear = () => {
   // TODO: Stream cancel?
-  Store.update((s) => {
+  store.update((s) => {
     s.input = ''
     s.output = ''
     s.fileIn = ''
@@ -46,7 +63,7 @@ const clear = () => {
 }
 
 const clearOut = () => {
-  Store.update((s) => {
+  store.update((s) => {
     s.output = ''
     s.fileOut = ''
     s.error = undefined
@@ -54,7 +71,7 @@ const clearOut = () => {
 }
 
 const setError = (err: Error) => {
-  Store.update((s) => {
+  store.update((s) => {
     s.error = err
   })
 }
@@ -76,7 +93,7 @@ const signInput = (input: string, signer?: Key) => {
   sign(req)
     .then((resp: SignResponse) => {
       const signed = new TextDecoder().decode(resp.data)
-      Store.update((s) => {
+      store.update((s) => {
         s.output = signed
         s.fileOut = ''
         s.error = undefined
@@ -98,18 +115,18 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
   }
 
   console.log('Signing file...')
-  Store.update((s) => {
+  store.update((s) => {
     s.loading = true
   })
   const send = signFile((event: SignFileEvent) => {
     const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
-        Store.update((s) => {
+        store.update((s) => {
           s.loading = false
         })
       } else {
-        Store.update((s) => {
+        store.update((s) => {
           s.error = err
           s.loading = false
         })
@@ -117,14 +134,14 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
       return
     }
     if (res) {
-      Store.update((s) => {
+      store.update((s) => {
         s.output = ''
         s.fileOut = res?.out || ''
         s.error = undefined
       })
     }
     if (done) {
-      Store.update((s) => {
+      store.update((s) => {
         s.loading = false
       })
     }
@@ -165,12 +182,12 @@ export default (props: Props) => {
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    Store.update((s) => {
+    store.update((s) => {
       s.input = target.value || ''
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, signer, loading} = Store.useState()
+  const {input, output, fileIn, fileOut, error, signer, loading} = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -191,7 +208,7 @@ export default (props: Props) => {
       <SignKeySelectView
         value={signer}
         onChange={(k) => {
-          Store.update((s) => {
+          store.update((s) => {
             s.signer = k
           })
         }}

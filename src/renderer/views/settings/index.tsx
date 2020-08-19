@@ -18,7 +18,7 @@ import {ipcRenderer, remote} from 'electron'
 
 import Header from '../header'
 import ElectronStore from 'electron-store'
-import {Store} from '../../store'
+import {store} from '../../store'
 import {useLocation} from 'wouter'
 
 const version = remote.app.getVersion()
@@ -36,7 +36,7 @@ export default (props: {}) => {
 
   const forceUpdate = () => {
     ipcRenderer.send('update-force')
-    Store.update((s) => {
+    store.update((s) => {
       s.updating = true
     })
   }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Store} from '../../store'
+import {store} from '../../store'
 
 import {
   Box,
@@ -48,7 +48,7 @@ export default (props: Props) => {
     {name: 'Verify', icon: VerifyIcon, id: 'verify'},
   ]
 
-  const selected = Store.useState((s) => s.selectedTool)
+  const selected = store.useState((s) => s.selectedTool)
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
@@ -63,7 +63,7 @@ export default (props: Props) => {
         >
           {navs.map((nav, index) =>
             row(nav, index, selected == nav.id, () =>
-              Store.update((s) => {
+              store.update((s) => {
                 s.selectedTool = nav.id
               })
             )
