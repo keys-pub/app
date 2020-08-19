@@ -286,16 +286,15 @@ export const signFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.SignFile):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.SignFile):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.SignFile) done')
 	}
 	const res: SignFileEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -320,16 +319,15 @@ export const signStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.SignStream):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.SignStream):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.SignStream) done')
 	}
 	const res: SignStreamEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -373,16 +371,15 @@ export const verifyFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.VerifyFile):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.VerifyFile):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.VerifyFile) done')
 	}
 	const res: VerifyFileEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -407,16 +404,15 @@ export const verifyStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.VerifyStream):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.VerifyStream):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.VerifyStream) done')
 	}
 	const res: VerifyStreamEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -517,16 +513,15 @@ export const encryptStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.EncryptStream):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.EncryptStream):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.EncryptStream) done')
 	}
 	const res: EncryptStreamEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -551,16 +546,15 @@ export const encryptFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.EncryptFile):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.EncryptFile):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.EncryptFile) done')
 	}
 	const res: EncryptFileEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -604,16 +598,15 @@ export const decryptStream = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.DecryptStream):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.DecryptStream):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.DecryptStream) done')
 	}
 	const res: DecryptStreamEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -638,16 +631,15 @@ export const decryptFile = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.DecryptFile):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.DecryptFile):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.DecryptFile) done')
 	}
 	const res: DecryptFileEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)
@@ -1014,16 +1006,15 @@ export const wormhole = (
       ipcRenderer.removeAllListeners(reply)
 	}
 	if (arg.err) {
-	  console.error('RPC-stream error (Keys.Wormhole):', arg.err)	  
-	  const err = {message: arg.err.details, code: arg.err.code, name: 'RPCError'}
-      errHandler(err)
+	  console.error('RPC-stream error (Keys.Wormhole):', arg.err)
+      errHandler(arg.err)
     }
     if (!!arg.done) {
       console.log('RPC-stream (Keys.Wormhole) done')
 	}
 	const res: WormholeEvent = {		
 		res: arg.resp,
-		err: arg.err ? {message: arg.err.details, code: arg.err.code, name: 'RPCError'} : undefined, 
+		err: arg.err,
 		done: !!arg.done, 
 	}
 	f(res)

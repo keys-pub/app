@@ -99,7 +99,11 @@ const reloadSender = (kid?: string) => {
         s.sender = resp.key
       })
     })
-    .catch((err: Error) => store.update((s) => (s.error = err)))
+    .catch((err: Error) => {
+      store.update((s) => {
+        s.error = err
+      })
+    })
 }
 
 const decryptInput = (input: string) => {
@@ -124,7 +128,11 @@ const decryptInput = (input: string) => {
         s.mode = resp.mode
       })
     })
-    .catch((err: Error) => store.update((s) => (s.error = err)))
+    .catch((err: Error) =>
+      store.update((s) => {
+        s.error = err
+      })
+    )
 }
 
 const decryptFileIn = (fileIn: string, dir: string) => {
@@ -194,7 +202,7 @@ const DecryptToButton = (props: {onClick: () => void; disabled: boolean}) => (
   </Box>
 )
 
-export default (props: {}) => {
+export default (_: {}) => {
   const inputRef = React.useRef<HTMLInputElement>()
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
@@ -205,6 +213,8 @@ export default (props: {}) => {
   }, [])
 
   const {input, output, fileIn, fileOut, error, sender, mode, loading} = store.useState()
+
+  console.log('render, error:', error)
 
   React.useEffect(() => {
     if (fileIn == '') {

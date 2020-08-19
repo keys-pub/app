@@ -12,6 +12,7 @@ import DisableDialog from './disable'
 import Header from '../header'
 
 import {dateString} from '../helper'
+import {Store} from 'pullstate'
 
 import {vaultAuth, vaultStatus, vaultSync} from '../../rpc/keys'
 import {
@@ -23,86 +24,86 @@ import {
   VaultStatusResponse,
 } from '../../rpc/keys.d'
 
-type Props = {}
-
 type State = {
-  loading: boolean
-  openDisable: boolean
-  snack?: SnackProps
-  snackOpen: boolean
   phrase: string
-  status?: VaultStatusResponse
+  status: VaultStatusResponse | null
 }
 
-export default class VaultView extends React.Component<Props, State> {
-  state: State = {
-    loading: false,
-    openDisable: false,
-    phrase: '',
-    snackOpen: false,
-  }
+const store = new Store<State>({
+  phrase: '',
+  status: null,
+})
 
-  componentDidMount() {
-    this.status()
-  }
+export default (_: {}) => {
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
+  const [disableOpen, setDisableOpen] = React.useState(false)
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if (this.props != prevProps) {
-      this.status()
+  const {phrase, status} = store.useState()
+  console.log('status:', status)
+
+  React.useEffect(() => {
+    reloadStatus()
+  }, [])
+
+  const reloadStatus = async () => {
+    try {
+      const req: VaultStatusRequest = {}
+      const resp = await vaultStatus(req)
+      console.log('Vault status:', resp)
+      store.update((s) => {
+        s.status = resp
+      })
+    } catch (err) {
+      setSnack({message: err.message, alert: 'error'})
+      setSnackOpen(true)
     }
   }
 
-  status = () => {
-    const req: VaultStatusRequest = {}
-    vaultStatus(req)
-      .then((resp: VaultStatusResponse) => {
-        console.log('Vault status:', resp)
-        this.setState({status: resp})
-      })
-      .catch((err: Error) => {
-        this.setState({snack: {message: err.message, alert: 'error'}, snackOpen: true})
-      })
-  }
-
-  openDisable = () => {
-    this.setState({openDisable: true})
-  }
-
-  closeDisable = (snack: string) => {
-    this.setState({openDisable: false, snack: {message: snack, duration: 4000}, snackOpen: !!snack})
-    this.status()
-  }
-
-  vaultAuth = () => {
+  const generateAuth = () => {
+    setLoading(true)
     const req: VaultAuthRequest = {}
-    this.setState({loading: true})
     vaultAuth(req)
       .then((resp: VaultAuthResponse) => {
-        this.setState({loading: false, phrase: resp.phrase || ''})
+        store.update((s) => {
+          s.phrase = resp.phrase || ''
+        })
+        setLoading(false)
       })
       .catch((err: Error) => {
-        this.setState({loading: false, snack: {message: err.message, alert: 'error'}, snackOpen: true})
+        setLoading(false)
+        setSnack({message: err.message, alert: 'error'})
+        setSnackOpen(true)
       })
   }
 
-  vaultAuthClear = () => {
-    this.setState({phrase: ''})
+  const authClear = () => {
+    store.update((s) => (s.phrase = ''))
   }
 
-  sync = () => {
-    this.setState({loading: true})
+  const sync = () => {
+    setLoading(true)
     const req: VaultSyncRequest = {}
     vaultSync(req)
       .then((resp: VaultSyncResponse) => {
-        this.setState({loading: false})
-        this.status()
+        setLoading(false)
+        reloadStatus()
       })
       .catch((err: Error) => {
-        this.setState({loading: false, snack: {message: err.message, alert: 'error'}, snackOpen: true})
+        setLoading(false)
+        setSnack({message: err.message, alert: 'error'})
+        setSnackOpen(true)
       })
   }
 
-  renderEnable() {
+  const closeDisable = (snack: string) => {
+    setSnack({message: snack, duration: 4000})
+    setSnackOpen(!!snack)
+    reloadStatus()
+  }
+
+  const renderEnable = () => {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
@@ -117,20 +118,14 @@ export default class VaultView extends React.Component<Props, State> {
           </Link>
           .
         </Typography>
-        <Button
-          color="primary"
-          variant="outlined"
-          onClick={this.sync}
-          disabled={this.state.loading}
-          size="small"
-        >
+        <Button color="primary" variant="outlined" onClick={sync} disabled={loading} size="small">
           Enable Sync
         </Button>
       </Box>
     )
   }
 
-  renderInfo() {
+  const renderInfo = () => {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
@@ -138,27 +133,21 @@ export default class VaultView extends React.Component<Props, State> {
         </Typography>
         <Typography>
           <span style={{display: 'inline-block', width: 100}}>Vault API Key:</span>
-          <span style={{...styles.mono}}>{this.state?.status?.kid}</span>
+          <span style={{...styles.mono}}>{status?.kid}</span>
         </Typography>
         <Typography style={{paddingBottom: 6}}>
           <span style={{display: 'inline-block', width: 100}}>Last Sync: </span>
-          {dateString(this.state?.status?.syncedAt)}
+          {dateString(status?.syncedAt)}
         </Typography>
 
-        <Button
-          color="primary"
-          variant="outlined"
-          onClick={this.sync}
-          disabled={this.state.loading}
-          size="small"
-        >
+        <Button color="primary" variant="outlined" onClick={sync} disabled={loading} size="small">
           Sync Now
         </Button>
       </Box>
     )
   }
 
-  renderDelete() {
+  const renderDelete = () => {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
@@ -178,8 +167,8 @@ export default class VaultView extends React.Component<Props, State> {
         <Button
           color="secondary"
           variant="outlined"
-          onClick={this.openDisable}
-          disabled={this.state.loading}
+          onClick={() => setDisableOpen(true)}
+          disabled={loading}
           size="small"
         >
           Delete Vault Sync
@@ -188,26 +177,24 @@ export default class VaultView extends React.Component<Props, State> {
     )
   }
 
-  renderAuth() {
+  const renderAuth = () => {
     return (
       <Box>
         <Typography variant="h6" style={{paddingBottom: 6}}>
           Connect another Device
         </Typography>
-        {this.state.phrase && (
+        {phrase && (
           <Box flex={1} flexDirection="column">
             <Typography style={{paddingBottom: 10, maxWidth: 500}}>
               This is a vault auth phrase that allows another device to sync with this vault.
               <br />
               This will expire in 5 minutes.
             </Typography>
-            <Typography style={{...styles.mono, paddingBottom: 5, width: 500}}>
-              {this.state.phrase}
-            </Typography>
-            <Link onClick={this.vaultAuthClear}>Clear</Link>
+            <Typography style={{...styles.mono, paddingBottom: 5, width: 500}}>{phrase}</Typography>
+            <Link onClick={authClear}>Clear</Link>
           </Box>
         )}
-        {!this.state.phrase && (
+        {!phrase && (
           <Box flex={1} flexDirection="column">
             <Typography style={{paddingBottom: 10, maxWidth: 500}}>
               Creating a vault auth phrase allows another device to sync to this vault. <br />A generated auth
@@ -218,13 +205,7 @@ export default class VaultView extends React.Component<Props, State> {
               </Link>
               .
             </Typography>
-            <Button
-              color="primary"
-              variant="outlined"
-              onClick={this.vaultAuth}
-              disabled={this.state.loading}
-              size="small"
-            >
+            <Button color="primary" variant="outlined" onClick={generateAuth} disabled={loading} size="small">
               Generate Vault Auth Phrase
             </Button>
           </Box>
@@ -233,34 +214,29 @@ export default class VaultView extends React.Component<Props, State> {
     )
   }
 
-  render() {
-    if (!this.state?.status) return null
+  console.log('Render:', status)
+  if (!status) return null
+  const syncEnabled = !!status?.kid
 
-    const syncEnabled = !!this.state?.status?.kid
-    return (
-      <Box display="flex" flex={1} flexDirection="column">
-        <Header />
-        {!this.state.loading && <Box style={{marginBottom: 4}} />}
-        {this.state.loading && <LinearProgress />}
+  return (
+    <Box display="flex" flex={1} flexDirection="column">
+      <Header />
+      {!loading && <Box style={{marginBottom: 4}} />}
+      {loading && <LinearProgress />}
 
-        {!syncEnabled && <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderEnable()}</Box>}
-        {syncEnabled && (
-          <Box>
-            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderInfo()}</Box>
-            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderAuth()}</Box>
-            <Box style={{marginLeft: 20, marginBottom: 20}}>{this.renderDelete()}</Box>
-          </Box>
-        )}
+      {!syncEnabled && <Box style={{marginLeft: 20, marginBottom: 20}}>{renderEnable()}</Box>}
+      {syncEnabled && (
+        <Box>
+          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderInfo()}</Box>
+          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderAuth()}</Box>
+          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderDelete()}</Box>
+        </Box>
+      )}
 
-        <DisableDialog open={this.state.openDisable} close={(snack) => this.closeDisable(snack)} />
-        <Snack
-          open={this.state.snackOpen}
-          {...this.state.snack}
-          onClose={() => this.setState({snackOpen: false})}
-        />
-      </Box>
-    )
-  }
+      <DisableDialog open={disableOpen} close={(snack) => closeDisable(snack)} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
+    </Box>
+  )
 }
 
 const cstyles = {

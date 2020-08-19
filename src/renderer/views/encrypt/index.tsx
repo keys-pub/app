@@ -67,7 +67,9 @@ const openFile = async () => {
   }
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
-    store.update((s) => (s.fileIn = file || ''))
+    store.update((s) => {
+      s.fileIn = file || ''
+    })
   }
 }
 
@@ -147,6 +149,7 @@ const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: 
     s.loading = true
   })
   const send = encryptFile((event: EncryptFileEvent) => {
+    console.log('Encrypt file:', event)
     const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {

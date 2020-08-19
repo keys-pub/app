@@ -421,7 +421,7 @@ const ownerStyle: CSSProperties = {
   maxWidth: '60%',
 }
 
-export default (props: {}) => {
+export default (_: {}) => {
   const {sender, recipient, messages} = store.useState((s) => ({
     sender: s.sender,
     recipient: s.recipient,
