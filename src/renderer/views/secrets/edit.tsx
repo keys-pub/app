@@ -150,7 +150,7 @@ export default class SecretEditView extends React.Component<Props, State> {
 
   renderPassword() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column">
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
@@ -218,13 +218,14 @@ export default class SecretEditView extends React.Component<Props, State> {
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
+        <Box display="flex" flexGrow={1} />
       </Box>
     )
   }
 
   renderNote() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column">
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
@@ -261,23 +262,27 @@ export default class SecretEditView extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderEditActions()}
         <Divider />
-        <Box
-          display="flex"
-          flexDirection="column"
-          style={{
-            overflowY: 'auto',
-            height: 'calc(100vh - 94px)',
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingRight: 10,
-          }}
-        >
-          {this.props.isNew && (
-            <FormControl style={{marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
-          )}
-          <Box display="flex" flexDirection="column" marginLeft={1} marginRight={1}>
-            {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
-            {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
+        <Box display="flex" flexDirection="row" flex={1}>
+          <Divider orientation="vertical" />
+          <Box
+            display="flex"
+            flexDirection="column"
+            flex={1}
+            style={{
+              overflowY: 'auto',
+              height: 'calc(100vh - 94px)',
+              paddingTop: 10,
+              paddingRight: 10,
+            }}
+          >
+            {this.props.isNew && (
+              <FormControl style={{marginLeft: 14, marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
+            )}
+
+            <Box display="flex" flexDirection="column" flex={1} style={{marginLeft: 14}}>
+              {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
+              {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
+            </Box>
           </Box>
         </Box>
       </Box>
