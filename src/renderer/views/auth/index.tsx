@@ -10,13 +10,10 @@ import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '../../rpc
 export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
 
-  const refresh = () => {
+  const refresh = async () => {
     const req: RuntimeStatusRequest = {}
-    runtimeStatus(req)
-      .then((resp: RuntimeStatusResponse) => {
-        setStatus(resp.authStatus!)
-      })
-      .catch((err: Error) => {})
+    const resp = await runtimeStatus(req)
+    setStatus(resp.authStatus!)
   }
 
   React.useEffect(() => {
