@@ -67,6 +67,7 @@ export default (_: {}) => {
     try {
       const resp = await authUnlock(req)
       console.log('Auth unlocking...')
+      // TODO: So finally runs before unlocked
       setTimeout(() => {
         ipcRenderer.send('authToken', {authToken: resp.authToken})
         unlocked()
