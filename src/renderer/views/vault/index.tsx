@@ -79,7 +79,9 @@ export default (_: {}) => {
   }
 
   const authClear = () => {
-    store.update((s) => (s.phrase = ''))
+    store.update((s) => {
+      s.phrase = ''
+    })
   }
 
   const sync = () => {
