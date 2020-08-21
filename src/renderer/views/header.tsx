@@ -78,7 +78,7 @@ export default (props: Props) => {
           )}
           <Box display="flex" flexGrow={1} className="drag" />
           {!props.noLock && (
-            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}} id="lockButton">
               <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
             </IconButton>
           )}

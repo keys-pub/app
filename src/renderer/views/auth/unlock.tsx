@@ -27,13 +27,6 @@ export default (_: {}) => {
     setError(undefined)
   }, [])
 
-  const unlocked = () => {
-    store.update((s) => {
-      s.unlocked = true
-      setLocation('/keys/index')
-    })
-  }
-
   const onKeyDown = (event: React.KeyboardEvent<any>) => {
     if (event.key === 'Enter') {
       unlock()
@@ -67,19 +60,20 @@ export default (_: {}) => {
     try {
       const resp = await authUnlock(req)
       console.log('Auth unlocking...')
-      // TODO: So finally runs before unlocked
-      setTimeout(() => {
-        ipcRenderer.send('authToken', {authToken: resp.authToken})
-        unlocked()
-      }, 10)
-    } catch (err) {
-      setError(err)
-    } finally {
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
+
       clearTimeout(timeout)
       setLoading(false)
       setProgress(false)
-      inputRef.current?.focus()
-      inputRef.current?.select()
+      store.update((s) => {
+        s.unlocked = true
+        setLocation('/keys/index')
+      })
+    } catch (err) {
+      clearTimeout(timeout)
+      setLoading(false)
+      setProgress(false)
+      setError(err)
     }
   }
 
@@ -90,6 +84,7 @@ export default (_: {}) => {
       <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter your password to unlock.</Typography>
       <FormControl error={!!error} style={{marginBottom: 10}}>
         <TextField
+          id="unlockPasswordInput"
           autoFocus
           label="Password"
           variant="outlined"
@@ -107,7 +102,14 @@ export default (_: {}) => {
         <FormHelperText id="component-error-text">{error?.message || ' '}</FormHelperText>
       </FormControl>
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
-        <Button color="primary" variant="outlined" size="large" onClick={unlock} disabled={loading}>
+        <Button
+          color="primary"
+          variant="outlined"
+          size="large"
+          onClick={unlock}
+          disabled={loading}
+          id="unlockButton"
+        >
           Unlock
         </Button>
       </Box>

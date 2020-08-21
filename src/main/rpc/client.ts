@@ -5,6 +5,7 @@ import * as protoLoader from '@grpc/proto-loader'
 import * as fs from 'fs'
 import * as path from 'path'
 import {appResourcesPath, appSupportPath} from '../paths'
+import {getPort} from '../env'
 
 let keysClient: any = null
 let fido2Client: any = null
@@ -57,11 +58,9 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
     throw new Error('proto descriptor missing service ' + serviceName)
   }
 
-  const port = getenv.int('KEYS_PORT', 22405)
+  const port = getPort()
   console.log('Using client on port', port)
-
   const cl = new serviceCls('localhost:' + port, creds())
-
   return cl
 }
 

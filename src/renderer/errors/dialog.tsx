@@ -16,7 +16,7 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {Store, Error} from '../store'
+import {Error} from '../store'
 
 import ErrorView from './view'
 
@@ -42,9 +42,9 @@ export default (props: Props) => {
         {props.error && <ErrorView error={props.error} />}
       </DialogContent>
       <DialogActions>
-        <Button color="primary" onClick={props.clear}>
+        {/* <Button color="primary" onClick={props.clear}>
           Clear Error
-        </Button>
+        </Button> */}
         <Button color="secondary" onClick={props.restart}>
           Restart
         </Button>

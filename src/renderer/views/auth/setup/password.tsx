@@ -21,6 +21,7 @@ export default (props: Props) => {
   // const inputPasswordRef = React.useRef<HTMLInputElement>()
   const inputPasswordConfirmRef = React.useRef<HTMLInputElement>()
 
+  const [location, setLocation] = useLocation()
   const [password, setPassword] = React.useState('')
   const [passwordConfirm, setPasswordConfirm] = React.useState('')
   const [error, setError] = React.useState<Error>()
@@ -36,7 +37,7 @@ export default (props: Props) => {
     setPasswordConfirm(target.value || '')
   }, [])
 
-  const authSetPassword = () => {
+  const authSetPassword = async () => {
     if (password != passwordConfirm) {
       setError(new Error("Passwords don't match"))
       return
@@ -46,35 +47,30 @@ export default (props: Props) => {
       return
     }
 
-    const [location, setLocation] = useLocation()
-
-    const req: AuthSetupRequest = {
-      secret: password,
-      type: AuthType.PASSWORD_AUTH,
-    }
     setLoading(true)
     setError(undefined)
-
-    authSetup(req)
-      .then((resp: AuthSetupResponse) => {
-        const reqUnlock: AuthUnlockRequest = {
-          secret: password,
-          type: AuthType.PASSWORD_AUTH,
-          client: 'app',
-        }
-        return authUnlock(reqUnlock)
+    try {
+      const req: AuthSetupRequest = {
+        secret: password,
+        type: AuthType.PASSWORD_AUTH,
+      }
+      const setup: AuthSetupResponse = await authSetup(req)
+      const reqUnlock: AuthUnlockRequest = {
+        secret: password,
+        type: AuthType.PASSWORD_AUTH,
+        client: 'app',
+      }
+      const unlock: AuthUnlockResponse = await authUnlock(reqUnlock)
+      ipcRenderer.send('authToken', {authToken: unlock.authToken})
+      setLoading(false)
+      setLocation('/keys/index')
+      store.update((s) => {
+        s.unlocked = true
       })
-      .then((resp: AuthUnlockResponse) => {
-        ipcRenderer.send('authToken', {authToken: resp.authToken})
-        store.update((s) => {
-          s.unlocked = true
-        })
-        setLocation('/keys/index')
-      })
-      .catch(setError)
-      .finally(() => {
-        setLoading(false)
-      })
+    } catch (err) {
+      setLoading(false)
+      setError(err)
+    }
   }
 
   const onKeyDownPassword = (event: React.KeyboardEvent<any>) => {
@@ -91,12 +87,12 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <Typography style={{paddingTop: 0, paddingBottom: 20, width: 550, textAlign: 'center'}}>
-        Hi! If this is the first time you are here, let's create a password. This password will be used to
-        encrypt your keys and secrets and will be required to unlock your vault. This password is not stored
-        or transmitted anywhere.
+        Hi! Let's create a password. This password will be used to encrypt your keys and secrets and will be
+        required to unlock your vault.
       </Typography>
       <FormControl error={!!error}>
         <TextField
+          id="setupPasswordInput"
           autoFocus
           label="Create a Password"
           variant="outlined"
@@ -112,6 +108,7 @@ export default (props: Props) => {
         />
         <Box padding={1} />
         <TextField
+          id="setupPasswordConfirmInput"
           label="Confirm Password"
           variant="outlined"
           type="password"
@@ -128,7 +125,13 @@ export default (props: Props) => {
         <FormHelperText id="component-error-text">{error?.message || ' '}</FormHelperText>
       </FormControl>
       <Box display="flex" flexDirection="row" justifyContent="center" style={{width: 400}}>
-        <Button color="primary" variant="outlined" onClick={authSetPassword} disabled={loading}>
+        <Button
+          color="primary"
+          variant="outlined"
+          onClick={authSetPassword}
+          disabled={loading}
+          id="setupPasswordButton"
+        >
           Set Password
         </Button>
       </Box>

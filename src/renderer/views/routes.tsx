@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {Switch, Route} from 'wouter'
 
+import {Box} from '@material-ui/core'
 import DebugView from './settings/debug'
 
 import SecretsView from './secrets'
@@ -52,7 +53,9 @@ export const Routes = (_: Props) => {
     <Switch>
       {routes.map((r: RouteInfo) => (
         <Route path={r.path} key={r.path || 'default'}>
-          {r.component()}
+          <Box display="flex" flex={1} id={r.path}>
+            {r.component()}
+          </Box>
         </Route>
       ))}
     </Switch>

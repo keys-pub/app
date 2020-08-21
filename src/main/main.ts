@@ -12,7 +12,7 @@ const windowStateKeeper = require('electron-window-state')
 
 import {MenuActionType} from './menu'
 
-import {keysStart} from './service'
+import {keysStart, keysStop} from './service'
 import {update, UpdateResult} from './updater'
 
 import {rpcRegister} from './rpc'
@@ -48,8 +48,8 @@ app.on('ready', async () => {
     minHeight: 600,
 
     webPreferences: {
-      // TODO: Remove this
       nodeIntegration: true,
+      // devTools: false,
     },
   }
 
@@ -126,12 +126,17 @@ app.on('ready', async () => {
   menuBuilder.buildMenu()
 })
 
+app.on('quit', async () => {
+  // TODO: stop keysd by default on app exit?
+  if (process.env.KEYS_STOP_ON_EXIT != '') {
+    await keysStop()
+  }
+})
+
 ipcMain.removeAllListeners('reload-app')
 ipcMain.on('reload-app', (event, arg) => {
   if (mainWindow) reloadApp(mainWindow)
 })
-
-// TODO: stop keysd on app exit?
 
 ipcMain.removeAllListeners('keys-start')
 ipcMain.on('keys-start', (event, arg) => {

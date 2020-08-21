@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
+import Header from '../../header'
 import Logo from '../../logo'
 import Link from '../../../components/link'
 
@@ -22,6 +23,7 @@ export default class AuthSetupView extends React.Component<Props, State> {
   renderIntro() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
+        <Header noBack />
         <Logo top={60} />
         <AuthSetupPasswordView />
 
@@ -29,7 +31,7 @@ export default class AuthSetupView extends React.Component<Props, State> {
           <Typography style={{width: 550, marginTop: 10, textAlign: 'center'}}>
             Do you want to{' '}
             <Link span onClick={this.connect}>
-              connect to an existing vault
+              connect to an existing vault?
             </Link>
           </Typography>
         </Box>

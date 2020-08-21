@@ -52,7 +52,6 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   reset = () => {
-    // store.dispatch({type: 'INTRO', payload: false})
     this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
   }
 
@@ -79,7 +78,6 @@ export default class KeyCreateDialog extends React.Component<Props> {
       keyGenerate(req)
         .then((resp: KeyGenerateResponse) => {
           this.props.onChange()
-          // store.dispatch({type: 'INTRO', payload: false})
           this.setState({kid: resp.kid, step: 'CREATED', loading: false})
         })
         .catch((err: Error) => {
@@ -121,6 +119,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         disableBackdropClick
         // TransitionComponent={transition}
         keepMounted
+        id="keyGenerateDialog"
       >
         <DialogTitle loading={this.state.loading} onClose={this.close}>
           Generate Key
@@ -148,7 +147,9 @@ export default class KeyCreateDialog extends React.Component<Props> {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.close}>Close</Button>
+          <Button onClick={this.close} id="keyGenerateCloseButton">
+            Close
+          </Button>
           <Button autoFocus onClick={this.keyGenerate} color="primary">
             Generate
           </Button>

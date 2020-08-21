@@ -34,6 +34,8 @@ import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 import {IDView} from '../key/content'
 
+import {store} from '../../store'
+
 import Header from '../header'
 
 import KeyCreateDialog from '../key/create'
@@ -86,7 +88,7 @@ type State = {
   syncing: boolean
 }
 
-export default class KeysView extends React.Component<Props, State> {
+class KeysView extends React.Component<Props, State> {
   state: State = {
     keys: [],
     input: '',
@@ -151,6 +153,9 @@ export default class KeysView extends React.Component<Props, State> {
         // If we don't have keys and intro, then show create dialog
         if (keys.length == 0 && this.props.intro) {
           this.setState({openCreate: 'INTRO'})
+          store.update((s) => {
+            s.intro = false
+          })
         }
       })
       .catch(this.snackErr)
@@ -342,7 +347,7 @@ export default class KeysView extends React.Component<Props, State> {
     const direction = directionString(sortDirection)
 
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column" flex={1} id="keysView">
         {this.renderHeader()}
         <Divider />
         <Box display="flex" flexDirection="column" style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
@@ -445,4 +450,10 @@ export default class KeysView extends React.Component<Props, State> {
       </Box>
     )
   }
+}
+
+export default (_: {}) => {
+  const intro = store.useState((s) => s.intro)
+
+  return <KeysView intro={intro} />
 }
