@@ -104,23 +104,24 @@ export default class DBView extends React.Component<Props, State> {
               <TableBody>
                 {documents.map((doc: Document, index: number) => (
                   <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                    <Box style={{paddingLeft: 8, paddingTop: 8, paddingBottom: 8}}>
-                      <Typography
-                        style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}
-                      >
-                        {doc.path}
-                      </Typography>
-                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                        {doc.value}
-                      </Typography>
-                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                        {dateString(doc.createdAt)}
-                      </Typography>
-                      <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
-                        {dateString(doc.updatedAt)}
-                      </Typography>
-                    </Box>
-                    <Divider />
+                    <TableCell>
+                      <Box display="flex" flexDirection="column">
+                        <Typography
+                          style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}
+                        >
+                          {doc.path}
+                        </Typography>
+                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                          {doc.value}
+                        </Typography>
+                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                          {dateString(doc.createdAt)}
+                        </Typography>
+                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                          {dateString(doc.updatedAt)}
+                        </Typography>
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
