@@ -33,7 +33,7 @@ var dateOptions = {
 export const dateString = (ms?: any): string => {
   // ms can be a number or Long
   if (!ms) return ''
-  const l = ms.low ? Long.fromBits(ms.low, ms.high, ms.unsigned) : ms
+  const l = ms.low != undefined ? Long.fromBits(ms.low, ms.high, ms.unsigned) : ms
   const s = l.toString()
   const n = parseInt(s)
   if (n === 0) {
