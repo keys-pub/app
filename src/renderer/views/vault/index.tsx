@@ -41,7 +41,6 @@ export default (_: {}) => {
   const [disableOpen, setDisableOpen] = React.useState(false)
 
   const {phrase, status} = store.useState()
-  console.log('status:', status)
 
   React.useEffect(() => {
     reloadStatus()
@@ -216,7 +215,6 @@ export default (_: {}) => {
     )
   }
 
-  console.log('Render:', status)
   if (!status) return null
   const syncEnabled = !!status?.kid
 
