@@ -9,7 +9,6 @@ describe('App', () => {
   })
   afterEach(async () => {
     if (app.isRunning()) {
-      await sleep(3000)
       return app.stop()
     }
   })
@@ -45,7 +44,6 @@ describe('App', () => {
     // Select echo
     const userServiceSelect = await app.client.$('#userServiceSelect')
     await userServiceSelect.click()
-    await sleep(2000)
     await app.client.keys('ArrowDown')
     await app.client.keys('ArrowDown')
     await app.client.keys('ArrowDown')

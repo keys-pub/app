@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box, TextField, Typography} from '@material-ui/core'
+import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
 // import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
@@ -22,6 +22,7 @@ type Props = {
   placeholder?: string
   searchOption?: boolean
   importOption?: boolean
+  id?: string
 }
 
 const createOptions = (options: Key[], searchOption: boolean, importOption: boolean): Key[] => {
@@ -123,6 +124,7 @@ export default (props: Props) => {
   return (
     <Box style={{width: '100%'}}>
       <Autocomplete
+        id={props.id}
         open={open}
         disabled={props.disabled}
         onOpen={openAutoComplete}

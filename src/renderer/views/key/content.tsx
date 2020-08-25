@@ -80,7 +80,7 @@ const UserRow = (props: UserProps) => {
         </TableCell>
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="row">
-            <ServiceSelect service={service} setService={setService} />
+            <ServiceSelect service={service} setService={setService} small />
             <Box marginRight={1} />
             <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
               OK

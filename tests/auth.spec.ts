@@ -9,7 +9,6 @@ describe('App', () => {
   })
   afterEach(async () => {
     if (app.isRunning()) {
-      await sleep(3000)
       return app.stop()
     }
   })

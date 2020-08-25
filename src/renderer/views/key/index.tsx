@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Avatar, Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
-import {TransitionProps} from '@material-ui/core/transitions'
+// import Grow from '@material-ui/core/Grow'
 
 import {DialogTitle} from '../../components'
 import KeyView from './view'
@@ -115,7 +115,8 @@ export default class KeyDialog extends React.Component<Props, State> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        // TransitionComponent={transition}
+        // TransitionComponent={Grow}
+        // transitionDuration={4000}
         keepMounted
       >
         <DialogTitle loading={this.state.loading} onClose={() => this.close('')}>

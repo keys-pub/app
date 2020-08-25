@@ -51,6 +51,10 @@ export default (props: {}) => {
     }
   }, [])
 
+  const restart = () => {
+    ipcRenderer.send('reload-app', {})
+  }
+
   const labelWidth = 60
   return (
     <Box display="flex" flex={1} flexDirection="column">
@@ -110,6 +114,10 @@ export default (props: {}) => {
                   <br />
                   <Link span onClick={() => setLocation('/style-guide')}>
                     Style Guide
+                  </Link>
+                  <br />
+                  <Link span onClick={restart}>
+                    Restart
                   </Link>
                   <br />
                 </Typography>

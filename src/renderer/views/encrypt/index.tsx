@@ -249,6 +249,7 @@ export default (props: Props) => {
               s.recipients = recipients
             })
           }
+          id="encryptRecipientsAutocomplete"
           placeholder="Recipients"
           searchOption
           importOption

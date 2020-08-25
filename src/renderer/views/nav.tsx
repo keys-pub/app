@@ -33,9 +33,10 @@ import {useLocation} from 'wouter'
 
 type NavRoute = {
   name: string
-  icon: React.ReactNode
+  icon: React.ReactType
   route: string
   prefix: string
+  id: string
   onClick?: () => void
   anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
 }
@@ -68,30 +69,40 @@ export default (props: {}) => {
       }
 
   let navs: NavRoute[] = [
-    {name: 'Keys', icon: KeysIcon, route: '/keys/index', prefix: '/keys'},
+    {
+      name: 'Keys',
+      icon: KeysIcon,
+      route: '/keys/index',
+      prefix: '/keys',
+      id: 'navKeysItemIcon',
+    },
     {
       name: 'Secrets',
       icon: SecretsIcon,
       route: '/secrets/index',
       prefix: '/secrets',
+      id: 'navSecretsItemIcon',
     },
     {
       name: 'Tools',
       icon: ToolsIcon,
       route: '/tools/index',
       prefix: '/tools',
+      id: 'navToolsItemIcon',
     },
     {
       name: 'Vault',
       icon: VaultIcon,
       route: '/vault/index',
       prefix: '/vault',
+      id: 'navVaultItemIcon',
     },
     {
       name: 'Settings',
       icon: SettingsIcon,
       route: '/settings/index',
       prefix: '/settings',
+      id: 'navSettingsItemIcon',
     },
     {
       name: 'Experiments',
@@ -100,6 +111,7 @@ export default (props: {}) => {
       prefix: '/experiments',
       onClick: () => setOpenExperimental(true),
       anchorRef: experimentRef,
+      id: 'navExperimentsItemIcon',
     },
   ]
 
@@ -122,8 +134,7 @@ export default (props: {}) => {
               index,
               location.startsWith(nav.prefix),
               !minimized,
-              nav.onClick ? nav.onClick : () => setLocation(nav.route),
-              nav.anchorRef
+              nav.onClick ? nav.onClick : () => setLocation(nav.route)
             )
           )}
         </List>
@@ -162,18 +173,11 @@ export default (props: {}) => {
   )
 }
 
-const row = (
-  nav: any,
-  index: number,
-  selected: boolean,
-  open: boolean,
-  onClick?: () => void,
-  anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
-) => {
+const row = (nav: NavRoute, index: number, selected: boolean, open: boolean, onClick?: () => void) => {
   return (
     <ListItem
       button
-      ref={anchorRef as React.RefObject<HTMLDivElement>}
+      ref={nav.anchorRef as React.RefObject<HTMLDivElement>}
       style={{
         height: 40,
         backgroundColor: selected ? backgroundColorSelected : backgroundColor,
@@ -181,7 +185,7 @@ const row = (
       onClick={onClick}
       key={nav.name}
     >
-      <ListItemIcon style={{minWidth: 0, marginRight: 6}}>
+      <ListItemIcon style={{minWidth: 0, marginRight: 6}} id={nav.id}>
         <nav.icon
           style={{
             fontSize: open ? 18 : 24,

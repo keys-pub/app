@@ -75,13 +75,14 @@ type State = {
   sortDirection?: SortDirection
   input: string
   keyMenuRef?: HTMLButtonElement
-  openCreate: string // '' | 'NEW' | 'INTRO'
-  openExport: string
-  openImport: boolean
-  openKey: string
-  openSearch: boolean
+  createOpen: string // '' | 'NEW' | 'INTRO'
+  exportOpen: boolean
+  exportKey: string
+  importOpen: boolean
+  keyOpen: boolean
   removeOpen?: boolean
   removeKey?: Key
+  searchOpen: boolean
   snack?: SnackProps
   snackOpen: boolean
   selected: string
@@ -93,11 +94,12 @@ class KeysView extends React.Component<Props, State> {
   state: State = {
     keys: [],
     input: '',
-    openCreate: '',
-    openExport: '',
-    openImport: false,
-    openKey: '',
-    openSearch: false,
+    createOpen: '',
+    exportOpen: false,
+    exportKey: '',
+    importOpen: false,
+    keyOpen: false,
+    searchOpen: false,
     snackOpen: false,
     selected: '',
     syncEnabled: false,
@@ -153,7 +155,7 @@ class KeysView extends React.Component<Props, State> {
         })
         // If we don't have keys and intro, then show create dialog
         if (keys.length == 0 && this.props.intro) {
-          this.setState({openCreate: 'INTRO'})
+          this.setState({createOpen: 'INTRO'})
           store.update((s) => {
             s.intro = false
           })
@@ -167,7 +169,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   select = (key: Key) => {
-    this.setState({openKey: key.id!, selected: key.id!})
+    this.setState({keyOpen: true, selected: key.id!})
   }
 
   isSelected = (kid?: string): boolean => {
@@ -188,7 +190,7 @@ class KeysView extends React.Component<Props, State> {
   }
 
   export = () => {
-    this.setState({contextPosition: undefined, openExport: this.state.selected})
+    this.setState({contextPosition: undefined, exportOpen: true, exportKey: this.state.selected})
   }
 
   delete = () => {
@@ -220,26 +222,29 @@ class KeysView extends React.Component<Props, State> {
 
   keyGen = () => {
     this.closeMenu()
-    this.setState({openCreate: 'NEW'})
+    this.setState({createOpen: 'NEW'})
   }
 
   importKey = () => {
     this.closeMenu()
-    this.setState({openImport: true})
+    this.setState({importOpen: true})
   }
 
   closeImport = (imported: boolean) => {
-    this.setState({openImport: false})
-    this.reload()
+    this.setState({importOpen: false})
+    if (imported) {
+      // TODO: Select imported key
+      this.reload()
+    }
   }
 
   searchKey = () => {
     this.closeMenu()
-    this.setState({openSearch: true})
+    this.setState({searchOpen: true})
   }
 
   closeSearch = () => {
-    this.setState({openSearch: false})
+    this.setState({searchOpen: false})
     this.reload()
   }
 
@@ -342,7 +347,7 @@ class KeysView extends React.Component<Props, State> {
               <Typography style={{marginLeft: 10}}>Import Key</Typography>
             </MenuItem>
           </Menu>
-          <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
+          <SearchDialog open={this.state.searchOpen} close={this.closeSearch} />
         </Box>
       </Box>
     )
@@ -431,23 +436,23 @@ class KeysView extends React.Component<Props, State> {
         </Menu>
 
         <KeyCreateDialog
-          open={this.state.openCreate != ''}
-          close={() => this.setState({openCreate: ''})}
+          open={this.state.createOpen != ''}
+          close={() => this.setState({createOpen: ''})}
           onChange={this.onChange}
         />
-        <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
+        <KeyImportDialog open={this.state.importOpen} close={this.closeImport} />
         {this.state.removeKey && (
           <KeyRemoveDialog open={this.state.removeOpen} k={this.state.removeKey} close={this.closeRemove} />
         )}
         <KeyExportDialog
-          open={this.state.openExport != ''}
-          kid={this.state.openExport}
-          close={() => this.setState({openExport: '', selected: ''})}
+          open={this.state.exportOpen}
+          kid={this.state.exportKey}
+          close={() => this.setState({exportOpen: false})}
         />
         <KeyDialog
-          open={this.state.openKey != ''}
-          close={() => this.setState({openKey: '', selected: ''})}
-          kid={this.state.openKey}
+          open={this.state.keyOpen}
+          close={() => this.setState({keyOpen: false})}
+          kid={this.state.selected}
           reload={this.reload}
         />
         <Snack

@@ -1,11 +1,11 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
 
 import {FormControl, MenuItem, Select, TextField, Typography} from '@material-ui/core'
 
 type Props = {
   service: string
   setService: (service: string) => void
+  small?: boolean
 }
 
 export default (props: Props) => {
@@ -15,8 +15,10 @@ export default (props: Props) => {
     props.setService(service)
   }, [])
 
-  const styles: CSSProperties = {width: 200, height: 31}
-  console.log('foo')
+  const styles: React.CSSProperties = {width: 200}
+  if (props.small) {
+    styles.height = 31
+  }
 
   return (
     <FormControl variant="outlined">
@@ -26,7 +28,7 @@ export default (props: Props) => {
         value={props.service}
         onChange={setService}
         id="userServiceSelect"
-        inputProps={{
+        InputProps={{
           style: styles,
         }}
       >
