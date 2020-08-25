@@ -73,7 +73,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
               style: {...styles.mono, fontSize: 12, width: 450},
             }}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
           <Box display="flex" flexDirection="row" style={{width: 450, paddingTop: 6}}>

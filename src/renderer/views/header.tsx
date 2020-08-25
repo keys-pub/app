@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box} from '@material-ui/core'
 
-import {Button, Divider, IconButton, Typography} from '@material-ui/core'
+import {Button, Divider, LinearProgress, IconButton, Typography} from '@material-ui/core'
 
 import {store} from '../store'
 import {ipcRenderer} from 'electron'
@@ -23,6 +23,7 @@ import {remote} from 'electron'
 type Props = {
   noLock?: boolean
   noBack?: boolean
+  loading?: boolean
 }
 
 export default (props: Props) => {
@@ -65,9 +66,11 @@ export default (props: Props) => {
     setMaximized(!win.isMaximized())
     win.isMaximized() ? win.unmaximize() : win.maximize()
   }
+
   return (
     <Box display="flex" flexDirection="column" style={{width: '100%'}}>
       <Box display="flex" flexDirection="column" style={{height: 28}}>
+        <Box style={{position: 'fixed', top: 0, width: '100%'}}>{props.loading && <LinearProgress />}</Box>
         <Box display="flex" flexDirection="row">
           {!props.noBack && (
             <Box display="flex" flexDirection="row">

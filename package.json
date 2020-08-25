@@ -5,14 +5,15 @@
   "description": "Key management, signing and encryption.",
   "scripts": {
     "build": "yarn webpack --env.NODE_ENV=development --env.target=render && yarn webpack --env.NODE_ENV=development --env.target=main",
-    "build-prod": "yarn webpack --env.NODE_ENV=production --env.target=render && yarn webpack --env.NODE_ENV=production --env.target=main",
+    "build-prod-render": "yarn webpack --env.NODE_ENV=production --env.target=render",
+    "build-prod-main": "yarn webpack --env.NODE_ENV=production --env.target=main",
+    "build-prod": "yarn build-prod-render && yarn build-prod-main",
     "server": "yarn webpack-dev-server --env.NODE_ENV=development --env.target=render --hot",
-    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron .",
+    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron dist/main.dev.js",
     "pack": "yarn run build-prod && electron-builder --dir",
     "dist": "yarn run build-prod && electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "version": "cross-var echo $npm_package_version",
-    "test": "jest"
+    "version": "cross-var echo $npm_package_version"
   },
   "main": "./dist/main.js",
   "browserslist": [
@@ -138,7 +139,6 @@
     "html-webpack-externals-plugin": "^3.8.0",
     "html-webpack-plugin": "^4.0.4",
     "jest": "^26.4.0",
-    "mini-css-extract-plugin": "^0.10.0",
     "prettier": "^2.0.2",
     "react-test-renderer": "^16.13.1",
     "spectron": "^11.1.0",

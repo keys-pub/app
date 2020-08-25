@@ -104,7 +104,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             onChange={this.onPasswordInputChange}
             value={this.state.password}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

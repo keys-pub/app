@@ -2,12 +2,8 @@ const path = require('path')
 const HtmlPlugin = require('html-webpack-plugin')
 const HtmlExternalsPlugin = require('html-webpack-externals-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const DefinePlugin = require('webpack').DefinePlugin
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const webpack = require('webpack')
 
-// const to avoid typos
 const DEVELOPMENT = 'development'
 const PRODUCTION = 'production'
 
@@ -51,20 +47,6 @@ function createRenderConfig(isDev) {
 
     module: {
       rules: [
-        {
-          test: /\.scss$/,
-          use: [
-            {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                hmr: isDev,
-              },
-            },
-            'css-loader',
-            'sass-loader',
-          ],
-        },
-
         {
           test: /\.(js|jsx|ts|tsx)$/,
           exclude: /node_modules/,
@@ -121,11 +103,7 @@ function createRenderConfig(isDev) {
 
     plugins: [
       new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: ['!main.*.js'], // config for electron-main deletes this file
-      }),
-
-      new MiniCssExtractPlugin({
-        filename: 'main.css',
+        cleanOnceBeforeBuildPatterns: ['!main*.js*'], // Don't clean main files
       }),
 
       new HtmlPlugin({
@@ -181,7 +159,7 @@ function createMainConfig(isDev) {
     },
 
     output: {
-      filename: '[name].js',
+      filename: isDev ? '[name].dev.js' : '[name].js',
       path: path.join(__dirname, 'dist'),
     },
 
@@ -203,17 +181,12 @@ function createMainConfig(isDev) {
 
     plugins: [
       new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: ['main.*.js'],
+        cleanOnceBeforeBuildPatterns: ['main*.js*'], // Only clean main files
       }),
 
-      // inject this becaus the main process uses different logic for prod and dev.
+      // Inject this because the main process uses different logic for prod and dev.
       new DefinePlugin({
-        ENVIRONMENT: JSON.stringify(isDev ? DEVELOPMENT : PRODUCTION), // this variable name must match the one declared in the main process file.
-      }),
-
-      // electron-packager needs the package.json file. the "../" is because context is set to the ./src folder
-      new CopyWebpackPlugin({
-        patterns: [{from: 'package.json', to: './', context: '../'}],
+        ENVIRONMENT: JSON.stringify(isDev ? DEVELOPMENT : PRODUCTION),
       }),
     ],
   }

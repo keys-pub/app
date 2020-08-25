@@ -79,8 +79,9 @@ type State = {
   openExport: string
   openImport: boolean
   openKey: string
-  openRemove?: Key
   openSearch: boolean
+  removeOpen?: boolean
+  removeKey?: Key
   snack?: SnackProps
   snackOpen: boolean
   selected: string
@@ -195,7 +196,7 @@ class KeysView extends React.Component<Props, State> {
       return this.state.selected == k.id
     })
 
-    this.setState({contextPosition: undefined, openRemove: key})
+    this.setState({contextPosition: undefined, removeOpen: true, removeKey: key})
   }
 
   sort = (field: string, sortField?: string, sortDirection?: SortDirection) => {
@@ -243,8 +244,12 @@ class KeysView extends React.Component<Props, State> {
   }
 
   closeRemove = (removed: boolean) => {
-    this.setState({selected: ''})
-    this.reload()
+    if (removed) {
+      this.setState({selected: '', removeOpen: false})
+      this.reload()
+    } else {
+      this.setState({removeOpen: false})
+    }
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -274,6 +279,7 @@ class KeysView extends React.Component<Props, State> {
             onClick={this.keyGen}
             style={{marginTop: 2, minWidth: buttonWidth}}
             // startIcon={<AddIcon />}
+            id="newKeyButton"
           >
             New
           </Button>
@@ -430,7 +436,9 @@ class KeysView extends React.Component<Props, State> {
           onChange={this.onChange}
         />
         <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
-        <KeyRemoveDialog keyRemove={this.state.openRemove} close={this.closeRemove} />
+        {this.state.removeKey && (
+          <KeyRemoveDialog open={this.state.removeOpen} k={this.state.removeKey} close={this.closeRemove} />
+        )}
         <KeyExportDialog
           open={this.state.openExport != ''}
           kid={this.state.openExport}

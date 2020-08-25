@@ -100,7 +100,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinChange}
             value={this.state.pin}
           />
-          <FormHelperText id="component-error-text"> </FormHelperText>
+          <FormHelperText> </FormHelperText>
         </FormControl>
         <FormControl error={!!this.state.error}>
           <TextField
@@ -110,7 +110,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinConfirmChange}
             value={this.state.confirmPin}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )
@@ -137,7 +137,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinChange}
             value={this.state.pin}
           />
-          <FormHelperText id="component-error-text"> </FormHelperText>
+          <FormHelperText> </FormHelperText>
         </FormControl>
         <FormControl error={!!this.state.error}>
           <TextField
@@ -147,7 +147,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
             onChange={this.onPinConfirmChange}
             value={this.state.confirmPin}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

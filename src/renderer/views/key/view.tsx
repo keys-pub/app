@@ -28,10 +28,11 @@ export default class KeyView extends React.Component<Props, State> {
     this.setState({openRevoke: this.props.k?.user?.seq || 0})
   }
 
-  closeRevoke = () => {
+  closeRevoke = (revoked: boolean) => {
     this.setState({openRevoke: 0})
-    console.log('Closing revoke')
-    this.props.refresh(true)
+    if (revoked) {
+      this.props.refresh(true)
+    }
   }
 
   userSign = (service: string) => {

@@ -89,22 +89,34 @@ export default class UserSignDialog extends React.Component<Props, State> {
     }
     userSign(req)
       .then((resp: UserSignResponse) => {
-        let url = ''
-        if (this.props.service == 'https') {
-          url = 'https://' + this.state.name + '/keyspub.txt'
-        }
+        const name = resp.name || ''
+        const message = resp.message || ''
+        let url = this.defaultURL(this.props.service, this.props.kid, name, message)
 
         this.setState({
           loading: false,
-          name: resp.name || '',
-          url: url,
-          signedMessage: resp.message || '',
+          name,
+          url,
+          signedMessage: message,
           step: 'sign',
         })
       })
       .catch((err: Error) => {
         this.setState({loading: false, error: err})
       })
+  }
+
+  defaultURL = (service: string, kid: string, name: string, message: string) => {
+    switch (service) {
+      case 'https':
+        return 'https://' + name + '/keyspub.txt'
+      case 'echo':
+        let msg = message.replace(/(\r\n|\n|\r)/gm, '')
+        msg = encodeURIComponent(msg).replace(/%20/g, '+')
+        return 'test://echo/' + name + '/' + kid + '/' + msg
+      default:
+        return ''
+    }
   }
 
   userAdd = () => {
@@ -171,6 +183,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
         next =
           "In the next step, we'll create a signed message that you can put on your domain as /keyspub.txt."
         break
+      case 'echo':
+        placeholder = ''
+        question = "What's your test name?"
+        next = "In the next step, we'll save it."
+        break
     }
 
     return (
@@ -185,8 +202,10 @@ export default class UserSignDialog extends React.Component<Props, State> {
             onChange={this.onNameChange}
             value={this.state.name}
             style={{minWidth: 300}}
+            id="userNameTextField"
+            inputProps={{spellCheck: 'false', style: {...styles.mono}}}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
         <Typography variant="body1" style={{paddingBottom: 20}}>
           {next}
@@ -246,6 +265,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
         placeholder = 'https://' + this.state.name + '/keyspub.txt'
         urlLabel = 'Where did you save it?'
         break
+      case 'echo':
+        intro = 'Siged message:'
+        placeholder = ''
+        urlLabel = 'Test URL:'
+        break
     }
     return (
       <Box>
@@ -278,10 +302,12 @@ export default class UserSignDialog extends React.Component<Props, State> {
           </Button>
         </Box>
 
-        <Box display="flex" flexDirection="row">
-          <Typography variant="subtitle1">&bull; &nbsp;</Typography>
-          {instructions}
-        </Box>
+        {instructions && (
+          <Box display="flex" flexDirection="row">
+            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
+            {instructions}
+          </Box>
+        )}
         {openLabel && (
           <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20}}>
             <Button color="primary" variant="outlined" onClick={openAction} disabled={this.state.loading}>
@@ -289,7 +315,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Button>
           </Box>
         )}
-        <Box style={{paddingBottom: 20}} />
+        {(instructions || openLabel) && <Box style={{paddingBottom: 20}} />}
 
         {urlLabel && (
           <Box display="flex" flexDirection="column" flex={1}>
@@ -297,16 +323,19 @@ export default class UserSignDialog extends React.Component<Props, State> {
               <Typography variant="subtitle1">&bull; &nbsp;</Typography>
               <Typography variant="subtitle1">{urlLabel}</Typography>
             </Box>
-            <FormControl error={!!this.state.error} style={{marginLeft: 20}}>
+            <Box display="flex" flexDirection="row" flex={1} style={{marginLeft: 20}}>
               <TextField
                 placeholder={placeholder}
                 onChange={this.onURLChange}
                 value={this.state.url}
+                error={!!this.state.error}
+                helperText={this.state.error?.message || ' '}
+                FormHelperTextProps={{style: styles.breakWords}}
                 disabled={this.state.loading}
                 style={{width: 500}}
+                inputProps={{spellCheck: 'false', style: {...styles.mono, fontSize: 12}}}
               />
-              <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
-            </FormControl>
+            </Box>
           </Box>
         )}
         {!urlLabel && (
@@ -339,6 +368,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
       case 'https':
         title = 'Link to Website (HTTPS)'
         break
+      case 'echo':
+        title = 'Link to Echo'
+        break
     }
 
     return (
@@ -363,7 +395,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
           {this.state.step == 'name' && (
             <Box>
               <Button onClick={() => this.close(false)}>Close</Button>
-              <Button color="primary" onClick={this.userSign}>
+              <Button color="primary" onClick={this.userSign} id="userSignButton">
                 Next
               </Button>
             </Box>
@@ -371,7 +403,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
           {this.state.step == 'sign' && (
             <Box>
               <Button onClick={this.back}>Back</Button>
-              <Button color="primary" onClick={this.userAdd}>
+              <Button color="primary" onClick={this.userAdd} id="userAddButton">
                 Save
               </Button>
             </Box>

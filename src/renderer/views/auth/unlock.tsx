@@ -99,7 +99,7 @@ export default (_: {}) => {
           style={{fontSize: 48, width: 400}}
           disabled={loading}
         />
-        <FormHelperText id="component-error-text">{error?.message || ' '}</FormHelperText>
+        <FormHelperText>{error?.message || ' '}</FormHelperText>
       </FormControl>
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
         <Button

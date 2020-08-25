@@ -78,7 +78,7 @@ export default (_: {}) => {
         <Box style={{width: 300, marginBottom: 20}}>
           <FormControl>
             <Input placeholder="placeholder" />
-            <FormHelperText id="component-error-text" />
+            <FormHelperText />
           </FormControl>
         </Box>
 

@@ -1,27 +1,15 @@
-const path = require('path')
-const Application = require('spectron').Application
+import {app, setEnv, sleep} from './app'
 
 jest.setTimeout(20000)
 
-const electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
-const sleep = (time: number) => new Promise((r) => setTimeout(r, time))
-
-process.env.KEYS_APP = 'Keys11'
-process.env.KEYS_PORT = '22211'
-process.env.KEYS_BIN = path.join(process.env.HOME, 'go', 'bin', 'keys')
-process.env.KEYS_STOP_ON_EXIT = '1'
-
-const app = new Application({
-  path: electronPath,
-  args: [path.join(__dirname, '..', 'dist', 'main.js')],
-})
-
 describe('App', () => {
   beforeEach(() => {
+    setEnv(11)
     return app.start()
   })
-  afterEach(() => {
+  afterEach(async () => {
     if (app.isRunning()) {
+      await sleep(3000)
       return app.stop()
     }
   })
@@ -37,13 +25,16 @@ describe('App', () => {
     const setupPasswordButton = await app.client.$('#setupPasswordButton')
     await setupPasswordButton.click()
 
+    // Intro prompt for new key
     await app.client.$('#keyGenerateDialog')
     const keyGenerateCloseButton = await app.client.$('#keyGenerateCloseButton')
     await keyGenerateCloseButton.click()
 
+    // Lock
     const lockButton = await app.client.$('#lockButton')
     await lockButton.click()
 
+    // Unlock
     const unlockPasswordInput = await app.client.$('#unlockPasswordInput')
     await unlockPasswordInput.setValue('testpassword')
     const unlockButton = await app.client.$('#unlockButton')

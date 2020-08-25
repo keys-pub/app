@@ -60,7 +60,7 @@ export default class GetPinDialog extends React.Component<Props, State> {
         <Typography style={{paddingBottom: 20}}>Enter the PIN.</Typography>
         <FormControl error={!!this.state.error}>
           <TextField variant="outlined" label="PIN" onChange={this.onPinChange} value={this.state.pin} />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

@@ -220,9 +220,8 @@ export default (_: {}) => {
 
   return (
     <Box display="flex" flex={1} flexDirection="column">
-      <Header />
-      {!loading && <Box style={{marginBottom: 4}} />}
-      {loading && <LinearProgress />}
+      <Header loading={loading} />
+      <Box style={{marginTop: 4}} />
 
       {!syncEnabled && <Box style={{marginLeft: 20, marginBottom: 20}}>{renderEnable()}</Box>}
       {syncEnabled && (

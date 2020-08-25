@@ -109,7 +109,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
             onChange={this.onInputChangeConfirm}
             value={this.state.passwordConfirm}
           />
-          <FormHelperText id="component-error-text">{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )

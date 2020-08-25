@@ -122,7 +122,7 @@ export default (props: Props) => {
           disabled={loading}
           inputRef={inputPasswordConfirmRef}
         />
-        <FormHelperText id="component-error-text">{error?.message || ' '}</FormHelperText>
+        <FormHelperText>{error?.message || ' '}</FormHelperText>
       </FormControl>
       <Box display="flex" flexDirection="row" justifyContent="center" style={{width: 400}}>
         <Button

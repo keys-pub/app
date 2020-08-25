@@ -10,6 +10,7 @@ import {shell} from 'electron'
 import {Key, KeyType, User} from '../../rpc/keys.d'
 import ServiceSelect from '../user/service'
 import {styles, Link} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
@@ -25,14 +26,15 @@ export const KeyDescriptionView = (props: {value: Key}) => {
   return <Typography>{keyDescription(props.value)}</Typography>
 }
 
-type Props = {
+type UserProps = {
   k: Key
   revoke: () => void
   userSign: (service: string) => void
   update: () => void
+  openURL: (url: string) => void
 }
 
-const UserRow = (props: Props) => {
+const UserRow = (props: UserProps) => {
   const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
@@ -59,7 +61,7 @@ const UserRow = (props: Props) => {
             </Box>
             {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
             <Link
-              onClick={() => shell.openExternal(user.url!)}
+              onClick={() => props.openURL(user.url!)}
               style={{maxWidth: 480, textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
             >
               {user.url}
@@ -105,11 +107,31 @@ const UserRow = (props: Props) => {
   return null
 }
 
+type Props = {
+  k: Key
+  revoke: () => void
+  userSign: (service: string) => void
+  update: () => void
+}
+
 export default (props: Props) => {
   const key: Key = props.k
   const kid = key.id!
   const sigchainURL = 'https://keys.pub/sigchain/' + key.id
-  const openSigchain = () => shell.openExternal(sigchainURL)
+
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
+
+  const openURL = async (url: string) => {
+    try {
+      await shell.openExternal(url)
+    } catch (err) {
+      setSnack({message: err.message, duration: 4000, alert: 'error'})
+      setSnackOpen(true)
+    }
+  }
+
+  const openSigchain = () => openURL(sigchainURL)
 
   return (
     <Box>
@@ -133,7 +155,7 @@ export default (props: Props) => {
               <KeyDescriptionView value={key} />
             </TableCell>
           </TableRow>
-          <UserRow {...props} />
+          <UserRow {...props} openURL={openURL} />
           {key.user && (
             <TableRow>
               <TableCell style={{...cstyles.cell, paddingBottom: 6, verticalAlign: 'center'}}>
@@ -178,6 +200,7 @@ export default (props: Props) => {
           )}
         </TableBody>
       </Table>
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

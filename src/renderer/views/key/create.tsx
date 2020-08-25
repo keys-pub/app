@@ -150,7 +150,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
           <Button onClick={this.close} id="keyGenerateCloseButton">
             Close
           </Button>
-          <Button autoFocus onClick={this.keyGenerate} color="primary">
+          <Button autoFocus onClick={this.keyGenerate} color="primary" id="keyGenerateButton">
             Generate
           </Button>
         </DialogActions>
@@ -159,12 +159,14 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   renderCreated(open: boolean) {
+    let buttonId
     let buttonLabel = 'Close'
     let buttonAction = null
     let next = ''
     let closeLabel = ''
     switch (this.state.type) {
       case KeyType.EDX25519:
+        buttonId = 'keyCreatedNextButton'
         buttonLabel = 'Next'
         buttonAction = () => this.setState({step: 'USER'})
         next =
@@ -205,7 +207,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         <DialogActions>
           <Button onClick={this.close}>{closeLabel}</Button>
           {buttonAction && (
-            <Button autoFocus onClick={buttonAction} color="primary">
+            <Button onClick={buttonAction} color="primary" id={buttonId}>
               {buttonLabel}
             </Button>
           )}
@@ -242,7 +244,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         </DialogContent>
         <DialogActions>
           <Button onClick={this.close}>Later</Button>
-          <Button autoFocus onClick={this.selectService} color="primary">
+          <Button autoFocus onClick={this.selectService} color="primary" id="keyUserLinkButton">
             Next
           </Button>
         </DialogActions>
