@@ -9,7 +9,7 @@ import {ipcRenderer} from 'electron'
 type Props = {}
 type State = {
   loading: boolean
-  error: Error | void
+  error: Error | null
 }
 
 export default class Splash extends React.Component<Props, State> {
@@ -31,7 +31,7 @@ export default class Splash extends React.Component<Props, State> {
 
   render() {
     if (this.state.error) {
-      return <ErrorsView error={this.state.error} />
+      return <ErrorsView error={this.state.error!} />
     }
     return (
       <Box

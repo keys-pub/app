@@ -1,7 +1,8 @@
 import {ipcMain, BrowserWindow} from 'electron'
 
-import {RPCError} from './rpc/keys.d'
 import {client, setAuthToken, close} from './rpc/client'
+import {Error} from '@material-ui/icons'
+import * as grpc from '@grpc/grpc-js'
 
 type RPC = {
   service: string
@@ -11,37 +12,32 @@ type RPC = {
   end: boolean
 }
 
+interface Error {
+  code: number
+  message: string
+  name: string
+}
+
 type RPCReply = {
-  err: RPCError
-  resp: any
+  err?: Error
+  resp?: any
 }
 
 type RPCStreamReply = {
   resp?: any
-  err?: RPCError
+  err?: Error
   done?: boolean
 }
 
-const convertErr = (err: any): RPCError => {
-  if (!err) return null
-  // Need to convert err to an object type.
-  // TODO: what if source err is not RPCError?
-  return {
-    code: err.code,
-    message: err.message,
-    details: err.details,
-  }
-}
-
-const rpc = (cl, f): Promise<RPCReply> => {
+const rpc = (cl: any, f: RPC): Promise<RPCReply> => {
   return new Promise((resolve, reject) => {
     if (typeof cl[f.method] !== 'function') {
       console.log('rpc not found', f.reply)
       // console.log('methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(cl)))
-      resolve({err: notFound(f.method)} as RPCReply)
+      resolve({err: notFound(f.method)})
       return
     }
-    cl[f.method](f.args, (err: any, resp: any) => {
+    cl[f.method](f.args, (err: Error, resp: any) => {
       resolve({err: convertErr(err), resp: resp})
     })
   })
@@ -49,35 +45,18 @@ const rpc = (cl, f): Promise<RPCReply> => {
 
 let streams: Map<string, any> = new Map()
 
-export const reportErr = (currentWindow: () => BrowserWindow, err: RPCError) => {
-  const mainWindow = currentWindow()
-  switch (err.code) {
-    case 16:
-      if (mainWindow) {
-        mainWindow.webContents.send('unauthenticated', err)
-      }
-      break
-    case 14:
-      if (mainWindow) {
-        mainWindow.webContents.send('unavailable', err)
-      }
-      rpcReload()
-      break
-  }
-}
-
-export const rpcRegister = (currentWindow: () => BrowserWindow) => {
+export const rpcRegister = () => {
   ipcMain.removeAllListeners('rpc')
   ipcMain.on('rpc', async (event, arg) => {
     const f = arg as RPC
     const cl = await client(f.service)
-    console.log('rpc', f.reply)
+    // console.log('rpc', f.reply)
     const out: RPCReply = await rpc(cl, f)
     if (out.err) {
       console.error('rpc err', f.reply, out.err)
-      reportErr(currentWindow, out.err)
+      handleErr(out.err)
     } else {
-      console.log('rpc reply', f.reply)
+      // console.log('rpc reply', f.reply)
     }
     event.reply(f.reply, out)
   })
@@ -91,26 +70,26 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
   ipcMain.on('rpc-stream', async (event, arg) => {
     const f = arg as RPC
     const cl = await client(arg.service)
-    console.log('rpc-stream', f.reply)
+    // console.log('rpc-stream', f.reply)
 
     const stream = streams.get(f.reply)
     if (!!stream) {
-      console.log('found rpc-stream', f.reply)
+      // console.log('found rpc-stream', f.reply)
       if (f.args) {
-        console.log('rpc-stream write', f.reply)
+        // console.log('rpc-stream write', f.reply)
         stream.write(f.args)
       }
       if (f.end) {
-        console.log('rpc-stream end', f.reply)
+        // console.log('rpc-stream end', f.reply)
         stream.end()
         streams.delete(f.reply)
       }
       return
     }
 
-    console.log('new stream', f.reply)
+    // console.log('new stream', f.reply)
     if (typeof cl[f.method] !== 'function') {
-      console.log('rpc-stream not found', f.reply)
+      // console.log('rpc-stream not found', f.reply)
       event.reply(f.reply, {err: notFound(f.method)} as RPCStreamReply)
       return
     }
@@ -118,38 +97,51 @@ export const rpcRegister = (currentWindow: () => BrowserWindow) => {
 
     streams.set(f.reply, newStream)
 
-    newStream.on('data', (resp) => {
-      console.log('rpc-stream data', f.reply)
+    newStream.on('data', (resp: any) => {
+      // console.log('rpc-stream data', f.reply)
       event.reply(f.reply, {resp: resp} as RPCStreamReply)
     })
-    newStream.on('error', (err) => {
-      console.log('rpc-stream err', f.reply, err)
-      reportErr(currentWindow, err)
+    newStream.on('error', (err: Error) => {
+      // console.log('rpc-stream err', f.reply, err)
+      handleErr(err)
       event.reply(f.reply, {err: convertErr(err)} as RPCStreamReply)
       streams.delete(f.reply)
     })
     newStream.on('end', () => {
-      console.log('rpc-stream end', f.reply)
+      // console.log('rpc-stream end', f.reply)
       event.reply(f.reply, {done: true} as RPCStreamReply)
       streams.delete(f.reply)
     })
-    console.log('stream write', f.reply)
+    // console.log('stream write', f.reply)
     newStream.write(f.args)
     if (f.end) {
-      console.log('stream end', f.reply)
+      // console.log('stream end', f.reply)
       newStream.end()
     }
   })
 }
 
-const notFound = (method: string): RPCError => {
+const notFound = (method: string): Error => {
   return {
-    code: 0,
+    code: grpc.status.NOT_FOUND,
     message: method + ' not found',
-    details: method + ' not found',
+    name: 'NotFoundError',
   }
 }
 
-export const rpcReload = () => {
-  close()
+export const handleErr = (err: Error) => {
+  if (err.code == grpc.status.UNAVAILABLE) {
+    // Close RPC (will re-open next call)
+    close()
+  }
+}
+
+const convertErr = (err: any): Error | undefined => {
+  if (!err) return undefined
+  // Need to convert err to an object type.
+  return {
+    code: err?.code || grpc.status.UNKNOWN,
+    message: err?.details || err?.message || 'unknown error',
+    name: err?.name || 'Error',
+  }
 }

@@ -2,7 +2,11 @@ import * as React from 'react'
 
 import {Box} from '@material-ui/core'
 
-import {Button, Divider, IconButton, Typography} from '@material-ui/core'
+import {Button, Divider, LinearProgress, IconButton, Typography} from '@material-ui/core'
+
+import {store} from '../store'
+import {ipcRenderer} from 'electron'
+import {platform} from 'os'
 
 import {
   ChevronLeft,
@@ -13,28 +17,36 @@ import {
   Crop75 as UnmaximizeIcon,
 } from '@material-ui/icons'
 
-import {goBack} from 'connected-react-router'
-
-import {store} from '../store'
-
+import {history} from './router'
 import {remote} from 'electron'
-import {lock} from './state'
+import {authLock} from '../rpc/keys'
 
 type Props = {
-  lock?: boolean
-  back?: boolean
-  navMinimize?: boolean
-  noDivider?: boolean
+  noLock?: boolean
+  noBack?: boolean
+  loading?: boolean
 }
 
 export default (props: Props) => {
   const win = remote.getCurrentWindow()
   const [maximized, setMaximized] = React.useState(win.isMaximized())
 
-  const back = () => store.dispatch(goBack())
+  const back = () => {
+    history.back()
+  }
+
+  const lock = async () => {
+    ipcRenderer.send('authToken', {authToken: ''})
+    store.update((s) => {
+      s.unlocked = false
+    })
+    await authLock({})
+  }
+
+  const osname = platform()
 
   let showSystemButtons = true
-  if (process.platform == 'darwin') {
+  if (osname == 'darwin') {
     showSystemButtons = false
   }
 
@@ -56,21 +68,22 @@ export default (props: Props) => {
     setMaximized(!win.isMaximized())
     win.isMaximized() ? win.unmaximize() : win.maximize()
   }
+
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" style={{width: '100%'}}>
       <Box display="flex" flexDirection="column" style={{height: 28}}>
+        <Box style={{position: 'fixed', top: 0, width: '100%'}}>{props.loading && <LinearProgress />}</Box>
         <Box display="flex" flexDirection="row">
-          {props.back && (
+          {!props.noBack && (
             <Box display="flex" flexDirection="row">
-              <Box style={{width: props.navMinimize ? 68 : 140}} className="drag" />
               <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
                 <ChevronLeft />
               </IconButton>
             </Box>
           )}
           <Box display="flex" flexGrow={1} className="drag" />
-          {props.lock && (
-            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+          {!props.noLock && (
+            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}} id="lockButton">
               <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
             </IconButton>
           )}
@@ -95,7 +108,6 @@ export default (props: Props) => {
           {!showSystemButtons && <Box style={{marginTop: -6, marginBottom: -2, height: 41}} />}
         </Box>
       </Box>
-      {!props.noDivider && <Divider />}
     </Box>
   )
 }

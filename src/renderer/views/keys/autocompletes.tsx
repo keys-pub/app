@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box, TextField, Typography} from '@material-ui/core'
+import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
 // import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
@@ -10,27 +10,29 @@ import matchSorter from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeysRequest, KeysResponse} from '../../rpc/keys.d'
+import {Key, KeysRequest, KeysResponse, SortDirection} from '../../rpc/keys.d'
 
-export type Props = {
+type Props = {
   keys: Key[]
   onChange: (value: Key[]) => void
   disabled?: boolean
   placeholder?: string
   searchOption?: boolean
   importOption?: boolean
+  id?: string
 }
 
 const createOptions = (options: Key[], searchOption: boolean, importOption: boolean): Key[] => {
   if (searchOption) {
     options = options.filter((k: Key) => k.id != 'search')
-    options.push({id: 'search'})
+    options.push({id: 'search'} as Key)
   }
   if (importOption) {
     options = options.filter((k: Key) => k.id != 'import')
-    options.push({id: 'import'})
+    options.push({id: 'import'} as Key)
   }
   return options
 }
@@ -44,7 +46,7 @@ const renderOption = (option: Key) => {
   }
   return (
     <React.Fragment>
-      <UserLabel kid={option.id} user={option.user} />
+      <UserLabel kid={option.id!} user={option.user} />
     </React.Fragment>
   )
 }
@@ -57,20 +59,22 @@ const getOptionLabel = (option: Key): string => {
   if (option.id == 'search' || option.id == 'import') {
     return ''
   }
-  return ((<UserLabel kid={option.id} user={option.user} />) as unknown) as string
+  return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
 }
 
 export default (props: Props) => {
-  const filterOptions = (options, {inputValue}) => {
+  const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
     const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
-    return createOptions(filter, props.searchOption, props.importOption)
+    return createOptions(filter, !!props.searchOption, !!props.importOption)
   }
 
   const [open, setOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
   const [options, setOptions] = React.useState([] as Key[])
-  const [openSearch, setOpenSearch] = React.useState(false)
-  const [openImport, setOpenImport] = React.useState(false)
+  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [importOpen, setImportOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const openAutoComplete = () => {
     setOpen(true)
@@ -83,31 +87,42 @@ export default (props: Props) => {
   }, [])
 
   const search = (q: string) => {
-    const req: KeysRequest = {query: q}
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
-        // TODO: Set error
-        return
-      }
-
-      const keys = createOptions(resp.keys, props.searchOption, props.importOption)
-      setOptions(keys || [])
-    })
+    const req: KeysRequest = {
+      query: q,
+    }
+    keys(req)
+      .then((resp: KeysResponse) => {
+        const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
+        setOptions(keys || [])
+      })
+      .catch((err: Error) => {
+        setSnack({message: err.message, alert: 'error', duration: 4000})
+        setSnackOpen(true)
+      })
   }
 
   React.useEffect(() => {
     search(input)
   }, [input])
 
+  const reload = () => {
+    search(input)
+  }
+
+  const closeImport = () => {
+    setImportOpen(false)
+    reload()
+  }
+
   const onChange = (event: React.ChangeEvent<{}>, value: any) => {
     let keys = value as Key[]
 
     keys.forEach((k: Key) => {
       if (k.id == 'search') {
-        setOpenSearch(true)
+        setSearchOpen(true)
       }
       if (k.id == 'import') {
-        setOpenImport(true)
+        setImportOpen(true)
       }
     })
 
@@ -118,6 +133,7 @@ export default (props: Props) => {
   return (
     <Box style={{width: '100%'}}>
       <Autocomplete
+        id={props.id}
         open={open}
         disabled={props.disabled}
         onOpen={openAutoComplete}
@@ -155,8 +171,9 @@ export default (props: Props) => {
           />
         )}
       />
-      <SearchDialog open={openSearch} close={() => setOpenSearch(false)} />
-      <KeyImportDialog open={openImport} close={() => setOpenImport(false)} />
+      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
+      <KeyImportDialog open={importOpen} close={closeImport} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

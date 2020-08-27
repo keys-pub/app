@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   LinearProgress,
   Table,
@@ -14,17 +15,13 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {push} from 'connected-react-router'
-
 import {IDView} from '../key/content'
-import {store} from '../../store'
-
-import KeyDialog from '../key'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
-import {RPCError, Key, SearchRequest, SearchResponse} from '../../rpc/keys.d'
+import {Key, SearchRequest, SearchResponse} from '../../rpc/keys.d'
 import {search} from '../../rpc/keys'
 
 import {debounce, throttle} from 'lodash'
@@ -34,22 +31,21 @@ type Props = {
 }
 
 type State = {
-  error: string
   input: string
   loading: boolean
   query: string
   keys: Array<Key>
+  snackOpen: boolean
+  snack?: SnackProps
 }
 
-// TODO: UserLabel is KeyLabel
-
 export default class SearchView extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     input: '',
     loading: false,
     query: '',
     keys: [],
+    snackOpen: false,
   }
 
   debounceSearch = debounce((q: string) => this.search(q), 100)
@@ -62,14 +58,11 @@ export default class SearchView extends React.Component<Props, State> {
     this.search(this.state.input)
   }
 
-  search = (query: string) => {
-    this.setState({loading: true, error: ''})
-    const req: SearchRequest = {query: query}
-    search(req, (err: RPCError, resp: SearchResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
+  search = async (query: string) => {
+    this.setState({loading: true})
+    try {
+      const req: SearchRequest = {query: query}
+      const resp = await search(req)
       if (this.state.input === query) {
         const keys = resp.keys || []
         this.setState({
@@ -78,7 +71,14 @@ export default class SearchView extends React.Component<Props, State> {
           keys: keys,
         })
       }
-    })
+      this.setState({loading: false})
+    } catch (err) {
+      this.setState({
+        loading: false,
+        snackOpen: true,
+        snack: {message: err.message, alert: 'error', duration: 4000},
+      })
+    }
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
@@ -94,13 +94,14 @@ export default class SearchView extends React.Component<Props, State> {
   }
 
   render() {
-    const {loading} = this.state
+    const {loading, snackOpen, snack} = this.state
     return (
       <Box display="flex" flex={1} flexDirection="column" style={{position: 'relative'}}>
         <Box
           paddingTop={1}
           paddingLeft={1}
           paddingRight={1}
+          paddingBottom={1}
           style={{position: 'sticky', top: 0, backgroundColor: 'white'}}
         >
           <TextField
@@ -111,14 +112,12 @@ export default class SearchView extends React.Component<Props, State> {
             inputProps={{style: {paddingTop: 8, paddingBottom: 8}, spellCheck: 'false'}}
             fullWidth={true}
             style={{marginTop: 2}}
+            InputProps={{
+              endAdornment: loading ? <CircularProgress size={20} /> : null,
+            }}
           />
         </Box>
-        {this.state.error && (
-          <Typography style={{color: 'red', marginLeft: 10}}>{this.state.error}</Typography>
-        )}
-        <Box marginBottom={1} />
-        {!loading && <Divider style={{marginTop: 3}} />}
-        {loading && <LinearProgress />}
+        <Divider />
         <Box style={{overflowY: 'auto', height: '100%'}}>
           <Table size="small">
             <TableHead>
@@ -126,7 +125,7 @@ export default class SearchView extends React.Component<Props, State> {
                 <TableCell>
                   <Typography style={{...styles.mono}}>User</Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell style={{width: 500}}>
                   <Typography style={{...styles.mono}}>Key</Typography>
                 </TableCell>
               </TableRow>
@@ -135,16 +134,17 @@ export default class SearchView extends React.Component<Props, State> {
               {this.state.keys.map((k: Key, index: number): any => (
                 <TableRow hover onClick={(event) => this.select(k)} key={k.id} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">
-                    <UserLabel kid={k.id} user={k.user} />
+                    <UserLabel kid={k.id!} user={k.user} />
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView id={k.id} />
+                    <IDView id={k.id!} />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </Box>
+        <Snack open={snackOpen} {...snack} onClose={() => this.setState({snackOpen: false})} />
       </Box>
     )
   }

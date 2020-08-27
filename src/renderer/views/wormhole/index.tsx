@@ -1,6 +1,5 @@
 import * as React from 'react'
-
-import {connect} from 'react-redux'
+import {CSSProperties} from 'react'
 
 import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material-ui/core'
 
@@ -9,15 +8,14 @@ import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 import {Link, styles} from '../../components'
 import Autocomplete from '../keys/autocomplete'
 
-import {store} from '../../store'
 import * as grpc from '@grpc/grpc-js'
 import {shell} from 'electron'
 
+import Header from '../header'
 import TextInputView from '../textinput'
 
 import {generateID} from '../helper'
-
-import {CSSProperties} from '@material-ui/styles'
+import {Store} from 'pullstate'
 
 import {
   welcomeStatus,
@@ -28,26 +26,37 @@ import {
   errorStatus,
 } from './status'
 
-import {WormholeState, WormholeMessage, WormholeMessageType} from '../../reducers/wormhole'
-import {wormhole, rand} from '../../rpc/keys'
+import {wormhole, rand, WormholeEvent} from '../../rpc/keys'
 import {
-  Key,
   KeyType,
   ContentType,
-  Encoding,
   MessageType,
-  RPCError,
-  RandRequest,
-  RandResponse,
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
 } from '../../rpc/keys.d'
 
+import {WormholeMessage, WormholeMessageType} from './types'
+
+type WormholeState = {
+  sender: string
+  recipient: string
+  messages: WormholeMessage[]
+}
+
+const store = new Store<WormholeState>({
+  sender: '',
+  recipient: '',
+  messages: [],
+})
+
 export type Props = {
   sender: string
   recipient: string
   messages: WormholeMessage[]
+  setRecipient: (recipient?: string) => void
+  setSender: (sender?: string) => void
+  setMessages: (messages: WormholeMessage[]) => void
 }
 
 type State = {
@@ -63,7 +72,7 @@ class WormholeView extends React.Component<Props, State> {
     rows: this.props.messages,
   }
   private listRef: React.RefObject<HTMLDivElement> = React.createRef()
-  private wormhole: (req: WormholeInput, end: boolean) => void
+  private wormhole?: (req?: WormholeInput, end?: boolean) => void
 
   componentDidMount() {
     if (this.state.rows.length == 0) {
@@ -71,7 +80,7 @@ class WormholeView extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.sender != prevProps.sender || this.props.recipient != prevProps.recipient) {
       if (this.props.recipient && this.props.sender) {
         this.setState({rows: [welcomeStatus(), canStartStatus()]})
@@ -87,55 +96,45 @@ class WormholeView extends React.Component<Props, State> {
 
   openInvite = () => {}
 
-  setRecipient = (recipient: string) => {
-    store.dispatch({type: 'WORMHOLE_RECIPIENT', payload: {recipient}})
-  }
-
-  setSender = (sender: string) => {
-    store.dispatch({type: 'WORMHOLE_SENDER', payload: {sender}})
-  }
-
   start = async () => {
     console.log('Wormhole start...')
 
     this.addRow(connectingStatus(this.props.recipient))
 
     this.setState({loading: true, connected: false})
-    this.wormhole = wormhole((err: RPCError, resp: WormholeOutput, done: boolean) => {
+    this.wormhole = wormhole((event: WormholeEvent) => {
+      const {err, res, done} = event
       if (err) {
-        console.log('wormhole err:', err)
         this.setState({loading: false, connected: false})
-        if (err.code == grpc.status.CANCELLED || err.details == 'closed') {
+        if (err.code == grpc.status.CANCELLED || err.message == 'closed') {
           // Closed
           this.addRow(disconnectedStatus())
         } else {
-          this.addRow(errorStatus(err.details))
+          this.addRow(errorStatus(err.message))
         }
         return
       }
-      if (resp) {
-        console.log('wormhole resp:', resp)
-
-        if (this.state.loading && resp.status == WormholeStatus.WORMHOLE_CONNECTED) {
+      if (res) {
+        if (this.state.loading && res.status == WormholeStatus.WORMHOLE_CONNECTED) {
           this.setState({loading: false, connected: true})
           this.addRow(connectedStatus())
         }
 
-        if (resp.status == WormholeStatus.WORMHOLE_CLOSED) {
+        if (res.status == WormholeStatus.WORMHOLE_CLOSED) {
           this.setState({loading: false, connected: false})
           this.addRow(disconnectedStatus())
           return
         }
 
-        switch (resp.message?.type) {
+        switch (res.message?.type) {
           case MessageType.MESSAGE_ACK:
-            this.ack(resp.message.id)
+            this.ack(res.message.id!)
             return
         }
 
-        if (resp.message?.content?.data?.length > 0) {
-          const text = new TextDecoder().decode(resp.message.content.data)
-          this.addRow({id: resp.message.id, text: text, type: WormholeMessageType.Received})
+        if (res.message!.content!.data!.length! > 0) {
+          const text = new TextDecoder().decode(res.message!.content!.data!)
+          this.addRow({id: res.message!.id!, text: text, type: WormholeMessageType.Received})
         }
       }
       if (done) {
@@ -145,6 +144,10 @@ class WormholeView extends React.Component<Props, State> {
     const req: WormholeInput = {
       sender: this.props.sender,
       recipient: this.props.recipient,
+      invite: '',
+      id: '',
+      data: new Uint8Array(),
+      type: ContentType.UTF8_CONTENT,
     }
     console.log('Wormhole request:', req)
     this.wormhole(req, false)
@@ -162,6 +165,9 @@ class WormholeView extends React.Component<Props, State> {
       id: id,
       data: data,
       type: ContentType.UTF8_CONTENT,
+      sender: this.props.sender,
+      recipient: this.props.recipient,
+      invite: '',
     }
     // TODO: Check if wormhole closed
     this.wormhole(req, false)
@@ -171,8 +177,8 @@ class WormholeView extends React.Component<Props, State> {
     // TODO: Check if wormhole already closed
     if (this.wormhole) {
       this.addRowUnlessLast(disconnectedStatus())
-      this.wormhole(null, true)
-      this.wormhole = null
+      this.wormhole(undefined, true)
+      this.wormhole = undefined
     }
     this.setState({loading: false, connected: false})
   }
@@ -193,11 +199,11 @@ class WormholeView extends React.Component<Props, State> {
     })
   }
 
-  rowLast = (): WormholeMessage => {
+  rowLast = (): WormholeMessage | undefined => {
     if (this.state.rows.length > 0) {
       return this.state.rows[this.state.rows.length - 1]
     }
-    return null
+    return undefined
   }
 
   addRowUnlessExists = (row: WormholeMessage) => {
@@ -220,7 +226,7 @@ class WormholeView extends React.Component<Props, State> {
       rows: nextRows,
     })
 
-    store.dispatch({type: 'WORMHOLE_MESSAGES', payload: {messages: nextRows}})
+    this.props.setMessages(nextRows)
 
     // TODO: Don't scroll to bottom if we aren't at the bottom
     this.forceUpdate(() => {
@@ -239,13 +245,15 @@ class WormholeView extends React.Component<Props, State> {
 
   scrollToBottom = () => {
     const component = this.listRef.current
-    const scrollHeight = component.scrollHeight
-    const height = component.clientHeight
-    const maxScrollTop = scrollHeight - height
-    component.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+    if (component) {
+      const scrollHeight = component.scrollHeight
+      const height = component.clientHeight
+      const maxScrollTop = scrollHeight - height
+      component.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0
+    }
   }
 
-  renderItem = (index, key) => {
+  renderItem = (index: number, key: string) => {
     const row: WormholeMessage = this.state.rows[index]
     let style
     let className
@@ -317,26 +325,27 @@ class WormholeView extends React.Component<Props, State> {
   }
 
   render() {
-    const canStart = this.props.sender != '' && this.props.recipient != ''
     const {loading, connected} = this.state
 
     return (
-      <Box style={{height: '100%', overflowX: 'hidden', overflowY: 'hidden', position: 'relative'}}>
+      <Box display="flex" flexDirection="column" style={{height: '100%'}}>
+        <Header loading={loading} />
+        <Divider />
         <Box display="flex" flexDirection="row">
           <Box display="flex" flexDirection="column" flex={1}>
             <Box
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 8, paddingRight: 2}}
             >
-              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 8, width: 40}} align="right">
                 To:
               </Typography>
               <Autocomplete
                 identity={this.props.recipient}
                 disabled={this.state.loading || this.state.connected}
-                onChange={this.setRecipient}
+                onChange={this.props.setRecipient}
                 keyTypes={[KeyType.EDX25519_PUBLIC, KeyType.EDX25519]}
                 style={{width: '100%'}}
                 addOptions={true}
@@ -348,15 +357,15 @@ class WormholeView extends React.Component<Props, State> {
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 4, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 8, paddingRight: 2}}
             >
-              <Typography style={{paddingTop: 2, paddingRight: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 8, width: 40}} align="right">
                 From:
               </Typography>
               <Autocomplete
                 identity={this.props.sender}
                 disabled={this.state.loading || this.state.connected}
-                onChange={this.setSender}
+                onChange={this.props.setSender}
                 keyTypes={[KeyType.EDX25519]}
                 style={{width: '100%'}}
               />
@@ -364,24 +373,12 @@ class WormholeView extends React.Component<Props, State> {
           </Box>
           {this.renderStartStop()}
         </Box>
-        {!loading && <Divider style={{marginBottom: 3}} />}
-        {loading && <LinearProgress />}
-        <div ref={this.listRef} style={{height: 'calc(100vh - 151px)', overflowY: 'scroll'}}>
-          {' '}
-          {/* <ReactList
-            ref={this.listRef}
-            itemRenderer={this.renderItem}
-            length={this.state.rows.length}
-            type="simple"
-          /> */}
+        <Divider />
+        <div ref={this.listRef} style={{height: 'calc(100vh - 137px)', overflowY: 'auto'}}>
           {this.state.rows.map((row, index) => this.renderItem(index, 'wormhole-row-' + index))}
         </div>
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          style={{position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'white'}}
-        >
+        <Box display="flex" flexDirection="column" style={{backgroundColor: 'white'}}>
           <Divider />
           <TextInputView
             defaultValue=""
@@ -423,11 +420,38 @@ const ownerStyle: CSSProperties = {
   maxWidth: '60%',
 }
 
-const mapStateToProps = (state: {wormhole: WormholeState; router: any}, ownProps: any) => {
-  return {
-    sender: state.wormhole.sender || '',
-    recipient: state.wormhole.recipient || '',
-    messages: state.wormhole.messages || [],
+export default (_: {}) => {
+  const {sender, recipient, messages} = store.useState((s) => ({
+    sender: s.sender,
+    recipient: s.recipient,
+    messages: s.messages,
+  }))
+
+  const setRecipient = (recipient?: string) => {
+    store.update((s) => {
+      s.recipient = recipient || ''
+    })
   }
+  const setSender = (sender?: string) => {
+    store.update((s) => {
+      s.sender = sender || ''
+    })
+  }
+
+  const setMessages = (messages: WormholeMessage[]) => {
+    store.update((s) => {
+      s.messages = messages
+    })
+  }
+
+  return (
+    <WormholeView
+      sender={sender}
+      recipient={recipient}
+      messages={messages}
+      setSender={setSender}
+      setRecipient={setRecipient}
+      setMessages={setMessages}
+    />
+  )
 }
-export default connect(mapStateToProps)(WormholeView)

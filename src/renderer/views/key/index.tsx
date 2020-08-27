@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Avatar, Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
-import {TransitionProps} from '@material-ui/core/transitions'
+// import Grow from '@material-ui/core/Grow'
 
 import {DialogTitle} from '../../components'
 import KeyView from './view'
@@ -10,12 +10,12 @@ import KeyView from './view'
 import {styles} from '../../components'
 
 import {key, pull} from '../../rpc/keys'
-import {RPCError, Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
+import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
 
 type Props = {
   open: boolean
   close: (snack: string) => void
-  kid: string
+  kid?: string
   search?: boolean
   update?: boolean
   import?: boolean
@@ -23,9 +23,9 @@ type Props = {
 }
 
 type State = {
-  error: string
+  error?: Error
   loading: boolean
-  key: Key
+  key?: Key
   openExport: boolean
   openRemove: boolean
 }
@@ -35,11 +35,8 @@ type State = {
 // })
 
 export default class KeyDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
-    export: false,
+  state: State = {
     loading: false,
-    key: null,
     openExport: false,
     openRemove: false,
   }
@@ -50,55 +47,61 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
     if (this.props.kid !== prevProps.kid) {
-      this.loadKey(this.props.update, false)
+      this.loadKey(!!this.props.update, false)
     }
   }
 
   loadKey = (update: boolean, reload: boolean) => {
     if (!this.props.kid) {
-      this.setState({key: null})
+      this.setState({key: undefined})
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: KeyRequest = {
       key: this.props.kid,
-      search: this.props.search,
+      search: !!this.props.search,
       update: update,
     }
-    key(req, (err: RPCError, resp: KeyResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      if (resp.key) {
-        this.setState({key: resp.key, loading: false})
-      } else {
-        this.setState({error: 'Key not found', loading: false})
-      }
-      if (reload && this.props.reload) {
-        this.props.reload()
-      }
-    })
+    key(req)
+      .then((resp: KeyResponse) => {
+        this.setState({loading: false})
+        if (resp.key) {
+          this.setState({key: resp.key, loading: false})
+        } else {
+          this.setState({error: new Error('Key not found'), loading: false})
+        }
+        if (reload && this.props.reload) {
+          this.props.reload()
+        }
+      })
+      .catch((err: Error) => {
+        this.setState({error: err, loading: false})
+      })
   }
 
   refresh = (update: boolean) => {
     this.loadKey(update, true)
   }
 
-  import = () => {
-    this.setState({loading: true, error: ''})
+  import = async () => {
+    if (!this.props.kid) {
+      return
+    }
+    this.setState({loading: true, error: undefined})
     const req: PullRequest = {
       key: this.props.kid,
     }
-    pull(req, (err: RPCError, resp: PullResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
+    try {
+      const resp = await pull(req)
       this.setState({loading: false})
       this.close('Imported key')
-    })
+      if (this.props.reload) {
+        this.props.reload()
+      }
+    } catch (err) {
+      this.setState({error: err, loading: false})
+    }
   }
 
   render() {
@@ -109,7 +112,8 @@ export default class KeyDialog extends React.Component<Props, State> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        // TransitionComponent={transition}
+        // TransitionComponent={Grow}
+        // transitionDuration={4000}
         keepMounted
       >
         <DialogTitle loading={this.state.loading} onClose={() => this.close('')}>
@@ -119,10 +123,10 @@ export default class KeyDialog extends React.Component<Props, State> {
           {/*TODO: Better error display*/}
           {this.state.error && (
             <Typography style={{...styles.mono, ...styles.breakWords, color: 'red', paddingBottom: 20}}>
-              {this.state.error}
+              {this.state.error?.message}
             </Typography>
           )}
-          {this.state.key && <KeyView value={this.state.key} refresh={this.refresh} />}
+          {this.state.key && <KeyView k={this.state.key} refresh={this.refresh} />}
         </DialogContent>
         <DialogActions>
           {this.props.import && (

@@ -2,7 +2,8 @@ import * as React from 'react'
 
 import {Button, Input, Typography, Box} from '@material-ui/core'
 
-import {styles, Snack, SnackOpts} from '../../components'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {clipboard} from 'electron'
 
@@ -13,11 +14,13 @@ export type Props = {
 // TODO: This is a copy of encrypted.tsx
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState({message: ''} as SnackOpts)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
-    setSnack({message: 'Copied to Clipboard', duration: 2000} as SnackOpts)
+    setSnack({message: 'Copied to Clipboard', duration: 2000})
+    setSnackOpen(true)
   }
   const disabled = !props.value
 
@@ -56,13 +59,7 @@ export default (props: Props) => {
           Copy to Clipboard
         </Button>
       </Box>
-      <Snack
-        open={!!snack.message}
-        message={snack.message}
-        duration={snack.duration}
-        alert={snack.alert}
-        onClose={() => setSnack({message: ''})}
-      />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

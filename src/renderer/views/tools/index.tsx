@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Store} from '../../store/pull'
+import {store} from '../../store'
 
 import {
   Box,
@@ -13,6 +13,8 @@ import {
   Tooltip,
   Typography,
 } from '@material-ui/core'
+
+import Header from '../header'
 
 import EncryptView from '../encrypt'
 import DecryptView from '../decrypt'
@@ -46,30 +48,34 @@ export default (props: Props) => {
     {name: 'Verify', icon: VerifyIcon, id: 'verify'},
   ]
 
-  const selected = Store.useState((s) => s.selectedTool)
+  const selected = store.useState((s) => s.selectedTool)
 
   return (
-    <Box display="flex" flexGrow={1} flexDirection="row">
-      <List
-        style={{
-          height: '100%',
-          padding: 0,
-        }}
-      >
-        {navs.map((nav, index) =>
-          row(nav, index, selected == nav.id, () =>
-            Store.update((s) => {
-              s.selectedTool = nav.id
-            })
-          )
-        )}
-      </List>
-      <Divider orientation="vertical" />
-      <Box display="flex" flexDirection="column" flex={1}>
-        {selected == 'encrypt' && <EncryptView />}
-        {selected == 'decrypt' && <DecryptView />}
-        {selected == 'sign' && <SignView />}
-        {selected == 'verify' && <VerifyView />}
+    <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
+      <Header />
+      <Divider />
+      <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
+        <List
+          style={{
+            height: '100%',
+            padding: 0,
+          }}
+        >
+          {navs.map((nav, index) =>
+            row(nav, index, selected == nav.id, () =>
+              store.update((s) => {
+                s.selectedTool = nav.id
+              })
+            )
+          )}
+        </List>
+        <Divider orientation="vertical" />
+        <Box display="flex" flexDirection="column" flex={1}>
+          {selected == 'encrypt' && <EncryptView />}
+          {selected == 'decrypt' && <DecryptView />}
+          {selected == 'sign' && <SignView />}
+          {selected == 'verify' && <VerifyView />}
+        </Box>
       </Box>
     </Box>
   )

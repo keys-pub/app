@@ -1,105 +1,73 @@
 import * as React from 'react'
 
-import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
+import {Box, Button, Typography} from '@material-ui/core'
 
-import {DialogTitle, styles} from '../../components'
+import {styles} from '../../components'
+import Dialog from '../../components/dialog'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {keyRemove} from '../../rpc/keys'
-import {RPCError, Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
+import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
-  keyRemove: Key
-  open: boolean
+  open?: boolean
+  k: Key
   close: (removed: boolean) => void
 }
 
-type State = {
-  error: string
+export default (props: Props) => {
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
+
+  const removeKey = async () => {
+    try {
+      const req: KeyRemoveRequest = {kid: props.k.id}
+      const resp = await keyRemove(req)
+      props.close(true)
+    } catch (err) {
+      setSnack({message: err.message, alert: 'error', duration: 4000})
+      setSnackOpen(true)
+    }
+  }
+
+  const key = props.k
+  const open = props.open
+  const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+
+  return (
+    <Dialog
+      open={!!open}
+      close={{label: 'Cancel', action: () => props.close(false)}}
+      title="Delete Key"
+      actions={[{label: 'Delete', action: removeKey, color: 'secondary'}]}
+    >
+      {isPrivate ? <PrivateKey kid={props.k.id} /> : <PublicKey kid={props.k.id} />}
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
+    </Dialog>
+  )
 }
 
-export default class KeyRemoveDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
-  }
-
-  removeKey = () => {
-    const req: KeyRemoveRequest = {kid: this.props.keyRemove.id}
-    keyRemove(req, (err: RPCError, resp: KeyRemoveResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
-      this.props.close(true)
-    })
-  }
-
-  renderDialog(open: boolean) {
-    const key = this.props.keyRemove
-    const isPrivate = key?.type == KeyType.X25519 || key?.type == KeyType.EDX25519
-
-    return (
-      <Dialog
-        onClose={() => this.props.close(false)}
-        open={open}
-        maxWidth="sm"
-        fullWidth
-        disableBackdropClick
-        // TransitionComponent={transition}
-        // keepMounted
-      >
-        <DialogTitle onClose={() => this.props.close(false)}>Delete Key</DialogTitle>
-        <DialogContent dividers>{isPrivate ? this.renderPrivateKey() : this.renderPublicKey()}</DialogContent>
-        <DialogActions>
-          <Button onClick={() => this.props.close(false)}>Cancel</Button>
-          <Button autoFocus onClick={this.removeKey} color="secondary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
-
-  renderPrivateKey() {
-    return (
-      <Box>
-        <Typography style={{paddingBottom: 10}}>
-          Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
-        </Typography>
-        <Typography style={{...styles.mono, paddingBottom: 10, fontWeight: 600}}>
-          {this.props.keyRemove?.id}
-        </Typography>
-        <Typography>
-          <span style={{fontWeight: 600}}>
-            If you haven't backed up the key, you won't be able to recover it.
-          </span>
-        </Typography>
-      </Box>
-    )
-  }
-
-  renderPublicKey() {
-    return (
-      <Box>
-        <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
-        <Typography style={{...styles.mono}}>{this.props.keyRemove?.id}</Typography>
-      </Box>
-    )
-  }
-
-  render() {
-    return this.renderDialog(this.props.open)
-    /* <Step
-        title="Delete Key"
-        prev={{label: 'Cancel', action: this.props.close}}
-        next={{label: 'Yes, Delete', action: this.removeKey}}
-        >
-        {this.renderContent()}
-        </Step> */
-  }
+const PrivateKey = (props: {kid?: string}) => {
+  return (
+    <Box>
+      <Typography style={{paddingBottom: 10}}>
+        Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
+      </Typography>
+      <Typography style={{...styles.mono, paddingBottom: 10, fontWeight: 600}}>{props.kid}</Typography>
+      <Typography>
+        <span style={{fontWeight: 600}}>
+          If you haven't backed up the key, you won't be able to recover it.
+        </span>
+      </Typography>
+    </Box>
+  )
 }
 
-// const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-//   return {kid: query(state, 'kid')}
-// }
-
-// export default connect(mapStateToProps)(KeyRemoveView)
+const PublicKey = (props: {kid?: string}) => {
+  return (
+    <Box>
+      <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
+      <Typography style={{...styles.mono}}>{props.kid}</Typography>
+    </Box>
+  )
+}

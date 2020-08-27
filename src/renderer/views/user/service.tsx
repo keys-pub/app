@@ -1,24 +1,37 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
 
-import {FormControl, MenuItem, Select, Typography} from '@material-ui/core'
+import {FormControl, MenuItem, Select, TextField, Typography} from '@material-ui/core'
 
 type Props = {
   service: string
   setService: (service: string) => void
+  small?: boolean
 }
 
 export default (props: Props) => {
-  const setService = (event: React.ChangeEvent<{value: unknown}>) => {
-    const service = event.target.value as string
+  const setService = React.useCallback((event: React.SyntheticEvent<EventTarget>) => {
+    let target = event.target as HTMLInputElement
+    const service = target.value
     props.setService(service)
-  }
+  }, [])
 
-  const styles: CSSProperties = {width: 200}
+  const styles: React.CSSProperties = {width: 200}
+  if (props.small) {
+    styles.height = 31
+  }
 
   return (
     <FormControl variant="outlined">
-      <Select value={props.service} onChange={setService} style={{...styles, height: 31}}>
+      <TextField
+        variant="outlined"
+        select
+        value={props.service}
+        onChange={setService}
+        id="userServiceSelect"
+        InputProps={{
+          style: styles,
+        }}
+      >
         <MenuItem value={'github'}>
           <Typography>Link to Github</Typography>
         </MenuItem>
@@ -31,7 +44,12 @@ export default (props: Props) => {
         <MenuItem value={'https'}>
           <Typography>Link to Website (HTTPS)</Typography>
         </MenuItem>
-      </Select>
+        {process.env.KEYS_ECHO_ENABLED && (
+          <MenuItem value={'echo'}>
+            <Typography>Link to Echo</Typography>
+          </MenuItem>
+        )}
+      </TextField>
     </FormControl>
   )
 }

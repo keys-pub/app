@@ -5,8 +5,8 @@ import {appPath, appSupportPath} from './paths'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {keysStopSync} from './service'
-import * as Store from 'electron-store'
+import {keysStop} from './service'
+import ElectronStore from 'electron-store'
 
 export type Asset = {
   name: string
@@ -42,8 +42,8 @@ export type UpdateResult = {
   relaunch: boolean
 }
 
-export const update = async (version: string, apply: boolean): Promise<UpdateResult> => {
-  return new Promise((resolve, reject) => {
+export const update = (version: string, apply: boolean): Promise<UpdateResult> => {
+  return new Promise(async (resolve, reject) => {
     if (version == '') {
       version = app.getVersion()
       if (process.env.VERSION) {
@@ -88,7 +88,7 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
         updaterPath = updaterDest
 
         console.log('Stopping keys...')
-        keysStopSync()
+        await keysStop()
 
         // Installer will relaunch on windows.
         relaunch = false
@@ -98,7 +98,7 @@ export const update = async (version: string, apply: boolean): Promise<UpdateRes
     let args = '-github ' + repo + ' -app-name ' + appName + ' -current ' + version
 
     // Check for prerelease
-    const localStore = new Store()
+    const localStore = new ElectronStore()
     if (localStore.get('prerelease') == '1') {
       args = args + ' -prerelease'
     }

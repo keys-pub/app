@@ -2,41 +2,24 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, Input, Typography} from '@material-ui/core'
 
-import {Link, Snack, SnackOpts} from '../../components'
-
+import {Link} from '../../components'
+import Header from '../header'
+import Snack, {SnackProps} from '../../components/snack'
 import {UpdateAlertView} from '../update/alert'
 
-import {ipcMain} from 'electron'
-
-type Props = {}
-
-type State = {
-  openSnack: SnackOpts
-  openUpdateAlert: boolean
-}
-
-export default class StyleGuide extends React.Component<Props, State> {
-  state = {
-    openSnack: null,
-    openUpdateAlert: false,
+export default (_: {}) => {
+  const [updateAlert, setUpdateAlert] = React.useState(false)
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const openSnack = (snack: SnackProps) => {
+    setSnack(snack)
+    setSnackOpen(true)
   }
 
-  closeSnack = () => {
-    this.setState({openSnack: null})
-  }
-
-  updateAlert = () => {
-    this.setState({openUpdateAlert: true})
-  }
-
-  render() {
-    return (
-      <Box
-        display="flex"
-        flex={1}
-        flexDirection="column"
-        style={{paddingLeft: 20}} // , backgroundColor: '#efefef'
-      >
+  return (
+    <Box display="flex" flex={1} flexDirection="column">
+      <Header />
+      <Box display="flex" flexDirection="column" marginLeft={2}>
         <Box display="flex" flexDirection="column">
           <Typography variant="h3">Header3</Typography>
           <Typography variant="h4">Header4</Typography>
@@ -95,35 +78,33 @@ export default class StyleGuide extends React.Component<Props, State> {
         <Box style={{width: 300, marginBottom: 20}}>
           <FormControl>
             <Input placeholder="placeholder" />
-            <FormHelperText id="component-error-text" />
+            <FormHelperText />
           </FormControl>
         </Box>
 
         <Box marginBottom={2}>
-          <Link span onClick={() => this.setState({openSnack: {message: 'Testing'}})}>
+          <Link span onClick={() => openSnack({message: 'Testing'})}>
             Snack Test
           </Link>
           <br />
-          <Link span onClick={() => this.setState({openSnack: {message: 'Testing', alert: 'success'}})}>
+          <Link span onClick={() => openSnack({message: 'Testing', alert: 'success', duration: 1000})}>
             Snack Test (alert, success)
           </Link>
           <br />
-          <Link span onClick={() => this.setState({openSnack: {message: 'Testing', alert: 'info'}})}>
+          <Link span onClick={() => openSnack({message: 'Testing', alert: 'info', duration: 2000})}>
             Snack Test (alert, info)
           </Link>
           <br />
-          <Link span onClick={() => this.setState({openSnack: {message: 'Testing', alert: 'warning'}})}>
+          <Link span onClick={() => openSnack({message: 'Testing', alert: 'warning', duration: 3000})}>
             Snack Test (alert, warning)
           </Link>
           <br />
           <Link
             span
             onClick={() =>
-              this.setState({
-                openSnack: {
-                  message: 'Testing error message error message error message error message error message',
-                  alert: 'error',
-                },
+              openSnack({
+                message: 'Testing error message error message error message error message error message',
+                alert: 'error',
               })
             }
           >
@@ -131,29 +112,29 @@ export default class StyleGuide extends React.Component<Props, State> {
           </Link>
           <br />
           <Snack
-            open={!!this.state.openSnack}
-            onClose={this.closeSnack}
-            message={this.state.openSnack?.message}
-            alert={this.state.openSnack?.alert}
-            duration={this.state.openSnack?.duration}
+            open={snackOpen}
+            {...snack}
+            onClose={() => {
+              setSnackOpen(false)
+            }}
           />
         </Box>
 
         <Box>
-          <Link span onClick={this.updateAlert}>
+          <Link span onClick={() => setUpdateAlert(true)}>
             Update Alert
           </Link>
           <br />
           <UpdateAlertView
-            open={this.state.openUpdateAlert}
-            close={() => this.setState({openUpdateAlert: false})}
+            open={updateAlert}
+            close={() => setUpdateAlert(false)}
             version={'1.2.3'}
             apply={() => {}}
           />
         </Box>
       </Box>
-    )
-  }
+    </Box>
+  )
 }
 
 const cstyles = {

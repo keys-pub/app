@@ -5,41 +5,31 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 import {DialogTitle, styles} from '../../components'
 
 import {secretRemove} from '../../rpc/keys'
-import {RPCError, Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/keys.d'
+import {Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/keys.d'
 
 type Props = {
-  secret: Secret
   open: boolean
+  secret?: Secret
   close: (removed: boolean) => void
 }
 
-type State = {
-  error: string
-}
+type State = {}
 
 export default class SecretRemoveDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
-  }
-
   remove = () => {
+    if (!this.props.secret) return
     const req: SecretRemoveRequest = {id: this.props.secret.id}
-    secretRemove(req, (err: RPCError, resp: SecretRemoveResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
+    secretRemove(req).then((resp: SecretRemoveResponse) => {
       this.props.close(true)
     })
+    // TODO: Catch error
   }
 
-  renderDialog(open: boolean) {
-    const secret = this.props.secret
-
+  render() {
     return (
       <Dialog
         onClose={() => this.props.close(false)}
-        open={open}
+        open={this.props.open}
         maxWidth="sm"
         fullWidth
         disableBackdropClick
@@ -66,9 +56,5 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
         </DialogActions>
       </Dialog>
     )
-  }
-
-  render() {
-    return this.renderDialog(this.props.open)
   }
 }

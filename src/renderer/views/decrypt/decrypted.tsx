@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Button, Divider, Input, Box, IconButton, Typography} from '@material-ui/core'
 
 import SignerView from '../verify/signer'
-import {Snack, SnackOpts} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {clipboard} from 'electron'
 
@@ -17,11 +17,13 @@ export type Props = {
 }
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState({message: ''} as SnackOpts)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
-    setSnack({message: 'Copied to Clipboard', duration: 2000} as SnackOpts)
+    setSnack({message: 'Copied to Clipboard', duration: 2000})
+    setSnackOpen(true)
   }
 
   const disabled = !props.value
@@ -63,13 +65,7 @@ export default (props: Props) => {
           Copy to Clipboard
         </Button>
       </Box>
-      <Snack
-        open={!!snack.message}
-        message={snack.message}
-        duration={snack.duration}
-        alert={snack.alert}
-        onClose={() => setSnack({message: ''})}
-      />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

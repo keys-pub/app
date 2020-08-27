@@ -9,10 +9,10 @@ import {dateString} from '../helper'
 
 import PasswordOptions from './pw'
 
-import {RPCError, Secret, SecretType} from '../../rpc/keys.d'
+import {Secret, SecretType} from '../../rpc/keys.d'
 
 type Props = {
-  secret: Secret
+  secret?: Secret
   edit: () => void
 }
 
@@ -34,39 +34,42 @@ export default class SecretContentView extends React.Component<Props, State> {
         flexDirection="row"
         style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
       >
-        <Button
-          onClick={this.props.edit}
-          variant="outlined"
-          size="small"
-          style={{marginTop: 2, width: 55, marginRight: 10}}
-        >
-          Edit
-        </Button>
-        <Box display="flex" flexGrow={1} />
+        {this.props.secret && (
+          <Box display="flex" flexDirection="row">
+            <Button
+              onClick={this.props.edit}
+              variant="outlined"
+              size="small"
+              style={{marginTop: 2, width: 55, marginRight: 10}}
+            >
+              Edit
+            </Button>
+
+            <Box display="flex" flexGrow={1} />
+          </Box>
+        )}
       </Box>
     )
   }
 
-  renderPassword() {
+  renderPassword(secret: Secret) {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         <Typography style={labelStyle}>Name</Typography>
-        <Typography style={valueStyle}>{this.props.secret.name || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.name || ' '}</Typography>
 
         <Typography style={labelStyle}>Username</Typography>
-        <Typography style={valueStyle}>{this.props.secret.username || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.username || ' '}</Typography>
 
         <Typography style={labelStyle}>Password</Typography>
         <Box display="flex" flexDirection="row" style={{position: 'relative'}}>
           {!this.state.passwordVisible && (
-            <Typography style={valueStyle}>{this.props.secret.password ? '•'.repeat(12) : ' '}</Typography>
+            <Typography style={valueStyle}>{secret.password ? '•'.repeat(12) : ' '}</Typography>
           )}
-          {this.state.passwordVisible && (
-            <Typography style={valueStyle}>{this.props.secret.password || ' '}</Typography>
-          )}
+          {this.state.passwordVisible && <Typography style={valueStyle}>{secret.password || ' '}</Typography>}
           <Box style={{position: 'absolute', right: 10, top: -22}}>
             <PasswordOptions
-              password={this.props.secret.password}
+              password={secret?.password || ''}
               visible={this.state.passwordVisible}
               setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
             />
@@ -74,50 +77,57 @@ export default class SecretContentView extends React.Component<Props, State> {
         </Box>
 
         <Typography style={labelStyle}>URL</Typography>
-        <Typography style={valueStyle}>{this.props.secret.url || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.url || ' '}</Typography>
 
         <Typography style={labelStyle}>Notes</Typography>
-        <Typography style={valueStyle}>{this.props.secret.notes || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.notes || ' '}</Typography>
       </Box>
     )
   }
 
-  renderNote() {
+  renderNote(secret: Secret) {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         <Typography style={labelStyle}>Name</Typography>
-        <Typography style={valueStyle}>{this.props.secret.name || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.name || ' '}</Typography>
 
         <Typography style={labelStyle}>Notes</Typography>
-        <Typography style={valueStyle}>{this.props.secret.notes || ' '}</Typography>
+        <Typography style={valueStyle}>{secret.notes || ' '}</Typography>
+      </Box>
+    )
+  }
+
+  renderSecret(secret: Secret) {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        flex={1}
+        style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 14}}
+      >
+        {secret.type == SecretType.PASSWORD_SECRET && this.renderPassword(secret)}
+        {secret.type == SecretType.NOTE_SECRET && this.renderNote(secret)}
+
+        <Box display="flex" flexDirection="row">
+          <Typography style={{...dateLabelStyle}}>Created:&nbsp;</Typography>
+          <Typography style={dateValueStyle}>{dateString(secret.createdAt)}</Typography>
+        </Box>
+        <Box display="flex" flexDirection="row" marginBottom={1}>
+          <Typography style={{...dateLabelStyle}}>Updated:&nbsp;</Typography>
+          <Typography style={dateValueStyle}>{dateString(secret.updatedAt)}</Typography>
+        </Box>
       </Box>
     )
   }
 
   render() {
-    if (!this.props.secret) return null
-
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderActions()}
         <Divider />
-
-        <Box
-          display="flex"
-          flexDirection="column"
-          style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 18}}
-        >
-          {this.props.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
-          {this.props.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
-
-          <Box display="flex" flexDirection="row">
-            <Typography style={{...dateLabelStyle}}>Created:&nbsp;</Typography>
-            <Typography style={dateValueStyle}>{dateString(this.props.secret.createdAt)}</Typography>
-          </Box>
-          <Box display="flex" flexDirection="row" marginBottom={1}>
-            <Typography style={{...dateLabelStyle}}>Updated:&nbsp;</Typography>
-            <Typography style={dateValueStyle}>{dateString(this.props.secret.updatedAt)}</Typography>
-          </Box>
+        <Box display="flex" flexDirection="row" flex={1}>
+          <Divider orientation="vertical" />
+          {this.props.secret && this.renderSecret(this.props.secret)}
         </Box>
       </Box>
     )

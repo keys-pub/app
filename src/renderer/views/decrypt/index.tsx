@@ -8,12 +8,12 @@ import DecryptedFileView from './decryptedfile'
 import {styles, Link} from '../../components'
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
+import {Store} from 'pullstate'
 
-import {decrypt, decryptFile, key} from '../../rpc/keys'
+import {decrypt, decryptFile, key, DecryptFileEvent} from '../../rpc/keys'
 import {
   Key,
   EncryptMode,
-  RPCError,
   KeyRequest,
   KeyResponse,
   DecryptFileInput,
@@ -22,10 +22,27 @@ import {
   DecryptResponse,
 } from '../../rpc/keys.d'
 
-import {DecryptStore as Store} from '../../store/pull'
+type State = {
+  input: string
+  output: string
+  fileIn: string
+  fileOut: string
+  mode?: EncryptMode
+  sender?: Key
+  error?: Error
+  loading: boolean
+}
+
+const store = new Store<State>({
+  input: '',
+  output: '',
+  fileIn: '',
+  fileOut: '',
+  loading: false,
+})
 
 const openFile = async () => {
-  clearOut()
+  clear(true)
   const win = remote.getCurrentWindow()
   const open = await remote.dialog.showOpenDialog(win, {})
   if (open.canceled) {
@@ -34,57 +51,64 @@ const openFile = async () => {
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
 
-    Store.update((s) => {
+    store.update((s) => {
       s.fileIn = file
     })
   }
 }
 
-const clear = () => {
+const clear = (outOnly: boolean) => {
   // TODO: Stream cancel?
-  Store.update((s) => {
-    s.input = ''
-    s.output = ''
-    s.fileIn = ''
-    s.fileOut = ''
-    s.sender = null
-    s.mode = null
-    s.error = ''
-  })
+  if (outOnly) {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = ''
+      s.sender = undefined
+      s.mode = undefined
+      s.error = undefined
+    })
+  } else {
+    store.update((s) => {
+      s.input = ''
+      s.output = ''
+      s.fileIn = ''
+      s.fileOut = ''
+      s.sender = undefined
+      s.mode = undefined
+      s.error = undefined
+      s.loading = false
+    })
+  }
 }
 
-const clearOut = () => {
-  Store.update((s) => {
-    s.output = ''
-    s.fileOut = ''
-    s.sender = null
-    s.mode = null
-    s.error = ''
-  })
-}
-
-const reloadSender = (kid: string) => {
+const reloadSender = (kid?: string) => {
+  if (!kid) {
+    store.update((s) => {
+      s.sender = undefined
+    })
+    return
+  }
   const req: KeyRequest = {
     key: kid,
+    search: false,
+    update: false,
   }
-  key(req, (err: RPCError, resp: KeyResponse) => {
-    if (err) {
-      Store.update((s) => {
-        s.error = err.details
-      })
-      return
-    }
-    if (resp.key) {
-      Store.update((s) => {
+  key(req)
+    .then((resp: KeyResponse) => {
+      store.update((s) => {
         s.sender = resp.key
       })
-    }
-  })
+    })
+    .catch((err: Error) => {
+      store.update((s) => {
+        s.error = err
+      })
+    })
 }
 
 const decryptInput = (input: string) => {
   if (input == '') {
-    clearOut()
+    clear(true)
     return
   }
 
@@ -93,26 +117,26 @@ const decryptInput = (input: string) => {
   const req: DecryptRequest = {
     data: data,
   }
-  decrypt(req, (err: RPCError, resp: DecryptResponse) => {
-    if (err) {
-      Store.update((s) => {
-        s.error = err.details
+  decrypt(req)
+    .then((resp: DecryptResponse) => {
+      const decrypted = new TextDecoder().decode(resp.data)
+      store.update((s) => {
+        s.sender = resp.sender
+        s.error = undefined
+        s.output = decrypted
+        s.fileOut = ''
+        s.mode = resp.mode
       })
-      return
-    }
-    const decrypted = new TextDecoder().decode(resp.data)
-    Store.update((s) => {
-      s.sender = resp.sender
-      s.error = ''
-      s.output = decrypted
-      s.fileOut = ''
-      s.mode = resp.mode
     })
-  })
+    .catch((err: Error) =>
+      store.update((s) => {
+        s.error = err
+      })
+    )
 }
 
 const decryptFileIn = (fileIn: string, dir: string) => {
-  clearOut()
+  clear(true)
 
   if (fileIn == '') return
 
@@ -121,34 +145,35 @@ const decryptFileIn = (fileIn: string, dir: string) => {
     out: dir,
   }
   console.log('Decrypting file...')
-  Store.update((s) => {
+  store.update((s) => {
     s.loading = true
   })
-  const send = decryptFile((err: RPCError, resp: DecryptFileOutput, done: boolean) => {
+  const send = decryptFile((event: DecryptFileEvent) => {
+    const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
-        Store.update((s) => {
+        store.update((s) => {
           s.loading = false
         })
       } else {
-        Store.update((s) => {
-          s.error = err.details
+        store.update((s) => {
+          s.error = err
           s.loading = false
         })
       }
       return
     }
-    if (resp) {
-      Store.update((s) => {
-        s.fileOut = resp.out
-        s.sender = resp.sender
-        s.error = ''
+    if (res) {
+      store.update((s) => {
+        s.fileOut = res?.out || ''
+        s.sender = res?.sender
+        s.error = undefined
         s.output = ''
-        s.mode = resp.mode
+        s.mode = res?.mode
       })
     }
     if (done) {
-      Store.update((s) => {
+      store.update((s) => {
         s.loading = false
       })
     }
@@ -177,17 +202,19 @@ const DecryptToButton = (props: {onClick: () => void; disabled: boolean}) => (
   </Box>
 )
 
-export default (props: {}) => {
+export default (_: {}) => {
   const inputRef = React.useRef<HTMLInputElement>()
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    Store.update((s) => {
+    store.update((s) => {
       s.input = target.value || ''
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, sender, mode, loading} = Store.useState()
+  const {input, output, fileIn, fileOut, error, sender, mode, loading} = store.useState()
+
+  console.log('render, error:', error)
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -203,7 +230,7 @@ export default (props: {}) => {
         {fileIn && (
           <Box style={{paddingTop: 8, paddingLeft: 8}}>
             <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
-            <Link inline onClick={clear}>
+            <Link inline onClick={() => clear(false)}>
               Clear
             </Link>
           </Box>
@@ -238,11 +265,11 @@ export default (props: {}) => {
               <Box style={{position: 'absolute', top: 6, left: 8}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
-                  onClick={() => inputRef.current.focus()}
+                  onClick={() => inputRef.current?.focus()}
                 >
                   Enter encrypted text or{' '}
                 </Typography>
-                <Link inline onClick={openFile}>
+                <Link inline onClick={() => openFile()}>
                   select a file
                 </Link>
                 <Typography style={{display: 'inline'}}>.</Typography>
@@ -263,7 +290,7 @@ export default (props: {}) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error}&nbsp;</Typography>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
           </Box>
         )}
         {!error && showDecryptFileButton && (
@@ -274,7 +301,7 @@ export default (props: {}) => {
             fileOut={fileOut}
             sender={sender}
             mode={mode}
-            reloadKey={() => reloadSender(sender.id)}
+            reloadKey={() => reloadSender(sender?.id)}
           />
         )}
         {!error && !showDecryptFileButton && !fileOut && (
@@ -282,7 +309,7 @@ export default (props: {}) => {
             value={output}
             sender={sender}
             mode={mode}
-            reloadSender={() => reloadSender(sender.id)}
+            reloadSender={() => reloadSender(sender?.id)}
           />
         )}
       </Box>

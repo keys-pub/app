@@ -25,7 +25,6 @@ import PasswordOptions from './pw'
 
 import {randPassword} from '../../rpc/keys'
 import {
-  RPCError,
   Secret,
   SecretSaveRequest,
   SecretSaveResponse,
@@ -44,69 +43,62 @@ type Props = {
 }
 
 type State = {
-  error: string
-  errorName: string
+  errorName?: Error
   loading: boolean
   secret: Secret
   passwordVisible: boolean
 }
 
 export default class SecretEditView extends React.Component<Props, State> {
-  state = {
-    error: '',
-    errorName: '',
+  state: State = {
     loading: false,
     passwordVisible: false,
     secret: deepCopy(this.props.secret),
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.secret != prevProps.secret) {
       this.setState({secret: deepCopy(this.props.secret)})
     }
   }
 
-  save = async () => {
+  save = () => {
     if (!this.state.secret.name?.trim()) {
-      this.setState({errorName: 'Name is required'})
+      this.setState({errorName: new Error('Name is required')})
       return
     }
 
-    this.setState({loading: true, error: '', errorName: ''})
+    this.setState({loading: true, errorName: undefined})
     const req: SecretSaveRequest = {
       secret: this.state.secret,
     }
-    secretSave(req, (err: RPCError, resp: SecretSaveResponse) => {
-      if (err) {
-        // TODO: Error field name
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false, secret: resp.secret})
-      this.props.onChange(resp.secret)
-    })
+    secretSave(req)
+      .then((resp: SecretSaveResponse) => {
+        this.setState({loading: false, secret: resp.secret!})
+        this.props.onChange(resp.secret!)
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false})
+      })
   }
 
   onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {
     const value = e.target.value as string
     const secret = deepCopy(this.state.secret)
     secret[fieldName] = value
-    const state = {error: '', errorName: '', secret}
+    const state = {errorName: undefined, secret: secret} as State
     this.setState(state)
   }
 
   generatePassword = () => {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
-    randPassword({length: 14}, (err: RPCError, resp: RandPasswordResponse) => {
-      if (err) {
-        this.setState({error: err.details})
-        return
-      }
+    randPassword({length: 14}).then((resp: RandPasswordResponse) => {
       const secret = deepCopy(this.state.secret)
       secret.password = resp.password
       this.setState({secret})
     })
+    // TODO: Catch error
   }
 
   renderEditActions() {
@@ -159,11 +151,11 @@ export default class SecretEditView extends React.Component<Props, State> {
 
   renderPassword() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column">
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
-            <span style={errStyle}>{this.state.errorName}</span>
+            <span style={errStyle}>{this.state.errorName.message}</span>
           </Typography>
         )}
         <TextField
@@ -197,7 +189,7 @@ export default class SecretEditView extends React.Component<Props, State> {
           </Box>
           <Box style={{position: 'absolute', right: 0}}>
             <PasswordOptions
-              password={this.state.secret.password}
+              password={this.state.secret.password!}
               visible={this.state.passwordVisible}
               setVisible={(visible: boolean) => this.setState({passwordVisible: visible})}
               generate={this.generatePassword}
@@ -227,17 +219,18 @@ export default class SecretEditView extends React.Component<Props, State> {
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
+        <Box display="flex" flexGrow={1} />
       </Box>
     )
   }
 
   renderNote() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column">
         {!this.state.errorName && <Typography style={labelStyle}>Name</Typography>}
         {this.state.errorName && (
           <Typography style={labelStyle}>
-            <span style={errStyle}>{this.state.errorName}</span>
+            <span style={errStyle}>{this.state.errorName.message}</span>
           </Typography>
         )}
         <TextField
@@ -266,34 +259,31 @@ export default class SecretEditView extends React.Component<Props, State> {
   }
 
   render() {
-    if (!this.state.secret) return null
-
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         {this.renderEditActions()}
         <Divider />
-        <Box
-          display="flex"
-          flexDirection="column"
-          style={{
-            overflowY: 'auto',
-            height: 'calc(100vh - 94px)',
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingRight: 10,
-          }}
-        >
-          {this.state.error && (
-            <Box marginBottom={2}>
-              <Alert severity="error">{this.state.error}</Alert>
+        <Box display="flex" flexDirection="row" flex={1}>
+          <Divider orientation="vertical" />
+          <Box
+            display="flex"
+            flexDirection="column"
+            flex={1}
+            style={{
+              overflowY: 'auto',
+              height: 'calc(100vh - 94px)',
+              paddingTop: 10,
+              paddingRight: 10,
+            }}
+          >
+            {this.props.isNew && (
+              <FormControl style={{marginLeft: 14, marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
+            )}
+
+            <Box display="flex" flexDirection="column" flex={1} style={{marginLeft: 14}}>
+              {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
+              {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
             </Box>
-          )}
-          {this.props.isNew && (
-            <FormControl style={{marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
-          )}
-          <Box display="flex" flexDirection="column" marginLeft={1} marginRight={1}>
-            {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
-            {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
           </Box>
         </Box>
       </Box>

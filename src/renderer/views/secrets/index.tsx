@@ -25,23 +25,20 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
+import Header from '../header'
+
 import {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {styles, Snack} from '../../components'
-
-import {store} from '../../store'
-
-import {connect} from 'react-redux'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import SecretRemoveDialog from './remove'
 import SecretEditView from './edit'
 import SecretContentView from './content'
 
-import {directionString, flipDirection} from '../helper'
+import {Store} from 'pullstate'
 
-import {secrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
-  RPCError,
   Secret,
   SortDirection,
   SecretType,
@@ -52,11 +49,10 @@ import {
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
-import {AppState} from '../../reducers/app'
 
-type Props = {
-  intro: boolean
-}
+import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
+
+type Props = {}
 
 type Position = {
   x: number
@@ -64,265 +60,288 @@ type Position = {
 }
 
 type State = {
-  contextPosition: Position
-  secrets: Array<Secret>
-  sortField: string
-  sortDirection: SortDirection
+  contextPosition?: Position
+  editing?: Secret
   input: string
-  newKeyMenuEl: HTMLButtonElement
-  editing: Secret
   isNew: boolean
-  openRemove: OpenRemove
-  selected: Secret
-  openSnack: string
-  openSnackAlert: string
+  secrets: Secret[]
+  selected?: Secret
+  sortField?: string
+  sortDirection?: SortDirection
   syncEnabled: boolean
   syncing: boolean
 }
 
-type OpenRemove = {
-  open: boolean
-  secret: Secret
+const initialState: State = {
+  input: '',
+  isNew: false,
+  secrets: [],
+  syncEnabled: false,
+  syncing: false,
 }
 
-class SecretsView extends React.Component<Props, State> {
-  state = {
-    contextPosition: null,
-    secrets: [],
-    sortField: '',
-    sortDirection: 'ASC' as SortDirection,
-    input: '',
-    newKeyMenuEl: null,
-    editing: null,
-    isNew: false,
-    openRemove: {open: false, secret: null},
-    selected: null,
-    openSnack: '',
-    openSnackAlert: '',
-    syncEnabled: false,
-    syncing: false,
+const store = new Store(initialState)
+
+export default (props: Props) => {
+  const {
+    contextPosition,
+    editing,
+    input,
+    isNew,
+    secrets,
+    selected,
+    sortField,
+    sortDirection,
+    syncEnabled,
+    syncing,
+  } = store.useState()
+
+  const [remove, setRemove] = React.useState<Secret>()
+  const [removeOpen, setRemoveOpen] = React.useState(false)
+  const openRemove = (secret: Secret) => {
+    setRemove(secret)
+    setRemoveOpen(true)
   }
 
-  componentDidMount() {
-    this.reload()
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const openSnack = (snack: SnackProps) => {
+    setSnack(snack)
+    setSnackOpen(true)
   }
 
-  reload = () => {
-    const req: RuntimeStatusRequest = {}
-    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-      if (err) {
-        return
-      }
-      this.setState({syncEnabled: resp.sync})
-      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+  const onInput = React.useCallback((e) => {
+    let target = e.target
+    store.update((s) => {
+      s.input = target.value || ''
+    })
+  }, [])
+
+  const onContextMenu = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      const id = event.currentTarget.id
+      const secret = secrets.find((s: Secret) => s.id == id)
+      store.update((s) => {
+        s.contextPosition = {x: event.clientX - 2, y: event.clientY - 4}
+        s.selected = secret
+      })
+    },
+    [secrets]
+  )
+
+  // const direction = directionString(sortDirection)
+
+  const newSecret = () => {
+    const editing: Secret = {
+      id: '',
+      name: '',
+      type: SecretType.PASSWORD_SECRET,
+      username: '',
+      password: '',
+      url: '',
+      notes: '',
+      createdAt: 0,
+      updatedAt: 0,
+    }
+    store.update((s) => {
+      s.selected = undefined
+      s.editing = editing
+      s.isNew = true
     })
   }
 
-  sync = () => {
-    this.setState({syncing: true})
-    const req: VaultUpdateRequest = {}
-    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
-      this.setState({syncing: false})
-      if (err) {
-        this.setState({openSnack: err.details, openSnackAlert: 'error'})
-      }
-      this.reload()
-    })
+  const snackError = (err: Error) => {
+    console.error(err)
+    openSnack({message: err.message, alert: 'error'})
   }
 
-  list = (query: string, sortField: string, sortDirection: SortDirection) => {
-    console.log('List secrets', query, sortField, sortDirection)
+  React.useEffect(() => {
+    reload()
+  }, [input, sortField, sortDirection])
+
+  const reload = async () => {
+    try {
+      const req: RuntimeStatusRequest = {}
+      const resp = await runtimeStatus(req)
+      store.update((s) => {
+        s.syncEnabled = !!resp.sync
+      })
+      list(input, sortField, sortDirection)
+    } catch (err) {
+      snackError(err)
+    }
+  }
+
+  const sync = async () => {
+    store.update((s) => {
+      s.syncing = true
+    })
+    try {
+      const req: VaultUpdateRequest = {}
+      const resp = await vaultUpdate(req)
+      store.update((s) => {
+        s.syncing = false
+      })
+      reload()
+    } catch (err) {
+      store.update((s) => {
+        s.syncing = false
+      })
+      snackError(err)
+    }
+  }
+
+  const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
+    console.log('List secrets', query)
     const req: SecretsRequest = {
       query: query,
       sortField: sortField,
       sortDirection: sortDirection,
     }
-    secrets(req, (err: RPCError, resp: SecretsResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
-      this.setState({
-        secrets: resp.secrets,
-        sortField: resp.sortField,
-        sortDirection: resp.sortDirection,
+
+    try {
+      const resp = await listSecrets(req)
+      store.update((s) => {
+        s.secrets = resp.secrets || []
+        s.sortField = sortField
+        s.sortDirection = resp.sortDirection
       })
-      // If we don't have keys and intro, then show create dialog
-      //   if (resp.secrets.length == 0 && this.props.intro) {
-      //     this.setState({openCreate: 'INTRO'})
-      //   }
-    })
-  }
-
-  onChange = () => {
-    this.reload()
-  }
-
-  select = (secret: Secret) => {
-    this.setState({selected: secret})
-  }
-
-  isSelected = (id: string) => {
-    return this.state.selected?.id == id
-  }
-
-  onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const id = event.currentTarget.id
-    const secret = this.state.secrets.find((s: Secret) => s.id == id)
-    this.setState({
-      contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
-      selected: secret,
-    })
-  }
-
-  closeContext = () => {
-    this.setState({contextPosition: null, selected: null})
-  }
-
-  delete = () => {
-    const secret: Secret = this.state.secrets.find((s: Secret) => {
-      return this.state.selected?.id == s.id
-    })
-
-    this.setState({contextPosition: null, openRemove: {open: true, secret}})
-  }
-
-  sort = (sortField: string, field: string, sortDirection: SortDirection) => {
-    const active = sortField === field
-    let direction: SortDirection = sortDirection
-    if (active) {
-      direction = flipDirection(sortDirection)
-    } else {
-      direction = SortDirection.ASC
+    } catch (err) {
+      snackError(err)
     }
-    this.list(this.state.input, field, direction)
   }
 
-  closeRemove = (removed: boolean) => {
-    this.setState({openRemove: {open: false, secret: this.state.openRemove.secret}, selected: null})
-    this.reload()
-  }
+  // If filtering, selected might not be visible, but we don't want to clear
+  // selected when filtering so we find from the visible list (secrets).
+  const selectedInList = secrets.find((s: Secret) => {
+    return selected?.id == s.id
+  })
 
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({
-      input: target.value,
+  const cancelEdit = () => {
+    store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
     })
-    this.list(target.value, this.state.sortField, this.state.sortDirection)
   }
 
-  newSecret = () => {
-    this.setState({isNew: true, editing: {type: SecretType.PASSWORD_SECRET}})
+  const secretChanged = (changed: Secret) => {
+    const secretsUpdated = secrets.map((secret: Secret) => {
+      if (secret.id == changed.id) return changed
+      return secret
+    })
+    store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
+      s.selected = changed
+      s.secrets = secretsUpdated
+    })
+    // If changed is a new item we need to reload
+    reload()
   }
 
-  edit = () => {
-    this.setState({isNew: false, editing: this.state.selected})
+  const closeContext = () => {
+    store.update((s) => {
+      s.contextPosition = undefined
+      s.selected = undefined
+    })
   }
 
-  cancelEdit = () => {
-    this.setState({isNew: false, editing: null})
+  const removeSecret = () => {
+    store.update((s) => {
+      s.contextPosition = undefined
+    })
+    if (selected) {
+      openRemove(selected)
+    }
   }
 
-  secretChanged = (changed: Secret) => {
-    this.setState({isNew: false, editing: null, selected: changed})
-    this.reload()
+  const closeRemove = (removed: boolean) => {
+    setRemoveOpen(false)
+    if (removed) {
+      store.update((s) => {
+        s.selected = undefined
+      })
+      reload()
+    }
   }
 
-  renderHeader() {
-    return (
-      <Box
-        display="flex"
-        flexDirection="row"
-        flex={1}
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
-      >
-        <TextField
-          placeholder="Filter"
-          variant="outlined"
-          value={this.state.input}
-          onChange={this.onInputChange}
-          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, width: '100%', marginRight: 10}}
-        />
-        <Button
-          color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.newSecret}
-          disabled={!!this.state.editing}
-          style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
-        >
-          <AddIcon />
-        </Button>
-        {this.state.syncEnabled && (
-          <Button
-            onClick={this.sync}
-            size="small"
-            variant="outlined"
-            style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
-            disabled={this.state.syncing}
+  const edit = () => {
+    store.update((s) => {
+      s.isNew = false
+      s.editing = selected
+    })
+  }
+
+  const setSelected = (secret: Secret) => {
+    store.update((s) => {
+      s.selected = secret
+    })
+  }
+
+  return (
+    <Box display="flex" flexDirection="column" flex={1}>
+      <Header />
+      <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
+        <Box style={{width: 250}}>
+          <Box
+            display="flex"
+            flexDirection="row"
+            flex={1}
+            style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
           >
-            <SyncIcon />
-          </Button>
-        )}
-      </Box>
-    )
-  }
-
-  render() {
-    const {sortField, sortDirection} = this.state
-    const direction = directionString(sortDirection)
-
-    // If filtering, selected might not be visible, but we don't want to clear
-    // selected when filtering so we check to see if it's in the list before
-    // showing.
-    const selected: Secret = this.state.secrets.find((s: Secret) => {
-      return this.state.selected?.id == s.id
-    })
-
-    return (
-      <Box>
-        <Menu
-          keepMounted
-          open={this.state.contextPosition !== null}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition !== null
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem color="secondary" onClick={this.delete}>
-            <DeleteIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
-          </MenuItem>
-        </Menu>
-        <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
-          <Box style={{width: 250}}>
-            {this.renderHeader()}
-            <Divider />
-            <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
+            <TextField
+              placeholder="Filter"
+              variant="outlined"
+              value={input}
+              onChange={onInput}
+              inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+              style={{marginTop: 2, width: '100%', marginRight: 10}}
+            />
+            <Button
+              color="primary"
+              variant="outlined"
+              size="small"
+              onClick={newSecret}
+              disabled={!!editing}
+              style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
+            >
+              <AddIcon />
+            </Button>
+            {syncEnabled && (
+              <Button
+                onClick={sync}
+                size="small"
+                variant="outlined"
+                style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
+                disabled={syncing}
+              >
+                <SyncIcon />
+              </Button>
+            )}
+          </Box>
+          <Divider />
+          <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
+            <Box display="flex" flexDirection="row" style={{height: '100%'}}>
               <Table size="small">
-                <TableHead>
+                {/* <TableHead>
                   <TableRow>
                     <TableCell>
                       <Typography style={{...styles.mono}}>Name</Typography>
                     </TableCell>
                   </TableRow>
-                </TableHead>
+                </TableHead> */}
                 <TableBody>
-                  {this.state.secrets.map((secret, index) => {
+                  {secrets.map((secret, index) => {
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => this.select(secret)}
+                        onClick={() => setSelected(secret)}
                         key={secret.id}
                         style={{cursor: 'pointer'}}
-                        selected={this.isSelected(secret.id)}
+                        selected={selected?.id == secret.id}
                         component={(props: any) => {
-                          return <tr onContextMenu={this.onContextMenu} {...props} id={secret.id} />
+                          return <tr onContextMenu={onContextMenu} {...props} id={secret.id} />
                         }}
                       >
                         <TableCell component="th" scope="row" style={{padding: 0}}>
@@ -335,36 +354,33 @@ class SecretsView extends React.Component<Props, State> {
               </Table>
             </Box>
           </Box>
-          <Divider orientation="vertical" />
-          <Box display="flex" flex={1}>
-            {this.state.editing && (
-              <SecretEditView
-                isNew={this.state.isNew}
-                secret={this.state.editing}
-                onChange={this.secretChanged}
-                cancel={this.cancelEdit}
-              />
-            )}
-            {!this.state.editing && selected && (
-              <SecretContentView secret={this.state.selected} edit={this.edit} />
-            )}
-          </Box>
         </Box>
-        <SecretRemoveDialog
-          open={this.state.openRemove.open}
-          secret={this.state.openRemove.secret}
-          close={this.closeRemove}
-        />
-        <Snack
-          open={!!this.state.openSnack}
-          message={this.state.openSnack}
-          alert={this.state.openSnackAlert as AlertColor}
-          onClose={() => this.setState({openSnack: ''})}
-          duration={4000}
-        />
+
+        <Box display="flex" flex={1}>
+          {editing && (
+            <SecretEditView isNew={isNew} secret={editing} onChange={secretChanged} cancel={cancelEdit} />
+          )}
+          {!editing && <SecretContentView secret={selectedInList} edit={edit} />}
+        </Box>
       </Box>
-    )
-  }
+
+      <Menu
+        keepMounted
+        open={!!contextPosition}
+        onClose={closeContext}
+        anchorReference="anchorPosition"
+        anchorPosition={contextPosition ? {top: contextPosition.y, left: contextPosition.x} : undefined}
+      >
+        <MenuItem color="secondary" onClick={removeSecret}>
+          <DeleteIcon />
+          <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
+        </MenuItem>
+      </Menu>
+
+      <SecretRemoveDialog open={removeOpen} secret={remove} close={closeRemove} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
+    </Box>
+  )
 }
 
 const nowrapStyle = {
@@ -413,11 +429,3 @@ const NoteCell = (props: {secret: Secret}) => {
     </Box>
   )
 }
-
-const mapStateToProps = (state: {app: AppState}, ownProps: any) => {
-  return {
-    intro: state.app.intro,
-  }
-}
-
-export default connect(mapStateToProps)(SecretsView)

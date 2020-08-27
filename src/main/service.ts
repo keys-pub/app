@@ -1,9 +1,10 @@
 import {binPath} from './paths'
 import {execProc, spawnProc} from './run'
+import {getAppName, getPort, defaultAppName, defaultPort} from './env'
 
 const keysPath = (): string => {
   let path = ''
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV == 'production') {
     path = binPath('keys')
   }
   if (process.env.KEYS_BIN) {
@@ -16,20 +17,33 @@ const keysPath = (): string => {
 export const keysStart = (): Promise<any> => {
   const path = keysPath()
   if (path) {
+    const appName = getAppName()
+    const port = getPort()
+
+    let arg = ''
+    if (appName != defaultAppName) {
+      arg = '--app=' + appName
+    }
+    let start = 'start --from=app'
+    if (port != defaultPort) {
+      start = start + ' --port=' + port
+    }
+
     // This returns when the service is ready.
-    return execProc(path, 'start --from=app')
+    return execProc(path, arg + ' ' + start)
   }
   return Promise.resolve()
-}
-
-export const keysStopSync = async () => {
-  await keysStop()
 }
 
 export const keysStop = (): Promise<any> => {
   const path = keysPath()
   if (path) {
-    return execProc(path, 'stop')
+    const appName = getAppName()
+    let arg = ''
+    if (appName != defaultAppName) {
+      arg = '--app=' + appName
+    }
+    return execProc(path, arg + ' stop')
   }
   return Promise.resolve()
 }

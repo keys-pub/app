@@ -6,21 +6,20 @@ import {Close as CloseIcon} from '@material-ui/icons'
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-type Props = {
+// import Slide from '@material-ui/core/Slide'
+
+export type SnackProps = {
+  message?: string
+  alert?: string
+  duration?: number
+}
+
+interface Props extends SnackProps {
   open: boolean
-  message: string
   onClose: () => void
-  alert?: string
-  duration?: number
 }
 
-export type SnackOpts = {
-  message: string
-  alert?: string
-  duration?: number
-}
-
-export const Snack = (props: Props) => {
+export default (props: Props) => {
   if (!!props.alert) {
     return <SnackAlert {...props} />
   }
@@ -30,6 +29,7 @@ export const Snack = (props: Props) => {
       // anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
       open={props.open}
       onClose={props.onClose}
+      // TransitionComponent={Slide}
       autoHideDuration={props.duration}
     >
       <SnackbarContent

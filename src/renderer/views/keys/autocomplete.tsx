@@ -4,14 +4,17 @@ import {CSSProperties} from 'react'
 import {Box, Divider, TextField, Typography} from '@material-ui/core'
 import {Face as FaceIcon} from '@material-ui/icons'
 
-import Autocomplete, {createFilterOptions} from '@material-ui/lab/Autocomplete'
+import Autocomplete, {
+  createFilterOptions,
+  AutocompleteChangeReason,
+  AutocompleteInputChangeReason,
+} from '@material-ui/lab/Autocomplete'
 
 import UserLabel from '../user/label'
 import matchSorter from 'match-sorter'
 
-import {store} from '../../store'
 import {keys} from '../../rpc/keys'
-import {RPCError, Key, KeyType, KeysRequest, KeysResponse} from '../../rpc/keys.d'
+import {Key, SortDirection, KeyType, KeysRequest, KeysResponse} from '../../rpc/keys.d'
 import styles, {serviceColor} from '../../components/styles'
 
 import SearchDialog from '../search/dialog'
@@ -20,7 +23,7 @@ import KeyImportDialog from '../import'
 export type Props = {
   identity?: string
   disabled?: boolean
-  onChange?: (value: string) => void
+  onChange?: (value?: string) => void
   placeholder?: string
   keyTypes?: KeyType[]
   style?: CSSProperties
@@ -34,18 +37,17 @@ type State = {
   openImport: boolean
   openSearch: boolean
   options: Key[]
-  selected: Key
+  selected?: Key
 }
 
 export default class AutocompleteView extends React.Component<Props, State> {
-  state = {
-    defaultValue: this.props.identity,
+  state: State = {
+    defaultValue: this.props.identity || '',
     loading: false,
     open: false,
     openImport: false,
     openSearch: false,
     options: [],
-    selected: null,
   }
 
   componentDidMount() {
@@ -54,34 +56,35 @@ export default class AutocompleteView extends React.Component<Props, State> {
 
   search = (q: string) => {
     this.setState({loading: true}) // , options: []
-    const req: KeysRequest = {query: q, types: this.props.keyTypes}
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
+    const req: KeysRequest = {
+      query: q,
+      types: this.props.keyTypes,
+    }
+    keys(req)
+      .then((resp: KeysResponse) => {
+        // Set default selected key.
+        if (this.state.defaultValue) {
+          const selected = resp.keys?.find((k: Key) => {
+            return this.state.defaultValue == k.id || this.state.defaultValue == k.user?.id
+          })
+          this.setState({defaultValue: '', selected: selected})
+        }
+
+        const keys = this.createOptions(resp.keys || [])
+
+        this.setState({options: keys, loading: false})
+      })
+      .catch((err: Error) => {
         this.setState({loading: false, options: []})
-        store.dispatch({type: 'ERROR', payload: {error: err}})
-        return
-      }
-
-      // Set default selected key.
-      if (this.state.defaultValue) {
-        const selected = resp.keys.find((k: Key) => {
-          return this.state.defaultValue == k.id || this.state.defaultValue == k.user?.id
-        })
-        this.setState({defaultValue: null, selected: selected})
-      }
-
-      const keys = this.createOptions(resp.keys)
-
-      this.setState({options: keys, loading: false})
-    })
+      })
   }
 
   createOptions = (options: Key[]): Key[] => {
     if (this.props.addOptions) {
       options = options.filter((k: Key) => k.id != 'search')
-      options.push({id: 'search'})
+      options.push({id: 'search'} as Key)
       options = options.filter((k: Key) => k.id != 'import')
-      options.push({id: 'import'})
+      options.push({id: 'import'} as Key)
     }
     return options
   }
@@ -91,12 +94,12 @@ export default class AutocompleteView extends React.Component<Props, State> {
     this.setState({open: true})
   }
 
-  onInputChange = (event: React.ChangeEvent<{}>, value: string, reason: 'input' | 'reset') => {
+  onInputChange = (event: React.ChangeEvent<{}>, value: string, reason: AutocompleteInputChangeReason) => {
     this.search(value)
   }
 
-  onChange = (event: React.ChangeEvent<{}>, value: any) => {
-    const key = value as Key
+  onChange = (event: React.ChangeEvent<{}>, value: Key | null, reason: AutocompleteChangeReason) => {
+    const key = value || undefined
     if (key?.id == 'search') {
       this.openSearch()
       return
@@ -139,24 +142,24 @@ export default class AutocompleteView extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <UserLabel kid={option.id} user={option.user} />
+        <UserLabel kid={option.id!} user={option.user} />
       </React.Fragment>
     )
   }
 
-  optionSelected = (option: Key, value: string) => {
-    return option.id === value && option.user?.id === value
+  optionSelected = (option: Key, value: Key) => {
+    return option.id == value.id
   }
 
   optionLabel = (option: Key): string => {
     if (option.id == 'search' || option.id == 'import') {
       return ''
     }
-    return option.user?.id || option.id
+    return option.user?.id || option.id || ''
   }
 
   render() {
-    const filterOptions = (options, {inputValue}) => {
+    const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
       const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
       return this.createOptions(filter)
     }
@@ -211,12 +214,12 @@ const InputCustom = (props: InputCustomProps) => {
 
   const [focused, setFocused] = React.useState(false)
   const focus = inprops.onFocus
-  inprops.onFocus = (event) => {
+  inprops.onFocus = (event: {}) => {
     focus(event)
     setFocused(true)
   }
   const blur = inprops.onBlur
-  inprops.onBlur = (event) => {
+  inprops.onBlur = (event: {}) => {
     blur(event)
     setFocused(false)
   }

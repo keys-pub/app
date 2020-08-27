@@ -14,10 +14,12 @@ import {
 
 import {clipboard, shell} from 'electron'
 
-import {styles, DialogTitle, Snack} from '../../components'
+import styles from '../../components/styles'
+import {DialogTitle} from '../../components/dialog'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {userAdd, userSign} from '../../rpc/keys'
-import {RPCError, UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
+import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
 
 type Props = {
   kid: string
@@ -28,27 +30,27 @@ type Props = {
 
 type State = {
   name: string
-  error: string
+  error?: Error
   loading: boolean
   signedMessage: string
-  openSnack: boolean
-  url: string
+  snack?: SnackProps
+  snackOpen: boolean
   step: string
+  url: string
 }
 
 export default class UserSignDialog extends React.Component<Props, State> {
-  state = {
-    name: '',
-    error: '',
-    signedMessage: '',
+  state: State = {
     loading: false,
-    openSnack: false,
-    url: '',
+    name: '',
+    signedMessage: '',
+    snackOpen: false,
     step: 'name',
+    url: '',
   }
 
   clear = () => {
-    this.setState({name: '', error: '', signedMessage: '', loading: false, url: '', step: 'name'})
+    this.setState({name: '', error: undefined, signedMessage: '', loading: false, url: '', step: 'name'})
   }
 
   close = (changed: boolean) => {
@@ -58,46 +60,63 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   onNameChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({name: target ? target.value : '', error: ''})
+    this.setState({name: target ? target.value : '', error: undefined})
   }
 
   onURLChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({url: target ? target.value : '', error: ''})
+    this.setState({url: target ? target.value : '', error: undefined})
   }
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.signedMessage)
-    this.setState({openSnack: true})
+    this.setState({snack: {message: 'Copied to Clipboard', duration: 2000}, snackOpen: true})
   }
 
   userSign = () => {
     if (this.state.name === '') {
       this.setState({
-        error: 'Oops, name is empty',
+        error: new Error('Oops, name is empty'),
       })
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: UserSignRequest = {
       kid: this.props.kid,
       service: this.props.service,
       name: this.state.name,
     }
-    userSign(req, (err: RPCError, resp: UserSignResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
+    userSign(req)
+      .then((resp: UserSignResponse) => {
+        const name = resp.name || ''
+        const message = resp.message || ''
+        let url = this.defaultURL(this.props.service, this.props.kid, name, message)
 
-      let url = ''
-      if (this.props.service == 'https') {
-        url = 'https://' + this.state.name + '/keyspub.txt'
-      }
+        this.setState({
+          loading: false,
+          name,
+          url,
+          signedMessage: message,
+          step: 'sign',
+        })
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
+  }
 
-      this.setState({loading: false, name: resp.name, url: url, signedMessage: resp.message, step: 'sign'})
-    })
+  defaultURL = (service: string, kid: string, name: string, message: string) => {
+    switch (service) {
+      case 'https':
+        return 'https://' + name + '/keyspub.txt'
+      case 'echo':
+        let msg = message.replace(/(\r\n|\n|\r)/gm, '')
+        msg = encodeURIComponent(msg).replace(/%20/g, '+')
+        return 'test://echo/' + name + '/' + kid + '/' + msg
+      default:
+        return ''
+    }
   }
 
   userAdd = () => {
@@ -108,26 +127,26 @@ export default class UserSignDialog extends React.Component<Props, State> {
       url: this.state.url,
       local: false,
     }
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
 
     // setTimeout(() => {
     //   this.props.dispatch(go(-2))
     //   this.setState({loading: false})
     // }, 2000)
 
-    userAdd(req, (err: RPCError, resp: UserAddResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false})
-      this.close(true)
-    })
+    userAdd(req)
+      .then((resp: UserAddResponse) => {
+        this.setState({loading: false})
+        this.close(true)
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   back = () => {
     if (this.state.step == 'sign') {
-      this.setState({step: 'name', error: ''})
+      this.setState({step: 'name', error: undefined})
     } else {
       this.close(false)
     }
@@ -164,6 +183,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
         next =
           "In the next step, we'll create a signed message that you can put on your domain as /keyspub.txt."
         break
+      case 'echo':
+        placeholder = ''
+        question = "What's your test name?"
+        next = "In the next step, we'll save it."
+        break
     }
 
     return (
@@ -171,19 +195,19 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <Typography variant="subtitle1" style={{paddingBottom: 10}}>
           {question}
         </Typography>
-        <FormControl error={this.state.error !== ''}>
+        <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             placeholder={placeholder}
             onChange={this.onNameChange}
             value={this.state.name}
             style={{minWidth: 300}}
+            id="userNameTextField"
+            inputProps={{spellCheck: 'false', style: {...styles.mono}}}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
-        <Typography variant="body1" style={{paddingBottom: 20}}>
-          {next}
-        </Typography>
+        <Typography>{next}</Typography>
       </Box>
     )
   }
@@ -193,7 +217,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     let intro = 'Copy the signed message.'
     let instructions
     let openLabel = ''
-    let openAction = null
+    let openAction = () => {}
     let placeholder = ''
     let urlLabel = ''
     switch (service) {
@@ -239,6 +263,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
         placeholder = 'https://' + this.state.name + '/keyspub.txt'
         urlLabel = 'Where did you save it?'
         break
+      case 'echo':
+        intro = 'Siged message:'
+        placeholder = ''
+        urlLabel = 'Test URL:'
+        break
     }
     return (
       <Box>
@@ -271,10 +300,12 @@ export default class UserSignDialog extends React.Component<Props, State> {
           </Button>
         </Box>
 
-        <Box display="flex" flexDirection="row">
-          <Typography variant="subtitle1">&bull; &nbsp;</Typography>
-          {instructions}
-        </Box>
+        {instructions && (
+          <Box display="flex" flexDirection="row">
+            <Typography variant="subtitle1">&bull; &nbsp;</Typography>
+            {instructions}
+          </Box>
+        )}
         {openLabel && (
           <Box display="flex" flex={1} flexDirection="row" style={{marginLeft: 20}}>
             <Button color="primary" variant="outlined" onClick={openAction} disabled={this.state.loading}>
@@ -282,7 +313,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Button>
           </Box>
         )}
-        <Box style={{paddingBottom: 20}} />
+        {(instructions || openLabel) && <Box style={{paddingBottom: 20}} />}
 
         {urlLabel && (
           <Box display="flex" flexDirection="column" flex={1}>
@@ -290,25 +321,29 @@ export default class UserSignDialog extends React.Component<Props, State> {
               <Typography variant="subtitle1">&bull; &nbsp;</Typography>
               <Typography variant="subtitle1">{urlLabel}</Typography>
             </Box>
-            <FormControl error={this.state.error !== ''} style={{marginLeft: 20}}>
+            <Box display="flex" flexDirection="row" flex={1} style={{marginLeft: 20}}>
               <TextField
                 placeholder={placeholder}
                 onChange={this.onURLChange}
                 value={this.state.url}
+                error={!!this.state.error}
+                helperText={this.state.error?.message || ' '}
+                FormHelperTextProps={{style: styles.breakWords}}
                 disabled={this.state.loading}
                 style={{width: 500}}
+                inputProps={{spellCheck: 'false', style: {...styles.mono, fontSize: 12}}}
               />
-              <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
-            </FormControl>
+            </Box>
           </Box>
         )}
-        {!urlLabel && <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error}</Typography>}
+        {!urlLabel && (
+          <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error?.message}</Typography>
+        )}
 
         <Snack
-          open={this.state.openSnack}
-          duration={2000}
-          onClose={() => this.setState({openSnack: false})}
-          message="Copied to Clipboard"
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
         />
       </Box>
     )
@@ -330,6 +365,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
         break
       case 'https':
         title = 'Link to Website (HTTPS)'
+        break
+      case 'echo':
+        title = 'Link to Echo'
         break
     }
 
@@ -355,7 +393,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
           {this.state.step == 'name' && (
             <Box>
               <Button onClick={() => this.close(false)}>Close</Button>
-              <Button color="primary" onClick={this.userSign}>
+              <Button color="primary" onClick={this.userSign} id="userSignButton">
                 Next
               </Button>
             </Box>
@@ -363,7 +401,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
           {this.state.step == 'sign' && (
             <Box>
               <Button onClick={this.back}>Back</Button>
-              <Button color="primary" onClick={this.userAdd}>
+              <Button color="primary" onClick={this.userAdd} id="userAddButton">
                 Save
               </Button>
             </Box>

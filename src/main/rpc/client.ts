@@ -1,12 +1,11 @@
 import * as getenv from 'getenv'
 import * as grpc from '@grpc/grpc-js'
-// import * as protoLoader from '@grpc/proto-loader'
-// @ln-zap/proto-loader works in electron, see https://github.com/grpc/grpc-node/issues/969
-import * as protoLoader from '@ln-zap/proto-loader'
+import * as protoLoader from '@grpc/proto-loader'
 
 import * as fs from 'fs'
 import * as path from 'path'
 import {appResourcesPath, appSupportPath} from '../paths'
+import {getPort} from '../env'
 
 let keysClient: any = null
 let fido2Client: any = null
@@ -30,10 +29,12 @@ const resolveProtoPath = (name: string): string => {
   return './src/main/rpc/' + name
 }
 
-const auth = (serviceUrl, callback) => {
+type CallMetadataOptions = {service_url: string}
+
+const auth = (options: CallMetadataOptions, cb: (err: Error | null, metadata?: grpc.Metadata) => void) => {
   const metadata = new grpc.Metadata()
   metadata.set('authorization', authToken)
-  callback(null, metadata)
+  cb(null, metadata)
 }
 
 export const setAuthToken = (t: string) => {
@@ -48,7 +49,7 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
   console.log('Proto path:', protoPath)
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})
-  const protoDescriptor = grpc.loadPackageDefinition(packageDefinition)
+  const protoDescriptor: any = grpc.loadPackageDefinition(packageDefinition)
   if (!protoDescriptor[packageName]) {
     throw new Error('proto descriptor should have package ' + packageName)
   }
@@ -57,11 +58,9 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
     throw new Error('proto descriptor missing service ' + serviceName)
   }
 
-  const port = getenv.int('KEYS_PORT', 22405)
+  const port = getPort()
   console.log('Using client on port', port)
-
   const cl = new serviceCls('localhost:' + port, creds())
-
   return cl
 }
 

@@ -1,102 +1,23 @@
-import {createStore, applyMiddleware, compose} from 'redux'
-import thunk from 'redux-thunk'
-import {createHashHistory} from 'history'
-import {routerMiddleware} from 'connected-react-router'
-import {createLogger} from 'redux-logger'
-import createRootReducer from '../reducers'
+import {Store} from 'pullstate'
 
-import {Store} from '../store/pull'
-
-import {ipcRenderer} from 'electron'
-import {push} from 'connected-react-router'
-
-import {runtimeStatus} from '../rpc/keys'
-import {RPCError, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
-
-const history = createHashHistory()
-const rootReducer = createRootReducer(history)
-
-const configureStore = (initialState?: any) => {
-  // Redux Configuration
-  const middleware = []
-  const enhancers = []
-
-  // Thunk Middleware
-  middleware.push(thunk)
-
-  const logger = createLogger({
-    level: 'info',
-    collapsed: true,
-  })
-  // Skip redux logs in console during the tests
-  if (process.env.NODE_ENV !== 'test') {
-    middleware.push(logger)
-  }
-
-  // Router Middleware
-  const router = routerMiddleware(history)
-  middleware.push(router)
-
-  // Create Store
-  const store = createStore(rootReducer, initialState, applyMiddleware(...middleware))
-
-  return store
+export interface Error {
+  message: string
+  details?: string
+  code?: number
+  name?: string
 }
 
-const store = configureStore()
-
-if (typeof module.hot !== 'undefined') {
-  module.hot.accept('../reducers', () => store.replaceReducer(require('../reducers').default))
+export type State = {
+  error?: Error
+  ready: boolean
+  selectedTool: string
+  unlocked: boolean
+  updating: boolean
 }
 
-ipcRenderer.on('preferences', (event, message) => {
-  store.dispatch(push('/settings/index'))
+export const store = new Store<State>({
+  ready: false,
+  selectedTool: 'encrypt',
+  unlocked: false,
+  updating: false,
 })
-
-ipcRenderer.on('unauthenticated', (event, message) => {
-  // TODO: Reset router?
-  store.dispatch(push('/auth/index'))
-})
-
-ipcRenderer.on('unavailable', (event, message) => {
-  store.dispatch(push('/auth/index'))
-})
-
-ipcRenderer.on('focus', (event, message) => {
-  // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: true}})
-  focused()
-})
-
-ipcRenderer.on('blur', (event, message) => {
-  // store.dispatch({type: 'WINDOW_FOCUSED', payload: {focused: false}})
-})
-
-ipcRenderer.on('unresponsive', (event, message) => {
-  store.dispatch({
-    type: 'WINDOW_UNRESPONSIVE',
-    payload: {
-      unresponsive: true,
-    },
-  })
-})
-
-ipcRenderer.on('responsive', (event, message) => {
-  store.dispatch({
-    type: 'WINDOW_UNRESPONSIVE',
-    payload: {
-      unresponsive: false,
-    },
-  })
-})
-
-const focused = () => {
-  const req: RuntimeStatusRequest = {}
-  runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-    if (err) {
-      console.log('Status err:', err)
-      return
-    }
-  })
-}
-
-export {history, store}

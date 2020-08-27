@@ -4,10 +4,8 @@ import {Box, CircularProgress} from '@material-ui/core'
 
 import MessageView from './message'
 
-import RList from '../../components/list'
-
 import {messages} from '../../rpc/keys'
-import {RPCError, Message, MessagesRequest, MessagesResponse} from '../../rpc/keys.d'
+import {Message, MessagesRequest, MessagesResponse} from '../../rpc/keys.d'
 import {MessageRow} from './types'
 
 type Props = {
@@ -121,14 +119,12 @@ export default class MessagesListView extends React.Component<Props, State> {
       return
     }
     const req: MessagesRequest = {
-      // kid: this.props.kid,
+      sender: '',
+      recipient: '',
     }
     console.log('Load rows, RPC messages:', req)
-    messages(req, (err: RPCError, resp: MessagesResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
+    // TODO: Catch error
+    messages(req).then((resp: MessagesResponse) => {
       if (this.listRef === null) {
         // console.error('No list ref')
         return
@@ -210,13 +206,13 @@ export default class MessagesListView extends React.Component<Props, State> {
     return (
       <Box display="flex" flex={1}>
         <Box display="flex" flex={1} style={{overflowY: 'scroll'}}>
-          <RList
+          {/* <RList
             ref={this.setListRef}
             renderItem={this.rowRenderer}
             rowCount={this.state.rowCount}
             isActive={false}
             onScroll={this.onScroll}
-          />
+          /> */}
         </Box>
         {!this.state.loaded && (
           <Box

@@ -8,12 +8,12 @@ import VerifiedFileView from './verifiedfile'
 import {styles, Link} from '../../components'
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
+import {Store} from 'pullstate'
 
-import {verify, verifyFile, key} from '../../rpc/keys'
+import {verify, verifyFile, key, VerifyFileEvent} from '../../rpc/keys'
 import {
   Key,
   EncryptMode,
-  RPCError,
   KeyRequest,
   KeyResponse,
   VerifyFileInput,
@@ -22,7 +22,23 @@ import {
   VerifyResponse,
 } from '../../rpc/keys.d'
 
-import {VerifyStore as Store} from '../../store/pull'
+type State = {
+  input: string
+  output: string
+  fileIn: string
+  fileOut: string
+  signer?: Key
+  error?: Error
+  loading: boolean
+}
+
+const store = new Store<State>({
+  input: '',
+  output: '',
+  fileIn: '',
+  fileOut: '',
+  loading: false,
+})
 
 const openFile = async () => {
   clearOut()
@@ -34,7 +50,7 @@ const openFile = async () => {
   if (open.filePaths.length == 1) {
     const file = open.filePaths[0]
 
-    Store.update((s) => {
+    store.update((s) => {
       s.fileIn = file
     })
   }
@@ -42,42 +58,50 @@ const openFile = async () => {
 
 const clear = () => {
   // TODO: Stream cancel?
-  Store.update((s) => {
+  store.update((s) => {
     s.input = ''
     s.output = ''
     s.fileIn = ''
     s.fileOut = ''
-    s.signer = null
-    s.error = ''
+    s.signer = undefined
+    s.error = undefined
   })
 }
 
 const clearOut = () => {
-  Store.update((s) => {
+  store.update((s) => {
     s.output = ''
     s.fileOut = ''
-    s.signer = null
-    s.error = ''
+    s.signer = undefined
+    s.error = undefined
   })
 }
 
-const reloadSigner = (kid: string) => {
+const setError = (err: Error) => {
+  store.update((s) => {
+    s.error = err
+  })
+}
+
+const reloadSigner = (kid?: string) => {
+  if (!kid) {
+    store.update((s) => {
+      s.signer = undefined
+    })
+    return
+  }
   const req: KeyRequest = {
     key: kid,
+    search: false,
+    update: false,
   }
-  key(req, (err: RPCError, resp: KeyResponse) => {
-    if (err) {
-      Store.update((s) => {
-        s.error = err.details
-      })
-      return
-    }
-    if (resp.key) {
-      Store.update((s) => {
+  key(req)
+    .then((resp: KeyResponse) => {
+      store.update((s) => {
         s.signer = resp.key
       })
-    }
-  })
+    })
+    .catch(setError)
 }
 
 const verifyInput = (input: string) => {
@@ -91,21 +115,17 @@ const verifyInput = (input: string) => {
   const req: VerifyRequest = {
     data: data,
   }
-  verify(req, (err: RPCError, resp: VerifyResponse) => {
-    if (err) {
-      Store.update((s) => {
-        s.error = err.details
+  verify(req)
+    .then((resp: VerifyResponse) => {
+      const verified = new TextDecoder().decode(resp.data)
+      store.update((s) => {
+        s.signer = resp.signer
+        s.error = undefined
+        s.output = verified
+        s.fileOut = ''
       })
-      return
-    }
-    const verified = new TextDecoder().decode(resp.data)
-    Store.update((s) => {
-      s.signer = resp.signer
-      s.error = ''
-      s.output = verified
-      s.fileOut = ''
     })
-  })
+    .catch(setError)
 }
 
 const verifyFileIn = (fileIn: string, dir: string) => {
@@ -118,33 +138,34 @@ const verifyFileIn = (fileIn: string, dir: string) => {
     out: dir,
   }
   console.log('Verifying file...')
-  Store.update((s) => {
+  store.update((s) => {
     s.loading = true
   })
-  const send = verifyFile((err: RPCError, resp: VerifyFileOutput, done: boolean) => {
+  const send = verifyFile((event: VerifyFileEvent) => {
+    const {err, res, done} = event
     if (err) {
       if (err.code == grpc.status.CANCELLED) {
-        Store.update((s) => {
+        store.update((s) => {
           s.loading = false
         })
       } else {
-        Store.update((s) => {
-          s.error = err.details
+        store.update((s) => {
+          s.error = err
           s.loading = false
         })
       }
       return
     }
-    if (resp) {
-      Store.update((s) => {
-        s.fileOut = resp.out
-        s.signer = resp.signer
-        s.error = ''
+    if (res) {
+      store.update((s) => {
+        s.fileOut = res?.out || ''
+        s.signer = res?.signer
+        s.error = undefined
         s.output = ''
       })
     }
     if (done) {
-      Store.update((s) => {
+      store.update((s) => {
         s.loading = false
       })
     }
@@ -178,12 +199,12 @@ export default (props: {}) => {
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    Store.update((s) => {
+    store.update((s) => {
       s.input = target.value || ''
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, signer, loading} = Store.useState()
+  const {input, output, fileIn, fileOut, error, signer, loading} = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -234,7 +255,7 @@ export default (props: {}) => {
               <Box style={{position: 'absolute', top: 6, left: 8}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
-                  onClick={() => inputRef.current.focus()}
+                  onClick={() => inputRef.current?.focus()}
                 >
                   Enter signed text or{' '}
                 </Typography>
@@ -259,17 +280,17 @@ export default (props: {}) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error}&nbsp;</Typography>
+            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
           </Box>
         )}
         {!error && showVerifyFileButton && (
           <VerifyToButton onClick={() => verifyFileTo(fileIn)} disabled={loading} />
         )}
         {!error && !showVerifyFileButton && fileOut && (
-          <VerifiedFileView fileOut={fileOut} signer={signer} reloadKey={() => reloadSigner(signer.id)} />
+          <VerifiedFileView fileOut={fileOut} signer={signer} reloadKey={() => reloadSigner(signer?.id)} />
         )}
         {!error && !showVerifyFileButton && !fileOut && (
-          <VerifiedView value={output} signer={signer} reloadSigner={() => reloadSigner(signer.id)} />
+          <VerifiedView value={output} signer={signer} reloadSigner={() => reloadSigner(signer?.id)} />
         )}
       </Box>
     </Box>

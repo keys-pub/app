@@ -76,12 +76,6 @@ export enum MessageType {
     MESSAGE_PENDING = "MESSAGE_PENDING",
     MESSAGE_ACK = "MESSAGE_ACK",
 }
-export interface RPCError {
-    code?: number;
-    message?: string;
-    details?: string;
-}
-
 export interface SignRequest {
     data?: Uint8Array;
     signer?: string;
@@ -615,7 +609,6 @@ export interface SecretRemoveResponse {
 
 export interface SecretsRequest {
     query?: string;
-    sync?: boolean;
     sortField?: string;
     sortDirection?: SortDirection;
 }

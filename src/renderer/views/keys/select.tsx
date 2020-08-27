@@ -5,11 +5,11 @@ import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} fro
 import UserLabel from '../user/label'
 
 import {keys} from '../../rpc/keys'
-import {RPCError, KeysRequest, KeysResponse, Key, KeyType} from '../../rpc/keys.d'
+import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '../../rpc/keys.d'
 
 export type Props = {
-  value: Key
-  onChange: (value: Key) => void
+  value?: Key
+  onChange: (value?: Key) => void
   disabled?: boolean
   placeholder?: string
   placeholderDisabled?: boolean
@@ -29,15 +29,13 @@ export default (props: Props) => {
 
   const listKeys = () => {
     const req: KeysRequest = {
+      query: '',
       types: [KeyType.EDX25519],
     }
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
-        // TODO: Show error
-        return
-      }
+    keys(req).then((resp: KeysResponse) => {
       setOptions(resp.keys || [])
     })
+    // TODO: Catch error
   }
   React.useEffect(() => {
     listKeys()
@@ -75,7 +73,7 @@ export default (props: Props) => {
                   {props.itemLabel}&nbsp;
                 </Typography>
               )}
-              <UserLabel kid={k.id} user={k.user} />
+              <UserLabel kid={k.id!} user={k.user} />
             </Box>
           </MenuItem>
         ))}

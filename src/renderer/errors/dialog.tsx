@@ -16,43 +16,47 @@ import {
 
 import {styles, DialogTitle} from '../components'
 
-import {ipcRenderer} from 'electron'
+import {Error} from '../store'
+
 import ErrorView from './view'
+import {remote} from 'electron'
+import {ipcRenderer} from 'electron'
 
 type Props = {
-  error: Error | void
-  clearError: () => void
+  error: Error
 }
 
-export default class ErrorsDialog extends React.Component<Props> {
-  restart = () => {
+export default (props: Props) => {
+  const exit = () => {
+    remote.app.exit(0)
+  }
+
+  const restart = () => {
     ipcRenderer.send('reload-app', {})
   }
 
-  render() {
-    return (
-      <Dialog
-        open={!!this.props.error}
-        maxWidth="xl"
-        fullWidth
-        disableBackdropClick
-        PaperProps={{
-          style: {height: 'calc(100% - 64px)'},
-        }}
-      >
-        <DialogTitle>Error</DialogTitle>
-        <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
-          <ErrorView error={this.props.error} />
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={this.props.clearError}>
-            Clear Error
-          </Button>
-          <Button color="secondary" onClick={this.restart}>
-            Restart
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
+  return (
+    <Dialog
+      open={!!props.error}
+      maxWidth="xl"
+      fullWidth
+      disableBackdropClick
+      PaperProps={{
+        style: {height: '100%'},
+      }}
+    >
+      <DialogTitle>Error</DialogTitle>
+      <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
+        {props.error && <ErrorView error={props.error} />}
+      </DialogContent>
+      <DialogActions>
+        <Button color="secondary" onClick={restart}>
+          Restart
+        </Button>
+        <Button color="secondary" onClick={exit}>
+          Exit
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 }

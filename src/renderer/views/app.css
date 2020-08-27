@@ -6,11 +6,16 @@
 @import '~typeface-roboto/index.css';
 @import '~typeface-roboto-mono/index.css';
 @import '~typeface-open-sans/index.css';
-@import '../../resources/fonts.css';
+
+@font-face {
+  font-family: 'Minercraftory';
+  src: url('./Minercraftory.ttf');
+}
 
 body {
   font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
   margin: 0;
+  min-height: 100%;
 }
 
 .drag {

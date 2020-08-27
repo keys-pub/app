@@ -43,7 +43,7 @@ export const spawnProc = (path: string, args: string, killOnExit: boolean): Prom
       cmd = cmd + ' ' + args
     }
 
-    fs.access(path, fs.constants.X_OK, (err: Error) => {
+    fs.access(path, fs.constants.X_OK, (err: Error | null) => {
       if (err) {
         reject(err)
         return

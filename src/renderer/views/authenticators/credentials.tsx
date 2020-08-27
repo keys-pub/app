@@ -11,17 +11,10 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, Snack} from '../../components'
-import {dateString, pluralize} from '../helper'
-
-import SetPinDialog from './setpin'
-import ResetDialog from './reset'
-
-import {store} from '../../store'
+import {pluralize} from '../helper'
 
 import {credentials, deviceInfo, relyingParties, retryCount} from '../../rpc/fido2'
 import {
-  RPCError,
   Device,
   DeviceInfo,
   DeviceInfoRequest,
@@ -39,27 +32,32 @@ import {
 import {toHex} from '../helper'
 
 import CredentialsList from './credentials-list'
+import {stringify} from 'querystring'
 
 type Props = {
   device: Device
 }
 
+interface Error {
+  code: number
+  message: string
+}
+
 type State = {
+  clientPin: string
+  credMgmt: string
   loading: boolean
-  error: string
+  error?: Error
   pin: string
   pinInput: string
   credentials: Array<Credential>
   step: string
   retryCount: number
-  clientPin: string
-  credMgmt: string
 }
 
 export default class DeviceCredentialsView extends React.Component<Props, State> {
-  state = {
+  state: State = {
     loading: false,
-    error: '',
     pinInput: '',
     pin: '',
     credentials: [],
@@ -73,7 +71,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
     this.info()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.device != prevProps.device) {
       this.clear()
       this.info()
@@ -81,7 +79,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
   }
 
   clear = () => {
-    this.setState({pinInput: '', pin: '', error: '', credentials: [], step: ''})
+    this.setState({pinInput: '', pin: '', error: undefined, credentials: [], step: ''})
   }
 
   info = () => {
@@ -89,34 +87,33 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
       return
     }
 
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: DeviceInfoRequest = {
       device: this.props.device.path,
     }
-    deviceInfo(req, (err: RPCError, resp: DeviceInfoResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details, step: ''})
-        return
-      }
+    deviceInfo(req)
+      .then((resp: DeviceInfoResponse) => {
+        let clientPin = ''
+        const optClientPin = resp.info?.options?.find((opt: Option) => opt.name == 'clientPin')
+        if (optClientPin) {
+          clientPin = optClientPin.value || ''
+        }
+        let credMgmt = ''
+        const optCredMgmt = resp.info?.options?.find((opt: Option) => opt.name == 'credMgmt')
+        if (optCredMgmt) {
+          credMgmt = optCredMgmt.value || ''
+        }
 
-      let clientPin = ''
-      const optClientPin = resp.info.options.find((opt: Option) => opt.name == 'clientPin')
-      if (optClientPin) {
-        clientPin = optClientPin.value
-      }
-      let credMgmt = ''
-      const optCredMgmt = resp.info.options.find((opt: Option) => opt.name == 'credMgmt')
-      if (optCredMgmt) {
-        credMgmt = optCredMgmt.value
-      }
-
-      this.setState({
-        loading: false,
-        clientPin,
-        credMgmt,
-        step: 'pin',
+        this.setState({
+          loading: false,
+          clientPin,
+          credMgmt,
+          step: 'pin',
+        })
       })
-    })
+      .catch((err: Error) => {
+        this.setState({error: err, step: '', loading: false})
+      })
   }
 
   credentials = () => {
@@ -128,38 +125,40 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
     const req: CredentialsRequest = {
       device: this.props.device.path,
       pin: this.state.pin,
+      rpId: '',
     }
-    credentials(req, (err: RPCError, resp: CredentialsResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details, pin: '', step: 'pin', retryCount: -1})
+    credentials(req)
+      .then((resp: CredentialsResponse) => {
+        this.setState({
+          step: 'credentials',
+          credentials: resp.credentials || [],
+          loading: false,
+        })
+      })
+      .catch((err: Error) => {
+        this.setState({error: err, pin: '', step: 'pin', retryCount: -1, loading: false})
         if (err.code == 3) {
           // Invalid pin
           this.pinRetryCount()
         }
         return
-      }
-      this.setState({
-        step: 'credentials',
-        credentials: resp.credentials,
-        loading: false,
       })
-    })
   }
 
   pinRetryCount = () => {
     const req: RetryCountRequest = {
       device: this.props.device.path,
     }
-    retryCount(req, (err: RPCError, resp: RetryCountResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details, pin: '', step: 'pin'})
-        return
-      }
-      this.setState({
-        retryCount: resp.count,
-        loading: false,
+    retryCount(req)
+      .then((resp: RetryCountResponse) => {
+        this.setState({
+          retryCount: resp.count || 0,
+          loading: false,
+        })
       })
-    })
+      .catch((err: Error) => {
+        this.setState({error: err, pin: '', step: 'pin', loading: false})
+      })
   }
 
   //   rps = () => {
@@ -186,7 +185,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
 
   onPinChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({pinInput: target.value, error: ''})
+    this.setState({pinInput: target.value, error: undefined})
   }
 
   setPin = () => {
@@ -217,8 +216,8 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
           </Button>
         </Box>
         <Box marginTop={2} />
-        {this.state.error && <Typography style={{color: 'red'}}>{this.state.error}</Typography>}
-        {this.state.error == 'pin invalid' && this.state.retryCount >= 0 && (
+        {this.state.error && <Typography style={{color: 'red'}}>{this.state.error?.message}</Typography>}
+        {this.state.error?.message == 'pin invalid' && this.state.retryCount >= 0 && (
           <Typography>You have {pluralize(this.state.retryCount, 'retry', 'retries')} left.</Typography>
         )}
       </Box>
@@ -228,7 +227,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
   renderError() {
     return (
       <Box marginTop={2}>
-        <Typography style={{color: 'red'}}>{this.state.error}</Typography>
+        <Typography style={{color: 'red'}}>{this.state.error?.message}</Typography>
       </Box>
     )
   }
@@ -266,14 +265,14 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
   }
 }
 
-const credStatus = (credMgmt, clientPin) => {
-  if (credMgmt != 'true') {
+const credStatus = (credMgmt: string, clientPin: string) => {
+  if (credMgmt != 'TRUE') {
     return "This device can't manage credentials."
   }
   if (clientPin == '') {
     return "This device can't manage credentials."
   }
-  if (clientPin == 'false') {
+  if (clientPin == 'FALSE') {
     return 'You need to set a PIN before you can manage credentials.'
   }
   return ''

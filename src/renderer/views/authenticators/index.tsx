@@ -27,15 +27,14 @@ import {
   Search as SearchIcon,
 } from '@material-ui/icons'
 
+import Header from '../header'
 import {styles} from '../../components'
 import {pluralize} from '../helper'
-import {store} from '../../store'
 
 import DeviceContentView from './content'
 
 import {devices} from '../../rpc/fido2'
-import {RPCError, Device, DevicesRequest, DevicesResponse} from '../../rpc/fido2.d'
-import {AppState} from '../../reducers/app'
+import {Device, DevicesRequest, DevicesResponse} from '../../rpc/fido2.d'
 
 type Props = {}
 
@@ -44,30 +43,32 @@ type Position = {
   y: number
 }
 
+interface Error {
+  code: number
+  message: string
+}
+
 type State = {
-  contextPosition: Position
-  devices: Array<Device>
-  error: string
+  contextPosition?: Position
+  devices: Device[]
+  error?: Error
   input: string
   loading: boolean
-  selected: Device
+  selected?: Device
 }
 
 export default class AuthenticatorsView extends React.Component<Props, State> {
-  state = {
-    contextPosition: null,
+  state: State = {
     devices: [],
-    error: '',
     input: '',
     loading: false,
-    selected: null,
   }
 
   componentDidMount() {
     this.refresh()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props != prevProps) {
       this.refresh()
     }
@@ -79,26 +80,23 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 
   list = () => {
     console.log('List devices')
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const req: DevicesRequest = {}
-    devices(req, (err: RPCError, resp: DevicesResponse) => {
-      if (err) {
-        let error = err.details
-        if (err.code == 12) {
-          error = "Sorry, this feature isn't currently available on your platform."
-        }
-
-        this.setState({devices: [], loading: false, error})
-        return
-      }
-
-      const selected = resp.devices.find((d: Device) => d.path == this.state.selected?.path)
-      this.setState({
-        devices: resp.devices,
-        selected: selected,
-        loading: false,
+    devices(req)
+      .then((resp: DevicesResponse) => {
+        const selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
+        this.setState({
+          devices: resp.devices || [],
+          selected: selected,
+          loading: false,
+        })
       })
-    })
+      .catch((err: Error) => {
+        if (err.code == 12) {
+          err = {code: 12, message: "Sorry, this feature isn't currently available on your platform."}
+        }
+        this.setState({devices: [], loading: false, error: err})
+      })
   }
 
   onChange = () => {
@@ -124,7 +122,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   }
 
   closeContext = () => {
-    this.setState({contextPosition: null, selected: null})
+    this.setState({contextPosition: undefined, selected: undefined})
   }
 
   renderHeader() {
@@ -154,23 +152,9 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box>
-        <Menu
-          keepMounted
-          open={this.state.contextPosition !== null}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition !== null
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem onClick={() => {}}>
-            <ExportIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
-          </MenuItem>
-        </Menu>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <Header />
+        <Divider />
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
           <Box style={{width: 200}}>
             {this.renderHeader()}
@@ -182,7 +166,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => this.select(device)}
+                        onClick={() => this.select(device)}
                         key={device.path}
                         style={{cursor: 'pointer'}}
                         selected={this.isSelected(device)}
@@ -216,19 +200,35 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
           </Box>
           <Divider orientation="vertical" />
           <Box display="flex" flex={1}>
-            {this.state.error && (
+            {this.state.error?.message && (
               <Box display="flex" flex={1}>
                 <Typography
                   align="center"
                   style={{color: 'red', width: '100%', paddingTop: 10, paddingBottom: 20}}
                 >
-                  {this.state.error}
+                  {this.state.error.message}
                 </Typography>
               </Box>
             )}
-            {!this.state.error && <DeviceContentView device={this.state.selected} />}
+            {!this.state.error && this.state.selected && <DeviceContentView device={this.state.selected} />}
           </Box>
         </Box>
+        <Menu
+          keepMounted
+          open={!!this.state.contextPosition}
+          onClose={this.closeContext}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            this.state.contextPosition
+              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
+              : undefined
+          }
+        >
+          <MenuItem onClick={() => {}}>
+            <ExportIcon />
+            <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
+          </MenuItem>
+        </Menu>
       </Box>
     )
   }

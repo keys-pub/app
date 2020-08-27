@@ -1,10 +1,7 @@
 import * as React from 'react'
-import {Switch, Route} from 'react-router'
+import {Switch, Route} from 'wouter'
 
-import {Splash} from '../components'
-
-import AuthView from './auth'
-
+import {Box} from '@material-ui/core'
 import DebugView from './settings/debug'
 
 import SecretsView from './secrets'
@@ -15,21 +12,17 @@ import StyleGuide from './style-guide'
 import SettingsView from './settings'
 
 import DBView from './db'
-import KeyView from './key'
 import KeysView from './keys'
 import VaultView from './vault'
 import ToolsView from './tools'
 import AuthenticatorsView from './authenticators'
 
-// TODO: Make path string RoutePath type
 export type RouteInfo = {
   path: string
-  component: () => any
+  component: () => React.ReactNode
 }
 
 export const routes: Array<RouteInfo> = [
-  {path: '/auth/index', component: () => <AuthView />},
-
   {path: '/db/service', component: () => <DBView db="service" />},
   {path: '/db/vault', component: () => <DBView db="vault" />},
 
@@ -45,7 +38,6 @@ export const routes: Array<RouteInfo> = [
 
   {path: '/authenticators/index', component: () => <AuthenticatorsView />},
 
-  {path: '/splash', component: () => <Splash delay={0} />},
   {path: '/style-guide', component: () => <StyleGuide />},
 
   {path: '/settings/index', component: () => <SettingsView />},
@@ -57,12 +49,15 @@ export const routesMap: Map<string, RouteInfo> = new Map(routes.map((r: RouteInf
 type Props = {}
 
 export const Routes = (_: Props) => {
-  const routeComponents = routes.map((r: RouteInfo) => {
-    return (
-      <Route path={r.path} key={r.path}>
-        {r.component()}
-      </Route>
-    )
-  })
-  return <Switch>{routeComponents}</Switch>
+  return (
+    <Switch>
+      {routes.map((r: RouteInfo) => (
+        <Route path={r.path} key={r.path || 'default'}>
+          <Box display="flex" flex={1} id={r.path}>
+            {r.component()}
+          </Box>
+        </Route>
+      ))}
+    </Switch>
+  )
 }

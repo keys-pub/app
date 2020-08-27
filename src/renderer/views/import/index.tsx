@@ -16,16 +16,16 @@ import {
 
 import {styles, DialogTitle} from '../../components'
 
-import {RPCError, KeyImportRequest, KeyImportResponse} from '../../rpc/keys.d'
+import {KeyImportRequest, KeyImportResponse} from '../../rpc/keys.d'
 import {keyImport} from '../../rpc/keys'
 
 type Props = {
   open: boolean
-  close: (imported: boolean) => void
+  close: (imported: string) => void
 }
 
 type State = {
-  error: string
+  error?: Error
   in: string
   loading: boolean
   password: string
@@ -33,8 +33,7 @@ type State = {
 }
 
 export default class KeyImportDialog extends React.Component<Props, State> {
-  state = {
-    error: '',
+  state: State = {
     imported: '',
     in: '',
     loading: false,
@@ -42,46 +41,45 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   }
 
   reset = () => {
-    this.setState({error: '', in: '', loading: false, password: '', imported: ''})
+    this.setState({error: undefined, in: '', loading: false, password: '', imported: ''})
   }
 
   close = () => {
-    const added = this.state.imported != ''
-    this.props.close(added)
+    this.props.close(this.state.imported)
     setTimeout(this.reset, 200)
   }
 
   importKey = async () => {
-    this.setState({loading: true, error: ''})
+    this.setState({loading: true, error: undefined})
     const input = new TextEncoder().encode(this.state.in)
     const req: KeyImportRequest = {
       in: input,
       password: this.state.password,
     }
-    keyImport(req, (err: RPCError, resp: KeyImportResponse) => {
-      if (err) {
-        this.setState({loading: false, error: err.details})
-        return
-      }
-      this.setState({loading: false, imported: resp.kid})
-    })
+    keyImport(req)
+      .then((resp: KeyImportResponse) => {
+        this.setState({loading: false, imported: resp.kid || ''})
+      })
+      .catch((err: Error) => {
+        this.setState({loading: false, error: err})
+      })
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({in: target.value, error: ''})
+    this.setState({in: target.value, error: undefined})
   }
 
   onPasswordInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({password: target.value, error: ''})
+    this.setState({password: target.value, error: undefined})
   }
 
   renderImport() {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={{paddingBottom: 16}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
-        <FormControl error={this.state.error !== ''} style={{marginBottom: 10}}>
+        <FormControl error={!!this.state.error} style={{marginBottom: 10}}>
           <TextField
             multiline
             autoFocus
@@ -97,7 +95,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             }}
           />
         </FormControl>
-        <FormControl error={this.state.error !== ''} style={{marginBottom: -10}}>
+        <FormControl error={!!this.state.error} style={{marginBottom: -10}}>
           <TextField
             label="Password"
             variant="outlined"
@@ -105,7 +103,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             onChange={this.onPasswordInputChange}
             value={this.state.password}
           />
-          <FormHelperText id="component-error-text">{this.state.error || ' '}</FormHelperText>
+          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
       </Box>
     )
@@ -125,7 +123,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   render() {
     return (
       <Dialog
-        onClose={() => this.props.close(false)}
+        onClose={() => this.props.close('')}
         open={this.props.open}
         maxWidth="sm"
         fullWidth
@@ -133,7 +131,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading} onClose={() => this.props.close(false)}>
+        <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           Import Key
         </DialogTitle>
         <DialogContent dividers>

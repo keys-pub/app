@@ -1,7 +1,7 @@
 import {app} from 'electron'
 import * as path from 'path'
 import * as os from 'os'
-import * as getenv from 'getenv'
+import {getAppName} from './env'
 
 // Path to resources directory
 export const appResourcesPath = (): string => {
@@ -11,10 +11,6 @@ export const appResourcesPath = (): string => {
   }
   // console.log('Resources path:', resourcesPath)
   return resourcesPath
-}
-
-const getAppName = (): string => {
-  return getenv.string('KEYS_APP', 'Keys')
 }
 
 export const appSupportPath = (): string => {

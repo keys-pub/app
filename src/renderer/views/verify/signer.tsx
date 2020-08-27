@@ -3,44 +3,49 @@ import * as React from 'react'
 import {Typography, Box, Button} from '@material-ui/core'
 
 import UserLabel from '../user/label'
-import {styles, Snack, SnackOpts} from '../../components'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 
 import KeyDialog from '../key'
 
 import {Key, EncryptMode} from '../../rpc/keys.d'
 
 type Props = {
-  signer: Key
+  signer?: Key
   unsigned?: boolean
   mode?: EncryptMode
   reload: () => void
 }
 
 type State = {
-  openKey: string
-  openSnack?: SnackOpts
+  openKey?: string
+  snack?: SnackProps
+  snackOpen: boolean
 }
 
 export default class SignerView extends React.Component<Props, State> {
-  state = {
-    openKey: '',
-    openSnack: null,
+  state: State = {
+    snackOpen: false,
   }
 
   openKey = () => {
-    this.setState({openKey: this.props.signer.id})
+    this.setState({openKey: this.props.signer?.id})
   }
 
   closeKey = (snack: string) => {
-    this.setState({openKey: '', openSnack: snack ? {message: snack, alert: 'success', duration: 4000} : null})
+    this.setState({
+      openKey: '',
+      snack: {message: snack, alert: 'success', duration: 4000},
+      snackOpen: !!snack,
+    })
     this.props.reload()
   }
 
   renderSigner() {
     if (!this.props.signer) {
-      return <NoSigner unsigned={this.props.unsigned} />
+      return <NoSigner unsigned={!!this.props.unsigned} />
     }
-    if (!this.props.signer.user) {
+    if (!this.props.signer?.user) {
       return <SignerUserUnknown signer={this.props.signer} lookup={this.openKey} />
     }
     return <SignerUser signer={this.props.signer} />
@@ -59,11 +64,9 @@ export default class SignerView extends React.Component<Props, State> {
           import
         />
         <Snack
-          open={!!this.state.openSnack}
-          message={this.state.openSnack?.message}
-          duration={this.state.openSnack?.duration}
-          alert={this.state.openSnack?.alert}
-          onClose={() => this.setState({openSnack: null})}
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
         />
       </Box>
     )
@@ -91,7 +94,7 @@ const SignerUser = (props: {signer: Key}) => {
       <Typography display="inline" style={{...styles.mono}}>
         Verified&nbsp;
       </Typography>
-      <UserLabel kid={signer.id} user={signer.user} />
+      <UserLabel kid={signer.id!} user={signer.user} />
       {/* <Typography display="inline" style={{...styles.mono}}>
         {encryptModeDescription(mode)}
       </Typography> */}
@@ -110,7 +113,7 @@ const SignerUserUnknown = (props: {signer: Key; lookup: () => void}) => {
       <Typography display="inline" style={{...styles.mono}}>
         Signed by&nbsp;
       </Typography>
-      <UserLabel kid={signer.id} user={signer.user} />
+      <UserLabel kid={signer.id!} user={signer.user} />
       <Button
         size="small"
         variant="outlined"

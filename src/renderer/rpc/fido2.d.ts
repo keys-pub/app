@@ -5,12 +5,6 @@ export enum OptionValue {
     TRUE = "TRUE",
     FALSE = "FALSE",
 }
-export interface RPCError {
-    code?: number;
-    message?: string;
-    details?: string;
-}
-
 export interface Device {
     path?: string;
     productId?: number;

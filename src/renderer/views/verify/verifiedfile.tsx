@@ -20,7 +20,7 @@ export default (props: Props) => {
     shell.showItemInFolder(props.fileOut)
   }
 
-  const unsigned = props.fileOut && !props.signer
+  const unsigned = !!(props.fileOut && !props.signer)
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>

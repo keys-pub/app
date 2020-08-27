@@ -33,7 +33,7 @@ export default class MessageView extends React.Component<Props, State> {
       return null
     }
 
-    const key = row.message.id + index
+    const key = row.message.id! + index
 
     let textColor = '#212529'
     let timeColor = '#bfbfbf'

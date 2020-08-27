@@ -10,30 +10,32 @@ import {shell} from 'electron'
 import {Key, KeyType, User} from '../../rpc/keys.d'
 import ServiceSelect from '../user/service'
 import {styles, Link} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
 
 export const IDView = (props: {id: string; owner?: boolean}) => {
-  const styl = {}
-  if (props.owner) styl['fontWeight'] = 600
+  const style: CSSProperties = {}
+  if (props.owner) style.fontWeight = 600
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...styl}}>{props.id}</Typography>
+  return <Typography style={{...styles.mono, ...style}}>{props.id}</Typography>
 }
 
 export const KeyDescriptionView = (props: {value: Key}) => {
   return <Typography>{keyDescription(props.value)}</Typography>
 }
 
-type Props = {
-  value: Key
+type UserProps = {
+  k: Key
   revoke: () => void
   userSign: (service: string) => void
   update: () => void
+  openURL: (url: string) => void
 }
 
-const UserRow = (props: Props) => {
-  const key = props.value
+const UserRow = (props: UserProps) => {
+  const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
   const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
@@ -49,7 +51,7 @@ const UserRow = (props: Props) => {
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
             <Box display="flex" flexDirection="row">
-              <UserLabel kid={user.kid} user={user} />
+              <UserLabel kid={user.kid!} user={user} />
               <Box style={{marginLeft: 10}} />
               {isPrivate && (
                 <Link color="secondary" style={{marginTop: -1}} onClick={props.revoke}>
@@ -59,7 +61,7 @@ const UserRow = (props: Props) => {
             </Box>
             {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
             <Link
-              onClick={() => shell.openExternal(user.url)}
+              onClick={() => props.openURL(user.url!)}
               style={{maxWidth: 480, textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
             >
               {user.url}
@@ -78,7 +80,7 @@ const UserRow = (props: Props) => {
         </TableCell>
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="row">
-            <ServiceSelect service={service} setService={setService} />
+            <ServiceSelect service={service} setService={setService} small />
             <Box marginRight={1} />
             <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
               OK
@@ -105,12 +107,31 @@ const UserRow = (props: Props) => {
   return null
 }
 
-export default (props: Props) => {
-  const key: Key = props.value
-  const kid = key.id
+type Props = {
+  k: Key
+  revoke: () => void
+  userSign: (service: string) => void
+  update: () => void
+}
 
+export default (props: Props) => {
+  const key: Key = props.k
+  const kid = key.id!
   const sigchainURL = 'https://keys.pub/sigchain/' + key.id
-  const openSigchain = () => shell.openExternal(sigchainURL)
+
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const [snackOpen, setSnackOpen] = React.useState(false)
+
+  const openURL = async (url: string) => {
+    try {
+      await shell.openExternal(url)
+    } catch (err) {
+      setSnack({message: err.message, duration: 4000, alert: 'error'})
+      setSnackOpen(true)
+    }
+  }
+
+  const openSigchain = () => openURL(sigchainURL)
 
   return (
     <Box>
@@ -134,7 +155,7 @@ export default (props: Props) => {
               <KeyDescriptionView value={key} />
             </TableCell>
           </TableRow>
-          <UserRow {...props} />
+          <UserRow {...props} openURL={openURL} />
           {key.user && (
             <TableRow>
               <TableCell style={{...cstyles.cell, paddingBottom: 6, verticalAlign: 'center'}}>
@@ -142,10 +163,10 @@ export default (props: Props) => {
               </TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
-                  {key.user.verifiedAt && dateString(key.user.verifiedAt) + '  '}
-                  <Button size="small" color="primary" variant="outlined" onClick={props.update}>
+                  {key?.user?.verifiedAt && dateString(key.user.verifiedAt) + '  '}
+                  <Link span color="primary" onClick={props.update}>
                     Update
-                  </Button>
+                  </Link>
                 </Typography>
               </TableCell>
             </TableRow>
@@ -162,7 +183,7 @@ export default (props: Props) => {
               </TableCell>
             </TableRow>
           )}
-          {key.sigchainLength > 0 && (
+          {(key?.sigchainLength || 0) > 0 && (
             <TableRow>
               <TableCell style={{...cstyles.cell}}>
                 <Typography align="right">Sigchain</Typography>
@@ -179,6 +200,7 @@ export default (props: Props) => {
           )}
         </TableBody>
       </Table>
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

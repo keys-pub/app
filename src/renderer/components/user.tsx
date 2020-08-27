@@ -17,7 +17,7 @@ export const UserButton = (props: ButtonProps) => {
   const style = props.style || {}
   const user: User = props.user
   let service = user.service
-  let name = user.id
+  let name = user.id!
   let size = 14
 
   if (name.length > 24) {
@@ -73,7 +73,7 @@ export const UserLabel = (props: LabelProps) => {
   const style = props.style || {}
   const user: User = props.user
   let service = user.service
-  let name = user.id
+  let name = user.id!
   let size = 14
 
   if (name.length > 24) {

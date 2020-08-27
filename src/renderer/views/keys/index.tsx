@@ -27,17 +27,14 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
-import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
-
-import {styles, Snack, SnackOpts} from '../../components'
+import {styles} from '../../components'
+import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 import {IDView} from '../key/content'
 
-import {store} from '../../store'
+import {Store} from 'pullstate'
 
-import {push} from 'connected-react-router'
-
-import {connect} from 'react-redux'
+import Header from '../header'
 
 import KeyCreateDialog from '../key/create'
 import KeyImportDialog from '../import'
@@ -47,9 +44,8 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys, runtimeStatus, vaultUpdate} from '../../rpc/keys'
+import {keys as listKeys, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
-  RPCError,
   Key,
   KeyType,
   SortDirection,
@@ -60,11 +56,6 @@ import {
   VaultUpdateRequest,
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
-import {AppState} from '../../reducers/app'
-
-type Props = {
-  intro: boolean
-}
 
 type Position = {
   x: number
@@ -72,398 +63,402 @@ type Position = {
 }
 
 type State = {
-  contextPosition: Position
-  keys: Array<Key>
-  sortField: string
-  sortDirection: SortDirection
+  contextPosition?: Position
+  createOpen: boolean
+  exportOpen: boolean
+  exportKey: string
+  importOpen: boolean
   input: string
-  newKeyMenuEl: HTMLButtonElement
-  openCreate: string // '' | 'NEW' | 'INTRO'
-  openExport: string
-  openImport: boolean
-  openKey: string
-  openRemove: OpenRemove
-  openSearch: boolean
-  openSnack: SnackOpts
+  intro: boolean
+  keyOpen: boolean
+  keys: Key[]
+  removeOpen?: boolean
+  removeKey?: Key
+  searchOpen: boolean
   selected: string
+  sortField?: string
+  sortDirection?: SortDirection
   syncEnabled: boolean
   syncing: boolean
 }
 
-type OpenRemove = {
-  open: boolean
-  key: Key
+const initialState: State = {
+  createOpen: false,
+  exportOpen: false,
+  exportKey: '',
+  importOpen: false,
+  input: '',
+  intro: false,
+  keyOpen: false,
+  keys: [],
+  searchOpen: false,
+  selected: '',
+  syncEnabled: false,
+  syncing: false,
 }
 
-class KeysView extends React.Component<Props, State> {
-  state = {
-    contextPosition: null,
-    keys: [],
-    sortField: '',
-    sortDirection: 'ASC' as SortDirection,
-    input: '',
-    newKeyMenuEl: null,
-    openCreate: '',
-    openExport: '',
-    openImport: false,
-    openKey: '',
-    openRemove: {open: false, key: null},
-    openSearch: false,
-    openSnack: null,
-    selected: '',
-    syncEnabled: false,
-    syncing: false,
+const store = new Store(initialState)
+
+export default (_: {}) => {
+  const {
+    contextPosition,
+    createOpen,
+    exportOpen,
+    exportKey,
+    importOpen,
+    input,
+    intro,
+    keyOpen,
+    keys,
+    removeOpen,
+    removeKey,
+    searchOpen,
+    selected,
+    sortField,
+    sortDirection,
+    syncEnabled,
+    syncing,
+  } = store.useState()
+
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+
+  const tableDirection = directionString(sortDirection)
+
+  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    store.update((s) => {
+      s.input = target.value || ''
+    })
+  }, [])
+
+  const setSnackErr = (err: Error) => {
+    setSnackOpen(true)
+    setSnack({message: err.message, alert: 'error', duration: 4000})
   }
 
-  componentDidMount() {
-    this.reload()
-  }
-
-  reload = () => {
-    const req: RuntimeStatusRequest = {}
-    runtimeStatus(req, (err: RPCError, resp: RuntimeStatusResponse) => {
-      if (err) {
-        this.setState({openSnack: {message: err.details, alert: 'error'}})
-        return
-      }
-      this.setState({syncEnabled: resp.sync})
-      this.list(this.state.input, this.state.sortField, this.state.sortDirection)
+  const select = (key: Key) => {
+    store.update((s) => {
+      s.keyOpen = true
+      s.selected = key.id!
     })
   }
 
-  sync = () => {
-    this.setState({syncing: true})
-    const req: VaultUpdateRequest = {}
-    vaultUpdate(req, (err: RPCError, resp: VaultUpdateResponse) => {
-      this.setState({syncing: false})
-      if (err) {
-        this.setState({openSnack: {message: err.details, alert: 'error'}})
-      }
-      this.reload()
+  const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const kid = event.currentTarget.id
+    store.update((s) => {
+      s.contextPosition = {x: event.clientX - 2, y: event.clientY - 4}
+      s.selected = kid
     })
   }
 
-  list = (query: string, sortField: string, sortDirection: SortDirection) => {
+  const closeContext = () => {
+    store.update((s) => {
+      s.contextPosition = undefined
+      s.selected = ''
+    })
+  }
+
+  const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
     console.log('List keys', query, sortField, sortDirection)
     const req: KeysRequest = {
       query: query,
       sortField: sortField,
       sortDirection: sortDirection,
+      types: [],
     }
-    keys(req, (err: RPCError, resp: KeysResponse) => {
-      if (err) {
-        // TODO: error
-        return
-      }
-      this.setState({
-        keys: resp.keys,
-        sortField: resp.sortField,
-        sortDirection: resp.sortDirection,
+    try {
+      const resp = await listKeys(req)
+      const keys = resp.keys || []
+      store.update((s) => {
+        s.keys = keys
+        s.sortField = resp.sortField
+        s.sortDirection = resp.sortDirection
       })
       // If we don't have keys and intro, then show create dialog
-      if (resp.keys.length == 0 && this.props.intro) {
-        this.setState({openCreate: 'INTRO'})
+      if (keys.length == 0 && intro) {
+        store.update((s) => {
+          s.createOpen = true
+          s.intro = false
+        })
       }
-    })
+    } catch (err) {
+      setSnackErr(err)
+    }
   }
 
-  onChange = () => {
-    this.reload()
-  }
-
-  select = (key: Key) => {
-    //store.dispatch(push('/keys/key/index?kid=' + key.id))
-    this.setState({openKey: key.id, selected: key.id})
-  }
-
-  isSelected = (kid: string) => {
-    return this.state.selected == kid
-  }
-
-  onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const kid = event.currentTarget.id
-    this.setState({
-      contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
-      selected: kid,
-    })
-  }
-
-  closeContext = () => {
-    this.setState({contextPosition: null, selected: ''})
-  }
-
-  export = () => {
-    this.setState({contextPosition: null, openExport: this.state.selected})
-  }
-
-  delete = () => {
-    const key: Key = this.state.keys.find((k: Key) => {
-      return this.state.selected == k.id
-    })
-
-    this.setState({contextPosition: null, openRemove: {open: true, key}})
-  }
-
-  sort = (sortField: string, field: string, sortDirection: SortDirection) => {
+  const sort = (field: string, sortField?: string, sortDirection?: SortDirection) => {
     const active = sortField === field
-    let direction: SortDirection = sortDirection
+    let direction: SortDirection = sortDirection || SortDirection.ASC
     if (active) {
-      direction = flipDirection(sortDirection)
+      direction = flipDirection(direction)
     } else {
       direction = SortDirection.ASC
     }
-    this.list(this.state.input, field, direction)
+    list(input, field, direction)
   }
 
-  openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    this.setState({newKeyMenuEl: event.currentTarget})
-  }
+  React.useEffect(() => {
+    list(input, sortField, sortDirection)
+  }, [input, sortField, sortDirection])
 
-  closeMenu = () => {
-    this.setState({newKeyMenuEl: null})
-  }
-
-  keyGen = () => {
-    this.closeMenu()
-    this.setState({openCreate: 'NEW'})
-  }
-
-  importKey = () => {
-    this.closeMenu()
-    this.setState({openImport: true})
-    //store.dispatch(push('/keys/key/import'))
-  }
-
-  closeImport = (imported: boolean) => {
-    this.setState({openImport: false})
-    this.reload()
-  }
-
-  searchKey = () => {
-    this.closeMenu()
-    this.setState({openSearch: true})
-  }
-
-  closeSearch = () => {
-    this.setState({openSearch: false})
-    this.reload()
-  }
-
-  closeRemove = (removed: boolean) => {
-    this.setState({openRemove: {open: false, key: this.state.openRemove.key}, selected: ''})
-    this.reload()
-  }
-
-  onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    this.setState({
-      input: target.value,
+  const openExport = () => {
+    store.update((s) => {
+      s.contextPosition = undefined
+      s.exportOpen = true
+      s.exportKey = selected
     })
-    this.list(target.value, this.state.sortField, this.state.sortDirection)
   }
 
-  renderHeader() {
-    const buttonWidth = 80
-    return (
-      <Box
-        display="flex"
-        flexDirection="row"
-        flex={1}
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
-      >
-        <Button
-          color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.keyGen}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<AddIcon />}
+  const openRemove = () => {
+    const key = keys.find((k: Key) => {
+      return selected == k.id
+    })
+    if (key) {
+      store.update((s) => {
+        s.contextPosition = undefined
+        s.removeOpen = true
+        s.removeKey = key
+      })
+    }
+  }
+
+  const closeImport = (imported: string) => {
+    store.update((s) => {
+      s.importOpen = false
+      s.selected = imported
+    })
+    console.log('imported:', imported)
+    if (imported) {
+      reload()
+    }
+  }
+
+  const setSearchOpen = (b: boolean) => {
+    store.update((s) => {
+      s.searchOpen = b
+    })
+  }
+
+  const setCreateOpen = (b: boolean) => {
+    store.update((s) => {
+      s.createOpen = b
+    })
+  }
+
+  const setImportOpen = (b: boolean) => {
+    store.update((s) => {
+      s.importOpen = b
+    })
+  }
+
+  const setExportOpen = (b: boolean) => {
+    store.update((s) => {
+      s.exportOpen = b
+    })
+  }
+
+  const closeKey = () => {
+    store.update((s) => {
+      s.selected = ''
+      s.keyOpen = false
+    })
+  }
+
+  const closeRemove = (removed: boolean) => {
+    if (removed) {
+      store.update((s) => {
+        s.selected = ''
+        s.removeOpen = false
+      })
+      reload()
+    } else {
+      store.update((s) => {
+        s.removeOpen = false
+      })
+    }
+  }
+
+  const reload = async () => {
+    try {
+      const status = await runtimeStatus({})
+      store.update((s) => {
+        s.syncEnabled = !!status.sync
+      })
+      list(input, sortField, sortDirection)
+    } catch (err) {
+      setSnackErr(err)
+    }
+  }
+
+  const sync = () => {
+    store.update((s) => {
+      s.syncing = true
+    })
+    const req: VaultUpdateRequest = {}
+    vaultUpdate(req)
+      .then((resp: VaultUpdateResponse) => {
+        reload()
+        store.update((s) => {
+          s.syncing = false
+        })
+      })
+      .catch((err: Error) => {
+        store.update((s) => {
+          s.syncing = false
+        })
+        setSnackErr(err)
+      })
+  }
+
+  const buttonWidth = 80
+
+  return (
+    <Box display="flex" flexDirection="column" flex={1} id="keysView">
+      <Box display="flex" flexDirection="column">
+        <Header />
+
+        <Box
+          display="flex"
+          flexDirection="row"
+          flex={1}
+          style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
         >
-          New
-        </Button>
-        <Box paddingLeft={1} />
-        <Button
-          // color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.importKey}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<ImportKeyIcon />}
-        >
-          Import
-        </Button>
-        <Box paddingLeft={1} />
-        <Button
-          // color="primary"
-          variant="outlined"
-          size="small"
-          onClick={this.searchKey}
-          style={{marginTop: 2, minWidth: buttonWidth}}
-          // startIcon={<SearchIcon />}
-        >
-          Search
-        </Button>
-        <Box paddingLeft={1} />
-        {this.state.syncEnabled && (
           <Button
-            onClick={this.sync}
-            size="small"
+            color="primary"
             variant="outlined"
-            style={{marginTop: 2, minWidth: 'auto'}}
-            disabled={this.state.syncing}
+            size="small"
+            onClick={() => setCreateOpen(true)}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<AddIcon />}
+            id="newKeyButton"
           >
-            <SyncIcon />
+            New
           </Button>
-        )}
-        <Box display="flex" flexDirection="row" flexGrow={1} />
-        <TextField
-          placeholder="Filter"
-          variant="outlined"
-          value={this.state.input}
-          onChange={this.onInputChange}
-          inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-          style={{marginTop: 2, width: 300, marginRight: 10}}
-        />
-        <Menu
-          id="new-key-menu"
-          anchorEl={this.state.newKeyMenuEl}
-          keepMounted
-          open={!!this.state.newKeyMenuEl}
-          onClose={this.closeMenu}
-        >
-          <MenuItem onClick={this.keyGen}>
-            <GenerateKeyIcon />
-            <Typography style={{marginLeft: 10}}>Generate Key</Typography>
-          </MenuItem>
-          <MenuItem onClick={this.importKey}>
-            <ImportKeyIcon />
-            <Typography style={{marginLeft: 10}}>Import Key</Typography>
-          </MenuItem>
-        </Menu>
-        <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
-      </Box>
-    )
-  }
-
-  render() {
-    const {sortField, sortDirection} = this.state
-    const direction = directionString(sortDirection)
-
-    return (
-      <Box>
-        <Menu
-          keepMounted
-          open={this.state.contextPosition !== null}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition !== null
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem onClick={this.export}>
-            <ExportIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>Export</Typography>
-          </MenuItem>
-          <MenuItem color="secondary" onClick={this.delete}>
-            <DeleteIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
-          </MenuItem>
-        </Menu>
-        {this.renderHeader()}
-        <Divider />
-        <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortField === 'user'}
-                    direction={direction}
-                    onClick={() => this.sort(sortField, 'user', sortDirection)}
-                  >
-                    <Typography style={{...styles.mono}}>User</Typography>
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortField === 'kid'}
-                    direction={direction}
-                    onClick={() => this.sort(sortField, 'kid', sortDirection)}
-                  >
-                    <Typography style={{...styles.mono}}>Key</Typography>
-                  </TableSortLabel>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.keys.map((key, index) => {
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => this.select(key)}
-                    key={key.id}
-                    style={{cursor: 'pointer'}}
-                    selected={this.isSelected(key.id)}
-                    component={(props: any) => {
-                      return <tr onContextMenu={this.onContextMenu} {...props} id={key.id} />
-                    }}
-                  >
-                    <TableCell component="th" scope="row" style={{minWidth: 200}}>
-                      {key.user && <UserLabel kid={key.id} user={key.user} />}
-                    </TableCell>
-                    <TableCell style={{verticalAlign: 'top'}}>
-                      <IDView
-                        id={key.id}
-                        owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+          <Box paddingLeft={1} />
+          <Button
+            // color="primary"
+            variant="outlined"
+            size="small"
+            onClick={() => setImportOpen(true)}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<ImportKeyIcon />}
+          >
+            Import
+          </Button>
+          <Box paddingLeft={1} />
+          <Button
+            // color="primary"
+            variant="outlined"
+            size="small"
+            onClick={() => setSearchOpen(true)}
+            style={{marginTop: 2, minWidth: buttonWidth}}
+            // startIcon={<SearchIcon />}
+          >
+            Search
+          </Button>
+          <Box paddingLeft={1} />
+          {syncEnabled && (
+            <Button
+              onClick={sync}
+              size="small"
+              variant="outlined"
+              style={{marginTop: 2, minWidth: 'auto'}}
+              disabled={syncing}
+            >
+              <SyncIcon />
+            </Button>
+          )}
+          <Box display="flex" flexDirection="row" flexGrow={1} />
+          <TextField
+            placeholder="Filter"
+            variant="outlined"
+            value={input}
+            onChange={onInputChange}
+            inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
+            style={{marginTop: 2, width: 300, marginRight: 10}}
+          />
+          <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
         </Box>
-        <KeyCreateDialog
-          open={this.state.openCreate != ''}
-          close={() => this.setState({openCreate: ''})}
-          onChange={this.onChange}
-        />
-        <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
-        <KeyRemoveDialog
-          open={this.state.openRemove.open}
-          keyRemove={this.state.openRemove.key}
-          close={this.closeRemove}
-        />
-        <KeyExportDialog
-          open={this.state.openExport != ''}
-          kid={this.state.openExport}
-          close={() => this.setState({openExport: '', selected: ''})}
-        />
-        <KeyDialog
-          open={this.state.openKey != ''}
-          close={() => this.setState({openKey: '', selected: ''})}
-          kid={this.state.openKey}
-          reload={this.reload}
-        />
-        <Snack
-          open={!!this.state.openSnack}
-          onClose={() => this.setState({openSnack: null})}
-          message={this.state.openSnack?.message}
-          alert={this.state.openSnack?.alert}
-          duration={this.state.openSnack?.duration}
-        />
+        <Divider />
       </Box>
-    )
-  }
-}
+      <Box display="flex" flexDirection="column" style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField == 'user'}
+                  direction={tableDirection}
+                  onClick={() => sort('user', sortField, sortDirection)}
+                >
+                  <Typography style={{...styles.mono}}>User</Typography>
+                </TableSortLabel>
+              </TableCell>
+              <TableCell style={{width: 530}}>
+                <TableSortLabel
+                  active={sortField == 'kid'}
+                  direction={tableDirection}
+                  onClick={() => sort('kid', sortField, sortDirection)}
+                >
+                  <Typography style={{...styles.mono}}>Key</Typography>
+                </TableSortLabel>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {keys.map((key, index) => {
+              return (
+                <TableRow
+                  hover
+                  onClick={() => select(key)}
+                  key={key.id}
+                  style={{cursor: 'pointer'}}
+                  selected={selected == key.id}
+                  component={(props: any) => {
+                    return <tr onContextMenu={onContextMenu} {...props} id={key.id} />
+                  }}
+                >
+                  <TableCell component="th" scope="row" style={{minWidth: 200}}>
+                    {key.user && <UserLabel kid={key.id!} user={key.user} />}
+                  </TableCell>
+                  <TableCell style={{verticalAlign: 'top'}}>
+                    <IDView
+                      id={key.id!}
+                      owner={key.type == KeyType.X25519 || key.type === KeyType.EDX25519}
+                    />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </Box>
 
-const mapStateToProps = (state: {app: AppState}, ownProps: any) => {
-  return {
-    intro: state.app.intro,
-  }
-}
+      <Menu
+        keepMounted
+        open={!!contextPosition}
+        onClose={closeContext}
+        anchorReference="anchorPosition"
+        anchorPosition={contextPosition ? {top: contextPosition.y, left: contextPosition.x} : undefined}
+      >
+        <MenuItem onClick={openExport}>
+          <ExportIcon />
+          <Typography style={{marginLeft: 10, marginRight: 20}}>Export</Typography>
+        </MenuItem>
+        <MenuItem color="secondary" onClick={openRemove}>
+          <DeleteIcon />
+          <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
+        </MenuItem>
+      </Menu>
 
-export default connect(mapStateToProps)(KeysView)
+      <KeyCreateDialog open={createOpen} close={() => setCreateOpen(false)} onChange={reload} />
+      <KeyImportDialog open={importOpen} close={closeImport} />
+      {removeKey && <KeyRemoveDialog open={removeOpen} k={removeKey} close={closeRemove} />}
+      <KeyExportDialog open={exportOpen} kid={exportKey} close={() => setExportOpen(false)} />
+      <KeyDialog open={keyOpen} close={closeKey} kid={selected} reload={reload} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
+    </Box>
+  )
+}
