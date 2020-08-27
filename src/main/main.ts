@@ -19,7 +19,6 @@ import {update, UpdateResult} from './updater'
 
 import {rpcRegister} from './rpc'
 import {reloadApp} from './app'
-import {appResource} from './paths'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -50,7 +49,7 @@ app.on('ready', async () => {
     minWidth: 920,
     minHeight: 600,
     // For AppImage icon
-    icon: appResource(path.join('resources', 'icon.png')),
+    icon: path.join(__dirname, 'icon.png'),
 
     webPreferences: {
       nodeIntegration: true,

@@ -2,6 +2,7 @@ const path = require('path')
 const HtmlPlugin = require('html-webpack-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const DefinePlugin = require('webpack').DefinePlugin
+const CopyPlugin = require('copy-webpack-plugin')
 
 const DEVELOPMENT = 'development'
 const PRODUCTION = 'production'
@@ -164,6 +165,22 @@ function createMainConfig(isDev) {
     plugins: [
       new DefinePlugin({
         ENVIRONMENT: JSON.stringify(isDev ? DEVELOPMENT : PRODUCTION),
+      }),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'icon.png',
+            to: 'icon.png',
+          },
+          {
+            from: 'main/rpc/keys.proto',
+            to: 'keys.proto',
+          },
+          {
+            from: 'main/rpc/fido2.proto',
+            to: 'fido2.proto',
+          },
+        ],
       }),
     ],
   }

@@ -1,10 +1,9 @@
-import * as getenv from 'getenv'
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import {appResource, appSupportPath} from '../paths'
+import {appSupportPath} from '../paths'
 import {getPort} from '../env'
 
 let keysClient: any = null
@@ -38,7 +37,7 @@ export const setAuthToken = (t: string) => {
 export const newClient = (protoName: string, packageName: string, serviceName: string): any => {
   console.log('New client:', protoName)
 
-  const protoPath = appResource(path.join('src', 'main', 'rpc', protoName))
+  const protoPath = path.join(__dirname, protoName)
   console.log('Proto path:', protoPath)
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})

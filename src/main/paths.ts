@@ -2,14 +2,6 @@ import {app} from 'electron'
 import * as path from 'path'
 import * as os from 'os'
 import {getAppName} from './env'
-import * as fs from 'fs'
-
-export const appResource = (file: string): string => {
-  let resourcesPath = appResourcePath()
-  const resource = path.join(resourcesPath, file)
-  if (fs.existsSync(resource)) return resource
-  return file
-}
 
 export const appResourcePath = (): string => {
   let resourcesPath = app.getAppPath()
