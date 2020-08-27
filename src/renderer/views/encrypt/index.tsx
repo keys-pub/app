@@ -21,7 +21,7 @@ import SignKeySelectView from '../keys/select'
 
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
-import {Store, createAsyncAction, errorResult, successResult} from 'pullstate'
+import {Store} from 'pullstate'
 
 import {encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {

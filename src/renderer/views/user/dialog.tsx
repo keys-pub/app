@@ -207,9 +207,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
           />
           <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
-        <Typography variant="body1" style={{paddingBottom: 20}}>
-          {next}
-        </Typography>
+        <Typography>{next}</Typography>
       </Box>
     )
   }

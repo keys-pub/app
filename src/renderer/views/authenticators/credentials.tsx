@@ -112,10 +112,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
         })
       })
       .catch((err: Error) => {
-        this.setState({error: err, step: ''})
-      })
-      .finally(() => {
-        this.setState({loading: false})
+        this.setState({error: err, step: '', loading: false})
       })
   }
 
@@ -135,18 +132,16 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
         this.setState({
           step: 'credentials',
           credentials: resp.credentials || [],
+          loading: false,
         })
       })
       .catch((err: Error) => {
-        this.setState({error: err, pin: '', step: 'pin', retryCount: -1})
+        this.setState({error: err, pin: '', step: 'pin', retryCount: -1, loading: false})
         if (err.code == 3) {
           // Invalid pin
           this.pinRetryCount()
         }
         return
-      })
-      .finally(() => {
-        this.setState({loading: false})
       })
   }
 
@@ -158,13 +153,11 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
       .then((resp: RetryCountResponse) => {
         this.setState({
           retryCount: resp.count || 0,
+          loading: false,
         })
       })
       .catch((err: Error) => {
-        this.setState({error: err, pin: '', step: 'pin'})
-      })
-      .finally(() => {
-        this.setState({loading: false})
+        this.setState({error: err, pin: '', step: 'pin', loading: false})
       })
   }
 
@@ -273,13 +266,13 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
 }
 
 const credStatus = (credMgmt: string, clientPin: string) => {
-  if (credMgmt != 'true') {
+  if (credMgmt != 'TRUE') {
     return "This device can't manage credentials."
   }
   if (clientPin == '') {
     return "This device can't manage credentials."
   }
-  if (clientPin == 'false') {
+  if (clientPin == 'FALSE') {
     return 'You need to set a PIN before you can manage credentials.'
   }
   return ''

@@ -105,6 +105,7 @@ export default (props: Props) => {
   // const direction = directionString(sortDirection)
 
   const newSecret = () => {
+    setSelected(undefined)
     setEditing({
       id: '',
       name: '',

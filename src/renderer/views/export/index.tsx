@@ -54,26 +54,29 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     }
 
     this.setState({error: undefined})
-    const req: KeyExportRequest = {
-      kid: this.props.kid,
-      password: this.state.password,
-      noPassword: noPassword,
-      public: false,
-      type: ExportType.DEFAULT_EXPORT_TYPE,
+    try {
+      const req: KeyExportRequest = {
+        kid: this.props.kid,
+        password: this.state.password,
+        noPassword: noPassword,
+        public: false,
+        type: ExportType.DEFAULT_EXPORT_TYPE,
+      }
+      const resp = await keyExport(req)
+      const out = new TextDecoder().decode(resp.export)
+      this.setState({password: '', passwordConfirm: '', export: out})
+    } catch (err) {
+      this.setState({error: err})
     }
-    keyExport(req)
-      .then((resp: KeyExportResponse) => {
-        const out = new TextDecoder().decode(resp.export)
-        this.setState({password: '', passwordConfirm: '', export: out})
-      })
-      .catch((err: Error) => {
-        this.setState({error: err})
-      })
+  }
+
+  reset = () => {
+    this.setState({password: '', passwordConfirm: '', error: undefined, export: ''})
   }
 
   close = () => {
     this.props.close()
-    this.setState({password: '', passwordConfirm: '', export: '', error: undefined})
+    setTimeout(this.reset, 200)
   }
 
   onInputChangePassword = (e: React.SyntheticEvent<EventTarget>) => {
@@ -171,11 +174,3 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     )
   }
 }
-
-// const mapStateToProps = (state: {rpc: RPCState; router: any}, ownProps: any) => {
-//   return {
-//     kid: query(state, 'kid'),
-//   }
-// }
-
-// export default connect(mapStateToProps)(KeyExportView)

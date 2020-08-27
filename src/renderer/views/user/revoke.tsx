@@ -45,9 +45,10 @@ export default (props: Props) => {
       loading={loading}
       actions={[{label: 'Revoke', action: revoke, color: 'primary'}]}
     >
-      <DialogContentText id="alert-dialog-description">
-        Are you sure you want to revoke this user statement?
-      </DialogContentText>
+      <Typography>
+        Are you sure you want to revoke the user statement for key
+        {props.kid}?
+      </Typography>
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )

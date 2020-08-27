@@ -24,6 +24,7 @@ import KeyDialog from '../key'
 type Props = {
   open: boolean
   close: () => void
+  reload: () => void
 }
 
 type State = {
@@ -81,7 +82,7 @@ export default class SearchDialog extends React.Component<Props, State> {
           kid={this.state.openKey}
           update
           import
-          reload={() => {}}
+          reload={this.props.reload}
         />
         <Snack
           open={this.state.snackOpen}

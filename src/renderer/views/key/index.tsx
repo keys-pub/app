@@ -51,10 +51,6 @@ export default class KeyDialog extends React.Component<Props, State> {
     }
   }
 
-  setError = (err: Error) => {
-    this.setState({error: err})
-  }
-
   loadKey = (update: boolean, reload: boolean) => {
     if (!this.props.kid) {
       this.setState({key: undefined})
@@ -69,18 +65,18 @@ export default class KeyDialog extends React.Component<Props, State> {
     }
     key(req)
       .then((resp: KeyResponse) => {
+        this.setState({loading: false})
         if (resp.key) {
-          this.setState({key: resp.key})
+          this.setState({key: resp.key, loading: false})
         } else {
-          this.setError(new Error('Key not found'))
+          this.setState({error: new Error('Key not found'), loading: false})
         }
         if (reload && this.props.reload) {
           this.props.reload()
         }
       })
-      .catch(this.setError)
-      .finally(() => {
-        this.setState({loading: false})
+      .catch((err: Error) => {
+        this.setState({error: err, loading: false})
       })
   }
 
@@ -88,7 +84,7 @@ export default class KeyDialog extends React.Component<Props, State> {
     this.loadKey(update, true)
   }
 
-  import = () => {
+  import = async () => {
     if (!this.props.kid) {
       return
     }
@@ -96,15 +92,16 @@ export default class KeyDialog extends React.Component<Props, State> {
     const req: PullRequest = {
       key: this.props.kid,
     }
-    pull(req)
-      .then((resp: PullResponse) => {
-        this.setState({loading: false})
-        this.close('Imported key')
-      })
-      .catch(this.setError)
-      .finally(() => {
-        this.setState({loading: false})
-      })
+    try {
+      const resp = await pull(req)
+      this.setState({loading: false})
+      this.close('Imported key')
+      if (this.props.reload) {
+        this.props.reload()
+      }
+    } catch (err) {
+      this.setState({error: err, loading: false})
+    }
   }
 
   render() {

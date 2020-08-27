@@ -21,7 +21,7 @@ import {keyImport} from '../../rpc/keys'
 
 type Props = {
   open: boolean
-  close: (imported: boolean) => void
+  close: (imported: string) => void
 }
 
 type State = {
@@ -45,8 +45,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   }
 
   close = () => {
-    const added = this.state.imported != ''
-    this.props.close(added)
+    this.props.close(this.state.imported)
     setTimeout(this.reset, 200)
   }
 
@@ -124,7 +123,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   render() {
     return (
       <Dialog
-        onClose={() => this.props.close(false)}
+        onClose={() => this.props.close('')}
         open={this.props.open}
         maxWidth="sm"
         fullWidth
@@ -132,7 +131,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         // TransitionComponent={transition}
         // keepMounted
       >
-        <DialogTitle loading={this.state.loading} onClose={() => this.props.close(false)}>
+        <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           Import Key
         </DialogTitle>
         <DialogContent dividers>

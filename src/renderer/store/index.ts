@@ -9,7 +9,6 @@ export interface Error {
 
 export type State = {
   error?: Error
-  intro: boolean
   ready: boolean
   selectedTool: string
   unlocked: boolean
@@ -17,7 +16,6 @@ export type State = {
 }
 
 export const store = new Store<State>({
-  intro: true,
   ready: false,
   selectedTool: 'encrypt',
   unlocked: false,

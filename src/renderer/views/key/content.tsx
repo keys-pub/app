@@ -164,9 +164,9 @@ export default (props: Props) => {
               <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
                   {key?.user?.verifiedAt && dateString(key.user.verifiedAt) + '  '}
-                  <Button size="small" color="primary" variant="outlined" onClick={props.update}>
+                  <Link span color="primary" onClick={props.update}>
                     Update
-                  </Button>
+                  </Link>
                 </Typography>
               </TableCell>
             </TableRow>

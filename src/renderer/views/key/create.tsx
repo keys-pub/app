@@ -40,8 +40,6 @@ type State = {
 //   return <Slide direction="up" ref={ref} {...props} />
 // })
 
-const minHeight = 125
-
 export default class KeyCreateDialog extends React.Component<Props> {
   state = {
     type: KeyType.EDX25519,
@@ -125,7 +123,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
           Generate Key
         </DialogTitle>
         <DialogContent dividers>
-          <Box style={{minHeight}}>
+          <Box>
             <FormControl variant="outlined">
               <Select value={this.state.type} onChange={this.setType}>
                 <MenuItem value={KeyType.EDX25519}>
@@ -190,7 +188,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         {/* TODO: This title? */}
         <DialogTitle onClose={this.close}>Key Created</DialogTitle>
         <DialogContent dividers>
-          <Box style={{minHeight}}>
+          <Box>
             <Typography style={{paddingBottom: 10}}>We created and saved the key:</Typography>
             <Typography style={{...styles.mono, paddingBottom: 10, paddingLeft: 10}}>
               {this.state.kid}
@@ -227,9 +225,9 @@ export default class KeyCreateDialog extends React.Component<Props> {
         // TransitionComponent={transition}
         keepMounted
       >
-        <DialogTitle onClose={this.close}>Publish / Link Key</DialogTitle>
+        <DialogTitle onClose={this.close}>Publish Key</DialogTitle>
         <DialogContent dividers>
-          <Box style={{minHeight}}>
+          <Box>
             <Typography>
               Do you want to link this key with a user account (Github, Twitter, Reddit, etc) and publish your
               public key to the{' '}

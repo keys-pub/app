@@ -19,6 +19,7 @@ import {
 
 import {history} from './router'
 import {remote} from 'electron'
+import {authLock} from '../rpc/keys'
 
 type Props = {
   noLock?: boolean
@@ -34,11 +35,12 @@ export default (props: Props) => {
     history.back()
   }
 
-  const lock = () => {
+  const lock = async () => {
     ipcRenderer.send('authToken', {authToken: ''})
     store.update((s) => {
       s.unlocked = false
     })
+    await authLock({})
   }
 
   const osname = platform()

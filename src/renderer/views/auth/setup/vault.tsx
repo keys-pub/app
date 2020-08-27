@@ -101,10 +101,6 @@ export default class AuthVaultView extends React.Component<Props, State> {
     }
   }
 
-  setError = (err: Error) => {
-    this.setState({error: err})
-  }
-
   authVault = async () => {
     const req: AuthVaultRequest = {
       phrase: this.state.phrase,
@@ -113,8 +109,10 @@ export default class AuthVaultView extends React.Component<Props, State> {
     authVault(req)
       .then((resp: AuthVaultResponse) => {
         this.props.setup()
+        this.setState({loading: false})
       })
-      .catch(this.setError)
-      .finally(() => this.setState({loading: false}))
+      .catch((err: Error) => {
+        this.setState({error: err, loading: false})
+      })
   }
 }

@@ -41,7 +41,7 @@ function createRenderConfig(isDev) {
       'react-dom': 'ReactDOM',
       fs: "require('fs')",
       os: "require('os')",
-      '@grpc/grpc-js': "require('@grpc/grpc-js')",
+      // '@grpc/grpc-js': "require('@grpc/grpc-js')",
       electron: "require('electron')",
     },
 

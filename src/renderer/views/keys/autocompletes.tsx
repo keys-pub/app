@@ -105,6 +105,15 @@ export default (props: Props) => {
     search(input)
   }, [input])
 
+  const reload = () => {
+    search(input)
+  }
+
+  const closeImport = () => {
+    setImportOpen(false)
+    reload()
+  }
+
   const onChange = (event: React.ChangeEvent<{}>, value: any) => {
     let keys = value as Key[]
 
@@ -162,8 +171,8 @@ export default (props: Props) => {
           />
         )}
       />
-      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} />
-      <KeyImportDialog open={importOpen} close={() => setImportOpen(false)} />
+      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
+      <KeyImportDialog open={importOpen} close={closeImport} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )

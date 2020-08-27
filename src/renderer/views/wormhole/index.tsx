@@ -302,7 +302,7 @@ class WormholeView extends React.Component<Props, State> {
       <Box
         display="flex"
         flexDirection="row"
-        style={{paddingLeft: 8, paddingTop: 3, paddingBottom: 6, paddingRight: 8}}
+        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 6, paddingRight: 8}}
       >
         {!loading && !connected && (
           <Button
@@ -329,18 +329,17 @@ class WormholeView extends React.Component<Props, State> {
 
     return (
       <Box display="flex" flexDirection="column" style={{height: '100%'}}>
-        <Header />
-        {!loading && <Divider style={{marginBottom: 3}} />}
-        {loading && <LinearProgress />}
+        <Header loading={loading} />
+        <Divider />
         <Box display="flex" flexDirection="row">
           <Box display="flex" flexDirection="column" flex={1}>
             <Box
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 2, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 8, paddingRight: 2}}
             >
-              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 8, width: 40}} align="right">
                 To:
               </Typography>
               <Autocomplete
@@ -358,9 +357,9 @@ class WormholeView extends React.Component<Props, State> {
               display="flex"
               flexDirection="row"
               flex={1}
-              style={{paddingLeft: 8, paddingTop: 5, paddingRight: 2}}
+              style={{paddingLeft: 8, paddingTop: 8, paddingRight: 2}}
             >
-              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 4, width: 40}} align="right">
+              <Typography style={{paddingRight: 4, paddingTop: 2, paddingBottom: 8, width: 40}} align="right">
                 From:
               </Typography>
               <Autocomplete
