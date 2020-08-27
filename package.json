@@ -11,7 +11,6 @@
     "build-prod-main": "yarn webpack --env.NODE_ENV=production --env.target=main",
     "build-prod": "yarn build-prod-render && yarn build-prod-main",
     "start-prod": "yarn run build-prod && yarn electron dist/main.js",
-    "pack": "yarn run build-prod && electron-builder --dir",
     "dist": "yarn run build-prod && electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "version": "cross-var echo $npm_package_version"
