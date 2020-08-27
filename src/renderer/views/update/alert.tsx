@@ -9,109 +9,77 @@ import {platform} from '../../env'
 import {store} from '../../store'
 import {ipcRenderer, shell} from 'electron'
 
-export default (props: {}) => {
-  const setUpdating = () => {
-    store.update((s) => {
-      s.updating = true
-    })
-  }
-  return <UpdateAlert setUpdating={setUpdating} />
-}
+export default (_: {}) => {
+  const [open, setOpen] = React.useState(false)
+  const [version, setVersion] = React.useState('')
 
-type Props = {
-  setUpdating: () => void
-}
-
-type State = {
-  open: boolean
-  version: string
-}
-
-class UpdateAlert extends React.Component<Props, State> {
-  state = {
-    open: false,
-    version: '',
-  }
-
-  componentDidMount() {
-    console.log('UpdateAlert mount')
+  React.useEffect(() => {
     ipcRenderer.on('update-needed', (event, update) => {
       console.log('Update:', update)
       if (update.needUpdate) {
-        this.setState({
-          open: true,
-          version: update.version,
-        })
+        setOpen(true)
+        setVersion(update.version)
       }
     })
 
     ipcRenderer.on('update-check-err', (event, err) => {
-      // TODO
+      // TODO: Show snack error?
       console.error(err)
     })
 
     ipcRenderer.on('update-apply-err', (event, err) => {
-      // TODO
       console.error(err)
+      store.update((s) => {
+        s.error = err
+      })
     })
+
+    return function cleanup() {
+      ipcRenderer.removeAllListeners('update-needed')
+      ipcRenderer.removeAllListeners('update-check-err')
+      ipcRenderer.removeAllListeners('update-apply-err')
+    }
+  })
+
+  const close = () => {
+    setOpen(false)
+    setVersion('')
   }
 
-  componentWillUnmount() {
-    console.log('UpdateAlert unmount')
-    ipcRenderer.removeAllListeners('update-needed')
-    ipcRenderer.removeAllListeners('update-check-err')
-    ipcRenderer.removeAllListeners('update-apply-err')
-  }
-
-  close = () => {
-    this.setState({
-      open: false,
-      version: '',
-    })
-  }
-
-  apply = () => {
-    this.setState({
-      open: false,
-      version: '',
-    })
+  const apply = () => {
+    setOpen(false)
+    setVersion('')
     ipcRenderer.send('update-apply')
-    this.props.setUpdating()
+    store.update((s) => {
+      s.updating = true
+    })
   }
 
-  openReleases = () => {
+  const openReleases = () => {
     shell.openExternal('https://github.com/keys-pub/app/releases')
   }
 
-  render() {
-    let action
-    let actionLabel
+  let action
+  let actionLabel
 
-    switch (platform()) {
-      case 'darwin':
-        action = this.apply
-        actionLabel = 'Download & Restart'
-        break
-      case 'win32':
-        action = this.apply
-        actionLabel = 'Download & Restart'
-        break
-      default:
-        action = this.openReleases
-        actionLabel = 'View Releases'
-        break
-    }
-
-    return (
-      <UpdateAlertView
-        open={this.state.open}
-        close={this.close}
-        version={this.state.version}
-        action={action}
-        actionLabel={actionLabel}
-      />
-    )
+  switch (platform()) {
+    case 'darwin':
+      action = apply
+      actionLabel = 'Download & Restart'
+      break
+    case 'win32':
+      action = apply
+      actionLabel = 'Download & Restart'
+      break
+    default:
+      action = openReleases
+      actionLabel = 'View Releases'
+      break
   }
+
+  return (
+    <UpdateAlertView open={open} close={close} version={version} action={action} actionLabel={actionLabel} />
+  )
 }
 
 type UpdateAlertProps = {
