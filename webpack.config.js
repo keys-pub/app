@@ -1,6 +1,5 @@
 const path = require('path')
 const HtmlPlugin = require('html-webpack-plugin')
-const HtmlExternalsPlugin = require('html-webpack-externals-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const DefinePlugin = require('webpack').DefinePlugin
 
@@ -37,11 +36,8 @@ function createRenderConfig(isDev) {
     },
 
     externals: {
-      react: 'React',
-      'react-dom': 'ReactDOM',
       fs: "require('fs')",
       os: "require('os')",
-      // '@grpc/grpc-js': "require('@grpc/grpc-js')",
       electron: "require('electron')",
     },
 
@@ -102,30 +98,12 @@ function createRenderConfig(isDev) {
     },
 
     plugins: [
-      new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: ['!main*.js*'], // Don't clean main files
-      }),
+      new CleanWebpackPlugin({}),
 
       new HtmlPlugin({
         filename: 'index.html',
         template: 'index.html',
         cache: true,
-      }),
-
-      new HtmlExternalsPlugin({
-        cwpOptions: {context: path.join(__dirname, 'node_modules')},
-        externals: [
-          {
-            module: 'react',
-            global: 'React',
-            entry: isDev ? 'umd/react.development.js' : 'umd/react.production.min.js',
-          },
-          {
-            module: 'react-dom',
-            global: 'ReactDOM',
-            entry: isDev ? 'umd/react-dom.development.js' : 'umd/react-dom.production.min.js',
-          },
-        ],
       }),
     ],
 
@@ -180,11 +158,6 @@ function createMainConfig(isDev) {
     },
 
     plugins: [
-      new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: ['main*.js*'], // Only clean main files
-      }),
-
-      // Inject this because the main process uses different logic for prod and dev.
       new DefinePlugin({
         ENVIRONMENT: JSON.stringify(isDev ? DEVELOPMENT : PRODUCTION),
       }),
@@ -193,7 +166,6 @@ function createMainConfig(isDev) {
 }
 
 module.exports = function (env) {
-  // env variable is passed by webpack through the cli. see package.json scripts.
   const isDev = env.NODE_ENV == DEVELOPMENT
   const target = env.target
 
