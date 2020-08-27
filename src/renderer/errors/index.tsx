@@ -21,21 +21,17 @@ import {store} from '../store'
 import {ipcRenderer} from 'electron'
 import ErrorDialog from './dialog'
 
-const restart = () => {
-  ipcRenderer.send('reload-app', {})
-}
-
 export default (_: {}) => {
   const {error} = store.useState((s) => ({
     error: s.error,
   }))
 
-  const clear = () => {
-    store.update((s) => {
-      s.error = undefined
-    })
-  }
+  // const clear = () => {
+  //   store.update((s) => {
+  //     s.error = undefined
+  //   })
+  // }
 
   if (!error) return null
-  return <ErrorDialog error={error} clear={clear} restart={restart} />
+  return <ErrorDialog error={error} />
 }

@@ -19,14 +19,22 @@ import {styles, DialogTitle} from '../components'
 import {Error} from '../store'
 
 import ErrorView from './view'
+import {remote} from 'electron'
+import {ipcRenderer} from 'electron'
 
 type Props = {
   error: Error
-  clear: () => void
-  restart: () => void
 }
 
 export default (props: Props) => {
+  const exit = () => {
+    remote.app.exit(0)
+  }
+
+  const restart = () => {
+    ipcRenderer.send('reload-app', {})
+  }
+
   return (
     <Dialog
       open={!!props.error}
@@ -42,11 +50,11 @@ export default (props: Props) => {
         {props.error && <ErrorView error={props.error} />}
       </DialogContent>
       <DialogActions>
-        {/* <Button color="primary" onClick={props.clear}>
-          Clear Error
-        </Button> */}
-        <Button color="secondary" onClick={props.restart}>
+        <Button color="secondary" onClick={restart}>
           Restart
+        </Button>
+        <Button color="secondary" onClick={exit}>
+          Exit
         </Button>
       </DialogActions>
     </Dialog>
