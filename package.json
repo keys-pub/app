@@ -10,6 +10,7 @@
     "build-prod": "yarn build-prod-render && yarn build-prod-main",
     "server": "yarn webpack-dev-server --env.NODE_ENV=development --env.target=render --hot",
     "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron dist/main.dev.js",
+    "start-prod": "yarn run build-prod && yarn electron dist/main.js",
     "pack": "yarn run build-prod && electron-builder --dir",
     "dist": "yarn run build-prod && electron-builder",
     "postinstall": "electron-builder install-app-deps",
