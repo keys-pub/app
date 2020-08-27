@@ -143,16 +143,16 @@ const Root = (_: {}) => {
     setLocation('/settings/index')
   })
 
+  if (updating) {
+    return <UpdateSplash />
+  }
+
   if (!ready) {
     return <AuthSplash />
   }
 
   if (!unlocked || location == '/') {
     return <Auth />
-  }
-
-  if (updating) {
-    return <UpdateSplash />
   }
 
   return <App />
