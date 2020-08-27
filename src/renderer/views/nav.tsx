@@ -118,15 +118,9 @@ export default (props: {}) => {
   // TODO: Drawer transitions
 
   return (
-    <Drawer
-      variant="permanent"
-      style={drawerStyles}
-      PaperProps={{style: drawerStyles}}
-      open={true}
-      className="drag"
-    >
+    <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={true}>
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
-        <Box height={33} style={{backgroundColor: backgroundColor}} />
+        <Box height={33} style={{backgroundColor: backgroundColor}} className="drag" />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
           {navs.map((nav, index) =>
             row(
