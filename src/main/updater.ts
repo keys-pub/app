@@ -4,7 +4,7 @@ import {app} from 'electron'
 import {appPath, appSupportPath} from './paths'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as os from 'os'
+import {platform} from './paths'
 import {keysStop} from './service'
 import ElectronStore from 'electron-store'
 
@@ -77,7 +77,7 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
       console.log('Apply:', applyPath)
       relaunch = true
 
-      if (os.platform() == 'win32') {
+      if (platform() == 'win32') {
         // Copy updater to support path, so we can update over the installed version.
         const updaterDest = path.join(appSupportPath(), 'updater.exe')
         if (fs.existsSync(updaterDest)) {

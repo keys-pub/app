@@ -5,9 +5,9 @@ import {Box, Snackbar, Typography} from '@material-ui/core'
 import {Link} from '../../components'
 
 import Alert from '@material-ui/lab/Alert'
-
+import {platform} from '../../env'
 import {store} from '../../store'
-import {ipcRenderer} from 'electron'
+import {ipcRenderer, shell} from 'electron'
 
 export default (props: {}) => {
   const setUpdating = () => {
@@ -34,6 +34,7 @@ class UpdateAlert extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    console.log('UpdateAlert mount')
     ipcRenderer.on('update-needed', (event, update) => {
       console.log('Update:', update)
       if (update.needUpdate) {
@@ -56,6 +57,7 @@ class UpdateAlert extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    console.log('UpdateAlert unmount')
     ipcRenderer.removeAllListeners('update-needed')
     ipcRenderer.removeAllListeners('update-check-err')
     ipcRenderer.removeAllListeners('update-apply-err')
@@ -77,35 +79,60 @@ class UpdateAlert extends React.Component<Props, State> {
     this.props.setUpdating()
   }
 
+  openReleases = () => {
+    shell.openExternal('https://github.com/keys-pub/app/releases')
+  }
+
   render() {
+    let action
+    let actionLabel
+
+    switch (platform()) {
+      case 'darwin':
+        action = this.apply
+        actionLabel = 'Download & Restart'
+        break
+      case 'win32':
+        action = this.apply
+        actionLabel = 'Download & Restart'
+        break
+      default:
+        action = this.openReleases
+        actionLabel = 'View Releases'
+        break
+    }
+
     return (
       <UpdateAlertView
         open={this.state.open}
         close={this.close}
         version={this.state.version}
-        apply={this.apply}
+        action={action}
+        actionLabel={actionLabel}
       />
     )
   }
 }
 
-const UpdateAlertView = (props: {open: boolean; close: () => void; version: string; apply: () => void}) => {
+type UpdateAlertProps = {
+  open: boolean
+  version: string
+  close: () => void
+  action: () => void
+  actionLabel: string
+}
+
+const UpdateAlertView = (props: UpdateAlertProps) => {
   return (
     <Snackbar
       open={props.open}
       onClose={() => {}} // Alert must be closed manually (not via clickaway or timeout)
       anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
     >
-      <Alert
-        onClose={props.close}
-        severity="info"
-        elevation={3}
-        // variant="filled"
-        style={{paddingTop: 5, paddingBottom: 3}}
-      >
+      <Alert onClose={props.close} severity="info" elevation={3} style={{paddingTop: 5, paddingBottom: 3}}>
         <Box>
           <Typography>There is a an update available ({props.version}).</Typography>
-          <Link onClick={props.apply}>Download &amp; Restart</Link>
+          <Link onClick={props.action}>{props.actionLabel}</Link>
         </Box>
       </Alert>
     </Snackbar>

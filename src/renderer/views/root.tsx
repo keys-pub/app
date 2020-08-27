@@ -164,6 +164,7 @@ export default (_: {}) => {
       <Router hook={useHashLocation}>
         <Root />
         <Errors />
+        <UpdateAlert />
       </Router>
     </ThemeProvider>
   )

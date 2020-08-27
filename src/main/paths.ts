@@ -13,25 +13,37 @@ export const appResourcesPath = (): string => {
   return resourcesPath
 }
 
+export const platform = (): NodeJS.Platform => {
+  let platform = os.platform()
+  if (process.env.KEYS_PLATFORM) {
+    platform = process.env.KEYS_PLATFORM as NodeJS.Platform
+  }
+  return platform
+}
+
 export const appSupportPath = (): string => {
-  const appName: string = getAppName()
+  const appName = getAppName()
   let supportDir
-  if (os.platform() == 'linux') {
-    if (process.env.XDG_DATA_HOME) {
-      supportDir = process.env.XDG_DATA_HOME
-    } else {
-      const homeDir = os.homedir()
-      supportDir = path.join(homeDir, '.local', 'share')
-    }
-  } else if (os.platform() == 'win32') {
-    if (process.env.LOCALAPPDATA) {
-      supportDir = process.env.LOCALAPPDATA
-    } else {
-      const homeDir = os.homedir()
-      supportDir = path.join(homeDir, 'AppData', 'Roaming')
-    }
-  } else {
-    supportDir = app.getPath('appData')
+  switch (platform()) {
+    case 'linux':
+      if (process.env.XDG_DATA_HOME) {
+        supportDir = process.env.XDG_DATA_HOME
+      } else {
+        const homeDir = os.homedir()
+        supportDir = path.join(homeDir, '.local', 'share')
+      }
+      break
+    case 'win32':
+      if (process.env.LOCALAPPDATA) {
+        supportDir = process.env.LOCALAPPDATA
+      } else {
+        const homeDir = os.homedir()
+        supportDir = path.join(homeDir, 'AppData', 'Roaming')
+      }
+      break
+    default:
+      supportDir = app.getPath('appData')
+      break
   }
 
   const p = path.join(supportDir, appName)
@@ -60,7 +72,7 @@ export const appPath = (): string => {
 // Path to an executable
 export const binPath = (name: string): string => {
   const resourcesPath = appResourcesPath()
-  if (os.platform() == 'win32') {
+  if (platform() == 'win32') {
     name = name + '.exe'
   }
   return path.join(resourcesPath, 'bin', name)
