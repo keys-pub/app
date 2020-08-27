@@ -36,7 +36,8 @@
       "bin/updater",
       "bin/keysd.exe",
       "bin/keys.exe",
-      "bin/updater.exe"
+      "bin/updater.exe",
+      "resources/icon.png"
     ],
     "dmg": {
       "contents": [
