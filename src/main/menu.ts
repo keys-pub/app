@@ -143,7 +143,7 @@ export default class MenuBuilder {
         {
           label: 'Learn More',
           click() {
-            shell.openExternal('http://keys.pub')
+            shell.openExternal('https://keys.pub')
           },
         },
       ],
@@ -188,7 +188,7 @@ export default class MenuBuilder {
           {
             label: 'Learn More',
             click() {
-              shell.openExternal('http://keys.pub')
+              shell.openExternal('https://keys.pub')
             },
           },
         ],
