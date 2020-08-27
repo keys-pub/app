@@ -128,7 +128,7 @@ app.on('ready', async () => {
 
 app.on('quit', async () => {
   // TODO: stop keysd by default on app exit?
-  if (process.env.KEYS_STOP_ON_EXIT != '') {
+  if (process.env.KEYS_STOP_ON_EXIT) {
     await keysStop()
   }
 })
