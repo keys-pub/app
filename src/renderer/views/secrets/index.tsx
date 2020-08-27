@@ -36,9 +36,8 @@ import SecretRemoveDialog from './remove'
 import SecretEditView from './edit'
 import SecretContentView from './content'
 
-import {directionString, flipDirection} from '../helper'
+import {Store} from 'pullstate'
 
-//import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 import {
   Secret,
   SortDirection,
@@ -60,17 +59,42 @@ type Position = {
   y: number
 }
 
+type State = {
+  contextPosition?: Position
+  editing?: Secret
+  input: string
+  isNew: boolean
+  secrets: Secret[]
+  selected?: Secret
+  sortField?: string
+  sortDirection?: SortDirection
+  syncEnabled: boolean
+  syncing: boolean
+}
+
+const initialState: State = {
+  input: '',
+  isNew: false,
+  secrets: [],
+  syncEnabled: false,
+  syncing: false,
+}
+
+const store = new Store(initialState)
+
 export default (props: Props) => {
-  const [sortField, setSortField] = React.useState<string>()
-  const [sortDirection, setSortDirection] = React.useState<SortDirection>()
-  const [secrets, setSecrets] = React.useState<Secret[]>([])
-  const [selected, setSelected] = React.useState<Secret>()
-  const [input, setInput] = React.useState('')
-  const [editing, setEditing] = React.useState<Secret>()
-  const [isNew, setIsNew] = React.useState(false)
-  const [syncEnabled, setSyncEnabled] = React.useState(false)
-  const [syncing, setSyncing] = React.useState(false)
-  const [contextPosition, setContextPosition] = React.useState<Position>()
+  const {
+    contextPosition,
+    editing,
+    input,
+    isNew,
+    secrets,
+    selected,
+    sortField,
+    sortDirection,
+    syncEnabled,
+    syncing,
+  } = store.useState()
 
   const [remove, setRemove] = React.useState<Secret>()
   const [removeOpen, setRemoveOpen] = React.useState(false)
@@ -88,7 +112,9 @@ export default (props: Props) => {
 
   const onInput = React.useCallback((e) => {
     let target = e.target
-    setInput(target.value || '')
+    store.update((s) => {
+      s.input = target.value || ''
+    })
   }, [])
 
   const onContextMenu = React.useCallback(
@@ -96,8 +122,10 @@ export default (props: Props) => {
       event.preventDefault()
       const id = event.currentTarget.id
       const secret = secrets.find((s: Secret) => s.id == id)
-      setContextPosition({x: event.clientX - 2, y: event.clientY - 4})
-      setSelected(secret)
+      store.update((s) => {
+        s.contextPosition = {x: event.clientX - 2, y: event.clientY - 4}
+        s.selected = secret
+      })
     },
     [secrets]
   )
@@ -105,8 +133,7 @@ export default (props: Props) => {
   // const direction = directionString(sortDirection)
 
   const newSecret = () => {
-    setSelected(undefined)
-    setEditing({
+    const editing: Secret = {
       id: '',
       name: '',
       type: SecretType.PASSWORD_SECRET,
@@ -116,8 +143,12 @@ export default (props: Props) => {
       notes: '',
       createdAt: 0,
       updatedAt: 0,
+    }
+    store.update((s) => {
+      s.selected = undefined
+      s.editing = editing
+      s.isNew = true
     })
-    setIsNew(true)
   }
 
   const snackError = (err: Error) => {
@@ -127,13 +158,15 @@ export default (props: Props) => {
 
   React.useEffect(() => {
     reload()
-  }, [])
+  }, [input, sortField, sortDirection])
 
   const reload = async () => {
     try {
       const req: RuntimeStatusRequest = {}
       const resp = await runtimeStatus(req)
-      setSyncEnabled(!!resp.sync)
+      store.update((s) => {
+        s.syncEnabled = !!resp.sync
+      })
       list(input, sortField, sortDirection)
     } catch (err) {
       snackError(err)
@@ -141,13 +174,20 @@ export default (props: Props) => {
   }
 
   const sync = async () => {
-    setSyncing(true)
+    store.update((s) => {
+      s.syncing = true
+    })
     try {
       const req: VaultUpdateRequest = {}
       const resp = await vaultUpdate(req)
-      setSyncing(false)
+      store.update((s) => {
+        s.syncing = false
+      })
       reload()
     } catch (err) {
+      store.update((s) => {
+        s.syncing = false
+      })
       snackError(err)
     }
   }
@@ -162,9 +202,11 @@ export default (props: Props) => {
 
     try {
       const resp = await listSecrets(req)
-      setSecrets(resp.secrets || [])
-      setSortField(sortField)
-      setSortDirection(resp.sortDirection)
+      store.update((s) => {
+        s.secrets = resp.secrets || []
+        s.sortField = sortField
+        s.sortDirection = resp.sortDirection
+      })
     } catch (err) {
       snackError(err)
     }
@@ -177,32 +219,38 @@ export default (props: Props) => {
   })
 
   const cancelEdit = () => {
-    setIsNew(false)
-    setEditing(undefined)
+    store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
+    })
   }
 
   const secretChanged = (changed: Secret) => {
-    setIsNew(false)
-    setEditing(undefined)
-    setSelected(changed)
-
-    setSecrets(
-      secrets.map((secret: Secret) => {
-        if (secret.id == changed.id) return changed
-        return secret
-      })
-    )
-
+    const secretsUpdated = secrets.map((secret: Secret) => {
+      if (secret.id == changed.id) return changed
+      return secret
+    })
+    store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
+      s.selected = changed
+      s.secrets = secretsUpdated
+    })
+    // If changed is a new item we need to reload
     reload()
   }
 
   const closeContext = () => {
-    setContextPosition(undefined)
-    setSelected(undefined)
+    store.update((s) => {
+      s.contextPosition = undefined
+      s.selected = undefined
+    })
   }
 
   const removeSecret = () => {
-    setContextPosition(undefined)
+    store.update((s) => {
+      s.contextPosition = undefined
+    })
     if (selected) {
       openRemove(selected)
     }
@@ -211,26 +259,25 @@ export default (props: Props) => {
   const closeRemove = (removed: boolean) => {
     setRemoveOpen(false)
     if (removed) {
-      setSelected(undefined)
+      store.update((s) => {
+        s.selected = undefined
+      })
       reload()
     }
   }
 
   const edit = () => {
-    setIsNew(false)
-    setEditing(selected)
+    store.update((s) => {
+      s.isNew = false
+      s.editing = selected
+    })
   }
 
-  // const sort = (sortField: string, field: string, sortDirection: SortDirection) => {
-  //   const active = sortField === field
-  //   let direction: SortDirection = sortDirection
-  //   if (active) {
-  //     direction = flipDirection(sortDirection)
-  //   } else {
-  //     direction = SortDirection.ASC
-  //   }
-  //   list(input, field, direction)
-  // }
+  const setSelected = (secret: Secret) => {
+    store.update((s) => {
+      s.selected = secret
+    })
+  }
 
   return (
     <Box display="flex" flexDirection="column" flex={1}>

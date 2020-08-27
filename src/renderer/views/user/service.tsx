@@ -44,9 +44,11 @@ export default (props: Props) => {
         <MenuItem value={'https'}>
           <Typography>Link to Website (HTTPS)</Typography>
         </MenuItem>
-        <MenuItem value={'echo'}>
-          <Typography>Link to Echo</Typography>
-        </MenuItem>
+        {process.env.KEYS_ECHO_ENABLED && (
+          <MenuItem value={'echo'}>
+            <Typography>Link to Echo</Typography>
+          </MenuItem>
+        )}
       </TextField>
     </FormControl>
   )

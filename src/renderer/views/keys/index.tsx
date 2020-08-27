@@ -68,6 +68,7 @@ type State = {
   exportOpen: boolean
   exportKey: string
   importOpen: boolean
+  input: string
   intro: boolean
   keyOpen: boolean
   keys: Key[]
@@ -86,6 +87,7 @@ const initialState: State = {
   exportOpen: false,
   exportKey: '',
   importOpen: false,
+  input: '',
   intro: false,
   keyOpen: false,
   keys: [],
@@ -104,6 +106,7 @@ export default (_: {}) => {
     exportOpen,
     exportKey,
     importOpen,
+    input,
     intro,
     keyOpen,
     keys,
@@ -117,7 +120,6 @@ export default (_: {}) => {
     syncing,
   } = store.useState()
 
-  const [input, setInput] = React.useState('')
   const [snackOpen, setSnackOpen] = React.useState(false)
   const [snack, setSnack] = React.useState<SnackProps>()
 
@@ -125,7 +127,9 @@ export default (_: {}) => {
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    setInput(target.value || '')
+    store.update((s) => {
+      s.input = target.value || ''
+    })
   }, [])
 
   const setSnackErr = (err: Error) => {
