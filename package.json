@@ -5,11 +5,11 @@
   "description": "Key management, signing and encryption.",
   "scripts": {
     "build": "yarn webpack --env.NODE_ENV=development --env.target=render && yarn webpack --env.NODE_ENV=development --env.target=main",
+    "server": "yarn webpack-dev-server --env.NODE_ENV=development --env.target=render --hot",
+    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron dist/main.dev.js",
     "build-prod-render": "yarn webpack --env.NODE_ENV=production --env.target=render",
     "build-prod-main": "yarn webpack --env.NODE_ENV=production --env.target=main",
     "build-prod": "yarn build-prod-render && yarn build-prod-main",
-    "server": "yarn webpack-dev-server --env.NODE_ENV=development --env.target=render --hot",
-    "start": "yarn webpack --env.NODE_ENV=development --env.target=main && yarn electron dist/main.dev.js",
     "start-prod": "yarn run build-prod && yarn electron dist/main.js",
     "pack": "yarn run build-prod && electron-builder --dir",
     "dist": "yarn run build-prod && electron-builder",
