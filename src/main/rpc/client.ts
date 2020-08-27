@@ -4,7 +4,7 @@ import * as protoLoader from '@grpc/proto-loader'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import {appResourcesPath, appSupportPath} from '../paths'
+import {appResource, appSupportPath} from '../paths'
 import {getPort} from '../env'
 
 let keysClient: any = null
@@ -20,13 +20,6 @@ const creds = (): any => {
   const sslCreds = grpc.credentials.createSsl(Buffer.from(cert, 'ascii'))
   const creds = grpc.credentials.combineChannelCredentials(sslCreds, callCreds)
   return creds
-}
-
-const resolveProtoPath = (name: string): string => {
-  // Check in resources, otherwise use current path
-  const protoInResources = path.join(appResourcesPath(), 'src', 'main', 'rpc', name)
-  if (fs.existsSync(protoInResources)) return protoInResources
-  return './src/main/rpc/' + name
 }
 
 type CallMetadataOptions = {service_url: string}
@@ -45,7 +38,7 @@ export const setAuthToken = (t: string) => {
 export const newClient = (protoName: string, packageName: string, serviceName: string): any => {
   console.log('New client:', protoName)
 
-  const protoPath = resolveProtoPath(protoName)
+  const protoPath = appResource(path.join('src', 'main', 'rpc', protoName))
   console.log('Proto path:', protoPath)
   // TODO: Show error if proto path doesn't exist
   const packageDefinition = protoLoader.loadSync(protoPath, {arrays: true, enums: String, defaults: true})

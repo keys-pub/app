@@ -1,7 +1,7 @@
 import {binPath} from './paths'
 import {execProc, ExecOut} from './run'
 import {app} from 'electron'
-import {appPath, appSupportPath} from './paths'
+import {updateApplyPath, appSupportPath} from './paths'
 import * as fs from 'fs'
 import * as path from 'path'
 import {platform} from './paths'
@@ -66,7 +66,7 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
 
     let applyPath = ''
     if (apply) {
-      applyPath = appPath()
+      applyPath = updateApplyPath()
       if (process.env.UPDATER_APPLY) {
         applyPath = process.env.UPDATER_APPLY
       }
