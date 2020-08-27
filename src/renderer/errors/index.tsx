@@ -1,24 +1,6 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Input,
-  InputLabel,
-  FormControl,
-  FormHelperText,
-  TextField,
-  Typography,
-} from '@material-ui/core'
-
-import {styles, DialogTitle} from '../components'
-
 import {store} from '../store'
-
-import {ipcRenderer} from 'electron'
 import ErrorDialog from './dialog'
 
 export default (_: {}) => {
