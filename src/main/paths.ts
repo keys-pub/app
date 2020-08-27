@@ -3,13 +3,11 @@ import * as path from 'path'
 import * as os from 'os'
 import {getAppName} from './env'
 
-// Path to resources directory
-export const appResourcesPath = (): string => {
+export const appResourcePath = (): string => {
   let resourcesPath = app.getAppPath()
-  if (path.extname(resourcesPath) === '.asar') {
+  if (path.extname(resourcesPath) == '.asar') {
     resourcesPath = path.dirname(resourcesPath)
   }
-  // console.log('Resources path:', resourcesPath)
   return resourcesPath
 }
 
@@ -51,27 +49,26 @@ export const appSupportPath = (): string => {
   return p
 }
 
-// Path to app
-export const appPath = (): string => {
-  const resourcesPath = appResourcesPath()
-  let appPath
-  switch (os.platform()) {
+export const updateApplyPath = (): string => {
+  const resourcePath = appResourcePath()
+  let applyPath
+  switch (platform()) {
     case 'darwin':
-      appPath = path.resolve(resourcesPath, '..', '..')
+      applyPath = path.resolve(resourcePath, '..', '..')
       break
     case 'win32':
-      appPath = path.resolve(resourcesPath, '..')
+      applyPath = path.resolve(resourcePath, '..')
       break
     default:
       throw new Error('unsupported platform')
   }
-  console.log('App path:', appPath)
-  return appPath
+  console.log('Update apply path:', applyPath)
+  return applyPath
 }
 
 // Path to an executable
 export const binPath = (name: string): string => {
-  const resourcesPath = appResourcesPath()
+  const resourcesPath = appResourcePath()
   if (platform() == 'win32') {
     name = name + '.exe'
   }

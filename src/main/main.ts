@@ -48,6 +48,8 @@ app.on('ready', async () => {
     height: ws.height,
     minWidth: 920,
     minHeight: 600,
+    // For AppImage icon
+    icon: path.join(__dirname, 'icon.png'),
 
     webPreferences: {
       nodeIntegration: true,

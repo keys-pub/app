@@ -28,8 +28,6 @@
       "package.json"
     ],
     "extraResources": [
-      "src/main/rpc/keys.proto",
-      "src/main/rpc/fido2.proto",
       "bin/keysd",
       "bin/keys",
       "bin/fido2.so",
