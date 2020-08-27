@@ -8,6 +8,8 @@ import {app, BrowserWindow, ipcMain, BrowserWindowConstructorOptions} from 'elec
 
 import MenuBuilder from './menu'
 
+import * as path from 'path'
+
 const windowStateKeeper = require('electron-window-state')
 
 import {MenuActionType} from './menu'
@@ -75,7 +77,7 @@ app.on('ready', async () => {
     console.log('Using dev port', port)
     mainWindow.loadURL(`http://localhost:` + port)
   } else {
-    mainWindow.loadFile('index.html')
+    mainWindow.loadFile(path.join(__dirname, 'index.html'))
   }
 
   // @TODO: Use 'ready-to-show' event

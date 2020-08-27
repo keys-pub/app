@@ -132,6 +132,10 @@ function createMainConfig(isDev) {
 
     devtool: isDev ? 'source-map' : 'none',
 
+    node: {
+      __dirname: false,
+    },
+
     entry: {
       main: './main/main.ts',
     },
