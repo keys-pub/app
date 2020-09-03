@@ -36,7 +36,7 @@ export default (_: {}) => {
   const unlock = async () => {
     if (!input) {
       setError(new Error('Oops, password is empty'))
-      inputRef?.current?.focus()
+      inputRef.current?.focus()
       return
     }
 
@@ -74,6 +74,8 @@ export default (_: {}) => {
       setLoading(false)
       setProgress(false)
       setError(err)
+      inputRef.current?.focus()
+      inputRef.current?.select()
     }
   }
 
