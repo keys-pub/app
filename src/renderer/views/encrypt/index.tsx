@@ -27,7 +27,7 @@ import EncryptedView from './encrypted'
 import EncryptedFileView from './encryptedfile'
 import SignKeySelectView from '../keys/select'
 
-import {remote} from 'electron'
+import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
 import Popup from '../../components/popup'
@@ -74,7 +74,7 @@ const store = new Store(initialState)
 
 const openFile = async () => {
   clear(true)
-  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {})
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {})
   if (open.canceled) {
     return
   }
@@ -177,7 +177,7 @@ const encryptFileTo = async (
   addSenderRecipient: boolean,
   sign: boolean
 ) => {
-  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {
     properties: ['openDirectory'],
   })
   if (open.canceled) {

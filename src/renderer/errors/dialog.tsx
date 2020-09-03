@@ -19,7 +19,6 @@ import {styles, DialogTitle} from '../components'
 import {Error} from '../store'
 
 import ErrorView from './view'
-import {remote} from 'electron'
 import {ipcRenderer} from 'electron'
 
 type Props = {
@@ -28,7 +27,7 @@ type Props = {
 
 export default (props: Props) => {
   const exit = () => {
-    remote.app.exit(0)
+    ipcRenderer.send('exit', {})
   }
 
   const restart = () => {

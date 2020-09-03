@@ -6,7 +6,7 @@ import VerifiedView from './verified'
 import VerifiedFileView from './verifiedfile'
 
 import {styles, Link} from '../../components'
-import {remote} from 'electron'
+import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
 
@@ -42,8 +42,7 @@ const store = new Store<State>({
 
 const openFile = async () => {
   clearOut()
-  const win = remote.getCurrentWindow()
-  const open = await remote.dialog.showOpenDialog(win, {})
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {})
   if (open.canceled) {
     return
   }
@@ -174,7 +173,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
 }
 
 const verifyFileTo = async (fileIn: string) => {
-  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {
     properties: ['openDirectory'],
   })
   if (open.canceled) {

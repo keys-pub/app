@@ -18,7 +18,6 @@ import {
 } from '@material-ui/icons'
 
 import {history} from './router'
-import {remote} from 'electron'
 import {authLock} from '../rpc/keys'
 
 type Props = {
@@ -28,8 +27,7 @@ type Props = {
 }
 
 export default (props: Props) => {
-  const win = remote.getCurrentWindow()
-  const [maximized, setMaximized] = React.useState(win.isMaximized())
+  const [maximized, setMaximized] = React.useState(false)
 
   const back = () => {
     history.back()
@@ -52,22 +50,27 @@ export default (props: Props) => {
 
   const close = () => {
     console.log('Close')
-    const win = remote.getCurrentWindow()
-    win.close()
+    ipcRenderer.send('window-close')
   }
 
   const minimize = () => {
     console.log('Minimize')
-    const win = remote.getCurrentWindow()
-    win.minimize()
+    ipcRenderer.send('window-minimize')
   }
 
-  const maximize = () => {
+  const maximize = async () => {
     console.log('Maximize')
-    const win = remote.getCurrentWindow()
-    setMaximized(!win.isMaximized())
-    win.isMaximized() ? win.unmaximize() : win.maximize()
+    const maximized: boolean = await ipcRenderer.invoke('window-maximize')
+    setMaximized(maximized)
   }
+
+  React.useEffect(() => {
+    const isMaximized = async () => {
+      const maximized: boolean = await ipcRenderer.invoke('window-isMaximized')
+      setMaximized(maximized)
+    }
+    isMaximized()
+  }, [])
 
   return (
     <Box display="flex" flexDirection="column" style={{width: '100%'}}>

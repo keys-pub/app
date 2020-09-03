@@ -14,24 +14,20 @@ import {
 } from '@material-ui/core'
 
 import {Link} from '../../components'
-import {ipcRenderer, remote} from 'electron'
+import {ipcRenderer} from 'electron'
 
 import Header from '../header'
-import ElectronStore from 'electron-store'
 import {store} from '../../store'
 import {useLocation} from 'wouter'
 
-const version = remote.app.getVersion()
-const localStore = new ElectronStore()
-
 export default (props: {}) => {
-  const [prerelease, setPrerelease] = React.useState(localStore.get('prerelease') == '1')
+  const [prerelease, setPrerelease] = React.useState(false)
+  const [version, setVersion] = React.useState('')
 
   const [location, setLocation] = useLocation()
 
   const devTools = () => {
-    const win = remote.getCurrentWindow()
-    win.webContents.toggleDevTools()
+    ipcRenderer.send('toggle-dev-tools', {})
   }
 
   const forceUpdate = () => {
@@ -44,16 +40,28 @@ export default (props: {}) => {
   const onPrereleaseChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     setPrerelease(checked)
-    if (checked) {
-      localStore.set('prerelease', '1')
-    } else {
-      localStore.delete('prerelease')
+    ipcRenderer.send('electron-store-set', {key: 'prerelease', value: checked ? '1' : ''})
+  }, [])
+
+  React.useEffect(() => {
+    const isPrerelease = async () => {
+      const prerelease = await ipcRenderer.invoke('electron-store-get', 'prerelease')
+      setPrerelease(prerelease == '1')
     }
+    isPrerelease()
   }, [])
 
   const restart = () => {
     ipcRenderer.send('reload-app', {})
   }
+
+  React.useEffect(() => {
+    const appVersion = async () => {
+      const version: string = await ipcRenderer.invoke('version')
+      setVersion(version)
+    }
+    appVersion()
+  }, [])
 
   const labelWidth = 60
   return (

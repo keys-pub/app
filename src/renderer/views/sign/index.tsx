@@ -4,7 +4,7 @@ import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material
 
 import {styles, Link} from '../../components'
 
-import {remote} from 'electron'
+import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import * as path from 'path'
 
@@ -36,7 +36,7 @@ const store = new Store<State>({
 
 const openFile = async () => {
   clearOut()
-  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {})
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {})
   if (open.canceled) {
     return
   }
@@ -155,7 +155,7 @@ const signFileTo = async (fileIn: string, signer?: Key) => {
     return
   }
 
-  const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {
     properties: ['openDirectory'],
   })
   if (open.canceled) {

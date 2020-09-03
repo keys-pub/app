@@ -4,13 +4,22 @@
  * through IPC.
  */
 
-import {app, BrowserWindow, ipcMain, BrowserWindowConstructorOptions} from 'electron'
+import {
+  app,
+  dialog,
+  BrowserWindow,
+  ipcMain,
+  BrowserWindowConstructorOptions,
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+} from 'electron'
 
 import MenuBuilder from './menu'
 
 import * as path from 'path'
 
 const windowStateKeeper = require('electron-window-state')
+import ElectronStore from 'electron-store'
 
 import {MenuActionType} from './menu'
 
@@ -137,12 +146,63 @@ app.on('quit', async () => {
   }
 })
 
-ipcMain.removeAllListeners('reload-app')
 ipcMain.on('reload-app', (event, arg) => {
-  if (mainWindow) reloadApp(mainWindow)
+  if (mainWindow) {
+    reloadApp(mainWindow)
+  }
 })
 
-ipcMain.removeAllListeners('keys-start')
+ipcMain.on('exit', (event, arg) => {
+  app.exit(0)
+})
+
+ipcMain.on('toggle-dev-tools', (event, arg) => {
+  if (mainWindow) {
+    mainWindow.webContents.toggleDevTools()
+  }
+})
+
+ipcMain.on('window-close', (event, arg) => {
+  if (mainWindow) {
+    mainWindow.close()
+  }
+})
+
+ipcMain.on('window-minimize', (event, arg) => {
+  if (mainWindow) {
+    mainWindow.minimize()
+  }
+})
+
+ipcMain.handle('window-maximize', (event, arg) => {
+  if (mainWindow) {
+    mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()
+    return mainWindow.isMaximized()
+  }
+  return false
+})
+
+ipcMain.handle('window-isMaximized', (event, arg) => {
+  if (mainWindow) {
+    return mainWindow.isMaximized()
+  }
+  return false
+})
+
+ipcMain.handle(
+  'open-dialog',
+  async (event, arg: OpenDialogOptions): Promise<OpenDialogReturnValue> => {
+    if (mainWindow) {
+      return await dialog.showOpenDialog(mainWindow, arg)
+    }
+    return {canceled: true, filePaths: []}
+  }
+)
+
+ipcMain.handle('version', (event, arg) => {
+  return app.getVersion()
+})
+
 ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
@@ -155,7 +215,6 @@ ipcMain.on('keys-start', (event, arg) => {
     })
 })
 
-ipcMain.removeAllListeners('update-check')
 ipcMain.on('update-check', (event, arg) => {
   update('', false)
     .then((res: UpdateResult) => {
@@ -166,7 +225,6 @@ ipcMain.on('update-check', (event, arg) => {
     })
 })
 
-ipcMain.removeAllListeners('update-apply')
 ipcMain.on('update-apply', (event, arg) => {
   update('', true)
     .then((res: UpdateResult) => {
@@ -181,7 +239,6 @@ ipcMain.on('update-apply', (event, arg) => {
     })
 })
 
-ipcMain.removeAllListeners('update-force')
 ipcMain.on('update-force', (event, arg) => {
   update('0.0.1', true)
     .then((res: UpdateResult) => {
@@ -194,4 +251,19 @@ ipcMain.on('update-force', (event, arg) => {
     .catch((err: Error) => {
       event.sender.send('update-apply-err', err)
     })
+})
+
+ipcMain.handle('electron-store-get', (event, arg: string) => {
+  const localStore = new ElectronStore()
+  return localStore.get(arg)
+})
+
+ipcMain.on('electron-store-set', (event, arg: {key: string; value: string}) => {
+  const localStore = new ElectronStore()
+  if (!arg.key) return
+  if (!arg.value) {
+    localStore.delete(arg.key)
+  } else {
+    localStore.set(arg.key, arg.value)
+  }
 })
