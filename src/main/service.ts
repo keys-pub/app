@@ -16,23 +16,23 @@ const keysPath = (): string => {
 
 export const keysStart = (): Promise<any> => {
   const path = keysPath()
-  if (path) {
-    const appName = getAppName()
-    const port = getPort()
-
-    let arg = ''
-    if (appName != defaultAppName) {
-      arg = '--app=' + appName
-    }
-    let start = 'start --from=app'
-    if (port != defaultPort) {
-      start = start + ' --port=' + port
-    }
-
-    // This returns when the service is ready.
-    return execProc(path, arg + ' ' + start)
+  if (!path) {
+    return Promise.resolve()
   }
-  return Promise.resolve()
+  const appName = getAppName()
+  const port = getPort()
+
+  let arg = ''
+  if (appName != defaultAppName) {
+    arg = '--app=' + appName
+  }
+  let start = 'start --from=app'
+  if (port != defaultPort) {
+    start = start + ' --port=' + port
+  }
+
+  // This returns when the service is ready.
+  return execProc(path, arg + ' ' + start)
 }
 
 export const keysStop = (): Promise<any> => {

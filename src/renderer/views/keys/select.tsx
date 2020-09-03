@@ -6,6 +6,7 @@ import UserLabel from '../user/label'
 
 import {keys} from '../../rpc/keys'
 import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '../../rpc/keys.d'
+import {ArrowDropDown} from '@material-ui/icons'
 
 export type Props = {
   value?: Key
@@ -14,6 +15,10 @@ export type Props = {
   placeholder?: string
   placeholderDisabled?: boolean
   itemLabel?: string
+}
+
+const empty = (_: {}) => {
+  return null
 }
 
 export default (props: Props) => {
@@ -50,6 +55,7 @@ export default (props: Props) => {
         fullWidth
         disabled={props.disabled}
         displayEmpty
+        IconComponent={empty}
         SelectDisplayProps={{
           style: {
             paddingLeft: 8,

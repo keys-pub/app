@@ -1,6 +1,8 @@
 import * as React from 'react'
 
-import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
+import {Button, Divider, IconButton, LinearProgress, Input, Typography, Box} from '@material-ui/core'
+
+import {Assignment as CopyIcon} from '@material-ui/icons'
 
 import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
@@ -19,43 +21,32 @@ export default (props: Props) => {
     setSnack({message: 'Copied to Clipboard', duration: 2000})
     setSnackOpen(true)
   }
-  const disabled = !props.value
-
   return (
     <Box style={{width: '100%', height: '100%', position: 'relative'}}>
-      <Input
-        multiline
+      <textarea
         readOnly
         value={props.value}
-        disableUnderline
-        inputProps={{
-          style: {
-            ...styles.mono,
-            height: '100%',
-            overflow: 'auto',
-            paddingTop: 0,
-            paddingLeft: 8,
-            paddingBottom: 0,
-            paddingRight: 0,
-          },
-        }}
+        spellCheck="false"
         style={{
-          height: '100%',
-          width: '100%',
+          height: 'calc(100% - 8px)',
+          width: 'calc(100% - 8px)',
+          overflow: 'auto',
+          border: 'none',
+          padding: 0,
+          ...styles.mono,
+          outline: 0,
+          resize: 'none',
+          paddingTop: 8,
+          paddingLeft: 8,
         }}
       />
-      <Box style={{position: 'absolute', right: 20, bottom: 6}}>
-        <Button
-          size="small"
-          variant="outlined"
-          color="primary"
-          disabled={disabled}
-          onClick={copyToClipboard}
-          style={{backgroundColor: 'white'}}
-        >
-          Copy to Clipboard
-        </Button>
-      </Box>
+      {props.value && (
+        <Box style={{position: 'absolute', right: 16, top: 4}}>
+          <IconButton onClick={copyToClipboard} size="small" style={{padding: 4, backgroundColor: 'white'}}>
+            <CopyIcon />
+          </IconButton>
+        </Box>
+      )}
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )

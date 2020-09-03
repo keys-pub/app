@@ -148,6 +148,7 @@ export default (props: Props) => {
         options={options}
         ChipProps={{variant: 'outlined', size: 'small', style: {marginLeft: 0, marginRight: 5}}} //  icon: <FaceIcon />,
         renderOption={renderOption}
+        popupIcon={null}
         renderInput={(params) => (
           <TextField
             {...params}

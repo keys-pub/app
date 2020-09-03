@@ -32,7 +32,7 @@ function createRenderConfig(isDev) {
     },
 
     output: {
-      path: path.join(__dirname, 'dist'),
+      path: path.join(__dirname, isDev ? 'build' : 'dist'),
       filename: isDev ? '[name].js' : '[name].[hash].js',
     },
 
@@ -99,8 +99,6 @@ function createRenderConfig(isDev) {
     },
 
     plugins: [
-      new CleanWebpackPlugin({}),
-
       new HtmlPlugin({
         filename: 'index.html',
         template: 'index.html',
@@ -110,7 +108,7 @@ function createRenderConfig(isDev) {
 
     devServer: isDev
       ? {
-          contentBase: path.join(__dirname, 'dist'),
+          contentBase: path.join(__dirname, 'build'),
           compress: true,
           hot: true,
           port: port,
@@ -142,8 +140,8 @@ function createMainConfig(isDev) {
     },
 
     output: {
-      filename: isDev ? '[name].dev.js' : '[name].js',
-      path: path.join(__dirname, 'dist'),
+      filename: '[name].js',
+      path: path.join(__dirname, isDev ? 'build' : 'dist'),
     },
 
     module: {

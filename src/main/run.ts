@@ -8,7 +8,7 @@ export type ExecOut = {
 
 export const execProc = (path: string, args: string): Promise<ExecOut> => {
   return new Promise((resolve, reject) => {
-    if (path === '') {
+    if (!path) {
       reject('No path to exec')
       return
     }
@@ -32,7 +32,7 @@ export const execProc = (path: string, args: string): Promise<ExecOut> => {
 
 export const spawnProc = (path: string, args: string, killOnExit: boolean): Promise<any> => {
   return new Promise((resolve, reject) => {
-    if (path === '') {
+    if (!path) {
       reject('No path to spawn')
       return
     }

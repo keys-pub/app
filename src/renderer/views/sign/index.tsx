@@ -178,10 +178,10 @@ const SignToButton = (props: {onClick: () => void; disabled: boolean}) => (
 type Props = {}
 
 export default (props: Props) => {
-  const inputRef = React.useRef<HTMLInputElement>()
+  const inputRef = React.useRef<HTMLTextAreaElement>()
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
+    let target = e.target as HTMLTextAreaElement
     store.update((s) => {
       s.input = target.value || ''
     })
@@ -228,27 +228,26 @@ export default (props: Props) => {
         )}
         {!fileIn && (
           <Box style={{height: '100%'}}>
-            <Input
-              multiline
-              autoFocus
-              onChange={onInputChange}
+            <textarea
+              ref={inputRef as React.RefObject<HTMLTextAreaElement>}
               value={input}
-              disableUnderline
-              inputProps={{
-                ref: inputRef,
-                spellCheck: 'false',
-                style: {
-                  height: '100%',
-                  overflow: 'auto',
-                  paddingTop: 8,
-                  paddingLeft: 8,
-                  paddingBottom: 0,
-                  paddingRight: 0,
-                },
-              }}
+              onChange={onInputChange}
+              spellCheck="false"
               style={{
-                height: '100%',
-                width: '100%',
+                height: 'calc(100% - 16px)',
+                width: 'calc(100% - 8px)',
+                overflow: 'auto',
+                border: 'none',
+                padding: 0,
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontSize: '0.857rem',
+                fontFamily: 'Open Sans',
+                fontWeight: 400,
+                outline: 0,
+                resize: 'none',
+                paddingTop: 8,
+                paddingLeft: 8,
+                paddingBottom: 8,
               }}
             />
             {!input && (

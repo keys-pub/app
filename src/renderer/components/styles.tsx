@@ -4,13 +4,7 @@ import {CSSProperties} from 'react'
 
 import {fade} from '@material-ui/core/styles/colorManipulator'
 
-type Colors = {
-  github: string
-  twitter: string
-  reddit: string
-}
-
-const logo = {
+export const logo: CSSProperties = {
   fontSize: 64,
   fontFamily: 'Futura',
   fontWeight: 600,
@@ -19,81 +13,29 @@ const logo = {
   color: 'white',
 } // fontFamily: 'Sans Forgetica',
 
-const mono = {
+export const mono: CSSProperties = {
   fontFamily: 'Roboto Mono',
   whiteSpace: 'pre-wrap',
   fontSize: 13,
 }
 
-const breakWords = {
+export const regular: CSSProperties = {
+  color: 'rgba(0, 0, 0, 0.87)',
+  fontSize: '0.857rem',
+  fontFamily: 'Open Sans',
+  fontWeight: 400,
+}
+
+export const breakWords: CSSProperties = {
   whiteSpace: 'pre-wrap',
   wordWrap: 'break-word',
   wordBreak: 'break-all',
 }
 
-const messageInput = {
-  color: 'rgba(0, 0, 0, 0.87)',
-  fontSize: '0.875rem',
-  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  fontWeight: 400,
-  lineHeight: 1.5,
-  letterSpacing: '0.01071em',
-}
-
-export type AppStyles = {
-  colors: Colors
-  messageInput: CSSProperties
-  logo: CSSProperties
-  mono: any
-  breakWords: any
-}
-
-export const colors: Colors = {
+export const colors = {
   github: 'purple', // rgb(68,68,68)'
   twitter: 'rgb(76,160,235)',
   reddit: '#FF5700',
-}
-
-// type CellStyles = {
-//   user: CSSProperties
-//   owner: CSSProperties
-// }
-
-// export const cells: CellStyles = {
-//   user: {
-//     // backgroundColor: '#efefef',
-//     // border: '0.5px solid #afafaf',
-//     boxShadow: '0 0 0 0.5px #afafaf',
-//     borderRadius: 3,
-//     paddingLeft: 4,
-//     paddingRight: 4,
-//     paddingTop: 2,
-//     paddingBottom: 4,
-//     marginRight: 6,
-//     marginTop: 1,
-//     marginBottom: -1,
-//   },
-//   owner: {
-//     boxShadow: '0 0 0 0.5px #9f9f9f',
-//     borderRadius: 3,
-//     paddingLeft: 4,
-//     paddingRight: 4,
-//     paddingTop: 2,
-//     paddingBottom: 4,
-//     marginRight: 6,
-//     marginTop: 1,
-//     marginBottom: 2,
-//     color: 'green',
-//   },
-// }
-
-const styles: AppStyles = {
-  colors,
-  messageInput,
-  logo,
-  mono,
-  // cells,
-  breakWords,
 }
 
 export const serviceColor = (service: string): string => {
@@ -113,6 +55,12 @@ export const serviceColor = (service: string): string => {
 
 export const backgroundSelectedColor = () => {
   return '#eaeaea' // fade('#2196f3', 0.075)
+}
+
+const styles = {
+  mono,
+  regular,
+  breakWords,
 }
 
 export default styles

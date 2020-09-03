@@ -33,6 +33,7 @@ node_modules
 # App packaged
 release
 dist
+build
 bin
 tmp.release
 tmp.cask

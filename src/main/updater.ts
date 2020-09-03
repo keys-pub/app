@@ -3,7 +3,7 @@ import {execProc, ExecOut} from './run'
 import {app} from 'electron'
 import {updateApplyPath, appSupportPath} from './paths'
 import * as fs from 'fs'
-import * as path from 'path'
+import * as filepath from 'path'
 import {platform} from './paths'
 import {keysStop} from './service'
 import ElectronStore from 'electron-store'
@@ -42,6 +42,18 @@ export type UpdateResult = {
   relaunch: boolean
 }
 
+const updaterPath = (): string => {
+  let path = ''
+  if (process.env.NODE_ENV == 'production') {
+    path = binPath('updater')
+  }
+  if (process.env.UPDATER_BIN) {
+    path = process.env.UPDATER_BIN
+  }
+  console.log('Updater path:', path)
+  return path
+}
+
 export const update = (version: string, apply: boolean): Promise<UpdateResult> => {
   return new Promise(async (resolve, reject) => {
     if (version == '') {
@@ -51,12 +63,8 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
       }
     }
     console.log('Update, app version:', version)
-    let updaterPath = binPath('updater')
-    if (process.env.UPDATER_BIN) {
-      updaterPath = process.env.UPDATER_BIN
-    }
-    console.log('Updater path:', updaterPath)
-    if (!updaterPath) {
+    let path = updaterPath()
+    if (!path) {
       resolve(emptyUpdateResult())
       return
     }
@@ -79,13 +87,13 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
 
       if (platform() == 'win32') {
         // Copy updater to support path, so we can update over the installed version.
-        const updaterDest = path.join(appSupportPath(), 'updater.exe')
+        const updaterDest = filepath.join(appSupportPath(), 'updater.exe')
         if (fs.existsSync(updaterDest)) {
           fs.unlinkSync(updaterDest)
         }
         console.log('Copying updater to', updaterDest)
-        fs.copyFileSync(updaterPath, updaterDest)
-        updaterPath = updaterDest
+        fs.copyFileSync(path, updaterDest)
+        path = updaterDest
 
         console.log('Stopping keys...')
         await keysStop()
@@ -107,7 +115,7 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
       args = args + ' -download -apply "' + applyPath + '"'
     }
 
-    execProc(updaterPath, args)
+    execProc(path, args)
       .then((out: ExecOut) => {
         const update = JSON.parse(out.stdout) as Update
         resolve({update, relaunch})
