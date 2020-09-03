@@ -240,7 +240,6 @@ export default (props: Props) => {
           sender: sender?.id,
           options: {armored: true, noSenderRecipient: !addSenderRecipient, noSign: !sign},
         }
-        console.log('Encrypt:', sender?.id, req.options)
         const resp = await encrypt(req)
         const encrypted = new TextDecoder().decode(resp.data)
         store.update((s) => {
@@ -307,7 +306,7 @@ export default (props: Props) => {
             disabled={!sender}
           >
             <Tooltip title="Add to Recipients">
-              <AddRecipientIcon style={{color: addSenderRecipient ? '' : '#666'}} />
+              <AddRecipientIcon style={{color: addSenderRecipient ? '' : '#999'}} />
             </Tooltip>
           </IconButton>
 
@@ -321,7 +320,7 @@ export default (props: Props) => {
             disabled={!sender}
           >
             <Tooltip title="Sign">
-              <SignIcon style={{color: sign ? '' : '#666'}} />
+              <SignIcon style={{color: sign ? '' : '#999'}} />
             </Tooltip>
           </IconButton>
         </Box>
