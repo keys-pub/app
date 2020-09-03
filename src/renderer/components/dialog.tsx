@@ -26,9 +26,7 @@ const DialogTitle = (props: DialogTitleProps) => {
     <Box display="flex" flexDirection="column" className="drag">
       <Box display="flex" flexGrow={1} flexDirection="row">
         <Typography
-          id="alert-dialog-title"
-          variant="h5"
-          style={{paddingBottom: 7, paddingLeft: 20, paddingTop: 15, fontWeight: 600}}
+          style={{paddingBottom: 3, paddingLeft: 20, paddingTop: 10, fontSize: 19, fontWeight: 500}}
         >
           {props.children}
         </Typography>
@@ -54,7 +52,7 @@ export type DialogAction = {
 }
 
 type Props = {
-  title: string
+  title?: string
   open: boolean
   loading?: boolean
   children?: React.ReactNode
@@ -72,9 +70,11 @@ const Dialog = (props: Props) => {
       disableBackdropClick
       // keepMounted
     >
-      <DialogTitle loading={props.loading} onClose={props.close?.action}>
-        {props.title}
-      </DialogTitle>
+      {props.title && (
+        <DialogTitle loading={props.loading} onClose={props.close?.action}>
+          {props.title}
+        </DialogTitle>
+      )}
       <DialogContent dividers>{props.children}</DialogContent>
       <DialogActions>
         {props.close && (

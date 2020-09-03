@@ -1,8 +1,10 @@
 import * as React from 'react'
 
-import {Button, Divider, Input, Box, IconButton, Typography} from '@material-ui/core'
+import {Button, Divider, IconButton, Input, Box, Typography} from '@material-ui/core'
 
+import {Assignment as CopyIcon} from '@material-ui/icons'
 import SignerView from '../verify/signer'
+import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 
 import {clipboard} from 'electron'
@@ -33,37 +35,31 @@ export default (props: Props) => {
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
       <SignerView signer={props.sender} mode={props.mode} unsigned={unsigned} reload={props.reloadSender} />
       <Divider />
-      <Input
-        multiline
-        readOnly
-        value={props.value}
-        disableUnderline
-        inputProps={{
-          style: {
-            height: '100%',
+      <Box display="flex" style={{position: 'relative'}}>
+        <textarea
+          readOnly
+          value={props.value}
+          spellCheck="false"
+          style={{
+            height: 'calc(100% - 8px)',
+            width: 'calc(100% - 8px)',
             overflow: 'auto',
+            border: 'none',
+            padding: 0,
+            ...styles.regular,
+            outline: 0,
+            resize: 'none',
             paddingTop: 8,
             paddingLeft: 8,
-            paddingBottom: 0,
-            paddingRight: 0,
-          },
-        }}
-        style={{
-          height: '100%',
-          width: '100%',
-        }}
-      />
-      <Box style={{position: 'absolute', right: 20, bottom: 6}}>
-        <Button
-          size="small"
-          variant="outlined"
-          color="primary"
-          disabled={disabled}
-          onClick={copyToClipboard}
-          style={{backgroundColor: 'white'}}
-        >
-          Copy to Clipboard
-        </Button>
+          }}
+        />
+        {props.value && (
+          <Box style={{position: 'absolute', right: 16, top: 4}}>
+            <IconButton onClick={copyToClipboard} style={{padding: 4, backgroundColor: 'white'}}>
+              <CopyIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>

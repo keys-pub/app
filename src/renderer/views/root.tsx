@@ -6,6 +6,8 @@ import {fade} from '@material-ui/core/styles/colorManipulator'
 import {backgroundSelectedColor} from '../components/styles'
 import {Router} from 'wouter'
 
+import CheckBoxOutlineBlankSharpIcon from '@material-ui/icons/CheckBoxOutlineBlankSharp'
+
 import {Routes, routesMap} from './routes'
 import {useLocation} from 'wouter'
 import {store, Error} from '../store'

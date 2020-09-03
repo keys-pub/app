@@ -48,7 +48,7 @@ export default class SignerView extends React.Component<Props, State> {
     if (!this.props.signer?.user) {
       return <SignerUserUnknown signer={this.props.signer} lookup={this.openKey} />
     }
-    return <SignerUser signer={this.props.signer} />
+    return <SignerUser signer={this.props.signer} mode={this.props.mode} />
   }
 
   render() {
@@ -83,8 +83,8 @@ const NoSigner = (props: {unsigned: boolean}) => {
   )
 }
 
-const SignerUser = (props: {signer: Key}) => {
-  const {signer} = props
+const SignerUser = (props: {signer: Key; mode?: EncryptMode}) => {
+  const {signer, mode} = props
   return (
     <Box
       display="flex"
@@ -95,9 +95,9 @@ const SignerUser = (props: {signer: Key}) => {
         Verified&nbsp;
       </Typography>
       <UserLabel kid={signer.id!} user={signer.user} />
-      {/* <Typography display="inline" style={{...styles.mono}}>
+      <Typography display="inline" style={{...styles.mono}}>
         {encryptModeDescription(mode)}
-      </Typography> */}
+      </Typography>
     </Box>
   )
 }
@@ -123,16 +123,12 @@ const SignerUserUnknown = (props: {signer: Key; lookup: () => void}) => {
       >
         Lookup
       </Button>
-
-      {/* <Typography display="inline" style={{...styles.mono}}>
-          {encryptModeDescription(mode)}
-        </Typography> */}
     </Box>
   )
 }
 
-const encryptModeDescription = (m: EncryptMode): string => {
-  switch (m) {
+const encryptModeDescription = (mode?: EncryptMode): string => {
+  switch (mode) {
     case EncryptMode.SALTPACK_ENCRYPT:
       return ' (saltpack encrypt)'
     case EncryptMode.SALTPACK_SIGNCRYPT:

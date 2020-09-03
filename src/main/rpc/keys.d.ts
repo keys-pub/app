@@ -247,21 +247,31 @@ export interface SignOutput {
     kid?: string;
 }
 
+export interface EncryptOptions {
+    // Armored, if true will return armored string output.
+    armored?: boolean;
+    // Mode is the encryption mode.
+    mode?: EncryptMode;
+    // NoSenderRecipient if true, won't add sender to recipients list.
+    noSenderRecipient?: boolean;
+    // NoSign if true, won't sign with sender.
+    noSign?: boolean;
+}
+
 export interface EncryptRequest {
     // Data to encrypt.
     data?: Uint8Array;
-    // Armored, if true will return armored string output.
-    armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Sender, or empty, if anonymous.
+    // Sender, or anonymous.
     sender?: string;
-    // Mode is the encryption mode.
-    mode?: EncryptMode;
+    // Options for encrypt.
+    options?: EncryptOptions;
 }
 
 export interface EncryptResponse {
     data?: Uint8Array;
+    info?: string;
 }
 
 export interface EncryptFileInput {
@@ -269,14 +279,12 @@ export interface EncryptFileInput {
     in?: string;
     // Out is output file path.
     out?: string;
-    // Armored, if true will return armored string output.
-    armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Sender, or empty, if anonymous.
+    // Sender, or anonymous.
     sender?: string;
-    // Mode is the encryption mode.
-    mode?: EncryptMode;
+    // Options for encrypt.
+    options?: EncryptOptions;
 }
 
 export interface EncryptFileOutput {
@@ -289,14 +297,12 @@ export interface EncryptFileOutput {
 export interface EncryptInput {
     // Data to encrypt. Send empty byte slice as last message.
     data?: Uint8Array;
-    // Armored, if true will return armored string output.
-    armored?: boolean;
     // Recipients to encrypt to.
     recipients?: Array<string>;
-    // Sender, or empty, if anonymous.
+    // Sender, or anonymous.
     sender?: string;
-    // Mode is the encryption mode.
-    mode?: EncryptMode;
+    // Options for encrypt.
+    options?: EncryptOptions;
 }
 
 export interface EncryptOutput {

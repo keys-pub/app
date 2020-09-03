@@ -6,12 +6,20 @@ import {
   Button,
   Checkbox,
   Divider,
+  FormControl,
   FormControlLabel,
+  IconButton,
   Input,
+  InputLabel,
   LinearProgress,
+  MenuItem,
+  Select,
+  Tooltip,
   Typography,
   Box,
 } from '@material-ui/core'
+
+import {PersonAdd as AddRecipientIcon, CreateOutlined as SignIcon} from '@material-ui/icons'
 
 import {Link, styles} from '../../components'
 import AutocompletesView from '../keys/autocompletes'
@@ -22,11 +30,14 @@ import SignKeySelectView from '../keys/select'
 import {remote} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
+import Popup from '../../components/popup'
+import Dialog from '../../components/dialog'
 
 import {encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
   Key,
   EncryptMode,
+  EncryptOptions,
   EncryptRequest,
   EncryptResponse,
   EncryptFileInput,
@@ -34,29 +45,31 @@ import {
 } from '../../rpc/keys.d'
 
 type State = {
-  input: string
-  output: string
+  addSenderRecipient: boolean
+  error?: Error
   fileIn: string
   fileOut: string
+  input: string
+  loading: boolean
+  output: string
   recipients: Key[]
   sender?: Key
-  error?: Error
-  loading: boolean
-  // includeSelf?: boolean
+  sign: boolean
 }
 
 const initialState: State = {
-  input: '',
-  output: '',
+  addSenderRecipient: true,
   fileIn: '',
   fileOut: '',
-  recipients: [],
+  input: '',
   loading: false,
+  output: '',
+  recipients: [],
+  sign: true,
 }
 
 const store = new Store(initialState)
 
-// TODO: Option to include self/sender
 // TODO: Default sender
 
 const openFile = async () => {
@@ -92,40 +105,14 @@ const clear = (outOnly: boolean) => {
   }
 }
 
-const encryptInput = async (input: string, recipients: Key[], sender?: Key) => {
-  if (!input || recipients.length == 0) {
-    clear(true)
-    return
-  }
-
-  const recs = recipients.map((k: Key) => k.id!)
-
-  console.log('Encrypting...')
-  const data = new TextEncoder().encode(input)
-  const req: EncryptRequest = {
-    data: data,
-    armored: true,
-    recipients: recs,
-    sender: sender?.id || '',
-    mode: EncryptMode.DEFAULT_ENCRYPT,
-  }
-
-  try {
-    const resp = await encrypt(req)
-    const encrypted = new TextDecoder().decode(resp.data)
-    store.update((s) => {
-      s.output = encrypted
-      s.fileOut = ''
-      s.error = undefined
-    })
-  } catch (err) {
-    store.update((s) => {
-      s.error = err
-    })
-  }
-}
-
-const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: Key) => {
+const encryptFileIn = (
+  dir: string,
+  fileIn: string,
+  recipients: Key[],
+  sender: Key | undefined,
+  addSenderRecipient: boolean,
+  sign: boolean
+) => {
   clear(true)
   if (fileIn == '' || recipients.length == 0) {
     return
@@ -139,9 +126,12 @@ const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: 
     in: fileIn,
     out: fileOut,
     recipients: recs,
-    sender: sender?.id || '',
-    mode: EncryptMode.DEFAULT_ENCRYPT,
-    armored: false,
+    sender: sender?.id,
+    options: {
+      armored: false,
+      noSenderRecipient: !addSenderRecipient,
+      noSign: !sign,
+    },
   }
 
   console.log('Encrypting file...')
@@ -180,7 +170,13 @@ const encryptFileIn = (fileIn: string, dir: string, recipients: Key[], sender?: 
   send(req, false)
 }
 
-const encryptFileTo = async (fileIn: string, recipients: Key[], sender?: Key) => {
+const encryptFileTo = async (
+  fileIn: string,
+  recipients: Key[],
+  sender: Key | undefined,
+  addSenderRecipient: boolean,
+  sign: boolean
+) => {
   const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
   })
@@ -189,7 +185,7 @@ const encryptFileTo = async (fileIn: string, recipients: Key[], sender?: Key) =>
   }
   if (open.filePaths.length == 1) {
     const dir = open.filePaths[0]
-    encryptFileIn(fileIn, dir, recipients, sender)
+    encryptFileIn(dir, fileIn, recipients, sender, addSenderRecipient, sign)
   }
 }
 
@@ -204,7 +200,7 @@ const EncryptToButton = (props: {onClick: () => void; disabled: boolean}) => (
 type Props = {}
 
 export default (props: Props) => {
-  const inputRef = React.useRef<HTMLInputElement>()
+  const inputRef = React.useRef<HTMLTextAreaElement>()
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -214,32 +210,64 @@ export default (props: Props) => {
   }, [])
 
   const {
-    input,
-    output,
+    addSenderRecipient,
+    error,
     fileIn,
     fileOut,
-    error,
+    input,
+    loading,
+    output,
     recipients,
     sender,
-    // includeSelf,
-    loading,
+    sign,
   } = store.useState()
 
   React.useEffect(() => {
-    if (fileIn == '') {
-      encryptInput(input, recipients, sender)
+    const encryptInput = async () => {
+      if (!input || recipients.length == 0) {
+        clear(true)
+        return
+      }
+
+      const recs = recipients.map((k: Key) => k.id!)
+
+      console.log('Encrypting...')
+      try {
+        const data = new TextEncoder().encode(input)
+        const req: EncryptRequest = {
+          data: data,
+          recipients: recs,
+          sender: sender?.id,
+          options: {armored: true, noSenderRecipient: !addSenderRecipient, noSign: !sign},
+        }
+        console.log('Encrypt:', sender?.id, req.options)
+        const resp = await encrypt(req)
+        const encrypted = new TextDecoder().decode(resp.data)
+        store.update((s) => {
+          s.output = encrypted
+          s.fileOut = ''
+          s.error = undefined
+        })
+      } catch (err) {
+        store.update((s) => {
+          s.error = err
+        })
+      }
     }
-  }, [input, recipients, sender])
+
+    if (fileIn == '') {
+      encryptInput()
+    } else if (fileOut != '') {
+      store.update((s) => {
+        s.fileOut = ''
+      })
+    }
+  }, [input, recipients, sender, addSenderRecipient, sign])
 
   const canEncryptFile = fileIn && recipients.length > 0
   const showEncryptFileButton = canEncryptFile && fileIn && !fileOut
   return (
-    <Box
-      display="flex"
-      flex={1}
-      flexDirection="column"
-      // style={{height: '100%', position: 'relative', overflow: 'hidden'}}
-    >
+    <Box display="flex" flex={1} flexDirection="column">
       <Box style={{paddingLeft: 8, paddingTop: 5, paddingBottom: 5, paddingRight: 8}}>
         <AutocompletesView
           keys={recipients}
@@ -256,8 +284,8 @@ export default (props: Props) => {
         />
       </Box>
       <Divider />
-      <Box display="flex">
-        <Box display="flex" flex={1}>
+      <Box display="flex" style={{position: 'relative'}}>
+        <Box display="flex" flex={1} flexDirection="row">
           <SignKeySelectView
             value={sender}
             onChange={(sender?: Key) =>
@@ -267,23 +295,36 @@ export default (props: Props) => {
             }
             disabled={loading}
             placeholder="Anonymous"
-            itemLabel="Signed by"
           />
+
+          <IconButton
+            color={addSenderRecipient ? 'primary' : 'inherit'}
+            onClick={() =>
+              store.update((s) => {
+                s.addSenderRecipient = !addSenderRecipient
+              })
+            }
+            disabled={!sender}
+          >
+            <Tooltip title="Add to Recipients">
+              <AddRecipientIcon style={{color: addSenderRecipient ? '' : '#666'}} />
+            </Tooltip>
+          </IconButton>
+
+          <IconButton
+            color={sign ? 'primary' : 'inherit'}
+            onClick={() =>
+              store.update((s) => {
+                s.sign = !sign
+              })
+            }
+            disabled={!sender}
+          >
+            <Tooltip title="Sign">
+              <SignIcon style={{color: sign ? '' : '#666'}} />
+            </Tooltip>
+          </IconButton>
         </Box>
-        {/* <FormControlLabel
-          control={
-            <Checkbox
-              color="primary"
-              checked={!!includeSelf}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                EncryptStore.update((s) => {
-                  s.includeSelf = event.target.checked
-                })
-              }}
-            />
-          }
-          label="Include Self"
-        /> */}
       </Box>
       <Divider />
       <Box style={{position: 'relative', height: '47%'}}>
@@ -297,27 +338,26 @@ export default (props: Props) => {
         )}
         {!fileIn && (
           <Box style={{height: '100%'}}>
-            <Input
-              multiline
-              autoFocus
-              onChange={onInputChange}
+            <textarea
+              ref={inputRef as React.RefObject<HTMLTextAreaElement>}
               value={input}
-              disableUnderline
-              inputProps={{
-                ref: inputRef,
-                spellCheck: 'false',
-                style: {
-                  height: '100%',
-                  overflow: 'auto',
-                  paddingTop: 8,
-                  paddingLeft: 8,
-                  paddingBottom: 0,
-                  paddingRight: 0,
-                },
-              }}
+              onChange={onInputChange}
+              spellCheck="false"
               style={{
-                height: '100%',
-                width: '100%',
+                height: 'calc(100% - 16px)',
+                width: 'calc(100% - 8px)',
+                overflow: 'auto',
+                border: 'none',
+                padding: 0,
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontSize: '0.857rem',
+                fontFamily: 'Open Sans',
+                fontWeight: 400,
+                outline: 0,
+                resize: 'none',
+                paddingTop: 8,
+                paddingLeft: 8,
+                paddingBottom: 8,
               }}
             />
             {!input && (
@@ -328,7 +368,7 @@ export default (props: Props) => {
                 >
                   Type text to encrypt or{' '}
                 </Typography>
-                <Link inline onClick={() => openFile()}>
+                <Link inline onClick={openFile}>
                   select a file
                 </Link>
                 <Typography style={{display: 'inline'}}>.</Typography>
@@ -353,7 +393,10 @@ export default (props: Props) => {
           </Box>
         )}
         {!error && showEncryptFileButton && (
-          <EncryptToButton onClick={() => encryptFileTo(fileIn, recipients, sender)} disabled={loading} />
+          <EncryptToButton
+            onClick={() => encryptFileTo(fileIn, recipients, sender, addSenderRecipient, sign)}
+            disabled={loading}
+          />
         )}
         {!error && !showEncryptFileButton && fileOut && <EncryptedFileView fileOut={fileOut} />}
         {!error && !showEncryptFileButton && !fileOut && <EncryptedView value={output} />}

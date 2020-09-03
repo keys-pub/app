@@ -70,7 +70,7 @@ app.on('ready', async () => {
 
   ws.manage(mainWindow)
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.HOT) {
     // process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
     let port = process.env.DEV_PORT
     if (!port) {

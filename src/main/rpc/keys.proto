@@ -284,20 +284,31 @@ enum EncryptMode {
   SALTPACK_SIGNCRYPT = 3 [(gogoproto.enumvalue_customname) = "SaltpackSigncrypt"];  
 }
 
+message EncryptOptions {
+  // Armored, if true will return armored string output.
+  bool armored = 1;
+  // Mode is the encryption mode.
+  EncryptMode mode = 2;
+  // NoSenderRecipient if true, won't add sender to recipients list.
+  bool noSenderRecipient = 3;
+  // NoSign if true, won't sign with sender.
+  bool noSign = 4;
+}
+
 message EncryptRequest {
   // Data to encrypt.
   bytes data = 1;
-  // Armored, if true will return armored string output.
-  bool armored = 10;
   // Recipients to encrypt to.
-  repeated string recipients = 11;
-  // Sender, or empty, if anonymous.
-  string sender = 12;
-  // Mode is the encryption mode.
-  EncryptMode mode = 13;
+  repeated string recipients = 3;
+  // Sender, or anonymous.
+  string sender = 4;  
+
+  // Options for encrypt.
+  EncryptOptions options = 10;
 }
 message EncryptResponse {
   bytes data = 1;
+  string info = 2;
 }
 
 message EncryptFileInput {
@@ -305,15 +316,13 @@ message EncryptFileInput {
   string in = 1;
   // Out is output file path.
   string out = 2;
-  // Armored, if true will return armored string output.
-  bool armored = 10;
-  
   // Recipients to encrypt to.
-  repeated string recipients = 11;  
-  // Sender, or empty, if anonymous.
-  string sender = 12;
-  // Mode is the encryption mode.
-  EncryptMode mode = 13;
+  repeated string recipients = 3;
+  // Sender, or anonymous.
+  string sender = 4;  
+
+  // Options for encrypt.
+  EncryptOptions options = 10;
 }
 
 message EncryptFileOutput {
@@ -326,14 +335,13 @@ message EncryptFileOutput {
 message EncryptInput {
   // Data to encrypt. Send empty byte slice as last message.
   bytes data = 1;
-  // Armored, if true will return armored string output.
-  bool armored = 2;
   // Recipients to encrypt to.
-  repeated string recipients = 3;  
-  // Sender, or empty, if anonymous.
+  repeated string recipients = 3;
+  // Sender, or anonymous.
   string sender = 4;  
-  // Mode is the encryption mode.
-  EncryptMode mode = 5;
+
+  // Options for encrypt.
+  EncryptOptions options = 10;
 }
 
 message EncryptOutput {
@@ -599,10 +607,7 @@ message Key {
   // User associated with this key.
   User user = 6;  
   // Saved if saved locally.
-  bool saved = 10;
-  
-  // TODO: Notes saved with the key.
-  // string notes = 30;
+  bool saved = 10;  
 
   // SigchainLength is length of sigchain (if any).
   int32 sigchainLength = 40;
