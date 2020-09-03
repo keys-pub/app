@@ -213,8 +213,6 @@ export default (_: {}) => {
 
   const {input, output, fileIn, fileOut, error, sender, mode, loading} = store.useState()
 
-  console.log('render, error:', error)
-
   React.useEffect(() => {
     if (fileIn == '') {
       decryptInput(input)

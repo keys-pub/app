@@ -192,6 +192,10 @@ export default (props: Props) => {
   React.useEffect(() => {
     if (fileIn == '') {
       signInput(input, signer)
+    } else if (fileOut != '') {
+      store.update((s) => {
+        s.fileOut = ''
+      })
     }
   }, [input, signer])
 

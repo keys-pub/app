@@ -14,12 +14,12 @@ import {
   LinearProgress,
   MenuItem,
   Select,
-  TextareaAutosize,
+  Tooltip,
   Typography,
   Box,
 } from '@material-ui/core'
 
-import {Settings as OptionsIcon} from '@material-ui/icons'
+import {PersonAdd as AddRecipientIcon, CreateOutlined as SignIcon} from '@material-ui/icons'
 
 import {Link, styles} from '../../components'
 import AutocompletesView from '../keys/autocompletes'
@@ -45,14 +45,12 @@ import {
 } from '../../rpc/keys.d'
 
 type State = {
+  addSenderRecipient: boolean
   error?: Error
   fileIn: string
   fileOut: string
   input: string
   loading: boolean
-  // mode: EncryptMode
-  noSenderRecipient: boolean
-  optionsOpen: boolean
   output: string
   recipients: Key[]
   sender?: Key
@@ -60,16 +58,14 @@ type State = {
 }
 
 const initialState: State = {
+  addSenderRecipient: true,
   fileIn: '',
   fileOut: '',
   input: '',
   loading: false,
-  // mode: EncryptMode.SALTPACK_SIGNCRYPT,
-  noSenderRecipient: false,
-  optionsOpen: false,
   output: '',
   recipients: [],
-  sign: false,
+  sign: true,
 }
 
 const store = new Store(initialState)
@@ -114,7 +110,8 @@ const encryptFileIn = (
   fileIn: string,
   recipients: Key[],
   sender: Key | undefined,
-  noSenderRecipient: boolean
+  addSenderRecipient: boolean,
+  sign: boolean
 ) => {
   clear(true)
   if (fileIn == '' || recipients.length == 0) {
@@ -132,7 +129,8 @@ const encryptFileIn = (
     sender: sender?.id,
     options: {
       armored: false,
-      noSenderRecipient,
+      noSenderRecipient: !addSenderRecipient,
+      noSign: !sign,
     },
   }
 
@@ -176,7 +174,8 @@ const encryptFileTo = async (
   fileIn: string,
   recipients: Key[],
   sender: Key | undefined,
-  noSenderRecipient: boolean
+  addSenderRecipient: boolean,
+  sign: boolean
 ) => {
   const open = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
@@ -186,7 +185,7 @@ const encryptFileTo = async (
   }
   if (open.filePaths.length == 1) {
     const dir = open.filePaths[0]
-    encryptFileIn(dir, fileIn, recipients, sender, noSenderRecipient)
+    encryptFileIn(dir, fileIn, recipients, sender, addSenderRecipient, sign)
   }
 }
 
@@ -210,22 +209,13 @@ export default (props: Props) => {
     })
   }, [])
 
-  // const onModeChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
-  //   let target = e.target as HTMLSelectElement
-  //   store.update((s) => {
-  //     s.mode = target.value as EncryptMode
-  //   })
-  // }, [])
-
   const {
+    addSenderRecipient,
     error,
     fileIn,
     fileOut,
     input,
     loading,
-    // mode,
-    noSenderRecipient,
-    optionsOpen,
     output,
     recipients,
     sender,
@@ -242,15 +232,15 @@ export default (props: Props) => {
       const recs = recipients.map((k: Key) => k.id!)
 
       console.log('Encrypting...')
-      const data = new TextEncoder().encode(input)
-      const req: EncryptRequest = {
-        data: data,
-        recipients: recs,
-        sender: sender?.id,
-        options: {armored: true, noSenderRecipient},
-      }
-
       try {
+        const data = new TextEncoder().encode(input)
+        const req: EncryptRequest = {
+          data: data,
+          recipients: recs,
+          sender: sender?.id,
+          options: {armored: true, noSenderRecipient: !addSenderRecipient, noSign: !sign},
+        }
+        console.log('Encrypt:', sender?.id, req.options)
         const resp = await encrypt(req)
         const encrypted = new TextDecoder().decode(resp.data)
         store.update((s) => {
@@ -267,18 +257,17 @@ export default (props: Props) => {
 
     if (fileIn == '') {
       encryptInput()
+    } else if (fileOut != '') {
+      store.update((s) => {
+        s.fileOut = ''
+      })
     }
-  }, [input, recipients, sender, noSenderRecipient])
+  }, [input, recipients, sender, addSenderRecipient, sign])
 
   const canEncryptFile = fileIn && recipients.length > 0
   const showEncryptFileButton = canEncryptFile && fileIn && !fileOut
   return (
-    <Box
-      display="flex"
-      flex={1}
-      flexDirection="column"
-      // style={{height: '100%', position: 'relative', overflow: 'hidden'}}
-    >
+    <Box display="flex" flex={1} flexDirection="column">
       <Box style={{paddingLeft: 8, paddingTop: 5, paddingBottom: 5, paddingRight: 8}}>
         <AutocompletesView
           keys={recipients}
@@ -307,17 +296,35 @@ export default (props: Props) => {
             disabled={loading}
             placeholder="Anonymous"
           />
+
+          <IconButton
+            color={addSenderRecipient ? 'primary' : 'inherit'}
+            onClick={() =>
+              store.update((s) => {
+                s.addSenderRecipient = !addSenderRecipient
+              })
+            }
+            disabled={!sender}
+          >
+            <Tooltip title="Add to Recipients">
+              <AddRecipientIcon style={{color: addSenderRecipient ? '' : '#666'}} />
+            </Tooltip>
+          </IconButton>
+
+          <IconButton
+            color={sign ? 'primary' : 'inherit'}
+            onClick={() =>
+              store.update((s) => {
+                s.sign = !sign
+              })
+            }
+            disabled={!sender}
+          >
+            <Tooltip title="Sign">
+              <SignIcon style={{color: sign ? '' : '#666'}} />
+            </Tooltip>
+          </IconButton>
         </Box>
-        <IconButton
-          style={{position: 'absolute', right: 0}}
-          onClick={() =>
-            store.update((s) => {
-              s.optionsOpen = true
-            })
-          }
-        >
-          <OptionsIcon fontSize="small" />
-        </IconButton>
       </Box>
       <Divider />
       <Box style={{position: 'relative', height: '47%'}}>
@@ -387,57 +394,13 @@ export default (props: Props) => {
         )}
         {!error && showEncryptFileButton && (
           <EncryptToButton
-            onClick={() => encryptFileTo(fileIn, recipients, sender, noSenderRecipient)}
+            onClick={() => encryptFileTo(fileIn, recipients, sender, addSenderRecipient, sign)}
             disabled={loading}
           />
         )}
         {!error && !showEncryptFileButton && fileOut && <EncryptedFileView fileOut={fileOut} />}
         {!error && !showEncryptFileButton && !fileOut && <EncryptedView value={output} />}
       </Box>
-
-      <Dialog
-        open={!!optionsOpen}
-        close={{
-          label: 'Close',
-          action: () =>
-            store.update((s) => {
-              s.optionsOpen = false
-            }),
-        }}
-      >
-        <Box display="flex" flex={1} flexDirection="column">
-          {/* <FormControl variant="outlined">
-            <InputLabel id="mode-label">Mode</InputLabel>
-            <Select
-              labelId="mode-label"
-              label="Mode"
-              variant="outlined"
-              value={mode}
-              onChange={onModeChange}
-              // style={{width: 250, height: 40, marginBottom: 8}}
-            >
-              <MenuItem value={EncryptMode.SALTPACK_SIGNCRYPT}>Signcrypt</MenuItem>
-              <MenuItem value={EncryptMode.SALTPACK_ENCRYPT}>Encrypt</MenuItem>
-            </Select>
-          </FormControl> */}
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={noSenderRecipient}
-                color="primary"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  store.update((s) => {
-                    s.noSenderRecipient = event.target.checked
-                  })
-                }}
-                name="noSenderRecipient"
-              />
-            }
-            label="Don't add sender to recipients"
-          />
-        </Box>
-      </Dialog>
     </Box>
   )
 }

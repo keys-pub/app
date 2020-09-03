@@ -254,6 +254,8 @@ export interface EncryptOptions {
     mode?: EncryptMode;
     // NoSenderRecipient if true, won't add sender to recipients list.
     noSenderRecipient?: boolean;
+    // NoSign if true, won't sign with sender.
+    noSign?: boolean;
 }
 
 export interface EncryptRequest {
@@ -269,6 +271,7 @@ export interface EncryptRequest {
 
 export interface EncryptResponse {
     data?: Uint8Array;
+    info?: string;
 }
 
 export interface EncryptFileInput {

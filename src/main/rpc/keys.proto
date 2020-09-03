@@ -291,6 +291,8 @@ message EncryptOptions {
   EncryptMode mode = 2;
   // NoSenderRecipient if true, won't add sender to recipients list.
   bool noSenderRecipient = 3;
+  // NoSign if true, won't sign with sender.
+  bool noSign = 4;
 }
 
 message EncryptRequest {
@@ -306,6 +308,7 @@ message EncryptRequest {
 }
 message EncryptResponse {
   bytes data = 1;
+  string info = 2;
 }
 
 message EncryptFileInput {
