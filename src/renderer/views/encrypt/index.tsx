@@ -31,7 +31,7 @@ import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
 
-import {configSet, configGet, encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
+import {configSet, configGet, keys, encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
   Key,
   EncryptMode,
@@ -42,7 +42,7 @@ import {
   EncryptFileOutput,
 } from '../../rpc/keys.d'
 
-type State = {
+export type State = {
   addSenderRecipient: boolean
   error?: Error
   fileIn: string
@@ -69,14 +69,19 @@ const initialState: State = {
 const store = new Store(initialState)
 
 const loadState = async () => {
-  const resp = await configGet({key: 'encrypt'})
-  const config = resp?.config?.encrypt
-  const recipients = config?.recipients || []
-  const sender = config?.sender || ''
+  const configResp = await configGet({key: 'encrypt'})
+  const config = configResp?.config?.encrypt
+
+  const keysResp = await keys({})
+  const recipients = (config?.recipients || [])
+    .map((kid: string) => keysResp.keys?.find((k: Key) => k.id == kid))
+    .filter((k?: Key) => k) as Key[]
+
+  const sender = keysResp.keys?.find((k: Key) => k.id == config?.sender)
 
   store.update((s) => {
-    s.recipients = recipients.map((kid: string) => ({id: kid} as Key))
-    s.sender = sender ? {id: sender} : undefined
+    s.recipients = recipients
+    s.sender = sender
     s.sign = !config?.noSign
     s.addSenderRecipient = !config?.noSenderRecipient
   })
@@ -334,6 +339,7 @@ export default (props: Props) => {
 
           <IconButton
             color={addSenderRecipient ? 'primary' : 'inherit'}
+            style={{paddingTop: 10, paddingBottom: 10}}
             onClick={() =>
               store.update((s) => {
                 s.addSenderRecipient = !addSenderRecipient
@@ -348,6 +354,7 @@ export default (props: Props) => {
 
           <IconButton
             color={sign ? 'primary' : 'inherit'}
+            style={{paddingTop: 10, paddingBottom: 10}}
             onClick={() =>
               store.update((s) => {
                 s.sign = !sign
