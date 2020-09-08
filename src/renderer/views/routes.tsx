@@ -25,6 +25,7 @@ export type RouteInfo = {
 export const routes: Array<RouteInfo> = [
   {path: '/db/service', component: () => <DBView db="service" />},
   {path: '/db/vault', component: () => <DBView db="vault" />},
+  {path: '/db/cfg', component: () => <DBView db="cfg" />},
 
   {path: '/debug', component: () => <DebugView />},
 

@@ -12,7 +12,7 @@ import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 import Snack, {SnackProps} from '../../components/snack'
 
-import {keys} from '../../rpc/keys'
+import {keys as listKeys} from '../../rpc/keys'
 import {Key, KeysRequest, KeysResponse, SortDirection} from '../../rpc/keys.d'
 
 type Props = {
@@ -52,14 +52,7 @@ const renderOption = (option: Key) => {
 }
 
 const optionSelected = (option: Key, value: Key): boolean => {
-  return option.id === value.id
-}
-
-const getOptionLabel = (option: Key): string => {
-  if (option.id == 'search' || option.id == 'import') {
-    return ''
-  }
-  return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
+  return option.id == value.id
 }
 
 export default (props: Props) => {
@@ -70,7 +63,7 @@ export default (props: Props) => {
 
   const [open, setOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
-  const [options, setOptions] = React.useState([] as Key[])
+  const [options, setOptions] = React.useState(props.keys)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [importOpen, setImportOpen] = React.useState(false)
   const [snack, setSnack] = React.useState<SnackProps>()
@@ -80,25 +73,37 @@ export default (props: Props) => {
     setOpen(true)
   }
 
+  const lookupOption = (option: Key): Key => {
+    const found = options.find((k: Key) => k.id == option.id)
+    return found || option
+  }
+
+  const getOptionLabel = (option: Key): string => {
+    option = lookupOption(option)
+    if (option.id == 'search' || option.id == 'import') {
+      return ''
+    }
+    return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
+  }
+
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     const q = target.value || ''
     setInput(q)
   }, [])
 
-  const search = (q: string) => {
+  const search = async (q: string) => {
     const req: KeysRequest = {
       query: q,
     }
-    keys(req)
-      .then((resp: KeysResponse) => {
-        const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
-        setOptions(keys || [])
-      })
-      .catch((err: Error) => {
-        setSnack({message: err.message, alert: 'error', duration: 4000})
-        setSnackOpen(true)
-      })
+    try {
+      const resp = await listKeys(req)
+      const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
+      setOptions(keys || [])
+    } catch (err) {
+      setSnack({message: err.message, alert: 'error', duration: 4000})
+      setSnackOpen(true)
+    }
   }
 
   React.useEffect(() => {

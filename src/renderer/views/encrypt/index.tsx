@@ -30,10 +30,8 @@ import SignKeySelectView from '../keys/select'
 import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
-import Popup from '../../components/popup'
-import Dialog from '../../components/dialog'
 
-import {encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
+import {configSet, configGet, encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
   Key,
   EncryptMode,
@@ -70,7 +68,20 @@ const initialState: State = {
 
 const store = new Store(initialState)
 
-// TODO: Default sender
+const loadState = async () => {
+  const resp = await configGet({key: 'encrypt'})
+  const config = resp?.config?.encrypt
+  const recipients = config?.recipients || []
+  const sender = config?.sender || ''
+
+  store.update((s) => {
+    s.recipients = recipients.map((kid: string) => ({id: kid} as Key))
+    s.sender = sender ? {id: sender} : undefined
+    s.sign = !config?.noSign
+    s.addSenderRecipient = !config?.noSenderRecipient
+  })
+}
+loadState()
 
 const openFile = async () => {
   clear(true)
@@ -262,6 +273,31 @@ export default (props: Props) => {
       })
     }
   }, [input, recipients, sender, addSenderRecipient, sign])
+
+  React.useEffect(() => {
+    return store.createReaction(
+      (s) => ({
+        recipients: s.recipients,
+        sender: s.sender,
+        addSenderRecipient: s.addSenderRecipient,
+        sign: s.sign,
+      }),
+      (s) => {
+        const recs = s.recipients.map((k: Key) => k.id!)
+        const config = {
+          encrypt: {
+            recipients: recs,
+            sender: s.sender?.id,
+            noSenderRecipient: !s.addSenderRecipient,
+            noSign: !s.sign,
+          },
+        }
+        console.log('Set config:', config)
+        const set = async () => await configSet({key: 'encrypt', config})
+        set()
+      }
+    )
+  }, [])
 
   const canEncryptFile = fileIn && recipients.length > 0
   const showEncryptFileButton = canEncryptFile && fileIn && !fileOut

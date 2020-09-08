@@ -112,6 +112,10 @@ export default (props: {}) => {
                     DB (vault)
                   </Link>
                   <br />
+                  <Link span onClick={() => setLocation('/db/cfg')}>
+                    DB (cfg)
+                  </Link>
+                  <br />
                   <Link span onClick={devTools}>
                     Toggle Dev Tools
                   </Link>

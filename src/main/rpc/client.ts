@@ -47,7 +47,7 @@ export const newClient = (protoName: string, packageName: string, serviceName: s
   }
   const serviceCls = protoDescriptor[packageName][serviceName]
   if (typeof serviceCls !== 'function') {
-    throw new Error('proto descriptor missing service ' + serviceName)
+    throw new Error('proto descriptor missing ' + serviceName)
   }
 
   const port = getPort()

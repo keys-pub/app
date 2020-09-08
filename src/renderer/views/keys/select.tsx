@@ -32,16 +32,16 @@ export default (props: Props) => {
     props.onChange(selected)
   }
 
-  const listKeys = () => {
+  const listKeys = async () => {
     const req: KeysRequest = {
       query: '',
       types: [KeyType.EDX25519],
     }
-    keys(req).then((resp: KeysResponse) => {
-      setOptions(resp.keys || [])
-    })
+    const resp = await keys(req)
+    setOptions(resp.keys || [])
     // TODO: Catch error
   }
+
   React.useEffect(() => {
     listKeys()
   }, [])

@@ -77,8 +77,6 @@ app.on('ready', async () => {
   // TODO: Double check recommendations again
   mainWindow = new BrowserWindow(winOpts)
 
-  ws.manage(mainWindow)
-
   if (process.env.HOT) {
     // process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
     let port = process.env.DEV_PORT
@@ -103,6 +101,7 @@ app.on('ready', async () => {
   })
 
   mainWindow.on('closed', () => {
+    ws.saveState()
     mainWindow = null
   })
 
@@ -123,6 +122,16 @@ app.on('ready', async () => {
   mainWindow.on('blur', () => {
     if (!mainWindow) return
     mainWindow.webContents.send('blur')
+  })
+
+  mainWindow.on('move', () => {
+    ws.saveState()
+  })
+  mainWindow.on('resize', () => {
+    ws.saveState()
+  })
+  mainWindow.on('close', () => {
+    ws.saveState()
   })
 
   mainWindow.on('responsive', () => {

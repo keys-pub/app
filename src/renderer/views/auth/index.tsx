@@ -6,14 +6,21 @@ import AuthSplash from './splash'
 
 import {runtimeStatus} from '../../rpc/keys'
 import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '../../rpc/keys.d'
+import {store, Error} from '../../store'
 
 export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
 
   const refresh = async () => {
-    const req: RuntimeStatusRequest = {}
-    const resp = await runtimeStatus(req)
-    setStatus(resp.authStatus!)
+    try {
+      const req: RuntimeStatusRequest = {}
+      const resp = await runtimeStatus(req)
+      setStatus(resp.authStatus!)
+    } catch (err) {
+      store.update((s) => {
+        s.error = err as Error
+      })
+    }
   }
 
   React.useEffect(() => {
