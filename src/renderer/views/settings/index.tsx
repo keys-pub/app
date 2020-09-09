@@ -17,7 +17,7 @@ import {Link} from '../../components'
 import {ipcRenderer} from 'electron'
 
 import Header from '../header'
-import {store} from '../../store'
+import {store} from '../store'
 import {useLocation} from 'wouter'
 
 export default (props: {}) => {
@@ -105,11 +105,11 @@ export default (props: {}) => {
               <Box display="flex" flexDirection="column">
                 <Typography>
                   <Link span onClick={() => setLocation('/db/service')}>
-                    DB (service)
+                    DB
                   </Link>
                   <br />
                   <Link span onClick={() => setLocation('/db/vault')}>
-                    DB (vault)
+                    Vault
                   </Link>
                   <br />
                   <Link span onClick={devTools}>

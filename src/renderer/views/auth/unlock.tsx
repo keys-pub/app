@@ -11,7 +11,7 @@ import {authUnlock} from '../../rpc/keys'
 import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
 import {useLocation} from 'wouter'
 
-import {store} from '../../store'
+import {store} from '../store'
 
 export default (_: {}) => {
   const [location, setLocation] = useLocation()

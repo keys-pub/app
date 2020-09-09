@@ -6,7 +6,7 @@ import {Link} from '../../components'
 
 import Alert from '@material-ui/lab/Alert'
 import {platform} from '../../env'
-import {store} from '../../store'
+import {store} from '../store'
 import {ipcRenderer, shell} from 'electron'
 
 export default (_: {}) => {

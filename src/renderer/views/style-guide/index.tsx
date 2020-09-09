@@ -83,24 +83,17 @@ export default (_: {}) => {
         </Box>
 
         <Box marginBottom={2}>
-          <Link span onClick={() => openSnack({message: 'Testing'})}>
-            Snack Test
-          </Link>
-          <br />
-          <Link span onClick={() => openSnack({message: 'Testing', alert: 'success', duration: 1000})}>
+          <Link onClick={() => openSnack({message: 'Testing'})}>Snack Test</Link>
+          <Link onClick={() => openSnack({message: 'Testing', alert: 'success', duration: 1000})}>
             Snack Test (alert, success)
           </Link>
-          <br />
-          <Link span onClick={() => openSnack({message: 'Testing', alert: 'info', duration: 2000})}>
+          <Link onClick={() => openSnack({message: 'Testing', alert: 'info', duration: 2000})}>
             Snack Test (alert, info)
           </Link>
-          <br />
-          <Link span onClick={() => openSnack({message: 'Testing', alert: 'warning', duration: 3000})}>
+          <Link onClick={() => openSnack({message: 'Testing', alert: 'warning', duration: 3000})}>
             Snack Test (alert, warning)
           </Link>
-          <br />
           <Link
-            span
             onClick={() =>
               openSnack({
                 message: 'Testing error message error message error message error message error message',
@@ -110,7 +103,6 @@ export default (_: {}) => {
           >
             Snack Test (alert, error)
           </Link>
-          <br />
           <Snack
             open={snackOpen}
             {...snack}
@@ -121,15 +113,13 @@ export default (_: {}) => {
         </Box>
 
         <Box>
-          <Link span onClick={() => setUpdateAlert(true)}>
-            Update Alert
-          </Link>
-          <br />
+          <Link onClick={() => setUpdateAlert(true)}>Update Alert</Link>
           <UpdateAlertView
             open={updateAlert}
             close={() => setUpdateAlert(false)}
             version={'1.2.3'}
-            apply={() => {}}
+            action={() => setUpdateAlert(false)}
+            actionLabel="Download &amp; restart"
           />
         </Box>
       </Box>

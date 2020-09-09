@@ -53,10 +53,6 @@ export const serviceColor = (service: string): string => {
   }
 }
 
-export const backgroundSelectedColor = () => {
-  return '#eaeaea' // fade('#2196f3', 0.075)
-}
-
 const styles = {
   mono,
   regular,

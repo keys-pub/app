@@ -13,7 +13,7 @@ import {
 import {ipcRenderer} from 'electron'
 
 import {useLocation} from 'wouter'
-import {store} from '../../../store'
+import {store} from '../../store'
 
 type Props = {}
 

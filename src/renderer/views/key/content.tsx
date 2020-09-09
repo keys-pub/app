@@ -34,7 +34,7 @@ type UserProps = {
   openURL: (url: string) => void
 }
 
-const UserRow = (props: UserProps) => {
+export const UserRow = (props: UserProps) => {
   const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
@@ -51,7 +51,7 @@ const UserRow = (props: UserProps) => {
         <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
             <Box display="flex" flexDirection="row">
-              <UserLabel kid={user.kid!} user={user} />
+              <UserLabel user={user} />
               <Box style={{marginLeft: 10}} />
               {isPrivate && (
                 <Link color="secondary" style={{marginTop: -1}} onClick={props.revoke}>
@@ -132,6 +132,7 @@ export default (props: Props) => {
   }
 
   const openSigchain = () => openURL(sigchainURL)
+  const verifiedAt = dateString(key.user?.verifiedAt)
 
   return (
     <Box>
@@ -156,14 +157,14 @@ export default (props: Props) => {
             </TableCell>
           </TableRow>
           <UserRow {...props} openURL={openURL} />
-          {key.user && (
+          {verifiedAt != '' && (
             <TableRow>
               <TableCell style={{...cstyles.cell, paddingBottom: 6, verticalAlign: 'center'}}>
                 <Typography align="right">Verified</Typography>
               </TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 4}}>
                 <Typography>
-                  {key?.user?.verifiedAt && dateString(key.user.verifiedAt) + '  '}
+                  {verifiedAt}&nbsp;&nbsp;
                   <Link span color="primary" onClick={props.update}>
                     Update
                   </Link>
@@ -171,11 +172,9 @@ export default (props: Props) => {
               </TableCell>
             </TableRow>
           )}
-          {!key.user && (
+          {verifiedAt == '' && (
             <TableRow>
-              <TableCell style={{...cstyles.cell}}>
-                <Typography align="right">&nbsp;</Typography>
-              </TableCell>
+              <TableCell style={{...cstyles.cell}}></TableCell>
               <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
                 <Button size="small" variant="outlined" onClick={props.update}>
                   Update
@@ -193,7 +192,6 @@ export default (props: Props) => {
                   <Link span onClick={openSigchain}>
                     View {key.sigchainLength} {key.sigchainLength == 1 ? 'entry' : 'entries'}
                   </Link>
-                  {/* &nbsp;&nbsp;(Updated {dateString(key.sigchainUpdatedAt)}) */}
                 </Typography>
               </TableCell>
             </TableRow>

@@ -12,27 +12,9 @@ import SignedView from './signed'
 import SignFileView from './signedfile'
 import SignKeySelectView from '../keys/select'
 
-import {sign, signFile, SignFileEvent} from '../../rpc/keys'
+import {keys, sign, configGet, configSet, signFile, SignFileEvent} from '../../rpc/keys'
 import {Key, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
-import {Store} from 'pullstate'
-
-type State = {
-  input: string
-  output: string
-  fileIn: string
-  fileOut: string
-  signer?: Key
-  error?: Error
-  loading: boolean
-}
-
-const store = new Store<State>({
-  input: '',
-  output: '',
-  fileIn: '',
-  fileOut: '',
-  loading: false,
-})
+import {store, loadStore} from './store'
 
 const openFile = async () => {
   clearOut()
@@ -198,6 +180,25 @@ export default (props: Props) => {
       })
     }
   }, [input, signer])
+
+  React.useEffect(() => {
+    loadStore()
+
+    return store.createReaction(
+      (s) => ({
+        signer: s.signer,
+      }),
+      (s) => {
+        const config = {
+          sign: {
+            signer: s.signer?.id,
+          },
+        }
+        const set = async () => await configSet({name: 'sign', config})
+        set()
+      }
+    )
+  }, [])
 
   const canSign = fileIn && signer
   const showButton = canSign && fileIn && !fileOut

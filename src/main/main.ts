@@ -7,9 +7,11 @@
 import {
   app,
   dialog,
-  BrowserWindow,
   ipcMain,
+  BrowserWindow,
   BrowserWindowConstructorOptions,
+  Menu,
+  MenuItemConstructorOptions,
   OpenDialogOptions,
   OpenDialogReturnValue,
 } from 'electron'
@@ -77,6 +79,8 @@ app.on('ready', async () => {
   // TODO: Double check recommendations again
   mainWindow = new BrowserWindow(winOpts)
 
+  ws.manage(mainWindow)
+
   if (process.env.HOT) {
     // process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'
     let port = process.env.DEV_PORT
@@ -101,7 +105,7 @@ app.on('ready', async () => {
   })
 
   mainWindow.on('closed', () => {
-    ws.saveState()
+    ws.unmanage()
     mainWindow = null
   })
 
@@ -125,12 +129,7 @@ app.on('ready', async () => {
   })
 
   mainWindow.on('move', () => {
-    ws.saveState()
-  })
-  mainWindow.on('resize', () => {
-    ws.saveState()
-  })
-  mainWindow.on('close', () => {
+    // TODO: This shouldn't be necessary
     ws.saveState()
   })
 
@@ -153,6 +152,61 @@ app.on('quit', async () => {
   if (process.env.KEYS_STOP_ON_EXIT) {
     await keysStop()
   }
+})
+
+type ContextMenuProps = {
+  labels: string[]
+  x: number
+  y: number
+}
+
+type ContextMenuSelected = {
+  label?: string
+  close?: boolean
+}
+
+ipcMain.on('context-menu', (event, props: ContextMenuProps) => {
+  const window = mainWindow
+  if (!window) return
+  const template: MenuItemConstructorOptions[] = props.labels.map((label: string) => {
+    if (label == '-') {
+      return {type: 'separator'}
+    }
+    return {
+      label: label,
+      click: () => {
+        const out: ContextMenuSelected = {label}
+        event.sender.send('context-menu', out)
+      },
+    }
+  })
+
+  if (process.env.NODE_ENV == 'development') {
+    template.push(
+      {type: 'separator'},
+      {
+        label: 'Inspect element',
+        click: () => {
+          window.webContents.inspectElement(props.x, props.y)
+        },
+      },
+      {
+        label: 'Reload',
+        click: () => {
+          reloadApp(window)
+        },
+      }
+    )
+  }
+
+  var contextMenu = Menu.buildFromTemplate(template)
+  contextMenu.popup({window: window})
+  contextMenu.on('menu-will-close', (e: Event) => {
+    setTimeout(() => {
+      const out: ContextMenuSelected = {close: true}
+      event.sender.send('context-menu', out)
+    }, 10)
+  })
 })
 
 ipcMain.on('reload-app', (event, arg) => {

@@ -6,7 +6,7 @@ import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import UserLabel from '../user/label'
-import matchSorter from 'match-sorter'
+import matchSorter, {rankings} from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
@@ -55,9 +55,21 @@ const optionSelected = (option: Key, value: Key): boolean => {
   return option.id == value.id
 }
 
+const getOptionLabel = (option: Key): string => {
+  if (option.id == 'search' || option.id == 'import') {
+    return ''
+  }
+  return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
+}
+
 export default (props: Props) => {
   const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
-    const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
+    const filter = matchSorter(options, inputValue, {
+      keys: [
+        {threshold: rankings.STARTS_WITH, key: 'user.id'},
+        {threshold: rankings.STARTS_WITH, key: 'id'},
+      ],
+    })
     return createOptions(filter, !!props.searchOption, !!props.importOption)
   }
 
@@ -69,21 +81,12 @@ export default (props: Props) => {
   const [snack, setSnack] = React.useState<SnackProps>()
   const [snackOpen, setSnackOpen] = React.useState(false)
 
+  React.useEffect(() => {
+    search()
+  }, [])
+
   const openAutoComplete = () => {
     setOpen(true)
-  }
-
-  const lookupOption = (option: Key): Key => {
-    const found = options.find((k: Key) => k.id == option.id)
-    return found || option
-  }
-
-  const getOptionLabel = (option: Key): string => {
-    option = lookupOption(option)
-    if (option.id == 'search' || option.id == 'import') {
-      return ''
-    }
-    return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
   }
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
@@ -92,12 +95,10 @@ export default (props: Props) => {
     setInput(q)
   }, [])
 
-  const search = async (q: string) => {
-    const req: KeysRequest = {
-      query: q,
-    }
+  const search = async () => {
     try {
-      const resp = await listKeys(req)
+      // Filtering happens with matchSorter.
+      const resp = await listKeys({})
       const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
       setOptions(keys || [])
     } catch (err) {
@@ -106,17 +107,9 @@ export default (props: Props) => {
     }
   }
 
-  React.useEffect(() => {
-    search(input)
-  }, [input])
-
-  const reload = () => {
-    search(input)
-  }
-
   const closeImport = () => {
     setImportOpen(false)
-    reload()
+    search()
   }
 
   const onChange = (event: React.ChangeEvent<{}>, value: any) => {
@@ -144,6 +137,7 @@ export default (props: Props) => {
         onOpen={openAutoComplete}
         onClose={() => setOpen(false)}
         multiple
+        filterSelectedOptions
         filterOptions={filterOptions}
         onInputChange={onInputChange}
         onChange={onChange}
@@ -177,7 +171,7 @@ export default (props: Props) => {
           />
         )}
       />
-      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
+      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={search} />
       <KeyImportDialog open={importOpen} close={closeImport} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>

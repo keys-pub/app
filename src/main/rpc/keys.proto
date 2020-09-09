@@ -1006,14 +1006,14 @@ message Config {
 }
 
 message ConfigGetRequest {
-  string key = 1;  
+  string name = 1;  
 }
 message ConfigGetResponse {
   Config config = 1;
 }
 
 message ConfigSetRequest {
-  string key = 1;
+  string name = 1;
   Config config = 2;
 }
 

@@ -891,7 +891,7 @@ export interface Config {
 }
 
 export interface ConfigGetRequest {
-    key?: string;
+    name?: string;
 }
 
 export interface ConfigGetResponse {
@@ -899,7 +899,7 @@ export interface ConfigGetResponse {
 }
 
 export interface ConfigSetRequest {
-    key?: string;
+    name?: string;
     config?: Config;
 }
 

@@ -6,7 +6,7 @@ import AuthSplash from './splash'
 
 import {runtimeStatus} from '../../rpc/keys'
 import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '../../rpc/keys.d'
-import {store, Error} from '../../store'
+import {store, Error} from '../store'
 
 export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)

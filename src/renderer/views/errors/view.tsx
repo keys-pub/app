@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 import {Error} from '../store'
 
 import {Button, Typography} from '@material-ui/core'
-import {styles} from '../components'
+import {styles} from '../../components'
 
 type Props = {
   error: Error

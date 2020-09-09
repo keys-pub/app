@@ -83,10 +83,9 @@ export default class KeyImportDialog extends React.Component<Props, State> {
           <TextField
             multiline
             autoFocus
-            label="Import Key"
+            label="Key"
             rows={8}
             variant="outlined"
-            placeholder={''}
             onChange={this.onInputChange}
             value={this.state.in}
             inputProps={{
@@ -97,7 +96,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         </FormControl>
         <FormControl error={!!this.state.error} style={{marginBottom: -10}}>
           <TextField
-            label="Password"
+            placeholder="Password (optional)"
             variant="outlined"
             type="password"
             onChange={this.onPasswordInputChange}

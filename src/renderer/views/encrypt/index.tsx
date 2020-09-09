@@ -29,7 +29,7 @@ import SignKeySelectView from '../keys/select'
 
 import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
-import {Store} from 'pullstate'
+import {store, loadStore} from './store'
 
 import {configSet, configGet, keys, encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
@@ -41,52 +41,6 @@ import {
   EncryptFileInput,
   EncryptFileOutput,
 } from '../../rpc/keys.d'
-
-export type State = {
-  addSenderRecipient: boolean
-  error?: Error
-  fileIn: string
-  fileOut: string
-  input: string
-  loading: boolean
-  output: string
-  recipients: Key[]
-  sender?: Key
-  sign: boolean
-}
-
-const initialState: State = {
-  addSenderRecipient: true,
-  fileIn: '',
-  fileOut: '',
-  input: '',
-  loading: false,
-  output: '',
-  recipients: [],
-  sign: true,
-}
-
-const store = new Store(initialState)
-
-const loadState = async () => {
-  const configResp = await configGet({key: 'encrypt'})
-  const config = configResp?.config?.encrypt
-
-  const keysResp = await keys({})
-  const recipients = (config?.recipients || [])
-    .map((kid: string) => keysResp.keys?.find((k: Key) => k.id == kid))
-    .filter((k?: Key) => k) as Key[]
-
-  const sender = keysResp.keys?.find((k: Key) => k.id == config?.sender)
-
-  store.update((s) => {
-    s.recipients = recipients
-    s.sender = sender
-    s.sign = !config?.noSign
-    s.addSenderRecipient = !config?.noSenderRecipient
-  })
-}
-loadState()
 
 const openFile = async () => {
   clear(true)
@@ -126,8 +80,8 @@ const encryptFileIn = (
   fileIn: string,
   recipients: Key[],
   sender: Key | undefined,
-  addSenderRecipient: boolean,
-  sign: boolean
+  noSenderRecipient: boolean,
+  noSign: boolean
 ) => {
   clear(true)
   if (fileIn == '' || recipients.length == 0) {
@@ -145,8 +99,8 @@ const encryptFileIn = (
     sender: sender?.id,
     options: {
       armored: false,
-      noSenderRecipient: !addSenderRecipient,
-      noSign: !sign,
+      noSenderRecipient,
+      noSign,
     },
   }
 
@@ -190,8 +144,8 @@ const encryptFileTo = async (
   fileIn: string,
   recipients: Key[],
   sender: Key | undefined,
-  addSenderRecipient: boolean,
-  sign: boolean
+  noSenderRecipient: boolean,
+  noSign: boolean
 ) => {
   const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {
     properties: ['openDirectory'],
@@ -201,7 +155,7 @@ const encryptFileTo = async (
   }
   if (open.filePaths.length == 1) {
     const dir = open.filePaths[0]
-    encryptFileIn(dir, fileIn, recipients, sender, addSenderRecipient, sign)
+    encryptFileIn(dir, fileIn, recipients, sender, noSenderRecipient, noSign)
   }
 }
 
@@ -226,16 +180,16 @@ export default (props: Props) => {
   }, [])
 
   const {
-    addSenderRecipient,
     error,
     fileIn,
     fileOut,
     input,
     loading,
+    noSenderRecipient,
+    noSign,
     output,
     recipients,
     sender,
-    sign,
   } = store.useState()
 
   React.useEffect(() => {
@@ -254,7 +208,7 @@ export default (props: Props) => {
           data: data,
           recipients: recs,
           sender: sender?.id,
-          options: {armored: true, noSenderRecipient: !addSenderRecipient, noSign: !sign},
+          options: {armored: true, noSenderRecipient, noSign},
         }
         const resp = await encrypt(req)
         const encrypted = new TextDecoder().decode(resp.data)
@@ -277,15 +231,17 @@ export default (props: Props) => {
         s.fileOut = ''
       })
     }
-  }, [input, recipients, sender, addSenderRecipient, sign])
+  }, [input, recipients, sender, noSenderRecipient, noSign])
 
   React.useEffect(() => {
+    loadStore()
+
     return store.createReaction(
       (s) => ({
         recipients: s.recipients,
         sender: s.sender,
-        addSenderRecipient: s.addSenderRecipient,
-        sign: s.sign,
+        noSenderRecipient: s.noSenderRecipient,
+        noSign: s.noSign,
       }),
       (s) => {
         const recs = s.recipients.map((k: Key) => k.id!)
@@ -293,12 +249,11 @@ export default (props: Props) => {
           encrypt: {
             recipients: recs,
             sender: s.sender?.id,
-            noSenderRecipient: !s.addSenderRecipient,
-            noSign: !s.sign,
+            noSenderRecipient: s.noSenderRecipient,
+            noSign: s.noSign,
           },
         }
-        console.log('Set config:', config)
-        const set = async () => await configSet({key: 'encrypt', config})
+        const set = async () => await configSet({name: 'encrypt', config})
         set()
       }
     )
@@ -338,32 +293,32 @@ export default (props: Props) => {
           />
 
           <IconButton
-            color={addSenderRecipient ? 'primary' : 'inherit'}
+            color={!noSenderRecipient ? 'primary' : 'inherit'}
             style={{paddingTop: 10, paddingBottom: 10}}
             onClick={() =>
               store.update((s) => {
-                s.addSenderRecipient = !addSenderRecipient
+                s.noSenderRecipient = !noSenderRecipient
               })
             }
-            disabled={!sender}
+            disabled={!sender || loading}
           >
             <Tooltip title="Add to Recipients">
-              <AddRecipientIcon style={{color: addSenderRecipient ? '' : '#999'}} />
+              <AddRecipientIcon style={{color: !noSenderRecipient ? '' : '#999'}} />
             </Tooltip>
           </IconButton>
 
           <IconButton
-            color={sign ? 'primary' : 'inherit'}
+            color={!noSign ? 'primary' : 'inherit'}
             style={{paddingTop: 10, paddingBottom: 10}}
             onClick={() =>
               store.update((s) => {
-                s.sign = !sign
+                s.noSign = !noSign
               })
             }
-            disabled={!sender}
+            disabled={!sender || loading}
           >
             <Tooltip title="Sign">
-              <SignIcon style={{color: sign ? '' : '#999'}} />
+              <SignIcon style={{color: !noSign ? '' : '#999'}} />
             </Tooltip>
           </IconButton>
         </Box>
@@ -436,7 +391,7 @@ export default (props: Props) => {
         )}
         {!error && showEncryptFileButton && (
           <EncryptToButton
-            onClick={() => encryptFileTo(fileIn, recipients, sender, addSenderRecipient, sign)}
+            onClick={() => encryptFileTo(fileIn, recipients, sender, noSenderRecipient, noSign)}
             disabled={loading}
           />
         )}
