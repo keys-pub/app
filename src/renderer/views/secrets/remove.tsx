@@ -38,13 +38,11 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
       >
         <DialogTitle onClose={() => this.props.close(false)}>Delete Secret</DialogTitle>
         <DialogContent dividers>
-          <Box>
-            <Typography style={{paddingBottom: 20}}>Do you want to delete this secret?</Typography>
-            <Typography style={{...styles.mono, paddingBottom: 10}}>{this.props.secret?.name}</Typography>
+          <Box style={{paddingBottom: 10}}>
+            <Typography style={{paddingBottom: 10}}>Do you want to delete this secret?</Typography>
+            <Typography style={{...styles.mono}}>{this.props.secret?.name}</Typography>
             {this.props.secret?.username && (
-              <Typography style={{...styles.mono, paddingBottom: 10}}>
-                {this.props.secret?.username}
-              </Typography>
+              <Typography style={{...styles.mono}}>{this.props.secret?.username}</Typography>
             )}
           </Box>
         </DialogContent>

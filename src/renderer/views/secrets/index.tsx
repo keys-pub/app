@@ -27,7 +27,7 @@ import {
 
 import Header from '../header'
 
-import {Color as AlertColor} from '@material-ui/lab/Alert'
+import {ipcRenderer, clipboard} from 'electron'
 
 import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
@@ -60,7 +60,6 @@ type Position = {
 }
 
 type State = {
-  contextPosition?: Position
   editing?: Secret
   input: string
   isNew: boolean
@@ -84,7 +83,6 @@ const store = new Store(initialState)
 
 export default (props: Props) => {
   const {
-    contextPosition,
     editing,
     input,
     isNew,
@@ -98,10 +96,6 @@ export default (props: Props) => {
 
   const [remove, setRemove] = React.useState<Secret>()
   const [removeOpen, setRemoveOpen] = React.useState(false)
-  const openRemove = (secret: Secret) => {
-    setRemove(secret)
-    setRemoveOpen(true)
-  }
 
   const [snackOpen, setSnackOpen] = React.useState(false)
   const [snack, setSnack] = React.useState<SnackProps>()
@@ -117,20 +111,74 @@ export default (props: Props) => {
     })
   }, [])
 
+  const openRemove = (secret: Secret) => {
+    setRemove(secret)
+    setRemoveOpen(true)
+  }
+
+  const closeRemove = (removed: boolean) => {
+    setRemoveOpen(false)
+    if (removed) {
+      store.update((s) => {
+        s.selected = undefined
+      })
+      reload()
+    }
+  }
+
+  const openEdit = (secret?: Secret) => {
+    if (!secret) return
+    store.update((s) => {
+      s.isNew = false
+      s.selected = secret
+      s.editing = secret
+    })
+  }
+
+  const closeEdit = () => {
+    store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
+    })
+  }
+
   const onContextMenu = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
       const id = event.currentTarget.id
       const secret = secrets.find((s: Secret) => s.id == id)
+      if (!secret) return
       store.update((s) => {
-        s.contextPosition = {x: event.clientX - 2, y: event.clientY - 4}
         s.selected = secret
+      })
+
+      ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
+        switch (arg.label) {
+          case 'Copy Password':
+            if (secret.password) {
+              clipboard.writeText(secret.password)
+              openSnack({message: 'Copied to Clipboard', duration: 2000})
+            }
+            break
+          case 'Edit':
+            openEdit(secret)
+            break
+          case 'Delete':
+            openRemove(secret)
+            break
+        }
+        if (arg.close) {
+          ipcRenderer.removeAllListeners('context-menu')
+        }
+      })
+      ipcRenderer.send('context-menu', {
+        labels: ['Copy Password', '-', 'Edit', '-', 'Delete'],
+        x: event.clientX,
+        y: event.clientY,
       })
     },
     [secrets]
   )
-
-  // const direction = directionString(sortDirection)
 
   const newSecret = () => {
     const editing: Secret = {
@@ -218,13 +266,6 @@ export default (props: Props) => {
     return selected?.id == s.id
   })
 
-  const cancelEdit = () => {
-    store.update((s) => {
-      s.isNew = false
-      s.editing = undefined
-    })
-  }
-
   const secretChanged = (changed: Secret) => {
     const secretsUpdated = secrets.map((secret: Secret) => {
       if (secret.id == changed.id) return changed
@@ -238,39 +279,6 @@ export default (props: Props) => {
     })
     // If changed is a new item we need to reload
     reload()
-  }
-
-  const closeContext = () => {
-    store.update((s) => {
-      s.contextPosition = undefined
-      s.selected = undefined
-    })
-  }
-
-  const removeSecret = () => {
-    store.update((s) => {
-      s.contextPosition = undefined
-    })
-    if (selected) {
-      openRemove(selected)
-    }
-  }
-
-  const closeRemove = (removed: boolean) => {
-    setRemoveOpen(false)
-    if (removed) {
-      store.update((s) => {
-        s.selected = undefined
-      })
-      reload()
-    }
-  }
-
-  const edit = () => {
-    store.update((s) => {
-      s.isNew = false
-      s.editing = selected
-    })
   }
 
   const setSelected = (secret: Secret) => {
@@ -358,24 +366,11 @@ export default (props: Props) => {
 
         <Box display="flex" flex={1}>
           {editing && (
-            <SecretEditView isNew={isNew} secret={editing} onChange={secretChanged} cancel={cancelEdit} />
+            <SecretEditView isNew={isNew} secret={editing} onChange={secretChanged} cancel={closeEdit} />
           )}
-          {!editing && <SecretContentView secret={selectedInList} edit={edit} />}
+          {!editing && <SecretContentView secret={selectedInList} edit={() => openEdit(selectedInList)} />}
         </Box>
       </Box>
-
-      <Menu
-        keepMounted
-        open={!!contextPosition}
-        onClose={closeContext}
-        anchorReference="anchorPosition"
-        anchorPosition={contextPosition ? {top: contextPosition.y, left: contextPosition.x} : undefined}
-      >
-        <MenuItem color="secondary" onClick={removeSecret}>
-          <DeleteIcon />
-          <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
-        </MenuItem>
-      </Menu>
 
       <SecretRemoveDialog open={removeOpen} secret={remove} close={closeRemove} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />

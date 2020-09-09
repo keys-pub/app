@@ -130,9 +130,10 @@ const notFound = (method: string): Error => {
 }
 
 export const handleErr = (err: Error) => {
-  if (err.code == grpc.status.UNAVAILABLE) {
-    // Close RPC (will re-open next call)
-    close()
+  switch (err.code) {
+    case grpc.status.UNAVAILABLE:
+      close()
+      break
   }
 }
 

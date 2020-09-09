@@ -5,6 +5,7 @@ import {Box, Button, Typography} from '@material-ui/core'
 import {styles} from '../../components'
 import Dialog from '../../components/dialog'
 import Snack, {SnackProps} from '../../components/snack'
+import KeyDescription from './description'
 
 import {keyRemove} from '../../rpc/keys'
 import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
@@ -41,19 +42,21 @@ export default (props: Props) => {
       title="Delete Key"
       actions={[{label: 'Delete', action: removeKey, color: 'secondary'}]}
     >
-      {isPrivate ? <PrivateKey kid={props.k.id} /> : <PublicKey kid={props.k.id} />}
+      {isPrivate ? <PrivateKey k={props.k} /> : <PublicKey k={props.k} />}
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }
 
-const PrivateKey = (props: {kid?: string}) => {
+const PrivateKey = (props: {k: Key}) => {
   return (
     <Box>
       <Typography style={{paddingBottom: 10}}>
         Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
       </Typography>
-      <Typography style={{...styles.mono, paddingBottom: 10, fontWeight: 600}}>{props.kid}</Typography>
+      <Box style={{paddingBottom: 10}}>
+        <KeyDescription k={props.k} />
+      </Box>
       <Typography>
         <span style={{fontWeight: 600}}>
           If you haven't backed up the key, you won't be able to recover it.
@@ -63,11 +66,11 @@ const PrivateKey = (props: {kid?: string}) => {
   )
 }
 
-const PublicKey = (props: {kid?: string}) => {
+const PublicKey = (props: {k: Key}) => {
   return (
-    <Box>
+    <Box style={{paddingBottom: 10}}>
       <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
-      <Typography style={{...styles.mono}}>{props.kid}</Typography>
+      <KeyDescription k={props.k} />
     </Box>
   )
 }

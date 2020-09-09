@@ -1,5 +1,4 @@
 import {app, Menu, MenuItemConstructorOptions, shell, BrowserWindow} from 'electron'
-import {reloadApp} from './app'
 
 export enum MenuActionType {
   Preferences,
@@ -37,24 +36,6 @@ export default class MenuBuilder {
 
   setupDevelopmentEnvironment() {
     this.mainWindow.webContents.openDevTools()
-    this.mainWindow.webContents.on('context-menu', (e, props) => {
-      const {x, y} = props
-
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y)
-          },
-        },
-        {
-          label: 'Reload',
-          click: () => {
-            reloadApp(this.mainWindow)
-          },
-        },
-      ]).popup({window: this.mainWindow})
-    })
   }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {

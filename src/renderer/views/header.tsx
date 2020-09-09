@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, LinearProgress, IconButton, Typography} from '@material-ui/core'
 
-import {store} from '../store'
+import {store} from './store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 

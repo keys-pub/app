@@ -874,6 +874,38 @@ export interface AdminCheckRequest {
 export interface AdminCheckResponse {
 }
 
+export interface Config_Encrypt {
+    recipients?: Array<string>;
+    sender?: string;
+    noSenderRecipient?: boolean;
+    noSign?: boolean;
+}
+
+export interface Config_Sign {
+    signer?: string;
+}
+
+export interface Config {
+    encrypt?: Config_Encrypt;
+    sign?: Config_Sign;
+}
+
+export interface ConfigGetRequest {
+    name?: string;
+}
+
+export interface ConfigGetResponse {
+    config?: Config;
+}
+
+export interface ConfigSetRequest {
+    name?: string;
+    config?: Config;
+}
+
+export interface ConfigSetResponse {
+}
+
 export interface KeysService {
     KeyGenerate: (r:KeyGenerateRequest) => KeyGenerateResponse;
     Keys: (r:KeysRequest) => KeysResponse;
@@ -934,6 +966,8 @@ export interface KeysService {
     Collections: (r:CollectionsRequest) => CollectionsResponse;
     Documents: (r:DocumentsRequest) => DocumentsResponse;
     DocumentDelete: (r:DocumentDeleteRequest) => DocumentDeleteResponse;
+    ConfigGet: (r:ConfigGetRequest) => ConfigGetResponse;
+    ConfigSet: (r:ConfigSetRequest) => ConfigSetResponse;
     AdminSignURL: (r:AdminSignURLRequest) => AdminSignURLResponse;
     AdminCheck: (r:AdminCheckRequest) => AdminCheckResponse;
     MessagePrepare: (r:MessagePrepareRequest) => MessagePrepareResponse;

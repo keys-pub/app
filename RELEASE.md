@@ -4,7 +4,7 @@
 - Update package.json version.
 - Create branch with version v1.2.3, the github action will build the apps.
 - Save app release as prerelease (from draft).
-- Test updater with `VERSION=0.0.0 KEYS_BIN=~/go/bin/keys UPDATER_BIN=~/go/bin/updater yarn start-prod` to ensure this version is updateable. (On both windows and macOS.)
+- Test updater with `VERSION=0.0.0 KEYS_BIN=~/go/bin/keys UPDATER_BIN=~/go/bin/updater UPDATER_APPLY=/Applications/Keys.app yarn start-prod` to ensure this version is updateable. (On both windows and macOS.)
 
 ## Prerelease to Release
 

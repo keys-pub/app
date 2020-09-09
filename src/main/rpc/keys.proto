@@ -1,25 +1,12 @@
 syntax = "proto3";
 
-package service;
-
 // Proto field names should be snake_case, but some plugins don't convert to 
 // camel like they should, so we use camelCase here.
 
-// gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
-import "gogoproto/gogo.proto";
+package service;
+option go_package=".;service";
 
-option (gogoproto.goproto_getters_all) = false;
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.gostring_all) = true;
-option (gogoproto.goproto_stringer_all) = true;
-option (gogoproto.goproto_enum_stringer_all) = true;
-
-// option (gogoproto.messagename_all) = true;
-// option (gogoproto.equal_all) = true;
-// option (gogoproto.verbose_equal_all) = true;
-// option (gogoproto.populate_all) = true;
+import "patch/go.proto";
 
 service Keys {  
   rpc KeyGenerate(KeyGenerateRequest) returns (KeyGenerateResponse) {}
@@ -71,7 +58,7 @@ service Keys {
 
   rpc Pull(PullRequest) returns (PullResponse) {}
   rpc Push(PushRequest) returns (PushResponse) {}
-  
+
   rpc Wormhole(stream WormholeInput) returns (stream WormholeOutput) {}  
   
   // These requests do not need auth.
@@ -100,6 +87,9 @@ service Keys {
   rpc Documents(DocumentsRequest) returns (DocumentsResponse) {}
   rpc DocumentDelete(DocumentDeleteRequest) returns (DocumentDeleteResponse) {}
 
+  rpc ConfigGet(ConfigGetRequest) returns (ConfigGetResponse) {}
+  rpc ConfigSet(ConfigSetRequest) returns (ConfigSetResponse) {}
+
   // Admin
   rpc AdminSignURL(AdminSignURLRequest) returns (AdminSignURLResponse) {}
   rpc AdminCheck(AdminCheckRequest) returns (AdminCheckResponse) {}
@@ -122,7 +112,7 @@ message SignRequest {
 message SignResponse {
   // Data is signed output.
   bytes data = 1;  
-  string kid = 2 [(gogoproto.customname) = "KID"];  
+  string kid = 2 [(go.field) = {name: "KID"}];  
 }
 
 message SignFileInput {
@@ -138,7 +128,7 @@ message SignFileInput {
   bool detached = 11;
 }
 message SignFileOutput {
-  string kid = 1 [(gogoproto.customname) = "KID"];  
+  string kid = 1 [(go.field) = {name: "KID"}];  
   string out = 2;
   int32 bytes = 10;
   int32 total = 11;
@@ -204,7 +194,7 @@ message Statement {
   // Data that was signed.
   bytes data = 2;
   // KID is the key that signed.
-  string kid = 3 [(gogoproto.customname) = "KID"];
+  string kid = 3 [(go.field) = {name: "KID"}];
   // Seq in a sigchain (1 is root).
   int32 seq = 4;
   // Prev is a hash of the previous item in the sigchain.
@@ -218,7 +208,7 @@ message Statement {
 }
 
 message SigchainRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];  
+  string kid = 1 [(go.field) = {name: "KID"}];  
 }
 message SigchainResponse {
   Key key = 1;
@@ -226,7 +216,7 @@ message SigchainResponse {
 }
 
 message StatementRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];  
+  string kid = 1 [(go.field) = {name: "KID"}];  
   int32 seq = 2;
 }
 message StatementResponse {
@@ -235,7 +225,7 @@ message StatementResponse {
 
 message StatementCreateRequest {
   bytes data = 1;
-  string kid = 2 [(gogoproto.customname) = "KID"];  
+  string kid = 2 [(go.field) = {name: "KID"}];  
 
   // Local, if true, won't save to the current key server.
   bool local = 5;
@@ -247,7 +237,7 @@ message StatementCreateResponse {
 message StatementRevokeRequest {
   // Seq to revoke.
   int32 seq = 1;
-  string kid = 2 [(gogoproto.customname) = "KID"];  
+  string kid = 2 [(go.field) = {name: "KID"}];  
 
   // Local, if true, won't save to the current key server.
   bool local = 5;
@@ -272,16 +262,15 @@ message SignInput {
 message SignOutput {
   // Data, signed.
   bytes data = 1;
-  string kid = 2 [(gogoproto.customname) = "KID"];  
+  string kid = 2 [(go.field) = {name: "KID"}];  
 }
 
 enum EncryptMode {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "EncryptMode";
+  option (go.enum) = {name: "EncryptMode"};
   
-  DEFAULT_ENCRYPT = 0 [(gogoproto.enumvalue_customname) = "DefaultEncrypt"];
-  SALTPACK_ENCRYPT = 1 [(gogoproto.enumvalue_customname) = "SaltpackEncrypt"];
-  SALTPACK_SIGNCRYPT = 3 [(gogoproto.enumvalue_customname) = "SaltpackSigncrypt"];  
+  DEFAULT_ENCRYPT = 0 [(go.value) = {name: "DefaultEncrypt"}];
+  SALTPACK_ENCRYPT = 1 [(go.value) = {name: "SaltpackEncrypt"}];
+  SALTPACK_SIGNCRYPT = 3 [(go.value) = {name: "SaltpackSigncrypt"}];  
 }
 
 message EncryptOptions {
@@ -406,31 +395,29 @@ message RuntimeStatusResponse {
   // SyncStatus is the status of vault sync.
   bool sync = 6;
   // FIDO2 available.
-  bool fido2 = 20 [(gogoproto.customname) = "FIDO2"];
+  bool fido2 = 20 [(go.field) = {name: "FIDO2"}];
 }
 
 enum AuthStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "AuthStatus";
+  option (go.enum) = {name: "AuthStatus"};
   
-  AUTH_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "AuthUnknown"];
+  AUTH_UNKNOWN = 0 [(go.value) = {name: "AuthUnknown"}];
   // AuthSetup if setup needed.
-  AUTH_SETUP = 1 [(gogoproto.enumvalue_customname) = "AuthSetup"];  
+  AUTH_SETUP = 1 [(go.value) = {name: "AuthSetup"}];  
   // AuthUnlocked if unlocked.
-  AUTH_UNLOCKED = 2 [(gogoproto.enumvalue_customname) = "AuthUnlocked"];  
+  AUTH_UNLOCKED = 2 [(go.value) = {name: "AuthUnlocked"}];  
   // AuthLocked if locked.
-  AUTH_LOCKED = 3 [(gogoproto.enumvalue_customname) = "AuthLocked"];  
+  AUTH_LOCKED = 3 [(go.value) = {name: "AuthLocked"}];  
 }
 
 enum AuthType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "AuthType";
+  option (go.enum) = {name: "AuthType"};
   
-  UNKNOWN_AUTH = 0 [(gogoproto.enumvalue_customname) = "UnknownAuth"];
+  UNKNOWN_AUTH = 0 [(go.value) = {name: "UnknownAuth"}];
   // PasswordAuth using argon2id.
-  PASSWORD_AUTH = 10 [(gogoproto.enumvalue_customname) = "PasswordAuth"];
+  PASSWORD_AUTH = 10 [(go.value) = {name: "PasswordAuth"}];
   // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension.
-  FIDO2_HMAC_SECRET_AUTH = 20 [(gogoproto.enumvalue_customname) = "FIDO2HMACSecretAuth"];
+  FIDO2_HMAC_SECRET_AUTH = 20 [(go.value) = {name: "FIDO2HMACSecretAuth"}];
 }
 
 message AuthSetupRequest {
@@ -472,7 +459,7 @@ message AuthProvisionResponse {
 }
 
 message AuthDeprovisionRequest {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
 }
 message AuthDeprovisionResponse {}
 
@@ -483,13 +470,13 @@ message PasswordChangeRequest {
 message PasswordChangeResponse {}
 
 message AuthProvision {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   AuthType type = 2;
   int64 createdAt = 3;
 
   // For FIDO2
   // AAGUID is a device "identifier" (only unique across batches for privacy reasons).
-  string aaguid = 100 [(gogoproto.customname) = "AAGUID"];
+  string aaguid = 100 [(go.field) = {name: "AAGUID"}];
   bool noPin = 101;
 }
 
@@ -505,12 +492,12 @@ message KeyGenerateRequest {
   KeyType type = 1;
 }
 message KeyGenerateResponse {
-  string kid = 1 [(gogoproto.customname) = "KID"];  
+  string kid = 1 [(go.field) = {name: "KID"}];  
 }
 
 message UserServiceRequest {
   // KID to use, or if empty the current key.
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   // Service such as twitter, github.
   string service = 2;
 }
@@ -521,7 +508,7 @@ message UserServiceResponse {
 
 message UserSignRequest {
   // KID to use, or if empty the current key.
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   // Service such as twitter, github.
   string service = 2;
   // Name is username on the service.
@@ -536,13 +523,13 @@ message UserSignResponse {
 
 message UserAddRequest {
   // KID to use, or if empty the current key.
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   // Service such as twitter, github.
   string service = 2;
   // Name is username on the service.
   string name = 3; 
   // URL is location of signed message on the service.
-  string url = 4 [(gogoproto.customname) = "URL"];
+  string url = 4 [(go.field) = {name: "URL"}];
 
   // Local, if true, won't save to the current key server.
   bool local = 5;
@@ -553,16 +540,15 @@ message UserAddResponse {
 }
 
 enum ExportType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "ExportType";
+  option (go.enum) = {name: "ExportType"};
   
-  DEFAULT_EXPORT_TYPE = 0 [(gogoproto.enumvalue_customname) = "DefaultExport"];
-  SALTPACK_EXPORT_TYPE = 1 [(gogoproto.enumvalue_customname) = "SaltpackExport"];
-  SSH_EXPORT_TYPE = 2 [(gogoproto.enumvalue_customname) = "SSHExport"];
+  DEFAULT_EXPORT_TYPE = 0 [(go.value) = {name: "DefaultExport"}];
+  SALTPACK_EXPORT_TYPE = 1 [(go.value) = {name: "SaltpackExport"}];
+  SSH_EXPORT_TYPE = 2 [(go.value) = {name: "SSHExport"}];
 }
 
 message KeyExportRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   string password = 2;
   ExportType type = 3;
   bool public = 4;
@@ -577,31 +563,30 @@ message KeyImportRequest {
   string password = 2;  
 }
 message KeyImportResponse {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
 }
 
 message KeyRemoveRequest {
   // KID of key to remove.
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
 }
 message KeyRemoveResponse {}
 
 enum KeyType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "KeyType";
+  option (go.enum) = {name: "KeyType"};
   
-  UNKNOWN_KEY_TYPE = 0 [(gogoproto.enumvalue_customname) = "UnknownKeyType"];
+  UNKNOWN_KEY_TYPE = 0 [(go.value) = {name: "UnknownKeyType"}];
   
-  EDX25519 = 10 [(gogoproto.enumvalue_customname) = "EdX25519"];
-  EDX25519_PUBLIC = 11 [(gogoproto.enumvalue_customname) = "EdX25519Public"];
+  EDX25519 = 10 [(go.value) = {name: "EdX25519"}];
+  EDX25519_PUBLIC = 11 [(go.value) = {name: "EdX25519Public"}];
 
-  X25519 = 20 [(gogoproto.enumvalue_customname) = "X25519"];  
-  X25519_PUBLIC = 21 [(gogoproto.enumvalue_customname) = "X25519Public"];  
+  X25519 = 20 [(go.value) = {name: "X25519"}];  
+  X25519_PUBLIC = 21 [(go.value) = {name: "X25519Public"}];  
 }
 
 message Key {
   // ID identifier.
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   // Type of key.
   KeyType type = 3;
   // User associated with this key.
@@ -629,11 +614,10 @@ message KeyResponse {
 }
 
 enum SortDirection {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "SortDirection";
+  option (go.enum) = {name: "SortDirection"};
 
-  ASC = 0  [(gogoproto.enumvalue_customname) = "SortAsc"];
-  DESC = 1 [(gogoproto.enumvalue_customname) = "SortDesc"];
+  ASC = 0  [(go.value) = {name: "SortAsc"}];
+  DESC = 1 [(go.value) = {name: "SortDesc"}];
 }
 
 message KeysRequest {
@@ -650,26 +634,25 @@ message KeysResponse {
 }
 
 enum SecretType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "SecretType";
+  option (go.enum) = {name: "SecretType"};
   
-  UNKNOWN_SECRET_TYPE = 0 [(gogoproto.enumvalue_customname) = "UnknownSecret"];
+  UNKNOWN_SECRET_TYPE = 0 [(go.value) = {name: "UnknownSecret"}];
   
-  PASSWORD_SECRET = 10 [(gogoproto.enumvalue_customname) = "PasswordSecret"];  
-  CONTACT_SECRET = 11 [(gogoproto.enumvalue_customname) = "ContactSecret"];  
-  CARD_SECRET = 12 [(gogoproto.enumvalue_customname) = "CardSecret"];  
-  NOTE_SECRET = 13 [(gogoproto.enumvalue_customname) = "NoteSecret"];  
+  PASSWORD_SECRET = 10 [(go.value) = {name: "PasswordSecret"}];  
+  CONTACT_SECRET = 11 [(go.value) = {name: "ContactSecret"}];  
+  CARD_SECRET = 12 [(go.value) = {name: "CardSecret"}];  
+  NOTE_SECRET = 13 [(go.value) = {name: "NoteSecret"}];  
 }
 
 message Secret {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   string name = 2;
   SecretType type = 3;
 
   string username = 10;
   string password = 11;
 	
-  string url = 20 [(gogoproto.customname) = "URL"];
+  string url = 20 [(go.field) = {name: "URL"}];
 
   string notes = 30;
 
@@ -678,7 +661,7 @@ message Secret {
 }
 
 message SecretRequest {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
 }
 message SecretResponse {
   Secret secret = 1;
@@ -692,7 +675,7 @@ message SecretSaveResponse {
 }
 
 message SecretRemoveRequest {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
 }
 
 message SecretRemoveResponse {}
@@ -709,7 +692,7 @@ message SecretsResponse {
 }
 
 message ItemRequest {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
 }
 message ItemResponse {
   Item item = 1;
@@ -723,22 +706,21 @@ message ItemsResponse {
 }
 
 message Item {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   string type = 2;
 }
 
 enum Encoding {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "Encoding";
+  option (go.enum) = {name: "Encoding"};
 
-  HEX = 0  [(gogoproto.enumvalue_customname) = "Hex"];
-  BASE62 = 1 [(gogoproto.enumvalue_customname) = "Base62"];    
-  BASE58 = 2 [(gogoproto.enumvalue_customname) = "Base58"];    
-  BASE32 = 3 [(gogoproto.enumvalue_customname) = "Base32"];    
-  BASE16 = 4 [(gogoproto.enumvalue_customname) = "Base16"];    
-  BASE64 = 5 [(gogoproto.enumvalue_customname) = "Base64"];    
-  SALTPACK = 6 [(gogoproto.enumvalue_customname) = "Saltpack"];    
-  BIP39 = 7 [(gogoproto.enumvalue_customname) = "BIP39"];    
+  HEX = 0  [(go.value) = {name: "Hex"}];
+  BASE62 = 1 [(go.value) = {name: "Base62"}];    
+  BASE58 = 2 [(go.value) = {name: "Base58"}];    
+  BASE32 = 3 [(go.value) = {name: "Base32"}];    
+  BASE16 = 4 [(go.value) = {name: "Base16"}];    
+  BASE64 = 5 [(go.value) = {name: "Base64"}];    
+  SALTPACK = 6 [(go.value) = {name: "Saltpack"}];    
+  BIP39 = 7 [(go.value) = {name: "BIP39"}];    
 }
 
 message RandRequest {
@@ -762,7 +744,7 @@ message PullRequest {
   string key = 1;  
 }
 message PullResponse {
-  repeated string kids = 1 [(gogoproto.customname) = "KIDs"];
+  repeated string kids = 1 [(go.field) = {name: "KIDs"}];
 }
 
 message PushRequest {
@@ -770,8 +752,8 @@ message PushRequest {
   bool remoteCheck = 2;
 }
 message PushResponse {
-  string kid = 1 [(gogoproto.customname) = "KID"];
-  repeated string urls = 2 [(gogoproto.customname) = "URLs"];
+  string kid = 1 [(go.field) = {name: "KID"}];
+  repeated string urls = 2 [(go.field) = {name: "URLs"}];
 }
 
 message Collection {
@@ -782,7 +764,7 @@ message CollectionsRequest {
   string parent = 1;
 
   // DB is "service" or "vault".
-  string db = 5 [(gogoproto.customname) = "DB"];
+  string db = 5 [(go.field) = {name: "DB"}];
 }
 message CollectionsResponse {
   repeated Collection collections = 1;
@@ -800,7 +782,7 @@ message DocumentsRequest {
   string prefix = 1;
 
   // DB is "service" or "vault".
-  string db = 5 [(gogoproto.customname) = "DB"];  
+  string db = 5 [(go.field) = {name: "DB"}];  
 }
 message DocumentsResponse {
   repeated Document documents = 1;
@@ -808,34 +790,33 @@ message DocumentsResponse {
 
 message DocumentDeleteRequest {  
   string path = 1;
-  string db = 5 [(gogoproto.customname) = "DB"];
+  string db = 5 [(go.field) = {name: "DB"}];
 }
 message DocumentDeleteResponse {}
 
 enum UserStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "UserStatus";
+  option (go.enum) = {name: "UserStatus"};
 
-  USER_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "UserStatusUnknown"];
-  USER_OK = 1 [(gogoproto.enumvalue_customname) = "UserStatusOK"];
+  USER_UNKNOWN = 0 [(go.value) = {name: "UserStatusUnknown"}];
+  USER_OK = 1 [(go.value) = {name: "UserStatusOK"}];
   
-  USER_RESOURCE_NOT_FOUND = 20 [(gogoproto.enumvalue_customname) = "UserStatusResourceNotFound"];
+  USER_RESOURCE_NOT_FOUND = 20 [(go.value) = {name: "UserStatusResourceNotFound"}];
   
-  USER_CONTENT_NOT_FOUND = 30 [(gogoproto.enumvalue_customname) = "UserStatusContentNotFound"];
-  USER_CONTENT_INVALID = 31 [(gogoproto.enumvalue_customname) = "UserStatusContentInvalid"];
+  USER_CONTENT_NOT_FOUND = 30 [(go.value) = {name: "UserStatusContentNotFound"}];
+  USER_CONTENT_INVALID = 31 [(go.value) = {name: "UserStatusContentInvalid"}];
   
-  USER_CONN_FAILURE = 40 [(gogoproto.enumvalue_customname) = "UserStatusConnFailure"];
+  USER_CONN_FAILURE = 40 [(go.value) = {name: "UserStatusConnFailure"}];
   
-  USER_FAILURE = 50 [(gogoproto.enumvalue_customname) = "UserStatusFailure"];
+  USER_FAILURE = 50 [(go.value) = {name: "UserStatusFailure"}];
 }
 
 message User {  
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   string name = 2;
-  string kid = 3 [(gogoproto.customname) = "KID"];
+  string kid = 3 [(go.field) = {name: "KID"}];
   int32 seq = 4;
   string service = 5; 
-  string url = 6 [(gogoproto.customname) = "URL"];
+  string url = 6 [(go.field) = {name: "URL"}];
   
   UserStatus status = 10;
   int64 verifiedAt = 11; 
@@ -845,7 +826,7 @@ message User {
 }
 
 message UserRequest {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   bool local = 4;
 }
 message UserResponse {
@@ -881,7 +862,7 @@ message VaultAuthResponse {
 
 message VaultStatusRequest {}
 message VaultStatusResponse {
-  string kid = 1 [(gogoproto.customname) = "KID"];
+  string kid = 1 [(go.field) = {name: "KID"}];
   int64 syncedAt = 2;
 }
 
@@ -893,32 +874,31 @@ message WormholeInput {
   string recipient = 2;
   string invite = 3;
     
-  string id = 10 [(gogoproto.customname) = "ID"];
+  string id = 10 [(go.field) = {name: "ID"}];
   bytes data = 11;
   ContentType type = 12;
 }
 
 enum WormholeStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "WormholeStatus";
+  option (go.enum) = {name: "WormholeStatus"};
 
-  WORMHOLE_DEFAULT = 0 [(gogoproto.enumvalue_customname) = "WormholeDefault"];
+  WORMHOLE_DEFAULT = 0 [(go.value) = {name: "WormholeDefault"}];
   
   // WormholeStarting if starting.
-  WORMHOLE_STARTING = 10 [(gogoproto.enumvalue_customname) = "WormholeStarting"];
+  WORMHOLE_STARTING = 10 [(go.value) = {name: "WormholeStarting"}];
   
   // WormholeOffering if offering.
-  WORMHOLE_OFFERING = 20 [(gogoproto.enumvalue_customname) = "WormholeOffering"];
+  WORMHOLE_OFFERING = 20 [(go.value) = {name: "WormholeOffering"}];
   // WormholeAnswering if answering.
-  WORMHOLE_ANSWERING = 21 [(gogoproto.enumvalue_customname) = "WormholeAnswering"];
+  WORMHOLE_ANSWERING = 21 [(go.value) = {name: "WormholeAnswering"}];
 
   // WormholeHandshake if found offer/answer and trying to SCTP/Noise handshake.
-  WORMHOLE_HANDSHAKE = 40 [(gogoproto.enumvalue_customname) = "WormholeHandshake"];
+  WORMHOLE_HANDSHAKE = 40 [(go.value) = {name: "WormholeHandshake"}];
   
   // WormholeConnected if connected
-  WORMHOLE_CONNECTED = 100 [(gogoproto.enumvalue_customname) = "WormholeConnected"];
+  WORMHOLE_CONNECTED = 100 [(go.value) = {name: "WormholeConnected"}];
   // WormholeClosed if closed
-  WORMHOLE_CLOSED = 200 [(gogoproto.enumvalue_customname) = "WormholeClosed"]; 
+  WORMHOLE_CLOSED = 200 [(go.value) = {name: "WormholeClosed"}]; 
 }
 
 message WormholeOutput {
@@ -927,24 +907,22 @@ message WormholeOutput {
 }
 
 enum ContentType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "ContentType";
+  option (go.enum) = {name: "ContentType"};
 
-  BINARY_CONTENT = 0 [(gogoproto.enumvalue_customname) = "BinaryContent"];
-  UTF8_CONTENT = 1 [(gogoproto.enumvalue_customname) = "UTF8Content"];
+  BINARY_CONTENT = 0 [(go.value) = {name: "BinaryContent"}];
+  UTF8_CONTENT = 1 [(go.value) = {name: "UTF8Content"}];
 }
 
 enum MessageType {
-  option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_customname) = "MessageType";
+  option (go.enum) = {name: "MessageType"};
 
-  MESSAGE_SENT = 0 [(gogoproto.enumvalue_customname) = "MessageSent"];
-  MESSAGE_PENDING = 1 [(gogoproto.enumvalue_customname) = "MessagePending"];
-  MESSAGE_ACK = 2 [(gogoproto.enumvalue_customname) = "MessageAck"];
+  MESSAGE_SENT = 0 [(go.value) = {name: "MessageSent"}];
+  MESSAGE_PENDING = 1 [(go.value) = {name: "MessagePending"}];
+  MESSAGE_ACK = 2 [(go.value) = {name: "MessageAck"}];
 }
 
 message Message {
-  string id = 1 [(gogoproto.customname) = "ID"];
+  string id = 1 [(go.field) = {name: "ID"}];
   
   Key sender = 2;
   Key recipient = 3;
@@ -994,13 +972,13 @@ message MessagesResponse {
 message AdminSignURLRequest {
   string signer = 1;
   string method = 2;
-  string url = 3 [(gogoproto.customname) = "URL"];
+  string url = 3 [(go.field) = {name: "URL"}];
 }
 
 message AdminSignURLResponse {
   string auth = 1;
-  string url = 2 [(gogoproto.customname) = "URL"];
-  string curl = 3  [(gogoproto.customname) = "CURL"];
+  string url = 2 [(go.field) = {name: "URL"}];
+  string curl = 3  [(go.field) = {name: "CURL"}];
 }
 
 message AdminCheckRequest {
@@ -1010,3 +988,33 @@ message AdminCheckRequest {
 
 message AdminCheckResponse {}
 
+message Config {
+  message Encrypt {
+    repeated string recipients = 1;
+    string sender = 2;
+      
+    bool noSenderRecipient = 3;
+    bool noSign = 4;
+  }
+
+  message Sign {
+    string signer = 1;  
+  }
+
+  Encrypt encrypt = 1;
+  Sign sign = 2;
+}
+
+message ConfigGetRequest {
+  string name = 1;  
+}
+message ConfigGetResponse {
+  Config config = 1;
+}
+
+message ConfigSetRequest {
+  string name = 1;
+  Config config = 2;
+}
+
+message ConfigSetResponse {}

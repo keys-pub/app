@@ -116,6 +116,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@jest-runner/electron": "^3.0.0",
     "@types/getenv": "^1.0.0",
+    "@types/google-protobuf": "^3.7.3",
     "@types/jest": "^26.0.10",
     "@types/lodash": "^4.14.149",
     "@types/match-sorter": "^4.0.0",

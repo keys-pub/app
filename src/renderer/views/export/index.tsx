@@ -14,13 +14,15 @@ import {
   Typography,
 } from '@material-ui/core'
 
+import KeyDescription from '../key/description'
+
 import {styles, DialogTitle} from '../../components'
 import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../../rpc/keys.d'
 
 import {keyExport} from '../../rpc/keys'
 
 type Props = {
-  kid: string
+  k: Key
   open: boolean
   close: () => void
 }
@@ -56,7 +58,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     this.setState({error: undefined})
     try {
       const req: KeyExportRequest = {
-        kid: this.props.kid,
+        kid: this.props.k.id,
         password: this.state.password,
         noPassword: noPassword,
         public: false,
@@ -93,12 +95,14 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     // TODO: Export type
     return (
       <Box display="flex" flexDirection="column" style={{height: 200}}>
-        <Typography style={{paddingBottom: 10}}>Export a key encrypted with a password.</Typography>
-        <Typography style={{...styles.mono, paddingBottom: 20}}>{this.props.kid}</Typography>
+        <Box style={{paddingBottom: 20}}>
+          <KeyDescription k={this.props.k} />
+        </Box>
         <FormControl error={!!this.state.error}>
           <TextField
             autoFocus
             label="Password"
+            placeholder="Password"
             variant="outlined"
             type="password"
             onChange={this.onInputChangePassword}

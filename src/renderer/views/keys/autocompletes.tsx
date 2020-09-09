@@ -6,13 +6,13 @@ import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import UserLabel from '../user/label'
-import matchSorter from 'match-sorter'
+import matchSorter, {rankings} from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 import Snack, {SnackProps} from '../../components/snack'
 
-import {keys} from '../../rpc/keys'
+import {keys as listKeys} from '../../rpc/keys'
 import {Key, KeysRequest, KeysResponse, SortDirection} from '../../rpc/keys.d'
 
 type Props = {
@@ -52,7 +52,7 @@ const renderOption = (option: Key) => {
 }
 
 const optionSelected = (option: Key, value: Key): boolean => {
-  return option.id === value.id
+  return option.id == value.id
 }
 
 const getOptionLabel = (option: Key): string => {
@@ -64,17 +64,26 @@ const getOptionLabel = (option: Key): string => {
 
 export default (props: Props) => {
   const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
-    const filter = matchSorter(options, inputValue, {keys: ['user.id', 'id']})
+    const filter = matchSorter(options, inputValue, {
+      keys: [
+        {threshold: rankings.STARTS_WITH, key: 'user.id'},
+        {threshold: rankings.STARTS_WITH, key: 'id'},
+      ],
+    })
     return createOptions(filter, !!props.searchOption, !!props.importOption)
   }
 
   const [open, setOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
-  const [options, setOptions] = React.useState([] as Key[])
+  const [options, setOptions] = React.useState(props.keys)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [importOpen, setImportOpen] = React.useState(false)
   const [snack, setSnack] = React.useState<SnackProps>()
   const [snackOpen, setSnackOpen] = React.useState(false)
+
+  React.useEffect(() => {
+    search()
+  }, [])
 
   const openAutoComplete = () => {
     setOpen(true)
@@ -86,32 +95,21 @@ export default (props: Props) => {
     setInput(q)
   }, [])
 
-  const search = (q: string) => {
-    const req: KeysRequest = {
-      query: q,
+  const search = async () => {
+    try {
+      // Filtering happens with matchSorter.
+      const resp = await listKeys({})
+      const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
+      setOptions(keys || [])
+    } catch (err) {
+      setSnack({message: err.message, alert: 'error', duration: 4000})
+      setSnackOpen(true)
     }
-    keys(req)
-      .then((resp: KeysResponse) => {
-        const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
-        setOptions(keys || [])
-      })
-      .catch((err: Error) => {
-        setSnack({message: err.message, alert: 'error', duration: 4000})
-        setSnackOpen(true)
-      })
-  }
-
-  React.useEffect(() => {
-    search(input)
-  }, [input])
-
-  const reload = () => {
-    search(input)
   }
 
   const closeImport = () => {
     setImportOpen(false)
-    reload()
+    search()
   }
 
   const onChange = (event: React.ChangeEvent<{}>, value: any) => {
@@ -139,6 +137,7 @@ export default (props: Props) => {
         onOpen={openAutoComplete}
         onClose={() => setOpen(false)}
         multiple
+        filterSelectedOptions
         filterOptions={filterOptions}
         onInputChange={onInputChange}
         onChange={onChange}
@@ -172,7 +171,7 @@ export default (props: Props) => {
           />
         )}
       />
-      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
+      <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={search} />
       <KeyImportDialog open={importOpen} close={closeImport} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>

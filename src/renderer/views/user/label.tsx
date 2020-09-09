@@ -6,22 +6,8 @@ import styles, {serviceColor} from '../../components/styles'
 
 import {User, UserStatus} from '../../rpc/keys.d'
 
-export default (props: {kid: string; user?: User}) => {
+export default (props: {user: User}) => {
   const {user} = props
-
-  if (!user) {
-    return (
-      <Typography
-        display="inline"
-        style={{
-          ...styles.mono,
-          ...styles.breakWords,
-        }}
-      >
-        {props.kid}
-      </Typography>
-    )
-  }
 
   let textColor = ''
   let scolor = serviceColor(user.service!)

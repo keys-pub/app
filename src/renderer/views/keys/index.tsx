@@ -5,8 +5,6 @@ import {
   Button,
   Divider,
   IconButton,
-  Menu,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -16,6 +14,8 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
+
+import {clipboard, ipcRenderer} from 'electron'
 
 import {
   Add as AddIcon,
@@ -31,8 +31,6 @@ import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 import {IDView} from '../key/content'
-
-import {Store} from 'pullstate'
 
 import Header from '../header'
 
@@ -57,51 +55,10 @@ import {
   VaultUpdateResponse,
 } from '../../rpc/keys.d'
 
-type Position = {
-  x: number
-  y: number
-}
-
-type State = {
-  contextPosition?: Position
-  createOpen: boolean
-  exportOpen: boolean
-  exportKey: string
-  importOpen: boolean
-  input: string
-  intro: boolean
-  keyOpen: boolean
-  keys: Key[]
-  removeOpen?: boolean
-  removeKey?: Key
-  searchOpen: boolean
-  selected: string
-  sortField?: string
-  sortDirection?: SortDirection
-  syncEnabled: boolean
-  syncing: boolean
-}
-
-const initialState: State = {
-  createOpen: false,
-  exportOpen: false,
-  exportKey: '',
-  importOpen: false,
-  input: '',
-  intro: false,
-  keyOpen: false,
-  keys: [],
-  searchOpen: false,
-  selected: '',
-  syncEnabled: false,
-  syncing: false,
-}
-
-const store = new Store(initialState)
+import {store} from './store'
 
 export default (_: {}) => {
   const {
-    contextPosition,
     createOpen,
     exportOpen,
     exportKey,
@@ -135,29 +92,6 @@ export default (_: {}) => {
   const setSnackErr = (err: Error) => {
     setSnackOpen(true)
     setSnack({message: err.message, alert: 'error', duration: 4000})
-  }
-
-  const select = (key: Key) => {
-    store.update((s) => {
-      s.keyOpen = true
-      s.selected = key.id!
-    })
-  }
-
-  const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const kid = event.currentTarget.id
-    store.update((s) => {
-      s.contextPosition = {x: event.clientX - 2, y: event.clientY - 4}
-      s.selected = kid
-    })
-  }
-
-  const closeContext = () => {
-    store.update((s) => {
-      s.contextPosition = undefined
-      s.selected = ''
-    })
   }
 
   const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
@@ -200,36 +134,68 @@ export default (_: {}) => {
   }
 
   React.useEffect(() => {
-    list(input, sortField, sortDirection)
+    reload()
   }, [input, sortField, sortDirection])
 
-  const openExport = () => {
+  const openKey = (key: Key) => {
     store.update((s) => {
-      s.contextPosition = undefined
-      s.exportOpen = true
-      s.exportKey = selected
+      s.keyOpen = true
+      s.selected = key.id!
     })
   }
 
-  const openRemove = () => {
-    const key = keys.find((k: Key) => {
-      return selected == k.id
+  const closeKey = () => {
+    store.update((s) => {
+      s.keyOpen = false
+      s.selected = ''
     })
-    if (key) {
-      store.update((s) => {
-        s.contextPosition = undefined
-        s.removeOpen = true
-        s.removeKey = key
-      })
+  }
+
+  const openExport = (key: Key) => {
+    store.update((s) => {
+      s.selected = key.id || ''
+      s.exportOpen = true
+      s.exportKey = key
+    })
+  }
+
+  const closeExport = () => {
+    store.update((s) => {
+      s.selected = ''
+      s.exportOpen = false
+    })
+  }
+
+  const openRemove = (key: Key) => {
+    store.update((s) => {
+      s.selected = key.id || ''
+      s.removeOpen = true
+      s.removeKey = key
+    })
+  }
+
+  const closeRemove = (removed: boolean) => {
+    store.update((s) => {
+      s.removeOpen = false
+      s.selected = ''
+    })
+    if (removed) {
+      reload()
     }
+  }
+
+  const openImport = () => {
+    store.update((s) => {
+      s.importOpen = true
+    })
   }
 
   const closeImport = (imported: string) => {
     store.update((s) => {
       s.importOpen = false
-      s.selected = imported
+      // TODO: Highlight for a second?
+      // s.selected = imported
     })
-    console.log('imported:', imported)
     if (imported) {
       reload()
     }
@@ -247,39 +213,6 @@ export default (_: {}) => {
     })
   }
 
-  const setImportOpen = (b: boolean) => {
-    store.update((s) => {
-      s.importOpen = b
-    })
-  }
-
-  const setExportOpen = (b: boolean) => {
-    store.update((s) => {
-      s.exportOpen = b
-    })
-  }
-
-  const closeKey = () => {
-    store.update((s) => {
-      s.selected = ''
-      s.keyOpen = false
-    })
-  }
-
-  const closeRemove = (removed: boolean) => {
-    if (removed) {
-      store.update((s) => {
-        s.selected = ''
-        s.removeOpen = false
-      })
-      reload()
-    } else {
-      store.update((s) => {
-        s.removeOpen = false
-      })
-    }
-  }
-
   const reload = async () => {
     try {
       const status = await runtimeStatus({})
@@ -292,25 +225,71 @@ export default (_: {}) => {
     }
   }
 
-  const sync = () => {
+  const sync = async () => {
     store.update((s) => {
       s.syncing = true
     })
-    const req: VaultUpdateRequest = {}
-    vaultUpdate(req)
-      .then((resp: VaultUpdateResponse) => {
-        reload()
-        store.update((s) => {
-          s.syncing = false
-        })
+    try {
+      const resp = await vaultUpdate({})
+      reload()
+      store.update((s) => {
+        s.syncing = false
       })
-      .catch((err: Error) => {
-        store.update((s) => {
-          s.syncing = false
-        })
-        setSnackErr(err)
+    } catch (err) {
+      store.update((s) => {
+        s.syncing = false
       })
+      setSnackErr(err)
+    }
   }
+
+  const onContextMenu = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      const kid = event.currentTarget?.id
+      if (!kid) return
+
+      store.update((s) => {
+        s.selected = kid
+      })
+
+      const key = keys.find((k: Key) => kid == k.id)
+      if (!key) return
+      const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+
+      let labels = []
+      if (isPrivate) {
+        labels = ['Copy', 'Export', 'Delete']
+      } else {
+        labels = ['Copy', 'Delete']
+      }
+      // TODO: Update
+
+      ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
+        switch (arg.label) {
+          case 'Export':
+            openExport(key)
+            break
+          case 'Copy':
+            if (key.id) {
+              clipboard.writeText(key.id)
+            }
+            break
+          case 'Delete':
+            openRemove(key)
+            break
+        }
+        if (arg.close) {
+          store.update((s) => {
+            s.selected = ''
+          })
+          ipcRenderer.removeAllListeners('context-menu')
+        }
+      })
+      ipcRenderer.send('context-menu', {labels, x: event.clientX, y: event.clientY})
+    },
+    [keys]
+  )
 
   const buttonWidth = 80
 
@@ -341,7 +320,7 @@ export default (_: {}) => {
             // color="primary"
             variant="outlined"
             size="small"
-            onClick={() => setImportOpen(true)}
+            onClick={openImport}
             style={{marginTop: 2, minWidth: buttonWidth}}
             // startIcon={<ImportKeyIcon />}
           >
@@ -412,7 +391,7 @@ export default (_: {}) => {
               return (
                 <TableRow
                   hover
-                  onClick={() => select(key)}
+                  onClick={() => openKey(key)}
                   key={key.id}
                   style={{cursor: 'pointer'}}
                   selected={selected == key.id}
@@ -421,7 +400,7 @@ export default (_: {}) => {
                   }}
                 >
                   <TableCell component="th" scope="row" style={{minWidth: 200}}>
-                    {key.user && <UserLabel kid={key.id!} user={key.user} />}
+                    {key.user && <UserLabel user={key.user} />}
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
                     <IDView
@@ -436,27 +415,10 @@ export default (_: {}) => {
         </Table>
       </Box>
 
-      <Menu
-        keepMounted
-        open={!!contextPosition}
-        onClose={closeContext}
-        anchorReference="anchorPosition"
-        anchorPosition={contextPosition ? {top: contextPosition.y, left: contextPosition.x} : undefined}
-      >
-        <MenuItem onClick={openExport}>
-          <ExportIcon />
-          <Typography style={{marginLeft: 10, marginRight: 20}}>Export</Typography>
-        </MenuItem>
-        <MenuItem color="secondary" onClick={openRemove}>
-          <DeleteIcon />
-          <Typography style={{marginLeft: 10, marginRight: 20}}>Delete</Typography>
-        </MenuItem>
-      </Menu>
-
       <KeyCreateDialog open={createOpen} close={() => setCreateOpen(false)} onChange={reload} />
       <KeyImportDialog open={importOpen} close={closeImport} />
       {removeKey && <KeyRemoveDialog open={removeOpen} k={removeKey} close={closeRemove} />}
-      <KeyExportDialog open={exportOpen} kid={exportKey} close={() => setExportOpen(false)} />
+      {exportKey && <KeyExportDialog open={exportOpen} k={exportKey} close={closeExport} />}
       <KeyDialog open={keyOpen} close={closeKey} kid={selected} reload={reload} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>

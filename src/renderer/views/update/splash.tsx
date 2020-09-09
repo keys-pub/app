@@ -2,9 +2,8 @@ import * as React from 'react'
 
 import {Box, CircularProgress, Typography} from '@material-ui/core'
 
-import ErrorsView from '../../errors'
-
 import {ipcRenderer} from 'electron'
+import {store} from '../store'
 
 type Props = {}
 type State = {
@@ -21,7 +20,9 @@ export default class Splash extends React.Component<Props, State> {
   componentDidMount() {
     ipcRenderer.on('update-apply-err', (event, err) => {
       console.error(err)
-      this.setState({error: err})
+      store.update((s) => {
+        s.error = err
+      })
     })
   }
 
@@ -30,9 +31,6 @@ export default class Splash extends React.Component<Props, State> {
   }
 
   render() {
-    if (this.state.error) {
-      return <ErrorsView error={this.state.error!} />
-    }
     return (
       <Box
         display="flex"

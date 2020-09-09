@@ -1,25 +1,12 @@
 syntax = "proto3";
 
 package fido2;
+option go_package=".;fido2";
+
+import "patch/go.proto";
 
 // Proto field names should be snake_case, but some plugins don't convert to 
 // camel like they should, so we use camelCase here.
-
-// gogo-protobuf is an extension of go-protobuf with more features, see https://github.com/gogo/protobuf
-import "gogoproto/gogo.proto";
-
-option (gogoproto.goproto_getters_all) = false;
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.gostring_all) = true;
-option (gogoproto.goproto_stringer_all) = true;
-option (gogoproto.goproto_enum_stringer_all) = true;
-
-// option (gogoproto.messagename_all) = true;
-// option (gogoproto.equal_all) = true;
-// option (gogoproto.verbose_equal_all) = true;
-// option (gogoproto.populate_all) = true;
 
 service Auth {  
     rpc Devices(DevicesRequest) returns (DevicesResponse) {}
@@ -39,8 +26,8 @@ service Auth {
 
 message Device {
     string path = 1;
-	int32 productId = 2 [(gogoproto.customname) = "ProductID"];
-	int32 vendorId = 3 [(gogoproto.customname) = "VendorID"];
+	int32 productId = 2 [(go.field) = {name: "ProductID"}];
+	int32 vendorId = 3 [(go.field) = {name: "VendorID"}];
 	string manufacturer = 4;
     string product = 5;
 }
@@ -53,17 +40,17 @@ message Option {
 message DeviceInfo {
     repeated string versions = 1;
     repeated string extensions = 2;
-    string aaguid = 3 [(gogoproto.customname) = "AAGUID"];
+    string aaguid = 3 [(go.field) = {name: "AAGUID"}];
 	repeated Option options = 4;
 }
 
 message RelyingParty {
-    string id = 1 [(gogoproto.customname) = "ID"];
+    string id = 1 [(go.field) = {name: "ID"}];
     string name = 2;
 }
 
 message User {
-    bytes id = 1 [(gogoproto.customname) = "ID"];
+    bytes id = 1 [(go.field) = {name: "ID"}];
     string name = 2;
     string displayName = 3;
     string icon = 4;
@@ -72,7 +59,7 @@ message User {
 message Attestation {
 	bytes clientDataHash = 1;
 	bytes authData = 2;
-	bytes credentialId = 3 [(gogoproto.customname) = "CredentialID"];
+	bytes credentialId = 3 [(go.field) = {name: "CredentialID"}];
 	string credentialType = 4;
 	bytes pubKey = 5;
 	bytes cert = 6;
@@ -81,21 +68,21 @@ message Attestation {
 }
 
 message Credential {
-	bytes id = 1 [(gogoproto.customname) = "ID"];
+	bytes id = 1 [(go.field) = {name: "ID"}];
 	string type = 2;
-    RelyingParty rp = 10 [(gogoproto.customname) = "RP"];
+    RelyingParty rp = 10 [(go.field) = {name: "RP"}];
 	User user = 11;
 }
 
 message Assertion {
 	bytes authData = 1;	
 	bytes sig = 2;
-    bytes hmacSecret = 3 [(gogoproto.customname) = "HMACSecret"];
+    bytes hmacSecret = 3 [(go.field) = {name: "HMACSecret"}];
 }
 
 message CredentialsInfo {
-	int32 rkExisting = 1 [(gogoproto.customname) = "RKExisting"];
-    int32 rkRemaining = 2 [(gogoproto.customname) = "RKRemaining"];
+	int32 rkExisting = 1 [(go.field) = {name: "RKExisting"}];
+    int32 rkRemaining = 2 [(go.field) = {name: "RKRemaining"}];
 }
 
 message DevicesRequest {}
@@ -113,14 +100,14 @@ message DeviceInfoResponse {
 message MakeCredentialRequest {
     string device = 1;
     bytes clientDataHash = 2;
-    RelyingParty rp = 3 [(gogoproto.customname) = "RP"];
+    RelyingParty rp = 3 [(go.field) = {name: "RP"}];
     User user = 4;
     string type = 5;
-    string pin = 6 [(gogoproto.customname) = "PIN"];
+    string pin = 6 [(go.field) = {name: "PIN"}];
         
     repeated string extensions = 100;
-    string rk = 101 [(gogoproto.customname) = "RK"];
-    string uv = 102 [(gogoproto.customname) = "UV"];
+    string rk = 101 [(go.field) = {name: "RK"}];
+    string uv = 102 [(go.field) = {name: "UV"}];
 }
 message MakeCredentialResponse {
     Attestation attestation = 1;
@@ -128,8 +115,8 @@ message MakeCredentialResponse {
 
 message SetPINRequest {
     string device = 1;
-    string pin = 2 [(gogoproto.customname) = "PIN"];
-    string oldPin = 3 [(gogoproto.customname) = "OldPIN"];
+    string pin = 2 [(go.field) = {name: "PIN"}];
+    string oldPin = 3 [(go.field) = {name: "OldPIN"}];
 } 
 message SetPINResponse {}
 
@@ -147,15 +134,15 @@ message RetryCountResponse {
 
 message AssertionRequest {
     string device = 1;
-    string rpId = 2 [(gogoproto.customname) = "RPID"];
+    string rpId = 2 [(go.field) = {name: "RPID"}];
     bytes clientDataHash = 3;
-    bytes credentialId = 4 [(gogoproto.customname) = "CredentialID"];
-    string pin = 5 [(gogoproto.customname) = "PIN"];
+    bytes credentialId = 4 [(go.field) = {name: "CredentialID"}];
+    string pin = 5 [(go.field) = {name: "PIN"}];
 
     repeated string extensions = 100;
-    string uv = 101 [(gogoproto.customname) = "UV"];
-    string up = 102 [(gogoproto.customname) = "UP"];
-    bytes hmacSalt = 103 [(gogoproto.customname) = "HMACSalt"];
+    string uv = 101 [(go.field) = {name: "UV"}];
+    string up = 102 [(go.field) = {name: "UP"}];
+    bytes hmacSalt = 103 [(go.field) = {name: "HMACSalt"}];
 }
 message AssertionResponse {
     Assertion assertion = 1;
@@ -163,7 +150,7 @@ message AssertionResponse {
 
 message CredentialsInfoRequest {
     string device = 1;
-    string pin = 2 [(gogoproto.customname) = "PIN"];
+    string pin = 2 [(go.field) = {name: "PIN"}];
 }
 message CredentialsInfoResponse {
     CredentialsInfo info = 1;
@@ -171,8 +158,8 @@ message CredentialsInfoResponse {
 
 message CredentialsRequest {
     string device = 1;
-    string rpId = 2 [(gogoproto.customname) = "RPID"];
-    string pin = 3 [(gogoproto.customname) = "PIN"];
+    string rpId = 2 [(go.field) = {name: "RPID"}];
+    string pin = 3 [(go.field) = {name: "PIN"}];
 }
 message CredentialsResponse {
     repeated Credential credentials = 1;
@@ -180,44 +167,43 @@ message CredentialsResponse {
 
 message RelyingPartiesRequest {
     string device = 1;
-    string pin = 2 [(gogoproto.customname) = "PIN"];
+    string pin = 2 [(go.field) = {name: "PIN"}];
 }
 message RelyingPartiesResponse {
     repeated RelyingParty parties = 1;
 }
 
 enum OptionValue {
-    option (gogoproto.goproto_enum_prefix) = false;
-    option (gogoproto.enum_customname) = "OptionValue";
+    option (go.enum) = {name: "OptionValue"};
   
-    DEFAULT_OPTION = 0 [(gogoproto.enumvalue_customname) = "Default"];
-    TRUE = 1 [(gogoproto.enumvalue_customname) = "True"];
-    FALSE = 2 [(gogoproto.enumvalue_customname) = "False"];
+    DEFAULT_OPTION = 0 [(go.value) = {name: "Default"}];
+    TRUE = 1 [(go.value) = {name: "True"}];
+    FALSE = 2 [(go.value) = {name: "False"}];
 }
 
 message GenerateHMACSecretRequest {
     string device = 1;
-    string pin = 2 [(gogoproto.customname) = "PIN"];
+    string pin = 2 [(go.field) = {name: "PIN"}];
         
     bytes clientDataHash = 10;
-    RelyingParty rp = 11 [(gogoproto.customname) = "RP"];    
+    RelyingParty rp = 11 [(go.field) = {name: "RP"}];    
     User user = 12;
 
-    OptionValue rk = 20 [(gogoproto.customname) = "RK"];    
+    OptionValue rk = 20 [(go.field) = {name: "RK"}];    
 }
 message GenerateHMACSecretResponse {        
-    bytes credentialId = 2 [(gogoproto.customname) = "CredentialID"];
+    bytes credentialId = 2 [(go.field) = {name: "CredentialID"}];
 }
 
 message HMACSecretRequest {
     string device = 1;
-    string pin = 2 [(gogoproto.customname) = "PIN"];
+    string pin = 2 [(go.field) = {name: "PIN"}];
     
-    string rpId = 10 [(gogoproto.customname) = "RPID"];
+    string rpId = 10 [(go.field) = {name: "RPID"}];
     bytes clientDataHash = 11;
-    bytes credentialId = 12 [(gogoproto.customname) = "CredentialID"];
+    bytes credentialId = 12 [(go.field) = {name: "CredentialID"}];
     bytes salt = 13;
 }
 message HMACSecretResponse {
-    bytes hmacSecret = 1 [(gogoproto.customname) = "HMACSecret"];
+    bytes hmacSecret = 1 [(go.field) = {name: "HMACSecret"}];
 }
