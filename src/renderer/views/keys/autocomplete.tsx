@@ -10,7 +10,7 @@ import Autocomplete, {
   AutocompleteInputChangeReason,
 } from '@material-ui/lab/Autocomplete'
 
-import UserLabel from '../user/label'
+import {KeyLabel} from '../key/label'
 import matchSorter from 'match-sorter'
 
 import {keys} from '../../rpc/keys'
@@ -142,7 +142,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <UserLabel kid={option.id!} user={option.user} />
+        <KeyLabel k={option} />
       </React.Fragment>
     )
   }
@@ -197,7 +197,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
             />
           )}
         />
-        <SearchDialog open={this.state.openSearch} close={this.closeSearch} />
+        <SearchDialog open={this.state.openSearch} close={this.closeSearch} reload={() => this.search('')} />
         <KeyImportDialog open={this.state.openImport} close={this.closeImport} />
       </Box>
     )

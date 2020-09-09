@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import KeyDescription from '../key/description'
+import {KeyLabel} from '../key/label'
 
 import {styles, DialogTitle} from '../../components'
 import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../../rpc/keys.d'
@@ -92,11 +92,10 @@ export default class KeyExportDialog extends React.Component<Props, State> {
   }
 
   renderExport() {
-    // TODO: Export type
     return (
       <Box display="flex" flexDirection="column" style={{height: 200}}>
         <Box style={{paddingBottom: 20}}>
-          <KeyDescription k={this.props.k} />
+          <KeyLabel k={this.props.k} full />
         </Box>
         <FormControl error={!!this.state.error}>
           <TextField

@@ -5,7 +5,7 @@ import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import UserLabel from '../user/label'
+import {KeyLabel} from '../key/label'
 import matchSorter, {rankings} from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
@@ -46,7 +46,7 @@ const renderOption = (option: Key) => {
   }
   return (
     <React.Fragment>
-      <UserLabel kid={option.id!} user={option.user} />
+      <KeyLabel k={option} />
     </React.Fragment>
   )
 }
@@ -59,7 +59,7 @@ const getOptionLabel = (option: Key): string => {
   if (option.id == 'search' || option.id == 'import') {
     return ''
   }
-  return ((<UserLabel kid={option.id!} user={option.user} />) as unknown) as string
+  return ((<KeyLabel k={option} />) as unknown) as string
 }
 
 export default (props: Props) => {

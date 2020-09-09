@@ -71,7 +71,7 @@ export default class MessageInputView extends React.Component<Props, State> {
         }}
       >
         <Input
-          style={styles.messageInput}
+          style={styles.regular}
           autoFocus
           disableUnderline
           fullWidth

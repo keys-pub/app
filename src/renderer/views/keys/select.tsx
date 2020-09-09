@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} from '@material-ui/core'
 
-import UserLabel from '../user/label'
+import {KeyLabel} from '../key/label'
 
 import {keys} from '../../rpc/keys'
 import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '../../rpc/keys.d'
@@ -79,7 +79,7 @@ export default (props: Props) => {
                   {props.itemLabel}&nbsp;
                 </Typography>
               )}
-              <UserLabel kid={k.id!} user={k.user} />
+              <KeyLabel k={k} />
             </Box>
           </MenuItem>
         ))}

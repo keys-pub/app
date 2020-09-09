@@ -1,9 +1,8 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
 
 import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
-import {Skeleton} from '@material-ui/lab'
+import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
@@ -15,18 +14,11 @@ import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
 
-export const IDView = (props: {id: string; owner?: boolean}) => {
-  const style: CSSProperties = {}
-  if (props.owner) style.fontWeight = 600
-  // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...style}}>{props.id}</Typography>
-}
-
 export const KeyDescriptionView = (props: {value: Key}) => {
   return <Typography>{keyDescription(props.value)}</Typography>
 }
 
-type UserProps = {
+type UserRowProps = {
   k: Key
   revoke: () => void
   userSign: (service: string) => void
@@ -34,7 +26,7 @@ type UserProps = {
   openURL: (url: string) => void
 }
 
-export const UserRow = (props: UserProps) => {
+const UserRow = (props: UserRowProps) => {
   const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
@@ -144,7 +136,7 @@ export default (props: Props) => {
             </TableCell>
             <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
               <Box display="flex" flexDirection="column">
-                <IDView id={kid} />
+                <IDLabel k={key} />
               </Box>
             </TableCell>
           </TableRow>
