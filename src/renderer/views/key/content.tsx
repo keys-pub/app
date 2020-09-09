@@ -15,11 +15,20 @@ import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
 
-export const IDView = (props: {id: string; owner?: boolean}) => {
+export const IDLabel = (props: {k: Key}) => {
+  const key = props.k
+  const owner = key.type == KeyType.X25519 || key.type === KeyType.EDX25519
   const style: CSSProperties = {}
-  if (props.owner) style.fontWeight = 600
+  if (owner) style.fontWeight = 600
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...style}}>{props.id}</Typography>
+  return <Typography style={{...styles.mono, ...style}}>{key.id}</Typography>
+}
+
+export const KeyLabel = (props: {k: Key}) => {
+  if (props.k.user) {
+    return <UserLabel user={props.k.user} />
+  }
+  return <IDLabel k={props.k} />
 }
 
 export const KeyDescriptionView = (props: {value: Key}) => {
@@ -144,7 +153,7 @@ export default (props: Props) => {
             </TableCell>
             <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
               <Box display="flex" flexDirection="column">
-                <IDView id={kid} />
+                <IDLabel k={key} />
               </Box>
             </TableCell>
           </TableRow>

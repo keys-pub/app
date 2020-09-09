@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {IDView} from './content'
+import {IDLabel} from './content'
 import UserLabel from '../user/label'
 import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
@@ -12,7 +12,7 @@ type Props = {
 
 export default (props: Props) => (
   <Box display="flex" flexDirection="column">
-    <IDView id={props.k.id || ''} />
+    <IDLabel id={props.k.id || ''} />
     {props.k.user && <UserLabel user={props.k.user} />}
   </Box>
 )

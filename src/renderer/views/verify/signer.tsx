@@ -9,6 +9,7 @@ import Snack, {SnackProps} from '../../components/snack'
 import KeyDialog from '../key'
 
 import {Key, EncryptMode} from '../../rpc/keys.d'
+import {KeyLabel} from '../key/content'
 
 type Props = {
   signer?: Key
@@ -94,7 +95,7 @@ const SignerUser = (props: {signer: Key; mode?: EncryptMode}) => {
       <Typography display="inline" style={{...styles.mono}}>
         Verified&nbsp;
       </Typography>
-      <UserLabel kid={signer.id!} user={signer.user} />
+      <KeyLabel k={signer} />
       <Typography display="inline" style={{...styles.mono}}>
         {encryptModeDescription(mode)}
       </Typography>
@@ -113,7 +114,7 @@ const SignerUserUnknown = (props: {signer: Key; lookup: () => void}) => {
       <Typography display="inline" style={{...styles.mono}}>
         Signed by&nbsp;
       </Typography>
-      <UserLabel kid={signer.id!} user={signer.user} />
+      <KeyLabel k={signer} />
       <Button
         size="small"
         variant="outlined"

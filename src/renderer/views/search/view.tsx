@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {IDView} from '../key/content'
+import {IDLabel} from '../key/content'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'
@@ -134,10 +134,10 @@ export default class SearchView extends React.Component<Props, State> {
               {this.state.keys.map((k: Key, index: number): any => (
                 <TableRow hover onClick={(event) => this.select(k)} key={k.id} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">
-                    <UserLabel kid={k.id!} user={k.user} />
+                    {k.user && <UserLabel user={k.user} />}
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDView id={k.id!} />
+                    <IDLabel k={k} />
                   </TableCell>
                 </TableRow>
               ))}

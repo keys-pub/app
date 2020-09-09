@@ -6,7 +6,11 @@ import styles, {serviceColor} from '../../components/styles'
 
 import {User, UserStatus} from '../../rpc/keys.d'
 
-export default (props: {user: User}) => {
+type Props = {
+  user: User
+}
+
+export default (props: Props) => {
   const {user} = props
 
   let textColor = ''
