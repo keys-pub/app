@@ -23,14 +23,16 @@ type DialogTitleProps = {
 
 const DialogTitle = (props: DialogTitleProps) => {
   return (
-    <Box display="flex" flexDirection="column" className="drag">
+    <Box display="flex" flexDirection="column">
       <Box display="flex" flexGrow={1} flexDirection="row">
-        <Typography
-          style={{paddingBottom: 3, paddingLeft: 20, paddingTop: 10, fontSize: 19, fontWeight: 500}}
-        >
-          {props.children}
-        </Typography>
-        <Box display="flex" flex={1} flexGrow={1} flexDirection="row" />
+        <Box className="drag">
+          <Typography
+            style={{paddingBottom: 3, paddingLeft: 20, paddingTop: 10, fontSize: 20, fontWeight: 500}}
+          >
+            {props.children}
+          </Typography>
+        </Box>
+        <Box display="flex" flex={1} flexGrow={1} flexDirection="row" className="drag" />
         {props.onClose && (
           <Box style={{marginTop: 12, marginRight: 10}}>
             <IconButton size="small" aria-label="close" color="inherit" onClick={props.onClose}>
