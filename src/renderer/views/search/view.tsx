@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {IDLabel} from '../key/content'
+import {IDLabel} from '../key/label'
 
 import UserLabel from '../user/label'
 import {styles} from '../../components'

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} from '@material-ui/core'
 
-import {KeyLabel} from '../key/content'
+import {KeyLabel} from '../key/label'
 
 import {keys} from '../../rpc/keys'
 import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '../../rpc/keys.d'

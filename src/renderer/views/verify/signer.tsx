@@ -9,7 +9,7 @@ import Snack, {SnackProps} from '../../components/snack'
 import KeyDialog from '../key'
 
 import {Key, EncryptMode} from '../../rpc/keys.d'
-import {KeyLabel} from '../key/content'
+import {KeyLabel} from '../key/label'
 
 type Props = {
   signer?: Key

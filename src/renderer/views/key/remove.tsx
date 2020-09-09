@@ -5,7 +5,7 @@ import {Box, Button, Typography} from '@material-ui/core'
 import {styles} from '../../components'
 import Dialog from '../../components/dialog'
 import Snack, {SnackProps} from '../../components/snack'
-import KeyDescription from './description'
+import {KeyLabel} from './label'
 
 import {keyRemove} from '../../rpc/keys'
 import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../../rpc/keys.d'
@@ -55,7 +55,7 @@ const PrivateKey = (props: {k: Key}) => {
         Are you really sure you want to delete this <span style={{fontWeight: 600}}>private</span> key?
       </Typography>
       <Box style={{paddingBottom: 10}}>
-        <KeyDescription k={props.k} />
+        <KeyLabel k={props.k} full />
       </Box>
       <Typography>
         <span style={{fontWeight: 600}}>
@@ -70,7 +70,7 @@ const PublicKey = (props: {k: Key}) => {
   return (
     <Box style={{paddingBottom: 10}}>
       <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
-      <KeyDescription k={props.k} />
+      <KeyLabel k={props.k} />
     </Box>
   )
 }

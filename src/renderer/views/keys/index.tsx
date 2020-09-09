@@ -30,7 +30,7 @@ import {
 import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
-import {IDLabel} from '../key/content'
+import {IDLabel} from '../key/label'
 
 import Header from '../header'
 
@@ -403,7 +403,7 @@ export default (_: {}) => {
                     {key.user && <UserLabel user={key.user} />}
                   </TableCell>
                   <TableCell style={{verticalAlign: 'top'}}>
-                    <IDLabel k={key} />
+                    <IDLabel k={key} owner />
                   </TableCell>
                 </TableRow>
               )

@@ -1,9 +1,8 @@
 import * as React from 'react'
-import {CSSProperties} from 'react'
 
 import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
-import {Skeleton} from '@material-ui/lab'
+import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
@@ -15,27 +14,11 @@ import UserLabel from '../user/label'
 
 import {keyDescription, dateString} from '../helper'
 
-export const IDLabel = (props: {k: Key}) => {
-  const key = props.k
-  const owner = key.type == KeyType.X25519 || key.type === KeyType.EDX25519
-  const style: CSSProperties = {}
-  if (owner) style.fontWeight = 600
-  // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...style}}>{key.id}</Typography>
-}
-
-export const KeyLabel = (props: {k: Key}) => {
-  if (props.k.user) {
-    return <UserLabel user={props.k.user} />
-  }
-  return <IDLabel k={props.k} />
-}
-
 export const KeyDescriptionView = (props: {value: Key}) => {
   return <Typography>{keyDescription(props.value)}</Typography>
 }
 
-type UserProps = {
+type UserRowProps = {
   k: Key
   revoke: () => void
   userSign: (service: string) => void
@@ -43,7 +26,7 @@ type UserProps = {
   openURL: (url: string) => void
 }
 
-export const UserRow = (props: UserProps) => {
+const UserRow = (props: UserRowProps) => {
   const key = props.k
   const user = key.user
   const signable = key.type == KeyType.EDX25519
