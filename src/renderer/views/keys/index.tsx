@@ -139,7 +139,7 @@ export default (_: {}) => {
 
   const openKey = (key: Key) => {
     store.update((s) => {
-      s.keyOpen = true
+      s.keyOpen = 'fail!'
       s.selected = key.id!
     })
   }
