@@ -27,7 +27,6 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
-import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 import {IDLabel} from '../key/label'
@@ -43,19 +42,9 @@ import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
 import {keys as listKeys, runtimeStatus, vaultUpdate} from '../../rpc/keys'
-import {
-  Key,
-  KeyType,
-  SortDirection,
-  KeysRequest,
-  KeysResponse,
-  RuntimeStatusRequest,
-  RuntimeStatusResponse,
-  VaultUpdateRequest,
-  VaultUpdateResponse,
-} from '../../rpc/keys.d'
+import {Key, KeyType, SortDirection, KeysRequest} from '../../rpc/keys.d'
 
-import {store} from './store'
+import {store, loadStore} from './store'
 
 export default (_: {}) => {
   const {
@@ -66,6 +55,7 @@ export default (_: {}) => {
     input,
     intro,
     keyOpen,
+    keyShow,
     keys,
     removeOpen,
     removeKey,
@@ -94,34 +84,6 @@ export default (_: {}) => {
     setSnack({message: err.message, alert: 'error', duration: 4000})
   }
 
-  const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
-    console.log('List keys', query, sortField, sortDirection)
-    const req: KeysRequest = {
-      query: query,
-      sortField: sortField,
-      sortDirection: sortDirection,
-      types: [],
-    }
-    try {
-      const resp = await listKeys(req)
-      const keys = resp.keys || []
-      store.update((s) => {
-        s.keys = keys
-        s.sortField = resp.sortField
-        s.sortDirection = resp.sortDirection
-      })
-      // If we don't have keys and intro, then show create dialog
-      if (keys.length == 0 && intro) {
-        store.update((s) => {
-          s.createOpen = true
-          s.intro = false
-        })
-      }
-    } catch (err) {
-      setSnackErr(err)
-    }
-  }
-
   const sort = (field: string, sortField?: string, sortDirection?: SortDirection) => {
     const active = sortField === field
     let direction: SortDirection = sortDirection || SortDirection.ASC
@@ -130,7 +92,10 @@ export default (_: {}) => {
     } else {
       direction = SortDirection.ASC
     }
-    list(input, field, direction)
+    store.update((s) => {
+      s.sortField = field
+      s.sortDirection = direction
+    })
   }
 
   React.useEffect(() => {
@@ -140,6 +105,7 @@ export default (_: {}) => {
   const openKey = (key: Key) => {
     store.update((s) => {
       s.keyOpen = true
+      s.keyShow = key
       s.selected = key.id!
     })
   }
@@ -215,11 +181,7 @@ export default (_: {}) => {
 
   const reload = async () => {
     try {
-      const status = await runtimeStatus({})
-      store.update((s) => {
-        s.syncEnabled = !!status.sync
-      })
-      list(input, sortField, sortDirection)
+      loadStore()
     } catch (err) {
       setSnackErr(err)
     }
@@ -372,7 +334,7 @@ export default (_: {}) => {
                   direction={tableDirection}
                   onClick={() => sort('user', sortField, sortDirection)}
                 >
-                  <Typography style={{...styles.mono}}>User</Typography>
+                  <Typography>User</Typography>
                 </TableSortLabel>
               </TableCell>
               <TableCell style={{width: 530}}>
@@ -381,7 +343,7 @@ export default (_: {}) => {
                   direction={tableDirection}
                   onClick={() => sort('kid', sortField, sortDirection)}
                 >
-                  <Typography style={{...styles.mono}}>Key</Typography>
+                  <Typography>Key</Typography>
                 </TableSortLabel>
               </TableCell>
             </TableRow>
@@ -416,7 +378,7 @@ export default (_: {}) => {
       <KeyImportDialog open={importOpen} close={closeImport} />
       {removeKey && <KeyRemoveDialog open={removeOpen} k={removeKey} close={closeRemove} />}
       {exportKey && <KeyExportDialog open={exportOpen} k={exportKey} close={closeExport} />}
-      <KeyDialog open={keyOpen} close={closeKey} kid={selected} reload={reload} />
+      {keyShow && <KeyDialog open={keyOpen} close={closeKey} kid={keyShow.id!} reload={reload} />}
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )

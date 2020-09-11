@@ -21,7 +21,8 @@ import {
 
 import {PersonAdd as AddRecipientIcon, CreateOutlined as SignIcon} from '@material-ui/icons'
 
-import {Link, styles} from '../../components'
+import {Link} from '../../components'
+
 import AutocompletesView from '../keys/autocompletes'
 import EncryptedView from './encrypted'
 import EncryptedFileView from './encryptedfile'
@@ -34,6 +35,7 @@ import {store, loadStore} from './store'
 import {configSet, configGet, keys, encrypt, encryptFile, EncryptFileEvent} from '../../rpc/keys'
 import {
   Key,
+  Config,
   EncryptMode,
   EncryptOptions,
   EncryptRequest,
@@ -245,7 +247,7 @@ export default (props: Props) => {
       }),
       (s) => {
         const recs = s.recipients.map((k: Key) => k.id!)
-        const config = {
+        const config: Config = {
           encrypt: {
             recipients: recs,
             sender: s.sender?.id,
@@ -327,7 +329,9 @@ export default (props: Props) => {
       <Box style={{position: 'relative', height: '47%'}}>
         {fileIn && (
           <Box style={{paddingTop: 6, paddingLeft: 8}}>
-            <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
+            <Typography variant="body2" style={{display: 'inline'}}>
+              {fileIn}&nbsp;
+            </Typography>
             <Link inline onClick={() => clear(false)} disabled={loading}>
               Clear
             </Link>
@@ -386,7 +390,9 @@ export default (props: Props) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
+            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
+              {error.message}
+            </Typography>
           </Box>
         )}
         {!error && showEncryptFileButton && (

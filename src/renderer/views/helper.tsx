@@ -5,7 +5,7 @@ import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '
 
 import * as Long from 'long'
 
-export const keyDescription = (key: Key): string => {
+export const keyTypeLabel = (key: Key): string => {
   switch (key.type) {
     case KeyType.X25519:
       return 'Curve25519 Private Key'
@@ -30,16 +30,23 @@ var dateOptions = {
   timeZoneName: 'short',
 }
 
-export const dateString = (ms?: any): string => {
+export const date = (ms?: any): Date | null => {
   // ms can be a number or Long
-  if (!ms) return ''
+  if (!ms) return null
   const l = ms.low != undefined ? Long.fromBits(ms.low, ms.high, ms.unsigned) : ms
   const s = l.toString()
   const n = parseInt(s)
   if (n === 0) {
+    return null
+  }
+  return new Date(n)
+}
+
+export const dateString = (ms?: any): string => {
+  const d = date(ms)
+  if (d == null) {
     return ''
   }
-  const d = new Date(n)
   // return d.toJSON()
   return d.toLocaleDateString('en-US', dateOptions)
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
-import styles, {serviceColor} from '../../components/styles'
+import {serviceColor} from '../theme'
 
 import {User, UserStatus} from '../../rpc/keys.d'
 
@@ -16,11 +16,24 @@ export default (props: Props) => {
   let textColor = ''
   let scolor = serviceColor(user.service!)
 
-  if (user.status == UserStatus.USER_OK || user.status == UserStatus.USER_CONN_FAILURE) {
-    // Don't show red on conn failure
-  } else {
-    textColor = 'red'
-    scolor = 'red'
+  const DAY = 1000 * 60 * 60 * 24
+
+  switch (user.status) {
+    case UserStatus.USER_OK:
+      break
+    case UserStatus.USER_CONN_FAILURE:
+      // TODO: This should be passed from the service
+      if (user.verifiedAt && user.verifiedAt < Date.now() - DAY * 7) {
+        // Temporary failure?
+      } else {
+        textColor = 'red'
+        scolor = 'red'
+      }
+      break
+    default:
+      textColor = 'red'
+      scolor = 'red'
+      break
   }
 
   const name = user.name
@@ -28,8 +41,8 @@ export default (props: Props) => {
   return (
     <Typography
       display="inline"
+      variant="body2"
       style={{
-        ...styles.mono,
         color: textColor,
       }}
     >

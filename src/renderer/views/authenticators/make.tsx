@@ -18,7 +18,7 @@ import {
 
 import Alert from '@material-ui/lab/Alert'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 import {deepCopy, fromHex} from '../helper'
 
 import {makeCredential, credentials} from '../../rpc/fido2'
@@ -141,7 +141,6 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'clientDataHash')}
           value={this.state.credential?.clientDataHash}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 20}}
         />
@@ -149,7 +148,6 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
           value={this.state.credential?.rpID}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
         />
@@ -157,7 +155,6 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
           value={this.state.credential?.rpID}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
         />
@@ -165,7 +162,6 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
           value={this.state.credential?.rpID}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
         />
@@ -173,7 +169,6 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'rp')}
           value={this.state.credential?.rpID}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 19}}
         />

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, Divider, Input, Box, Typography} from '@material-ui/core'
 
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
 
 import SignerView from '../verify/signer'
 
@@ -29,7 +29,9 @@ export default (props: Props) => {
         <Divider />
 
         <Box style={{paddingLeft: 10, paddingTop: 10}}>
-          <Typography style={{...styles.mono, display: 'inline'}}>{props.fileOut}&nbsp;</Typography>
+          <Typography variant="body2" style={{display: 'inline'}}>
+            {props.fileOut}&nbsp;
+          </Typography>
           <Link inline onClick={openFolder}>
             Open Folder
           </Link>

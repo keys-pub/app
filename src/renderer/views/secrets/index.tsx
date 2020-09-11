@@ -29,14 +29,13 @@ import Header from '../header'
 
 import {ipcRenderer, clipboard} from 'electron'
 
-import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 
 import SecretRemoveDialog from './remove'
 import SecretEditView from './edit'
 import SecretContentView from './content'
 
-import {Store} from 'pullstate'
+import {store, loadStore} from './store'
 
 import {
   Secret,
@@ -53,33 +52,6 @@ import {
 import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../../rpc/keys'
 
 type Props = {}
-
-type Position = {
-  x: number
-  y: number
-}
-
-type State = {
-  editing?: Secret
-  input: string
-  isNew: boolean
-  secrets: Secret[]
-  selected?: Secret
-  sortField?: string
-  sortDirection?: SortDirection
-  syncEnabled: boolean
-  syncing: boolean
-}
-
-const initialState: State = {
-  input: '',
-  isNew: false,
-  secrets: [],
-  syncEnabled: false,
-  syncing: false,
-}
-
-const store = new Store(initialState)
 
 export default (props: Props) => {
   const {
@@ -210,12 +182,7 @@ export default (props: Props) => {
 
   const reload = async () => {
     try {
-      const req: RuntimeStatusRequest = {}
-      const resp = await runtimeStatus(req)
-      store.update((s) => {
-        s.syncEnabled = !!resp.sync
-      })
-      list(input, sortField, sortDirection)
+      loadStore()
     } catch (err) {
       snackError(err)
     }
@@ -236,26 +203,6 @@ export default (props: Props) => {
       store.update((s) => {
         s.syncing = false
       })
-      snackError(err)
-    }
-  }
-
-  const list = async (query: string, sortField?: string, sortDirection?: SortDirection) => {
-    console.log('List secrets', query)
-    const req: SecretsRequest = {
-      query: query,
-      sortField: sortField,
-      sortDirection: sortDirection,
-    }
-
-    try {
-      const resp = await listSecrets(req)
-      store.update((s) => {
-        s.secrets = resp.secrets || []
-        s.sortField = sortField
-        s.sortDirection = resp.sortDirection
-      })
-    } catch (err) {
       snackError(err)
     }
   }
@@ -329,13 +276,13 @@ export default (props: Props) => {
             )}
           </Box>
           <Divider />
-          <Box style={{height: 'calc(100vh - 84px)', overflowY: 'auto'}}>
+          <Box style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
             <Box display="flex" flexDirection="row" style={{height: '100%'}}>
               <Table size="small">
                 {/* <TableHead>
                   <TableRow>
                     <TableCell>
-                      <Typography style={{...styles.mono}}>Name</Typography>
+                      <Typography variant="body2">Name</Typography>
                     </TableCell>
                   </TableRow>
                 </TableHead> */}
@@ -398,11 +345,9 @@ const PasswordCell = (props: {secret: Secret}) => {
     <Box display="flex" flexDirection="row">
       <PasswordIcon style={{alignSelf: 'center', paddingRight: 8}} />
       <Box display="flex" flexDirection="column">
-        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.1em', paddingBottom: 2}}>
-          {props.secret.name}
-        </Typography>
-        <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
-          {props.secret.username || '-'}
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap'}}>{props.secret.name}</Typography>
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', color: '#999'}}>
+          {props.secret.username || '•'}
         </Typography>
       </Box>
     </Box>
@@ -414,12 +359,8 @@ const NoteCell = (props: {secret: Secret}) => {
     <Box display="flex" flexDirection="row">
       <NoteIcon style={{alignSelf: 'center', paddingRight: 8}} />
       <Box display="flex" flexDirection="column">
-        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', fontSize: '1.1em', paddingBottom: 2}}>
-          {props.secret.name}
-        </Typography>
-        <Typography style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}>
-          (note)
-        </Typography>
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap'}}>{props.secret.name}</Typography>
+        <Typography style={{...nowrapStyle, whiteSpace: 'nowrap', color: '#999'}}>•</Typography>
       </Box>
     </Box>
   )

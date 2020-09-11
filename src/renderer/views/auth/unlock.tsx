@@ -9,12 +9,10 @@ import {ipcRenderer} from 'electron'
 
 import {authUnlock} from '../../rpc/keys'
 import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
-import {useLocation} from 'wouter'
 
-import {store} from '../store'
+import {store, unlocked, setLocation} from '../store'
 
 export default (_: {}) => {
-  const [location, setLocation] = useLocation()
   const [input, setInput] = React.useState('')
   const [error, setError] = React.useState<Error>()
   const [loading, setLoading] = React.useState(false)
@@ -27,13 +25,7 @@ export default (_: {}) => {
     setError(undefined)
   }, [])
 
-  const onKeyDown = (event: React.KeyboardEvent<any>) => {
-    if (event.key === 'Enter') {
-      unlock()
-    }
-  }
-
-  const unlock = async () => {
+  const onUnlock = async () => {
     if (!input) {
       setError(new Error('Oops, password is empty'))
       inputRef.current?.focus()
@@ -49,26 +41,19 @@ export default (_: {}) => {
     setLoading(true)
     setError(undefined)
 
-    // TODO: Use config app name for client name
     const req: AuthUnlockRequest = {
       secret: input,
       type: AuthType.PASSWORD_AUTH,
       client: 'app',
     }
-    console.log('Auth unlock')
 
     try {
       const resp = await authUnlock(req)
-      console.log('Auth unlocking...')
       ipcRenderer.send('authToken', {authToken: resp.authToken})
-
       clearTimeout(timeout)
+      unlocked()
       setLoading(false)
       setProgress(false)
-      store.update((s) => {
-        s.unlocked = true
-        setLocation('/keys/index')
-      })
     } catch (err) {
       clearTimeout(timeout)
       setLoading(false)
@@ -76,6 +61,12 @@ export default (_: {}) => {
       setError(err)
       inputRef.current?.focus()
       inputRef.current?.select()
+    }
+  }
+
+  const onKeyDown = (event: React.KeyboardEvent<any>) => {
+    if (event.key === 'Enter') {
+      onUnlock()
     }
   }
 
@@ -108,7 +99,7 @@ export default (_: {}) => {
           color="primary"
           variant="outlined"
           size="large"
-          onClick={unlock}
+          onClick={onUnlock}
           disabled={loading}
           id="unlockButton"
         >

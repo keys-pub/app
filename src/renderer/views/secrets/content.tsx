@@ -4,7 +4,7 @@ import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
 import {Visibility as PasswordVisibleIcon} from '@material-ui/icons'
 
-import {styles} from '../../components'
+import {mono, breakWords} from '../theme'
 import {dateString} from '../helper'
 
 import PasswordOptions from './pw'
@@ -64,10 +64,16 @@ export default class SecretContentView extends React.Component<Props, State> {
         <Typography style={labelStyle}>Password</Typography>
         <Box display="flex" flexDirection="row" style={{position: 'relative'}}>
           {!this.state.passwordVisible && (
-            <Typography style={valueStyle}>{secret.password ? '•'.repeat(12) : ' '}</Typography>
+            <Typography variant="body2" style={valueStyle}>
+              {secret.password ? '•'.repeat(12) : ' '}
+            </Typography>
           )}
-          {this.state.passwordVisible && <Typography style={valueStyle}>{secret.password || ' '}</Typography>}
-          <Box style={{position: 'absolute', right: 10, top: -22}}>
+          {this.state.passwordVisible && (
+            <Typography variant="body2" style={valueStyle}>
+              {secret.password || ' '}
+            </Typography>
+          )}
+          <Box style={{position: 'absolute', right: 10, top: -15}}>
             <PasswordOptions
               password={secret?.password || ''}
               visible={this.state.passwordVisible}
@@ -103,7 +109,7 @@ export default class SecretContentView extends React.Component<Props, State> {
         display="flex"
         flexDirection="column"
         flex={1}
-        style={{overflowY: 'auto', height: 'calc(100vh - 94px)', paddingTop: 10, marginLeft: 14}}
+        style={{overflowY: 'auto', height: 'calc(100vh - 87px)', paddingTop: 10, marginLeft: 14}}
       >
         {secret.type == SecretType.PASSWORD_SECRET && this.renderPassword(secret)}
         {secret.type == SecretType.NOTE_SECRET && this.renderNote(secret)}
@@ -135,15 +141,16 @@ export default class SecretContentView extends React.Component<Props, State> {
 }
 
 const labelStyle = {
-  ...styles.breakWords,
+  ...breakWords,
   transform: 'scale(0.75)',
   transformOrigin: 'top left',
   color: 'rgba(0, 0, 0, 0.54)',
   marginTop: -1,
   paddingBottom: 2,
   fontSize: '0.857rem',
+  height: 20,
 }
-const valueStyle = {...styles.mono, ...styles.breakWords, paddingBottom: 24}
+const valueStyle = {...breakWords, paddingBottom: 24, height: 20}
 
 const dateLabelStyle = {
   color: 'rgba(0, 0, 0, 0.5)',

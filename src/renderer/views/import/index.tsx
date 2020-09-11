@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 
 import {KeyImportRequest, KeyImportResponse} from '../../rpc/keys.d'
 import {keyImport} from '../../rpc/keys'
@@ -90,7 +90,6 @@ export default class KeyImportDialog extends React.Component<Props, State> {
             value={this.state.in}
             inputProps={{
               spellCheck: false,
-              style: {...styles.mono, fontSize: 12},
             }}
           />
         </FormControl>
@@ -112,7 +111,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={{paddingBottom: 10}}>We imported the key:</Typography>
-        <Typography style={{...styles.mono, paddingBottom: 10, paddingLeft: 10}}>
+        <Typography variant="body2" style={{paddingBottom: 10, paddingLeft: 10}}>
           {this.state.imported}
         </Typography>
       </Box>

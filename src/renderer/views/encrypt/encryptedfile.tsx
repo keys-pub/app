@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, Divider, Input, Box, Typography} from '@material-ui/core'
 
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
 
 import {shell} from 'electron'
 
@@ -18,7 +18,9 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
       <Box style={{paddingLeft: 10, paddingTop: 10}}>
-        <Typography style={{...styles.mono, display: 'inline'}}>{props.fileOut}&nbsp;</Typography>
+        <Typography variant="body2" style={{display: 'inline'}}>
+          {props.fileOut}&nbsp;
+        </Typography>
         <Link inline onClick={openFolder}>
           Open Folder
         </Link>

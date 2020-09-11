@@ -11,8 +11,9 @@ import {
   Typography,
 } from '@material-ui/core'
 
+import Header from '../../header'
 import Logo from '../../logo'
-import {styles} from '../../../components'
+import {mono} from '../../theme'
 
 import {authVault} from '../../../rpc/keys'
 import {AuthVaultRequest, AuthVaultResponse} from '../../../rpc/keys.d'
@@ -49,6 +50,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
+        <Header noLock noBack />
         <Logo loading={this.state.loading} top={60} />
         <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
           Enter in a vault auth phrase to connect to your vault.
@@ -70,7 +72,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
             value={this.state.phrase}
             disabled={this.state.loading}
             InputProps={{
-              style: {...styles.mono, fontSize: 12, width: 450},
+              style: {...mono, fontSize: 12, width: 450},
             }}
           />
           <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>

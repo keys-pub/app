@@ -2,7 +2,8 @@ import * as React from 'react'
 import {CSSProperties} from 'react'
 import {Box, Typography} from '@material-ui/core'
 
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
+
 import UserLabel from '../user/label'
 
 import {Key, KeyType, User} from '../../rpc/keys.d'
@@ -13,7 +14,11 @@ export const IDLabel = (props: {k: Key; owner?: boolean}) => {
   const style: CSSProperties = {}
   if (props.owner && isPrivate) style.fontWeight = 500
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
-  return <Typography style={{...styles.mono, ...style}}>{key.id}</Typography>
+  return (
+    <Typography variant="body2" style={{...style}}>
+      {key.id}
+    </Typography>
+  )
 }
 
 export const KeyLabel = (props: {k: Key; full?: boolean}) => {

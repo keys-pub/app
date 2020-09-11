@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core'
 
 import Header from '../header'
-import {styles} from '../../components'
+
 import {dateString} from '../helper'
 import {collections, documents} from '../../rpc/keys'
 import {
@@ -91,7 +91,9 @@ export default class DBView extends React.Component<Props, State> {
                     style={{cursor: 'pointer'}}
                   >
                     <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
-                      <Typography style={{...styles.mono, fontSize: 11}}>{col.path}</Typography>
+                      <Typography variant="body2" style={{fontSize: 11}}>
+                        {col.path}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -107,17 +109,18 @@ export default class DBView extends React.Component<Props, State> {
                     <TableCell>
                       <Box display="flex" flexDirection="column">
                         <Typography
-                          style={{...styles.mono, fontSize: 11, wordBreak: 'break-all', color: '#666'}}
+                          variant="body2"
+                          style={{fontSize: 11, wordBreak: 'break-all', color: '#666'}}
                         >
                           {doc.path}
                         </Typography>
-                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
                           {doc.value}
                         </Typography>
-                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
                           {dateString(doc.createdAt)}
                         </Typography>
-                        <Typography style={{...styles.mono, fontSize: 11, wordBreak: 'break-all'}}>
+                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
                           {dateString(doc.updatedAt)}
                         </Typography>
                       </Box>

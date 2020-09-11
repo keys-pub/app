@@ -29,13 +29,12 @@ import {
   Backup as VaultIcon,
 } from '@material-ui/icons'
 
-import {useLocation} from 'wouter'
+import {setLocation, store} from './store'
 
 type NavRoute = {
-  name: string
+  label: string
+  location: string
   icon: React.ReactType
-  route: string
-  prefix: string
   id: string
   onClick?: () => void
   anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
@@ -47,18 +46,21 @@ const backgroundColorSelected = '#1a1a1a'
 // TODO: Nav hover
 
 export default (props: {}) => {
-  const [location, setLocation] = useLocation()
   const [openExperimental, setOpenExperimental] = React.useState(false)
-  const [minimized, setMinimized] = React.useState(false)
+
+  const {location, navMinimized} = store.useState((s) => ({
+    location: s.location,
+    navMinimized: s.navMinimized,
+  }))
 
   const experimentRef = React.useRef<HTMLDivElement>()
-  const openExperiment = (route: string) => {
-    setLocation(route)
+  const openExperiment = (location: string) => {
+    setLocation(location)
     setOpenExperimental(false)
   }
 
-  const width = minimized ? 68 : 140
-  const drawerStyles: CSSProperties = !minimized
+  const width = navMinimized ? 68 : 140
+  const drawerStyles: CSSProperties = !navMinimized
     ? {width, border: 0, height: '100%'}
     : {
         width,
@@ -70,45 +72,39 @@ export default (props: {}) => {
 
   let navs: NavRoute[] = [
     {
-      name: 'Keys',
+      label: 'Keys',
       icon: KeysIcon,
-      route: '/keys/index',
-      prefix: '/keys',
+      location: 'keys',
       id: 'navKeysItemIcon',
     },
     {
-      name: 'Secrets',
+      label: 'Secrets',
       icon: SecretsIcon,
-      route: '/secrets/index',
-      prefix: '/secrets',
+      location: 'secrets',
       id: 'navSecretsItemIcon',
     },
     {
-      name: 'Tools',
+      label: 'Tools',
       icon: ToolsIcon,
-      route: '/tools/index',
-      prefix: '/tools',
+      location: 'tools',
       id: 'navToolsItemIcon',
     },
     {
-      name: 'Vault',
+      label: 'Vault',
       icon: VaultIcon,
-      route: '/vault/index',
-      prefix: '/vault',
+      location: 'vault',
       id: 'navVaultItemIcon',
     },
     {
-      name: 'Settings',
+      label: 'Settings',
       icon: SettingsIcon,
-      route: '/settings/index',
-      prefix: '/settings',
+      location: 'settings',
       id: 'navSettingsItemIcon',
     },
     {
-      name: 'Experiments',
+      label: 'Experiments',
       icon: ExpermimentalIcon,
-      route: '/experiments/index',
-      prefix: '/experiments',
+      location: 'experiments',
       onClick: () => setOpenExperimental(true),
       anchorRef: experimentRef,
       id: 'navExperimentsItemIcon',
@@ -126,9 +122,9 @@ export default (props: {}) => {
             row(
               nav,
               index,
-              location.startsWith(nav.prefix),
-              !minimized,
-              nav.onClick ? nav.onClick : () => setLocation(nav.route)
+              location.startsWith(nav.location),
+              !navMinimized,
+              nav.onClick ? nav.onClick : () => setLocation(nav.location)
             )
           )}
         </List>
@@ -137,11 +133,15 @@ export default (props: {}) => {
             </Typography> */}
           <Box display="flex" flexGrow={1} />
           <IconButton
-            onClick={() => setMinimized(!minimized)}
+            onClick={() =>
+              store.update((s) => {
+                s.navMinimized = !navMinimized
+              })
+            }
             style={{color: 'white', alignSelf: 'flex-end'}}
           >
-            {minimized && <LeftIcon />}
-            {!minimized && <RightIcon />}
+            {navMinimized && <LeftIcon />}
+            {!navMinimized && <RightIcon />}
           </IconButton>
         </Box>
       </Box>
@@ -154,11 +154,11 @@ export default (props: {}) => {
         anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
         getContentAnchorEl={null}
       >
-        <MenuItem onClick={() => openExperiment('/wormhole/index')}>
+        <MenuItem onClick={() => openExperiment('wormhole')}>
           <WormholeIcon />
           <Typography style={{marginLeft: 10}}>Wormhole</Typography>
         </MenuItem>
-        <MenuItem onClick={() => openExperiment('/authenticators/index')}>
+        <MenuItem onClick={() => openExperiment('authenticators')}>
           <AuthenticatorsIcon />
           <Typography style={{marginLeft: 10}}>Authenticators</Typography>
         </MenuItem>
@@ -177,7 +177,7 @@ const row = (nav: NavRoute, index: number, selected: boolean, open: boolean, onC
         backgroundColor: selected ? backgroundColorSelected : backgroundColor,
       }}
       onClick={onClick}
-      key={nav.name}
+      key={nav.location}
     >
       <ListItemIcon style={{minWidth: 0, marginRight: 6}} id={nav.id}>
         <nav.icon
@@ -190,9 +190,9 @@ const row = (nav: NavRoute, index: number, selected: boolean, open: boolean, onC
       </ListItemIcon>
       {open && (
         <ListItemText
-          primary={nav.name}
+          primary={nav.label}
           primaryTypographyProps={{
-            style: {fontSize: 14, color: selected ? 'white' : '#dfdfdf'},
+            style: {color: selected ? 'white' : '#dfdfdf'},
           }}
         />
       )}

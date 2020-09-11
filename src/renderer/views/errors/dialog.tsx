@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 
 import {Error} from '../store'
 

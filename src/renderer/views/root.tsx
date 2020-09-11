@@ -2,11 +2,9 @@ import * as React from 'react'
 
 import {ThemeProvider} from '@material-ui/styles'
 import {theme} from './theme'
-import {Router} from 'wouter'
 
-import {Routes, routesMap} from './routes'
-import {useLocation} from 'wouter'
-import {store, loadStore, Error} from './store'
+import Routes from './routes'
+import {store, loadStore, setLocation, Error} from './store'
 import {ipcRenderer, remote} from 'electron'
 
 import Auth from './auth'
@@ -21,15 +19,31 @@ import UpdateSplash from './update/splash'
 import {updateCheck} from './update'
 import * as grpc from '@grpc/grpc-js'
 
-import {useHashLocation} from './router'
-import {setErrHandler, runtimeStatus} from '../rpc/keys'
-import {RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
+import {configSet, setErrHandler, runtimeStatus} from '../rpc/keys'
+import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
 
 import './app.css'
 
 const App = (_: {}) => {
   React.useEffect(() => {
-    loadStore()
+    return store.createReaction(
+      (s) => ({
+        location: s.location,
+        history: s.history,
+        navMinimized: s.navMinimized,
+      }),
+      (s) => {
+        const config: Config = {
+          app: {
+            location: s.location,
+            history: s.history,
+            navMinimized: s.navMinimized,
+          },
+        }
+        const set = async () => await configSet({name: 'app', config})
+        set()
+      }
+    )
   }, [])
 
   return (
@@ -41,8 +55,6 @@ const App = (_: {}) => {
 }
 
 const Root = (_: {}) => {
-  const [location, setLocation] = useLocation()
-
   const {ready, unlocked, updating} = store.useState((s) => ({
     ready: s.ready,
     unlocked: s.unlocked,
@@ -51,7 +63,7 @@ const Root = (_: {}) => {
 
   ipcRenderer.removeAllListeners('preferences')
   ipcRenderer.on('preferences', (event, message) => {
-    setLocation('/settings/index')
+    setLocation('settings')
   })
 
   if (updating) {
@@ -62,7 +74,7 @@ const Root = (_: {}) => {
     return <AuthSplash />
   }
 
-  if (!unlocked || location == '/') {
+  if (!unlocked) {
     return <Auth />
   }
 
@@ -72,11 +84,11 @@ const Root = (_: {}) => {
 export default (_: {}) => {
   return (
     <ThemeProvider theme={theme}>
-      <Router hook={useHashLocation}>
+      <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
         <Root />
         <Errors />
         <UpdateAlert />
-      </Router>
+      </Box>
     </ThemeProvider>
   )
 }
@@ -138,6 +150,5 @@ ipcRenderer.on('focus', (event, message) => {
 // ipcRenderer.on('responsive', (event, message) => {})
 
 const ping = async () => {
-  console.log('Ping')
   await runtimeStatus({})
 }

@@ -625,27 +625,6 @@ export interface SecretsResponse {
     sortDirection?: SortDirection;
 }
 
-export interface ItemRequest {
-    id?: string;
-}
-
-export interface ItemResponse {
-    item?: Item;
-}
-
-export interface ItemsRequest {
-    query?: string;
-}
-
-export interface ItemsResponse {
-    items?: Array<Item>;
-}
-
-export interface Item {
-    id?: string;
-    type?: string;
-}
-
 export interface RandRequest {
     numBytes?: number;
     encoding?: Encoding;
@@ -874,6 +853,12 @@ export interface AdminCheckRequest {
 export interface AdminCheckResponse {
 }
 
+export interface Config_App {
+    location?: string;
+    history?: Array<string>;
+    navMinimized?: boolean;
+}
+
 export interface Config_Encrypt {
     recipients?: Array<string>;
     sender?: string;
@@ -886,6 +871,7 @@ export interface Config_Sign {
 }
 
 export interface Config {
+    app?: Config_App;
     encrypt?: Config_Encrypt;
     sign?: Config_Sign;
 }
@@ -942,8 +928,6 @@ export interface KeysService {
     SecretSave: (r:SecretSaveRequest) => SecretSaveResponse;
     SecretRemove: (r:SecretRemoveRequest) => SecretRemoveResponse;
     Secrets: (r:SecretsRequest) => SecretsResponse;
-    Item: (r:ItemRequest) => ItemResponse;
-    Items: (r:ItemsRequest) => ItemsResponse;
     Pull: (r:PullRequest) => PullResponse;
     Push: (r:PushRequest) => PushResponse;
     Wormhole: (r:() => {value: WormholeInput, done: boolean}, cb:(a:{value: WormholeOutput, done: boolean}) => void) => void;

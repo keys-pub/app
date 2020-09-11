@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, Divider, LinearProgress, Input, Typography, Box} from '@material-ui/core'
 
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
 
 import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
@@ -13,7 +13,7 @@ import SignFileView from './signedfile'
 import SignKeySelectView from '../keys/select'
 
 import {keys, sign, configGet, configSet, signFile, SignFileEvent} from '../../rpc/keys'
-import {Key, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
+import {Key, Config, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../../rpc/keys.d'
 import {store, loadStore} from './store'
 
 const openFile = async () => {
@@ -189,7 +189,7 @@ export default (props: Props) => {
         signer: s.signer,
       }),
       (s) => {
-        const config = {
+        const config: Config = {
           sign: {
             signer: s.signer?.id,
           },
@@ -225,7 +225,9 @@ export default (props: Props) => {
       <Box style={{position: 'relative', height: '47%'}}>
         {fileIn && (
           <Box style={{paddingTop: 6, paddingLeft: 8}}>
-            <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
+            <Typography variant="body2" style={{display: 'inline'}}>
+              {fileIn}&nbsp;
+            </Typography>
             <Link inline onClick={clear}>
               Clear
             </Link>
@@ -284,7 +286,9 @@ export default (props: Props) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
+            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
+              {error.message}
+            </Typography>
           </Box>
         )}
         {!error && showButton && (

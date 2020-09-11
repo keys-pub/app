@@ -16,7 +16,7 @@ import {
 
 import {KeyLabel} from '../key/label'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../../rpc/keys.d'
 
 import {keyExport} from '../../rpc/keys'
@@ -131,8 +131,8 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         style={{height: 200}}
       >
         <Typography
+          variant="body2"
           style={{
-            ...styles.mono,
             backgroundColor: 'black',
             color: 'white',
             paddingTop: 10,

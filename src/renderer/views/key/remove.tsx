@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import {Box, Button, Typography} from '@material-ui/core'
 
-import {styles} from '../../components'
 import Dialog from '../../components/dialog'
 import Snack, {SnackProps} from '../../components/snack'
 import {KeyLabel} from './label'

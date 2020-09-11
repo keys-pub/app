@@ -4,7 +4,7 @@ import {Button, Divider, IconButton, LinearProgress, Input, Typography, Box} fro
 
 import {Assignment as CopyIcon} from '@material-ui/icons'
 
-import {styles} from '../../components'
+import {mono} from '../theme'
 import Snack, {SnackProps} from '../../components/snack'
 import {clipboard} from 'electron'
 
@@ -33,7 +33,7 @@ export default (props: Props) => {
           overflow: 'auto',
           border: 'none',
           padding: 0,
-          ...styles.mono,
+          ...mono,
           outline: 0,
           resize: 'none',
           paddingTop: 8,

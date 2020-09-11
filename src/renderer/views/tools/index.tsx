@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {store} from '../store'
 
 import {
   Box,
@@ -21,7 +20,7 @@ import DecryptView from '../decrypt'
 import SignView from '../sign'
 import VerifyView from '../verify'
 
-// import {withStyles, Theme, makeStyles} from '@material-ui/core/styles'
+import {Store} from 'pullstate'
 
 import {
   EnhancedEncryption as EncryptIcon,
@@ -33,22 +32,28 @@ import {
 type Props = {}
 
 type Nav = {
+  label: string
   name: string
-  id: string
   icon: any
 }
 
-// TODO: hover
+const navs: Array<Nav> = [
+  {label: 'Encrypt', icon: EncryptIcon, name: 'encrypt'},
+  {label: 'Decrypt', icon: DecryptIcon, name: 'decrypt'},
+  {label: 'Sign', icon: SignIcon, name: 'sign'},
+  {label: 'Verify', icon: VerifyIcon, name: 'verify'},
+]
+
+type State = {
+  selected: string
+}
+
+const store = new Store<State>({
+  selected: 'encrypt',
+})
 
 export default (props: Props) => {
-  const navs: Array<Nav> = [
-    {name: 'Encrypt', icon: EncryptIcon, id: 'encrypt'},
-    {name: 'Decrypt', icon: DecryptIcon, id: 'decrypt'},
-    {name: 'Sign', icon: SignIcon, id: 'sign'},
-    {name: 'Verify', icon: VerifyIcon, id: 'verify'},
-  ]
-
-  const selected = store.useState((s) => s.selectedTool)
+  const {selected} = store.useState()
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
@@ -62,11 +67,11 @@ export default (props: Props) => {
           }}
         >
           {navs.map((nav, index) =>
-            row(nav, index, selected == nav.id, () =>
+            row(nav, index, selected == nav.name, () => {
               store.update((s) => {
-                s.selectedTool = nav.id
+                s.selected = nav.name
               })
-            )
+            })
           )}
         </List>
         <Divider orientation="vertical" />
@@ -92,7 +97,7 @@ export default (props: Props) => {
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
-    <ListItem button style={{height: 42}} onClick={onClick} key={nav.id}>
+    <ListItem button style={{height: 42}} onClick={onClick} key={nav.name}>
       <Tooltip title={nav.name} placement="left">
         <ListItemIcon style={{minWidth: 0}}>
           <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />

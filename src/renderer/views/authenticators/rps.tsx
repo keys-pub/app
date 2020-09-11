@@ -19,7 +19,6 @@ import {toHex} from '../helper'
 
 import {SortDirection} from '../../rpc/keys.d'
 
-import {styles} from '../../components'
 import {directionString, flipDirection} from '../helper'
 
 type Props = {
@@ -44,7 +43,7 @@ export default (props: Props) => {
               direction={direction}
               // onClick={() => this.sort(sortField, 'id', sortDirection)}
             >
-              <Typography style={{...styles.mono}}>ID</Typography>
+              <Typography variant="body2">ID</Typography>
             </TableSortLabel>
           </TableCell>
           <TableCell>
@@ -53,7 +52,7 @@ export default (props: Props) => {
               direction={direction}
               // onClick={() => this.sort(sortField, 'name', sortDirection)}
             >
-              <Typography style={{...styles.mono}}>Name</Typography>
+              <Typography variant="body2">Name</Typography>
             </TableSortLabel>
           </TableCell>
         </TableRow>

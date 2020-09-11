@@ -4,7 +4,7 @@ import {Box} from '@material-ui/core'
 
 import {Button, Divider, LinearProgress, IconButton, Typography} from '@material-ui/core'
 
-import {store} from './store'
+import {store, goBack} from './store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 
@@ -17,7 +17,6 @@ import {
   Crop75 as UnmaximizeIcon,
 } from '@material-ui/icons'
 
-import {history} from './router'
 import {authLock} from '../rpc/keys'
 
 type Props = {
@@ -28,10 +27,6 @@ type Props = {
 
 export default (props: Props) => {
   const [maximized, setMaximized] = React.useState(false)
-
-  const back = () => {
-    history.back()
-  }
 
   const lock = async () => {
     ipcRenderer.send('authToken', {authToken: ''})
@@ -79,7 +74,7 @@ export default (props: Props) => {
         <Box display="flex" flexDirection="row">
           {!props.noBack && (
             <Box display="flex" flexDirection="row">
-              <IconButton onClick={back} style={{marginTop: -6, marginBottom: -2, height: 41}}>
+              <IconButton onClick={goBack} style={{marginTop: -6, marginBottom: -2, height: 41}}>
                 <ChevronLeft />
               </IconButton>
             </Box>

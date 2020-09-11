@@ -13,9 +13,9 @@ import {
 } from '@material-ui/core'
 
 import {clipboard, shell} from 'electron'
-
-import styles from '../../components/styles'
+import {breakWords} from '../theme'
 import {DialogTitle} from '../../components/dialog'
+import {mono} from '../theme'
 import Snack, {SnackProps} from '../../components/snack'
 
 import {userAdd, userSign} from '../../rpc/keys'
@@ -203,7 +203,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             value={this.state.name}
             style={{minWidth: 300}}
             id="userNameTextField"
-            inputProps={{spellCheck: 'false', style: {...styles.mono}}}
+            inputProps={{spellCheck: 'false'}}
           />
           <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
         </FormControl>
@@ -255,9 +255,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
           <Typography>
             Save it to any of the following locations:
             <br />
-            <span style={{...styles.mono}}>https://{this.state.name}/keyspub.txt</span>
+            <span style={{...mono}}>https://{this.state.name}/keyspub.txt</span>
             <br />
-            <span style={{...styles.mono}}>https://{this.state.name}/.well-known/keyspub.txt</span>
+            <span style={{...mono}}>https://{this.state.name}/.well-known/keyspub.txt</span>
           </Typography>
         )
         placeholder = 'https://' + this.state.name + '/keyspub.txt'
@@ -278,8 +278,8 @@ export default class UserSignDialog extends React.Component<Props, State> {
           </Typography>
         </Box>
         <Typography
+          variant="body2"
           style={{
-            ...styles.mono,
             marginBottom: 5,
             marginLeft: 20,
             backgroundColor: 'black',
@@ -328,10 +328,10 @@ export default class UserSignDialog extends React.Component<Props, State> {
                 value={this.state.url}
                 error={!!this.state.error}
                 helperText={this.state.error?.message || ' '}
-                FormHelperTextProps={{style: styles.breakWords}}
+                FormHelperTextProps={{style: breakWords}}
                 disabled={this.state.loading}
                 style={{width: 500}}
-                inputProps={{spellCheck: 'false', style: {...styles.mono, fontSize: 12}}}
+                inputProps={{spellCheck: 'false'}}
               />
             </Box>
           </Box>

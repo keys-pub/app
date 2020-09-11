@@ -12,8 +12,7 @@ import {
 } from '../../../rpc/keys.d'
 import {ipcRenderer} from 'electron'
 
-import {useLocation} from 'wouter'
-import {store} from '../../store'
+import {store, unlocked} from '../../store'
 
 type Props = {}
 
@@ -21,7 +20,6 @@ export default (props: Props) => {
   // const inputPasswordRef = React.useRef<HTMLInputElement>()
   const inputPasswordConfirmRef = React.useRef<HTMLInputElement>()
 
-  const [location, setLocation] = useLocation()
   const [password, setPassword] = React.useState('')
   const [passwordConfirm, setPasswordConfirm] = React.useState('')
   const [error, setError] = React.useState<Error>()
@@ -50,23 +48,18 @@ export default (props: Props) => {
     setLoading(true)
     setError(undefined)
     try {
-      const req: AuthSetupRequest = {
+      const setup: AuthSetupResponse = await authSetup({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
-      }
-      const setup: AuthSetupResponse = await authSetup(req)
-      const reqUnlock: AuthUnlockRequest = {
+      })
+      const resp: AuthUnlockResponse = await authUnlock({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
         client: 'app',
-      }
-      const unlock: AuthUnlockResponse = await authUnlock(reqUnlock)
-      ipcRenderer.send('authToken', {authToken: unlock.authToken})
-      setLoading(false)
-      setLocation('/keys/index')
-      store.update((s) => {
-        s.unlocked = true
       })
+      ipcRenderer.send('authToken', {authToken: resp.authToken})
+      unlocked()
+      setLoading(false)
     } catch (err) {
       setLoading(false)
       setError(err)

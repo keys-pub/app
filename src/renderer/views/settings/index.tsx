@@ -17,14 +17,11 @@ import {Link} from '../../components'
 import {ipcRenderer} from 'electron'
 
 import Header from '../header'
-import {store} from '../store'
-import {useLocation} from 'wouter'
+import {store, setLocation} from '../store'
 
 export default (props: {}) => {
   const [prerelease, setPrerelease] = React.useState(false)
   const [version, setVersion] = React.useState('')
-
-  const [location, setLocation] = useLocation()
 
   const devTools = () => {
     ipcRenderer.send('toggle-dev-tools', {})
@@ -34,6 +31,12 @@ export default (props: {}) => {
     ipcRenderer.send('update-force')
     store.update((s) => {
       s.updating = true
+    })
+  }
+
+  const showError = () => {
+    store.update((s) => {
+      s.error = new Error('Test error '.repeat(1024))
     })
   }
 
@@ -104,11 +107,11 @@ export default (props: {}) => {
             <TableCell style={cstyles.cell}>
               <Box display="flex" flexDirection="column">
                 <Typography>
-                  <Link span onClick={() => setLocation('/db/service')}>
+                  <Link span onClick={() => setLocation('db/service')}>
                     DB
                   </Link>
                   <br />
-                  <Link span onClick={() => setLocation('/db/vault')}>
+                  <Link span onClick={() => setLocation('db/vault')}>
                     Vault
                   </Link>
                   <br />
@@ -120,12 +123,16 @@ export default (props: {}) => {
                     Force Update
                   </Link>
                   <br />
-                  <Link span onClick={() => setLocation('/style-guide')}>
+                  <Link span onClick={() => setLocation('style-guide')}>
                     Style Guide
                   </Link>
                   <br />
                   <Link span onClick={restart}>
                     Restart
+                  </Link>
+                  <br />
+                  <Link span onClick={showError}>
+                    Show Error
                   </Link>
                   <br />
                 </Typography>

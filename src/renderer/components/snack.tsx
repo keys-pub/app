@@ -5,6 +5,7 @@ import {Box, IconButton, Snackbar, SnackbarContent, Typography} from '@material-
 import {Close as CloseIcon} from '@material-ui/icons'
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
+import {body1} from '../views/theme'
 
 // import Slide from '@material-ui/core/Slide'
 
@@ -34,7 +35,7 @@ export default (props: Props) => {
     >
       <SnackbarContent
         message={props.message}
-        style={{fontSize: '0.857rem'}}
+        style={{...body1, fontSize: '0.857rem'}}
         action={
           <React.Fragment>
             <IconButton size="small" aria-label="close" color="inherit" onClick={props.onClose}>

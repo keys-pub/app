@@ -1,8 +1,6 @@
 import * as React from 'react'
 import {CSSProperties} from 'react'
 
-import {styles} from '../../components'
-
 import {Box, Button, CircularProgress, Divider, Input} from '@material-ui/core'
 
 export type Props = {
@@ -71,7 +69,6 @@ export default class MessageInputView extends React.Component<Props, State> {
         }}
       >
         <Input
-          style={styles.regular}
           autoFocus
           disableUnderline
           fullWidth

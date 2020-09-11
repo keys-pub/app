@@ -50,11 +50,10 @@ export const devices = (req: DevicesRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.Devices) done')
+				console.log('Auth.Devices')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.Devices)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'Devices', args: req, reply: reply})
 	})
 }
@@ -69,11 +68,10 @@ export const deviceInfo = (req: DeviceInfoRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.DeviceInfo) done')
+				console.log('Auth.DeviceInfo')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.DeviceInfo)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'DeviceInfo', args: req, reply: reply})
 	})
 }
@@ -88,11 +86,10 @@ export const makeCredential = (req: MakeCredentialRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.MakeCredential) done')
+				console.log('Auth.MakeCredential')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.MakeCredential)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'MakeCredential', args: req, reply: reply})
 	})
 }
@@ -107,11 +104,10 @@ export const setPIN = (req: SetPINRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.SetPIN) done')
+				console.log('Auth.SetPIN')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.SetPIN)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'SetPIN', args: req, reply: reply})
 	})
 }
@@ -126,11 +122,10 @@ export const reset = (req: ResetRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.Reset) done')
+				console.log('Auth.Reset')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.Reset)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'Reset', args: req, reply: reply})
 	})
 }
@@ -145,11 +140,10 @@ export const retryCount = (req: RetryCountRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.RetryCount) done')
+				console.log('Auth.RetryCount')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.RetryCount)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'RetryCount', args: req, reply: reply})
 	})
 }
@@ -164,11 +158,10 @@ export const assertion = (req: AssertionRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.Assertion) done')
+				console.log('Auth.Assertion')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.Assertion)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'Assertion', args: req, reply: reply})
 	})
 }
@@ -183,11 +176,10 @@ export const credentialsInfo = (req: CredentialsInfoRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.CredentialsInfo) done')
+				console.log('Auth.CredentialsInfo')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.CredentialsInfo)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'CredentialsInfo', args: req, reply: reply})
 	})
 }
@@ -202,11 +194,10 @@ export const credentials = (req: CredentialsRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.Credentials) done')
+				console.log('Auth.Credentials')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.Credentials)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'Credentials', args: req, reply: reply})
 	})
 }
@@ -221,11 +212,10 @@ export const relyingParties = (req: RelyingPartiesRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.RelyingParties) done')
+				console.log('Auth.RelyingParties')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.RelyingParties)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'RelyingParties', args: req, reply: reply})
 	})
 }
@@ -240,11 +230,10 @@ export const generateHMACSecret = (req: GenerateHMACSecretRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.GenerateHMACSecret) done')
+				console.log('Auth.GenerateHMACSecret')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.GenerateHMACSecret)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'GenerateHMACSecret', args: req, reply: reply})
 	})
 }
@@ -259,11 +248,10 @@ export const hmacSecret = (req: HMACSecretRequest) => {
 				reject(arg.err)
 				errHandler(arg.err)
 			} else {
-				console.log('RPC (Auth.HMACSecret) done')
+				console.log('Auth.HMACSecret')
 			}
 			resolve(arg.resp)
 		})
-		console.log('RPC (Auth.HMACSecret)...')
 		ipcRenderer.send('rpc', {service: 'Auth', method: 'HMACSecret', args: req, reply: reply})
 	})
 }

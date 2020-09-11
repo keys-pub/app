@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 
 import {Device, SetPINRequest, SetPINResponse} from '../../rpc/fido2.d'
 import {setPIN} from '../../rpc/fido2'

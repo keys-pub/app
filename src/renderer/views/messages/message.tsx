@@ -2,8 +2,8 @@
 import * as React from 'react'
 
 import {Avatar, Box, Button, Divider, Typography} from '@material-ui/core'
-import {styles} from '../../components'
 
+import {mono} from '../theme'
 import {Message, User} from '../../rpc/keys.d'
 import {MessageRow} from './types'
 
@@ -47,7 +47,7 @@ export default class MessageView extends React.Component<Props, State> {
     // nameColor = '#2196f3'
     // nameColor = 'green' // #2196f3 #339933
     const userStyles = {
-      ...styles.mono,
+      ...mono,
       color: nameColor,
       textDecoration: 'default',
     }

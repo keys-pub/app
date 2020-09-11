@@ -2,12 +2,10 @@ import * as React from 'react'
 
 import {Avatar, Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
-// import Grow from '@material-ui/core/Grow'
+import {breakWords} from '../theme'
 
 import {DialogTitle} from '../../components'
 import KeyView from './view'
-
-import {styles} from '../../components'
 
 import {key, pull} from '../../rpc/keys'
 import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc/keys.d'
@@ -15,7 +13,7 @@ import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../../rpc
 type Props = {
   open: boolean
   close: (snack: string) => void
-  kid?: string
+  kid: string
   search?: boolean
   update?: boolean
   import?: boolean
@@ -43,6 +41,10 @@ export default class KeyDialog extends React.Component<Props, State> {
 
   close = (snack: string) => {
     this.props.close(snack)
+  }
+
+  componentDidMount() {
+    this.loadKey(!!this.props.update, false)
   }
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
@@ -122,7 +124,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         <DialogContent dividers style={{minHeight: 161}}>
           {/*TODO: Better error display*/}
           {this.state.error && (
-            <Typography style={{...styles.mono, ...styles.breakWords, color: 'red', paddingBottom: 20}}>
+            <Typography variant="body2" style={{...breakWords, color: 'red', paddingBottom: 20}}>
               {this.state.error?.message}
             </Typography>
           )}

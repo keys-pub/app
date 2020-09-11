@@ -2,9 +2,8 @@ import * as React from 'react'
 
 import {Box} from '@material-ui/core'
 import {Error} from '../store'
-
+import {breakWords} from '../theme'
 import {Button, Typography} from '@material-ui/core'
-import {styles} from '../../components'
 
 type Props = {
   error: Error
@@ -14,9 +13,9 @@ type Props = {
 export default (props: Props) => {
   return (
     <Typography
+      variant="body2"
       style={{
-        ...styles.mono,
-        ...styles.breakWords,
+        ...breakWords,
         width: 'calc(100% - 30px)',
         backgroundColor: 'black',
         color: 'white',

@@ -5,7 +5,8 @@ import {Divider, Button, Box, Input, LinearProgress, Typography} from '@material
 import DecryptedView from './decrypted'
 import DecryptedFileView from './decryptedfile'
 
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
+import {mono} from '../theme'
 import {ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
@@ -226,7 +227,9 @@ export default (_: {}) => {
       <Box style={{position: 'relative', height: '40%'}}>
         {fileIn && (
           <Box style={{paddingTop: 8, paddingLeft: 8}}>
-            <Typography style={{...styles.mono, display: 'inline'}}>{fileIn}&nbsp;</Typography>
+            <Typography variant="body2" style={{display: 'inline'}}>
+              {fileIn}&nbsp;
+            </Typography>
             <Link inline onClick={() => clear(false)}>
               Clear
             </Link>
@@ -245,7 +248,7 @@ export default (_: {}) => {
                 overflow: 'auto',
                 border: 'none',
                 padding: 0,
-                ...styles.mono,
+                ...mono,
                 outline: 0,
                 resize: 'none',
                 paddingTop: 8,
@@ -282,7 +285,9 @@ export default (_: {}) => {
       >
         {error && (
           <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography style={{...styles.mono, color: 'red', display: 'inline'}}>{error.message}</Typography>
+            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
+              {error.message}
+            </Typography>
           </Box>
         )}
         {!error && showDecryptFileButton && (

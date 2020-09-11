@@ -162,7 +162,6 @@
     "electron-window-state": "^5.0.3",
     "getenv": "^1.0.0",
     "google-protobuf": "^3.5.0",
-    "history": "^5.0.0",
     "lodash": "^4.17.19",
     "match-sorter": "^4.0.2",
     "node-emoji": "^1.10.0",
@@ -171,9 +170,7 @@
     "react": "^16.8.0",
     "react-dom": "^16.5.1",
     "typeface-open-sans": "^0.0.75",
-    "typeface-roboto": "^0.0.75",
-    "typeface-roboto-mono": "^0.0.75",
-    "wouter": "^2.5.1"
+    "typeface-roboto-mono": "^0.0.75"
   },
   "engines": {
     "node": ">=10.x <15",

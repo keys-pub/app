@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 
 import {vaultSync} from '../../rpc/keys'
 import {VaultSyncRequest, VaultSyncResponse} from '../../rpc/keys.d'

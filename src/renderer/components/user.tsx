@@ -2,8 +2,6 @@ import * as React from 'react'
 
 import {Box, Button, Typography} from '@material-ui/core'
 
-import {styles} from '.'
-
 import {User} from '../rpc/keys.d'
 
 type ButtonProps = {
@@ -52,7 +50,9 @@ export const UserButton = (props: ButtonProps) => {
       onClick={props.onClick}
     >
       <Box display="flex" flexDirection="column">
-        <Typography style={{...styles.mono, color: 'white', fontSize: size}}>{name}</Typography>
+        <Typography variant="body2" style={{color: 'white', fontSize: size}}>
+          {name}
+        </Typography>
         {service !== '' && (
           <Typography style={{textTransform: 'lowercase', marginTop: -6, fontSize: 12, color: '#999'}}>
             @{service}
@@ -95,7 +95,9 @@ export const UserLabel = (props: LabelProps) => {
 
   return (
     <Box display="flex" flexDirection="column">
-      <Typography style={{...styles.mono, color: 'white', fontSize: size}}>{name}</Typography>
+      <Typography variant="body2" style={{color: 'white', fontSize: size}}>
+        {name}
+      </Typography>
       {service !== '' && (
         <Typography style={{textTransform: 'lowercase', marginTop: -6, fontSize: 12, color: '#999'}}>
           @{service}

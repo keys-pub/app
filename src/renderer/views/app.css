@@ -3,9 +3,8 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-@import '~typeface-roboto/index.css';
-@import '~typeface-roboto-mono/index.css';
 @import '~typeface-open-sans/index.css';
+@import '~typeface-roboto-mono/index.css';
 
 @font-face {
   font-family: 'Minercraftory';
@@ -13,7 +12,6 @@
 }
 
 body {
-  font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
   margin: 0;
   min-height: 100%;
 }

@@ -2,12 +2,12 @@ import * as React from 'react'
 
 import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
-import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 import {dateString} from '../helper'
 
 import SetPinDialog from './setpin'
 import ResetDialog from './reset'
+import {breakWords, mono} from '../theme'
 
 import {deviceInfo, relyingParties} from '../../rpc/fido2'
 import {
@@ -58,35 +58,34 @@ export default class DeviceInfoView extends React.Component<Props, State> {
     }
   }
 
-  info = () => {
+  info = async () => {
     if (!this.props.device) {
       this.setState({info: undefined, error: undefined, loading: false})
       return
     }
 
     this.setState({loading: true, error: undefined})
-    const req: DeviceInfoRequest = {
-      device: this.props.device.path,
-    }
-    deviceInfo(req)
-      .then((resp: DeviceInfoResponse) => {
-        let clientPin = ''
-        const optClientPin = (resp.info?.options || []).find((opt: Option) => {
-          return opt.name == 'clientPin'
-        })
-        if (optClientPin) {
-          clientPin = optClientPin.value || ''
-        }
+    try {
+      const req: DeviceInfoRequest = {
+        device: this.props.device.path,
+      }
+      const resp = await deviceInfo(req)
+      let clientPin = ''
+      const optClientPin = (resp.info?.options || []).find((opt: Option) => {
+        return opt.name == 'clientPin'
+      })
+      if (optClientPin) {
+        clientPin = optClientPin.value || ''
+      }
 
-        this.setState({
-          info: resp.info,
-          loading: false,
-          clientPin,
-        })
+      this.setState({
+        info: resp.info,
+        loading: false,
+        clientPin,
       })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
+    } catch (err) {
+      this.setState({loading: false, error: err})
+    }
   }
 
   closePin = (snack: string) => {
@@ -241,7 +240,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 }
 
 const labelStyle = {
-  ...styles.breakWords,
+  ...breakWords,
   transform: 'scale(0.75)',
   transformOrigin: 'top left',
   color: 'rgba(0, 0, 0, 0.54)',
@@ -249,4 +248,4 @@ const labelStyle = {
   paddingBottom: 2,
   fontSize: '0.857rem',
 }
-const valueStyle = {...styles.mono, ...styles.breakWords, paddingBottom: 16}
+const valueStyle = {...mono, ...breakWords, paddingBottom: 16}

@@ -18,8 +18,9 @@ import {
 
 import Alert from '@material-ui/lab/Alert'
 
-import {styles, DialogTitle} from '../../components'
+import {DialogTitle} from '../../components'
 import {deepCopy} from '../helper'
+import {mono} from '../theme'
 
 import PasswordOptions from './pw'
 
@@ -62,24 +63,23 @@ export default class SecretEditView extends React.Component<Props, State> {
     }
   }
 
-  save = () => {
+  save = async () => {
     if (!this.state.secret.name?.trim()) {
       this.setState({errorName: new Error('Name is required')})
       return
     }
 
     this.setState({loading: true, errorName: undefined})
-    const req: SecretSaveRequest = {
-      secret: this.state.secret,
+    try {
+      const req: SecretSaveRequest = {
+        secret: this.state.secret,
+      }
+      const resp = await secretSave(req)
+      this.setState({loading: false, secret: resp.secret!})
+      this.props.onChange(resp.secret!)
+    } catch (err) {
+      this.setState({loading: false})
     }
-    secretSave(req)
-      .then((resp: SecretSaveResponse) => {
-        this.setState({loading: false, secret: resp.secret!})
-        this.props.onChange(resp.secret!)
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false})
-      })
   }
 
   onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {
@@ -161,21 +161,19 @@ export default class SecretEditView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'name')}
           value={this.state.secret.name}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
-          style={{marginBottom: 20}}
+          style={{...valueStyle}}
         />
 
         <Typography style={labelStyle}>Username</Typography>
         <TextField
           onChange={(e) => this.onChange(e, 'username')}
           value={this.state.secret.username}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
-          style={{marginBottom: 19}}
+          style={{...valueStyle}}
         />
 
-        <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative', marginBottom: 20}}>
+        <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative'}}>
           <Box display="flex" flexDirection="column" style={{width: '100%'}}>
             <Typography style={labelStyle}>Password</Typography>
             <TextField
@@ -183,11 +181,12 @@ export default class SecretEditView extends React.Component<Props, State> {
               onChange={(e) => this.onChange(e, 'password')}
               value={this.state.secret.password}
               type={this.state.passwordVisible ? '' : 'password'}
-              InputProps={{style: styles.mono}}
               inputProps={{maxLength: 128}}
+              InputProps={{style: {...mono}}}
+              style={{...valueStyle}}
             />
           </Box>
-          <Box style={{position: 'absolute', right: 0}}>
+          <Box style={{position: 'absolute', right: 0, top: 6}}>
             <PasswordOptions
               password={this.state.secret.password!}
               visible={this.state.passwordVisible}
@@ -201,9 +200,8 @@ export default class SecretEditView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'url')}
           value={this.state.secret.url}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 256}}
-          style={{marginBottom: 20}}
+          style={{...valueStyle}}
         />
 
         <FormControl>
@@ -214,8 +212,6 @@ export default class SecretEditView extends React.Component<Props, State> {
             value={this.state.secret.notes}
             multiline
             rows={8}
-            InputProps={{style: styles.mono}}
-            inputProps={{maxLength: 1024}}
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
@@ -236,7 +232,6 @@ export default class SecretEditView extends React.Component<Props, State> {
         <TextField
           onChange={(e) => this.onChange(e, 'name')}
           value={this.state.secret.name}
-          InputProps={{style: styles.mono}}
           inputProps={{maxLength: 128}}
           style={{marginBottom: 20}}
         />
@@ -249,8 +244,6 @@ export default class SecretEditView extends React.Component<Props, State> {
             value={this.state.secret.notes}
             multiline
             rows={8}
-            InputProps={{style: styles.mono}}
-            inputProps={{maxLength: 1536}}
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
@@ -296,8 +289,14 @@ const labelStyle = {
   transformOrigin: 'top left',
   color: 'rgba(0, 0, 0, 0.54)',
   marginTop: -1,
-  marginBottom: -3,
+  paddingBottom: 2,
   fontSize: '0.857rem',
+  height: 20,
+}
+
+const valueStyle = {
+  marginTop: -5,
+  height: 49,
 }
 
 const errStyle = {

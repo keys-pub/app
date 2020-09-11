@@ -1,7 +1,12 @@
 import {Store} from 'pullstate'
 
-import {store as encryptStore, loadStore as encryptLoadStore} from './encrypt/store'
-import {store as signStore, loadStore as signLoadStore} from './sign/store'
+import {loadStore as keysLoadStore} from './keys/store'
+import {loadStore as secretsLoadStore} from './secrets/store'
+import {loadStore as encryptLoadStore} from './encrypt/store'
+import {loadStore as signLoadStore} from './sign/store'
+
+import {configGet, keys} from '../rpc/keys'
+import {Key} from '../rpc/keys.d'
 
 export interface Error {
   message: string
@@ -13,19 +18,70 @@ export interface Error {
 export type State = {
   error?: Error
   ready: boolean
-  selectedTool: string
   unlocked: boolean
   updating: boolean
+
+  location: string
+  history: string[]
+
+  navMinimized: boolean
 }
 
 export const store = new Store<State>({
   ready: false,
-  selectedTool: 'encrypt',
   unlocked: false,
   updating: false,
+
+  location: '',
+  history: [],
+
+  navMinimized: false,
 })
 
-export const loadStore = () => {
+export const loadStore = async () => {
+  const configResp = await configGet({name: 'app'})
+  const config = configResp?.config?.app
+  // console.log('Config:', config)
+  store.update((s) => {
+    s.location = config?.location || 'keys'
+    s.history = config?.history || ['keys']
+    s.navMinimized = !!config?.navMinimized
+  })
+
+  keysLoadStore()
+  secretsLoadStore()
   encryptLoadStore()
   signLoadStore()
+}
+
+export const unlocked = async () => {
+  await loadStore()
+  store.update((s) => {
+    s.unlocked = true
+  })
+}
+
+export const setLocation = (location: string) => {
+  store.update((s) => {
+    let history = [...s.history, location]
+    if (history.length > 10) {
+      history = history.slice(history.length - 10, history.length)
+    }
+    s.location = location
+    s.history = history
+  })
+}
+
+export const goBack = () => {
+  store.update((s) => {
+    let next = s.history
+    if (s.history.length > 0) {
+      next = s.history.slice(0, s.history.length - 1)
+    }
+    if (next.length > 0) {
+      const location = next[next.length - 1]
+      s.location = location
+      s.history = [...next]
+    }
+  })
 }

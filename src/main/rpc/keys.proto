@@ -53,9 +53,6 @@ service Keys {
   rpc SecretRemove(SecretRemoveRequest) returns (SecretRemoveResponse) {}
   rpc Secrets(SecretsRequest) returns (SecretsResponse) {}
 
-  rpc Item(ItemRequest) returns (ItemResponse) {}
-  rpc Items(ItemsRequest) returns (ItemsResponse) {}  
-
   rpc Pull(PullRequest) returns (PullResponse) {}
   rpc Push(PushRequest) returns (PushResponse) {}
 
@@ -691,25 +688,6 @@ message SecretsResponse {
   SortDirection sortDirection = 11;  
 }
 
-message ItemRequest {
-  string id = 1 [(go.field) = {name: "ID"}];
-}
-message ItemResponse {
-  Item item = 1;
-}
-
-message ItemsRequest {
-  string query = 1;
-}
-message ItemsResponse {
-  repeated Item items = 1;
-}
-
-message Item {
-  string id = 1 [(go.field) = {name: "ID"}];
-  string type = 2;
-}
-
 enum Encoding {
   option (go.enum) = {name: "Encoding"};
 
@@ -989,6 +967,12 @@ message AdminCheckRequest {
 message AdminCheckResponse {}
 
 message Config {
+  message App {
+    string location = 1;
+    repeated string history = 2;    
+    bool navMinimized = 100;
+  }
+
   message Encrypt {
     repeated string recipients = 1;
     string sender = 2;
@@ -1001,8 +985,9 @@ message Config {
     string signer = 1;  
   }
 
-  Encrypt encrypt = 1;
-  Sign sign = 2;
+  App app = 1;
+  Encrypt encrypt = 10;
+  Sign sign = 11;
 }
 
 message ConfigGetRequest {

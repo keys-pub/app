@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle, Link} from '../../components'
+import {DialogTitle, Link} from '../../components'
 import {shell} from 'electron'
 
 import {vaultUnsync} from '../../rpc/keys'

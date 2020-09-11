@@ -18,7 +18,7 @@ import {
 import {IDLabel} from '../key/label'
 
 import UserLabel from '../user/label'
-import {styles} from '../../components'
+
 import Snack, {SnackProps} from '../../components/snack'
 
 import {Key, SearchRequest, SearchResponse} from '../../rpc/keys.d'
@@ -123,10 +123,10 @@ export default class SearchView extends React.Component<Props, State> {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Typography style={{...styles.mono}}>User</Typography>
+                  <Typography>User</Typography>
                 </TableCell>
                 <TableCell style={{width: 500}}>
-                  <Typography style={{...styles.mono}}>Key</Typography>
+                  <Typography>Key</Typography>
                 </TableCell>
               </TableRow>
             </TableHead>

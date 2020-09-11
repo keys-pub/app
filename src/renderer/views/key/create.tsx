@@ -14,7 +14,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles, DialogTitle, Link} from '../../components'
+import {DialogTitle, Link} from '../../components'
+
 import UserSignDialog from '../user/dialog'
 import ServiceSelect from '../user/service'
 
@@ -190,7 +191,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         <DialogContent dividers>
           <Box>
             <Typography style={{paddingBottom: 10}}>We created and saved the key:</Typography>
-            <Typography style={{...styles.mono, paddingBottom: 10, paddingLeft: 10}}>
+            <Typography variant="body2" style={{paddingBottom: 10, paddingLeft: 10}}>
               {this.state.kid}
             </Typography>
             <Typography>This key identifier is also the public key, you can share with others.</Typography>

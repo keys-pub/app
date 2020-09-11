@@ -4,7 +4,7 @@ import {Button, Divider, IconButton, Input, Box, Typography} from '@material-ui/
 
 import {Assignment as CopyIcon} from '@material-ui/icons'
 import SignerView from '../verify/signer'
-import {styles} from '../../components'
+import {regular} from '../theme'
 import Snack, {SnackProps} from '../../components/snack'
 
 import {clipboard} from 'electron'
@@ -46,7 +46,7 @@ export default (props: Props) => {
             overflow: 'auto',
             border: 'none',
             padding: 0,
-            ...styles.regular,
+            ...regular,
             outline: 0,
             resize: 'none',
             paddingTop: 8,

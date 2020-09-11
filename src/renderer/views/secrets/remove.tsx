@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
-import {DialogTitle, styles} from '../../components'
+import {DialogTitle} from '../../components'
 
 import {secretRemove} from '../../rpc/keys'
 import {Secret, SecretRemoveRequest, SecretRemoveResponse} from '../../rpc/keys.d'
@@ -40,9 +40,9 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
         <DialogContent dividers>
           <Box style={{paddingBottom: 10}}>
             <Typography style={{paddingBottom: 10}}>Do you want to delete this secret?</Typography>
-            <Typography style={{...styles.mono}}>{this.props.secret?.name}</Typography>
+            <Typography variant="body2">{this.props.secret?.name}</Typography>
             {this.props.secret?.username && (
-              <Typography style={{...styles.mono}}>{this.props.secret?.username}</Typography>
+              <Typography variant="body2">{this.props.secret?.username}</Typography>
             )}
           </Box>
         </DialogContent>

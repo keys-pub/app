@@ -4,9 +4,8 @@ import {Button, IconButton, Input, Typography, Box} from '@material-ui/core'
 
 import {Assignment as CopyIcon} from '@material-ui/icons'
 
-import {styles} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
-
+import {mono} from '../theme'
 import {clipboard} from 'electron'
 
 export type Props = {
@@ -39,7 +38,7 @@ export default (props: Props) => {
           border: 'none',
           padding: 0,
           color: 'rgba(0, 0, 0, 0.87)',
-          ...styles.mono,
+          ...mono,
           outline: 0,
           resize: 'none',
           paddingTop: 8,

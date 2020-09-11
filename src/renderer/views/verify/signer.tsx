@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Typography, Box, Button} from '@material-ui/core'
 
 import UserLabel from '../user/label'
-import {styles} from '../../components'
+
 import Snack, {SnackProps} from '../../components/snack'
 
 import KeyDialog from '../key'
@@ -19,23 +19,25 @@ type Props = {
 }
 
 type State = {
-  openKey?: string
+  keyOpen: boolean
+  keyShow?: Key
   snack?: SnackProps
   snackOpen: boolean
 }
 
 export default class SignerView extends React.Component<Props, State> {
   state: State = {
+    keyOpen: false,
     snackOpen: false,
   }
 
   openKey = () => {
-    this.setState({openKey: this.props.signer?.id})
+    this.setState({keyOpen: true, keyShow: this.props.signer})
   }
 
   closeKey = (snack: string) => {
     this.setState({
-      openKey: '',
+      keyOpen: false,
       snack: {message: snack, alert: 'success', duration: 4000},
       snackOpen: !!snack,
     })
@@ -56,14 +58,16 @@ export default class SignerView extends React.Component<Props, State> {
     return (
       <Box>
         {this.renderSigner()}
-        <KeyDialog
-          open={!!this.state.openKey}
-          close={this.closeKey}
-          kid={this.state.openKey}
-          search
-          update
-          import
-        />
+        {this.state.keyShow && (
+          <KeyDialog
+            open={this.state.keyOpen}
+            close={this.closeKey}
+            kid={this.state.keyShow?.id!}
+            search
+            update
+            import
+          />
+        )}
         <Snack
           open={this.state.snackOpen}
           {...this.state.snack}
@@ -92,11 +96,11 @@ const SignerUser = (props: {signer: Key; mode?: EncryptMode}) => {
       flexDirection="row"
       style={{paddingLeft: 10, paddingTop: 8, paddingBottom: 8, backgroundColor: '#bbeebb'}}
     >
-      <Typography display="inline" style={{...styles.mono}}>
+      <Typography display="inline" variant="body2">
         Verified&nbsp;
       </Typography>
       <KeyLabel k={signer} />
-      <Typography display="inline" style={{...styles.mono}}>
+      <Typography display="inline" variant="body2">
         {encryptModeDescription(mode)}
       </Typography>
     </Box>
@@ -111,7 +115,7 @@ const SignerUserUnknown = (props: {signer: Key; lookup: () => void}) => {
       flexDirection="row"
       style={{paddingLeft: 10, paddingTop: 12, paddingBottom: 6, backgroundColor: '#eeeebb'}}
     >
-      <Typography display="inline" style={{...styles.mono}}>
+      <Typography display="inline" variant="body2">
         Signed by&nbsp;
       </Typography>
       <KeyLabel k={signer} />

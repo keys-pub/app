@@ -3,7 +3,9 @@ import * as React from 'react'
 import {Box, Button, Divider, LinearProgress, Typography} from '@material-ui/core'
 
 import {shell} from 'electron'
-import {Link, styles} from '../../components'
+import {Link} from '../../components'
+import {mono} from '../theme'
+
 import Snack, {SnackProps} from '../../components/snack'
 
 // import EnableDialog from './enable'
@@ -134,7 +136,7 @@ export default (_: {}) => {
         </Typography>
         <Typography>
           <span style={{display: 'inline-block', width: 100}}>Vault API Key:</span>
-          <span style={{...styles.mono}}>{status?.kid}</span>
+          <span style={{...mono}}>{status?.kid}</span>
         </Typography>
         <Typography style={{paddingBottom: 6}}>
           <span style={{display: 'inline-block', width: 100}}>Last Sync: </span>
@@ -191,7 +193,9 @@ export default (_: {}) => {
               <br />
               This will expire in 5 minutes.
             </Typography>
-            <Typography style={{...styles.mono, paddingBottom: 5, width: 500}}>{phrase}</Typography>
+            <Typography variant="body2" style={{paddingBottom: 5, width: 500}}>
+              {phrase}
+            </Typography>
             <Link onClick={authClear}>Clear</Link>
           </Box>
         )}

@@ -5,7 +5,7 @@ import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {Link, styles} from '../../components'
+import {Link} from '../../components'
 import Autocomplete from '../keys/autocomplete'
 
 import * as grpc from '@grpc/grpc-js'

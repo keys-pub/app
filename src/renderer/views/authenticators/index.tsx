@@ -28,28 +28,17 @@ import {
 } from '@material-ui/icons'
 
 import Header from '../header'
-import {styles} from '../../components'
 import {pluralize} from '../helper'
 
 import DeviceContentView from './content'
 
 import {devices} from '../../rpc/fido2'
 import {Device, DevicesRequest, DevicesResponse} from '../../rpc/fido2.d'
+import {Error} from '../store'
 
 type Props = {}
 
-type Position = {
-  x: number
-  y: number
-}
-
-interface Error {
-  code: number
-  message: string
-}
-
 type State = {
-  contextPosition?: Position
   devices: Device[]
   error?: Error
   input: string
@@ -78,25 +67,22 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     this.list()
   }
 
-  list = () => {
-    console.log('List devices')
+  list = async () => {
     this.setState({loading: true, error: undefined})
-    const req: DevicesRequest = {}
-    devices(req)
-      .then((resp: DevicesResponse) => {
-        const selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
-        this.setState({
-          devices: resp.devices || [],
-          selected: selected,
-          loading: false,
-        })
+    try {
+      const resp = await devices({})
+      const selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
+      this.setState({
+        devices: resp.devices || [],
+        selected: selected,
+        loading: false,
       })
-      .catch((err: Error) => {
-        if (err.code == 12) {
-          err = {code: 12, message: "Sorry, this feature isn't currently available on your platform."}
-        }
-        this.setState({devices: [], loading: false, error: err})
-      })
+    } catch (err) {
+      if (err.code == 12) {
+        err = {code: 12, message: "Sorry, this feature isn't currently available on your platform."}
+      }
+      this.setState({devices: [], loading: false, error: err})
+    }
   }
 
   onChange = () => {
@@ -109,20 +95,6 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 
   isSelected = (device: Device): boolean => {
     return this.state.selected?.path == device?.path
-  }
-
-  onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    // event.preventDefault()
-    // const path = event.currentTarget.id
-    // const device = this.state.devices.find((d: Device) => d.path == path)
-    // this.setState({
-    //   contextPosition: {x: event.clientX - 2, y: event.clientY - 4},
-    //   selected: device,
-    // })
-  }
-
-  closeContext = () => {
-    this.setState({contextPosition: undefined, selected: undefined})
   }
 
   renderHeader() {
@@ -159,7 +131,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
           <Box style={{width: 200}}>
             {this.renderHeader()}
             <Divider />
-            <Box style={{height: 'calc(100vh - 88px)', overflowY: 'auto'}}>
+            <Box style={{height: 'calc(100vh - 70px)', overflowY: 'auto'}}>
               <Table size="small">
                 <TableBody>
                   {this.state.devices.map((device, index) => {
@@ -171,23 +143,20 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
                         style={{cursor: 'pointer'}}
                         selected={this.isSelected(device)}
                         component={(props: any) => {
-                          return <tr onContextMenu={this.onContextMenu} {...props} id={device.path} />
+                          return <tr {...props} id={device.path} />
                         }}
                       >
-                        <TableCell component="th" scope="row" style={{minWidth: 150, verticalAlign: 'top'}}>
+                        <TableCell component="th" scope="row" style={{verticalAlign: 'top'}}>
                           <Typography
+                            noWrap
                             style={{
                               ...nowrapStyle,
-                              whiteSpace: 'nowrap',
-                              fontSize: '1.1em',
                               paddingBottom: 2,
                             }}
                           >
                             {device.product}
                           </Typography>
-                          <Typography
-                            style={{...nowrapStyle, ...styles.mono, whiteSpace: 'nowrap', color: '#777777'}}
-                          >
+                          <Typography noWrap style={{...nowrapStyle, color: '#777777'}}>
                             {device.manufacturer}
                           </Typography>
                         </TableCell>
@@ -213,22 +182,6 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
             {!this.state.error && this.state.selected && <DeviceContentView device={this.state.selected} />}
           </Box>
         </Box>
-        <Menu
-          keepMounted
-          open={!!this.state.contextPosition}
-          onClose={this.closeContext}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            this.state.contextPosition
-              ? {top: this.state.contextPosition.y, left: this.state.contextPosition.x}
-              : undefined
-          }
-        >
-          <MenuItem onClick={() => {}}>
-            <ExportIcon />
-            <Typography style={{marginLeft: 10, marginRight: 20}}>TODO</Typography>
-          </MenuItem>
-        </Menu>
       </Box>
     )
   }
@@ -237,5 +190,5 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
 const nowrapStyle = {
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  width: 145,
+  width: 166,
 }

@@ -15,10 +15,10 @@ import {
 
 import {Device, Credential} from '../../rpc/fido2.d'
 import {toHex} from '../helper'
+import {breakWords} from '../theme'
 
 import {SortDirection} from '../../rpc/keys.d'
 
-import {styles} from '../../components'
 import {directionString, flipDirection} from '../helper'
 
 type Props = {
@@ -47,7 +47,7 @@ export default (props: Props) => {
               direction={direction}
               // onClick={() => this.sort(sortField, 'id', sortDirection)}
             >
-              <Typography style={{...styles.mono}}>RP</Typography>
+              <Typography variant="body2">RP</Typography>
             </TableSortLabel>
           </TableCell>
           <TableCell>
@@ -56,7 +56,7 @@ export default (props: Props) => {
               direction={direction}
               // onClick={() => this.sort(sortField, '???', sortDirection)}
             >
-              <Typography style={{...styles.mono}}>User</Typography>
+              <Typography variant="body2">User</Typography>
             </TableSortLabel>
           </TableCell>
         </TableRow>
@@ -76,14 +76,14 @@ export default (props: Props) => {
               }}
             >
               <TableCell component="th" scope="row" style={{minWidth: 200}}>
-                <Typography style={{...styles.mono, ...styles.breakWords}}>
+                <Typography variant="body2" style={{...breakWords}}>
                   {cred.rp!.id}
                   <br />
                   {cred.rp!.name}
                 </Typography>
               </TableCell>
               <TableCell style={{verticalAlign: 'top', minWidth: 200}}>
-                <Typography style={{...styles.mono, ...styles.breakWords}}>
+                <Typography variant="body2" style={{...breakWords}}>
                   {cred.user!.name}
 
                   {cred.user!.displayName && <span>({cred.user!.displayName})</span>}

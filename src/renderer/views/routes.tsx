@@ -1,8 +1,6 @@
 import * as React from 'react'
-import {Switch, Route} from 'wouter'
 
 import {Box} from '@material-ui/core'
-import DebugView from './settings/debug'
 
 import SecretsView from './secrets'
 
@@ -17,47 +15,46 @@ import VaultView from './vault'
 import ToolsView from './tools'
 import AuthenticatorsView from './authenticators'
 
+import {store} from './store'
+
 export type RouteInfo = {
-  path: string
+  location: string
   component: () => React.ReactNode
 }
 
 export const routes: Array<RouteInfo> = [
-  {path: '/db/service', component: () => <DBView db="service" />},
-  {path: '/db/vault', component: () => <DBView db="vault" />},
+  {location: 'db/service', component: () => <DBView db="service" />},
+  {location: 'db/vault', component: () => <DBView db="vault" />},
 
-  {path: '/debug', component: () => <DebugView />},
+  {location: 'keys', component: () => <KeysView />},
+  {location: 'secrets', component: () => <SecretsView />},
 
-  {path: '/keys/index', component: () => <KeysView />},
-  {path: '/secrets/index', component: () => <SecretsView />},
+  {location: 'wormhole', component: () => <WormholeView />},
 
-  {path: '/wormhole/index', component: () => <WormholeView />},
-  {path: '/tools/index', component: () => <ToolsView />},
+  {location: 'tools', component: () => <ToolsView />},
 
-  {path: '/vault/index', component: () => <VaultView />},
+  {location: 'vault', component: () => <VaultView />},
 
-  {path: '/authenticators/index', component: () => <AuthenticatorsView />},
+  {location: 'authenticators', component: () => <AuthenticatorsView />},
 
-  {path: '/style-guide', component: () => <StyleGuide />},
+  {location: 'style-guide', component: () => <StyleGuide />},
 
-  {path: '/settings/index', component: () => <SettingsView />},
+  {location: 'settings', component: () => <SettingsView />},
 ]
 
 // Map of path to route
-export const routesMap: Map<string, RouteInfo> = new Map(routes.map((r: RouteInfo) => [r.path, r]))
+const routesMap: Map<string, RouteInfo> = new Map(routes.map((r: RouteInfo) => [r.location, r]))
 
 type Props = {}
 
-export const Routes = (_: Props) => {
+export default (_: Props) => {
+  const {location} = store.useState((s) => ({
+    location: s.location,
+  }))
+  const route = routesMap.get(location)
   return (
-    <Switch>
-      {routes.map((r: RouteInfo) => (
-        <Route path={r.path} key={r.path || 'default'}>
-          <Box display="flex" flex={1} id={r.path}>
-            {r.component()}
-          </Box>
-        </Route>
-      ))}
-    </Switch>
+    <Box display="flex" flex={1} id={route?.location}>
+      {route?.component()}
+    </Box>
   )
 }

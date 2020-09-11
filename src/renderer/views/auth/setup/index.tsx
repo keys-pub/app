@@ -23,7 +23,7 @@ export default class AuthSetupView extends React.Component<Props, State> {
   renderIntro() {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
-        <Header noBack />
+        <Header noBack noLock />
         <Logo top={60} />
         <AuthSetupPasswordView />
 

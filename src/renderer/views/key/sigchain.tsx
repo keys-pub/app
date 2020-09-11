@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {styles} from '../../components'
+import {breakWords} from '../theme'
 import {Statement} from '../../rpc/keys.d'
 
 type Props = {
@@ -40,11 +40,9 @@ export default (props: Props) => {
               </TableCell>
               <TableCell>
                 <Typography
+                  variant="body2"
                   style={{
-                    ...styles.mono,
-                    whiteSpace: 'pre-wrap',
-                    wordWrap: 'break-word',
-                    wordBreak: 'break-all',
+                    ...breakWords,
                   }}
                 >
                   {

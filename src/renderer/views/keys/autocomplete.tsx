@@ -15,7 +15,7 @@ import matchSorter from 'match-sorter'
 
 import {keys} from '../../rpc/keys'
 import {Key, SortDirection, KeyType, KeysRequest, KeysResponse} from '../../rpc/keys.d'
-import styles, {serviceColor} from '../../components/styles'
+import {serviceColor} from '../theme'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
@@ -190,7 +190,6 @@ export default class AutocompleteView extends React.Component<Props, State> {
               fullWidth
               InputProps={{
                 ...params.InputProps,
-                style: {...styles.mono},
                 disableUnderline: true,
                 inputComponent: InputCustom as any,
               }}

@@ -8,14 +8,14 @@ import {shell} from 'electron'
 
 import {Key, KeyType, User} from '../../rpc/keys.d'
 import ServiceSelect from '../user/service'
-import {styles, Link} from '../../components'
+import {Link} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
 import UserLabel from '../user/label'
 
-import {keyDescription, dateString} from '../helper'
+import {keyTypeLabel, dateString} from '../helper'
 
-export const KeyDescriptionView = (props: {value: Key}) => {
-  return <Typography>{keyDescription(props.value)}</Typography>
+export const KeyTypeLabel = (props: {k: Key}) => {
+  return <Typography>{keyTypeLabel(props.k)}</Typography>
 }
 
 type UserRowProps = {
@@ -40,7 +40,7 @@ const UserRow = (props: UserRowProps) => {
         <TableCell style={{...cstyles.cell}}>
           <Typography align="right">User</Typography>
         </TableCell>
-        <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+        <TableCell style={{...cstyles.cell, paddingBottom: 10, paddingTop: 1}}>
           <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
             <Box display="flex" flexDirection="row">
               <UserLabel user={user} />
@@ -131,10 +131,10 @@ export default (props: Props) => {
       <Table size="small">
         <TableBody>
           <TableRow>
-            <TableCell style={{...cstyles.cell, width: 30}}>
+            <TableCell style={{...cstyles.cell}}>
               <Typography align="right">ID</Typography>
             </TableCell>
-            <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
+            <TableCell style={{...cstyles.cell, paddingBottom: 10, paddingTop: 1}}>
               <Box display="flex" flexDirection="column">
                 <IDLabel k={key} />
               </Box>
@@ -145,7 +145,7 @@ export default (props: Props) => {
               <Typography align="right">Type</Typography>
             </TableCell>
             <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
-              <KeyDescriptionView value={key} />
+              <KeyTypeLabel k={key} />
             </TableCell>
           </TableRow>
           <UserRow {...props} openURL={openURL} />
@@ -200,7 +200,7 @@ const cstyles = {
     borderBottom: 0,
     paddingTop: 0,
     paddingLeft: 0,
-    paddingRight: 16,
+    paddingRight: 12,
     paddingBottom: 0,
     verticalAlign: 'top',
   },

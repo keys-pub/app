@@ -1,16 +1,28 @@
 import {createMuiTheme} from '@material-ui/core/styles'
 import {fade, lighten} from '@material-ui/core/styles/colorManipulator'
-
-import CheckBoxOutlineBlankSharpIcon from '@material-ui/icons/CheckBoxOutlineBlankSharp'
+import {CSSProperties} from 'react'
 
 const primary = '#2196f3'
 const secondary = '#f50057'
 
+const font = 'Open Sans'
+const monoFont = 'Roboto Mono'
+
+export const mono: CSSProperties = {
+  fontFamily: monoFont,
+  whiteSpace: 'pre-wrap',
+  fontSize: '0.8rem',
+}
+
 export const theme = createMuiTheme({
   typography: {
-    // fontFamily: 'Roboto',
-    fontFamily: 'Open Sans',
+    fontFamily: font,
     fontSize: 12,
+    body2: {
+      fontFamily: monoFont,
+      whiteSpace: 'pre-wrap',
+      fontSize: '0.81rem',
+    },
   },
   palette: {
     primary: {
@@ -22,9 +34,7 @@ export const theme = createMuiTheme({
   },
   overrides: {
     MuiInput: {
-      root: {
-        // fontFamily: 'Roboto Mono',
-      },
+      root: {},
       underline: {
         '&:after': {
           borderBottomColor: `#2196f3`,
@@ -38,7 +48,6 @@ export const theme = createMuiTheme({
     },
     MuiButton: {
       root: {
-        // fontFamily: 'Roboto',
         fontSize: 14,
       },
       sizeSmall: {
@@ -101,3 +110,44 @@ export const theme = createMuiTheme({
     // },
   },
 })
+
+export const breakWords: CSSProperties = {
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word',
+  wordBreak: 'break-all',
+}
+
+// TODO: Remove regular
+export const regular: CSSProperties = {
+  color: 'rgba(0, 0, 0, 0.87)',
+  fontSize: '0.857rem',
+  fontFamily: font,
+  fontWeight: 400,
+}
+
+// TODO: Remove body1
+export const body1: CSSProperties = {
+  fontFamily: font,
+  fontWeight: 400,
+}
+
+export const colors = {
+  github: 'purple', // rgb(68,68,68)'
+  twitter: 'rgb(76,160,235)',
+  reddit: '#FF5700',
+}
+
+export const serviceColor = (service: string): string => {
+  switch (service) {
+    case 'github':
+      return colors.github
+    case 'twitter':
+      return colors.twitter
+    case 'reddit':
+      return colors.reddit
+    case 'https':
+      return '#669'
+    default:
+      return '#666'
+  }
+}
