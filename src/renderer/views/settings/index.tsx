@@ -102,6 +102,21 @@ export default (props: {}) => {
 
           <TableRow>
             <TableCell style={cstyles.cell}>
+              <Typography align="right">Experimental</Typography>
+            </TableCell>
+            <TableCell style={cstyles.cell}>
+              <Box display="flex" flexDirection="column">
+                <Typography>
+                  <Link span onClick={() => setLocation('wormhole')}>
+                    Wormhole
+                  </Link>
+                </Typography>
+              </Box>
+            </TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableCell style={cstyles.cell}>
               <Typography align="right">Debug</Typography>
             </TableCell>
             <TableCell style={cstyles.cell}>

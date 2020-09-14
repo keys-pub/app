@@ -9,8 +9,9 @@ import "patch/go.proto";
 // camel like they should, so we use camelCase here.
 
 service Auth {  
-    rpc Devices(DevicesRequest) returns (DevicesResponse) {}
+    rpc Devices(DevicesRequest) returns (DevicesResponse) {}    
     rpc DeviceInfo(DeviceInfoRequest) returns (DeviceInfoResponse) {}
+    rpc DeviceType(DeviceTypeRequest) returns (DeviceTypeResponse) {}
     rpc MakeCredential(MakeCredentialRequest) returns (MakeCredentialResponse) {}
     rpc SetPIN(SetPINRequest) returns (SetPINResponse) {}
     rpc Reset(ResetRequest) returns (ResetResponse) {}
@@ -47,6 +48,14 @@ message DeviceInfo {
 message RelyingParty {
     string id = 1 [(go.field) = {name: "ID"}];
     string name = 2;
+}
+
+enum DeviceType {
+  option (go.enum) = {name: "DeviceType"};
+  
+  UNKNOWN_DEVICE = 0 [(go.value) = {name: "UnknownDevice"}];
+  U2F = 1 [(go.value) = {name: "U2F"}];
+  FIDO2 = 2 [(go.value) = {name: "FIDO2"}];  
 }
 
 message User {
@@ -90,7 +99,14 @@ message DevicesResponse {
     repeated Device devices = 1;    
 }
 
-message DeviceInfoRequest{
+message DeviceTypeRequest {
+    string device = 1;
+}
+message DeviceTypeResponse {
+    DeviceType type = 1;
+}
+
+message DeviceInfoRequest {
     string device = 1;
 }
 message DeviceInfoResponse {

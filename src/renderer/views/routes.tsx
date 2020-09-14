@@ -35,7 +35,7 @@ export const routes: Array<RouteInfo> = [
 
   {location: 'vault', component: () => <VaultView />},
 
-  {location: 'authenticators', component: () => <AuthenticatorsView />},
+  {location: 'authn', component: () => <AuthenticatorsView />},
 
   {location: 'style-guide', component: () => <StyleGuide />},
 

@@ -98,7 +98,7 @@ export default (props: Props) => {
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem button style={{height: 42}} onClick={onClick} key={nav.name}>
-      <Tooltip title={nav.name} placement="left">
+      <Tooltip title={nav.label} placement="left">
         <ListItemIcon style={{minWidth: 0}}>
           <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
         </ListItemIcon>

@@ -9,9 +9,10 @@ import SetPinDialog from './setpin'
 import ResetDialog from './reset'
 import {breakWords, mono} from '../theme'
 
-import {deviceInfo, relyingParties} from '../../rpc/fido2'
+import {deviceInfo, deviceType, relyingParties} from '../../rpc/fido2'
 import {
   Device,
+  DeviceType,
   DeviceInfo,
   Option,
   DeviceInfoRequest,
@@ -32,6 +33,7 @@ type State = {
   clientPin: string
   info?: DeviceInfo
   loading: boolean
+  unsupported: boolean
   error?: Error
   openReset: boolean
   openSetPin: boolean
@@ -42,6 +44,7 @@ type State = {
 export default class DeviceInfoView extends React.Component<Props, State> {
   state: State = {
     loading: false,
+    unsupported: false,
     openReset: false,
     openSetPin: false,
     clientPin: '',
@@ -60,18 +63,28 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 
   info = async () => {
     if (!this.props.device) {
-      this.setState({info: undefined, error: undefined, loading: false})
+      this.setState({info: undefined, error: undefined, loading: false, unsupported: false})
       return
     }
 
-    this.setState({loading: true, error: undefined})
+    this.setState({info: undefined, loading: true, error: undefined, unsupported: false})
     try {
-      const req: DeviceInfoRequest = {
+      const devt = await deviceType({
         device: this.props.device.path,
+      })
+      if (devt.type != DeviceType.FIDO2) {
+        this.setState({
+          loading: false,
+          unsupported: true,
+        })
+        return
       }
-      const resp = await deviceInfo(req)
+
+      const dev = await deviceInfo({
+        device: this.props.device.path,
+      })
       let clientPin = ''
-      const optClientPin = (resp.info?.options || []).find((opt: Option) => {
+      const optClientPin = (dev.info?.options || []).find((opt: Option) => {
         return opt.name == 'clientPin'
       })
       if (optClientPin) {
@@ -79,7 +92,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
       }
 
       this.setState({
-        info: resp.info,
+        info: dev.info,
         loading: false,
         clientPin,
       })
@@ -118,7 +131,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         {/* ({this.props.device.vendorId}) */}
 
         <Typography style={labelStyle}>Path</Typography>
-        <Typography style={valueStyle}>{this.props.device.path || ' '}</Typography>
+        <Typography style={{...valueStyle, ...mono}}>{this.props.device.path || ' '}</Typography>
       </Box>
     )
   }
@@ -127,7 +140,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={labelStyle}>Versions</Typography>
-        <Typography style={valueStyle}>
+        <Typography style={{...valueStyle, ...mono}}>
           {this.state.info?.versions?.map((v: string, index) => (
             <span key={v}>
               {v}
@@ -137,7 +150,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         </Typography>
 
         <Typography style={labelStyle}>Extensions</Typography>
-        <Typography style={valueStyle}>
+        <Typography style={{...valueStyle, ...mono}}>
           {this.state.info?.extensions?.map((e: string, index) => (
             <span key={e}>
               {e}
@@ -147,10 +160,10 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         </Typography>
 
         <Typography style={labelStyle}>AAGUID</Typography>
-        <Typography style={valueStyle}>{this.state.info?.aaguid}</Typography>
+        <Typography style={{...valueStyle, ...mono}}>{this.state.info?.aaguid}</Typography>
 
         <Typography style={labelStyle}>Options</Typography>
-        <Typography style={valueStyle}>
+        <Typography style={{...valueStyle, ...mono}}>
           {this.state.info?.options?.map((option: Option, index) => (
             <span key={option.name}>
               {option.name}: {option.value}
@@ -227,7 +240,18 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         <Divider /> */}
 
         {this.state.error && this.renderError()}
-        {!this.state.error && this.renderInfo()}
+
+        {this.state.unsupported && (
+          <Box display="flex" flexDirection="column" flex={1} alignItems="center" style={{marginTop: 20}}>
+            <Typography>This is not a FIDO2 device.</Typography>
+          </Box>
+        )}
+
+        {!this.state.loading &&
+          !this.state.error &&
+          !this.state.unsupported &&
+          this.state.info &&
+          this.renderInfo()}
 
         <Snack
           open={this.state.snackOpen}
@@ -248,4 +272,4 @@ const labelStyle = {
   paddingBottom: 2,
   fontSize: '0.857rem',
 }
-const valueStyle = {...mono, ...breakWords, paddingBottom: 16}
+const valueStyle = {...breakWords, paddingBottom: 16}

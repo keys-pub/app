@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   IconButton,
   Menu,
   MenuItem,
@@ -20,12 +21,11 @@ import {
   ArrowLeft as LeftIcon,
   ArrowRight as RightIcon,
   Search as SearchIcon,
-  Build as ToolsIcon,
+  EnhancedEncryption as CryptoToolsIcon,
   Settings as SettingsIcon,
   Album as WormholeIcon,
   Security as SecretsIcon,
-  Usb as AuthenticatorsIcon,
-  Toys as ExpermimentalIcon,
+  Policy as AuthnIcon,
   Backup as VaultIcon,
 } from '@material-ui/icons'
 
@@ -36,8 +36,6 @@ type NavRoute = {
   location: string
   icon: React.ReactType
   id: string
-  onClick?: () => void
-  anchorRef?: React.MutableRefObject<HTMLDivElement | undefined>
 }
 
 const backgroundColor = '#2f2f2f'
@@ -46,20 +44,12 @@ const backgroundColorSelected = '#1a1a1a'
 // TODO: Nav hover
 
 export default (props: {}) => {
-  const [openExperimental, setOpenExperimental] = React.useState(false)
-
   const {location, navMinimized} = store.useState((s) => ({
     location: s.location,
     navMinimized: s.navMinimized,
   }))
 
-  const experimentRef = React.useRef<HTMLDivElement>()
-  const openExperiment = (location: string) => {
-    setLocation(location)
-    setOpenExperimental(false)
-  }
-
-  const width = navMinimized ? 68 : 140
+  const width = navMinimized ? 68 : 120
   const drawerStyles: CSSProperties = !navMinimized
     ? {width, border: 0, height: '100%'}
     : {
@@ -70,7 +60,7 @@ export default (props: {}) => {
         overflowX: 'hidden',
       }
 
-  let navs: NavRoute[] = [
+  const navs: NavRoute[] = [
     {
       label: 'Keys',
       icon: KeysIcon,
@@ -84,8 +74,8 @@ export default (props: {}) => {
       id: 'navSecretsItemIcon',
     },
     {
-      label: 'Tools',
-      icon: ToolsIcon,
+      label: 'Crypto',
+      icon: CryptoToolsIcon,
       location: 'tools',
       id: 'navToolsItemIcon',
     },
@@ -96,18 +86,25 @@ export default (props: {}) => {
       id: 'navVaultItemIcon',
     },
     {
+      label: 'Authn',
+      icon: AuthnIcon,
+      location: 'authn',
+      id: 'navAuthnItemIcon',
+    },
+    {
       label: 'Settings',
       icon: SettingsIcon,
       location: 'settings',
       id: 'navSettingsItemIcon',
     },
+  ]
+
+  const experiments: NavRoute[] = [
     {
-      label: 'Experiments',
-      icon: ExpermimentalIcon,
-      location: 'experiments',
-      onClick: () => setOpenExperimental(true),
-      anchorRef: experimentRef,
-      id: 'navExperimentsItemIcon',
+      label: 'Wormhole',
+      icon: WormholeIcon,
+      location: 'wormhole',
+      id: 'navWormholeItemIcon',
     },
   ]
 
@@ -118,15 +115,8 @@ export default (props: {}) => {
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
         <Box height={33} style={{backgroundColor: backgroundColor}} className="drag" />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
-          {navs.map((nav, index) =>
-            row(
-              nav,
-              index,
-              location.startsWith(nav.location),
-              !navMinimized,
-              nav.onClick ? nav.onClick : () => setLocation(nav.location)
-            )
-          )}
+          {navs.map((nav) => row(nav, location, !navMinimized, () => setLocation(nav.location)))}
+          {/* {experiments.map((nav) => row(nav, location, !navMinimized, () => setLocation(nav.location)))} */}
         </List>
         <Box display="flex" flexDirection="row">
           {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
@@ -145,33 +135,15 @@ export default (props: {}) => {
           </IconButton>
         </Box>
       </Box>
-      <Menu
-        id="experimental-menu"
-        anchorEl={experimentRef.current}
-        keepMounted
-        open={openExperimental}
-        onClose={() => setOpenExperimental(false)}
-        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
-        getContentAnchorEl={null}
-      >
-        <MenuItem onClick={() => openExperiment('wormhole')}>
-          <WormholeIcon />
-          <Typography style={{marginLeft: 10}}>Wormhole</Typography>
-        </MenuItem>
-        <MenuItem onClick={() => openExperiment('authenticators')}>
-          <AuthenticatorsIcon />
-          <Typography style={{marginLeft: 10}}>Authenticators</Typography>
-        </MenuItem>
-      </Menu>
     </Drawer>
   )
 }
 
-const row = (nav: NavRoute, index: number, selected: boolean, open: boolean, onClick?: () => void) => {
+const row = (nav: NavRoute, location: string, open: boolean, onClick?: () => void) => {
+  const selected = location.startsWith(nav.location)
   return (
     <ListItem
       button
-      ref={nav.anchorRef as React.RefObject<HTMLDivElement>}
       style={{
         height: 40,
         backgroundColor: selected ? backgroundColorSelected : backgroundColor,
