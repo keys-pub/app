@@ -34,7 +34,7 @@ const Root = (_: {}) => {
 
   ipcRenderer.removeAllListeners('preferences')
   ipcRenderer.on('preferences', (event, message) => {
-    setLocation('settings')
+    setLocation('/settings')
   })
 
   if (updating) {

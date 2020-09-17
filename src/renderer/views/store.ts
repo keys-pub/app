@@ -43,9 +43,12 @@ export const loadStore = async () => {
   const configResp = await configGet({name: 'app'})
   const config = configResp?.config?.app
   // console.log('Config:', config)
+  const location = config?.location || '/keys'
+  const history = config?.history || ['/keys']
+
   store.update((s) => {
-    s.location = config?.location || 'keys'
-    s.history = config?.history || ['keys']
+    s.location = location
+    s.history = history
     s.navMinimized = !!config?.navMinimized
   })
 

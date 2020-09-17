@@ -128,7 +128,8 @@ export default (props: {}) => {
 }
 
 const row = (nav: NavRoute, location: string, open: boolean, experiment: boolean, onClick?: () => void) => {
-  const selected = location.startsWith(nav.location)
+  // Check with or without path ('/') prefix for backwards compatibility
+  const selected = location.startsWith(nav.location) || ('/' + location).startsWith(nav.location)
   if (experiment && !selected) return null
   return (
     <ListItem
