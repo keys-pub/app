@@ -64,6 +64,8 @@ service Keys {
   rpc AuthVault(AuthVaultRequest) returns (AuthVaultResponse) {}
   rpc AuthUnlock(AuthUnlockRequest) returns (AuthUnlockResponse) {}
   rpc AuthLock(AuthLockRequest) returns (AuthLockResponse) {}
+  rpc AuthReset(AuthResetRequest) returns (AuthResetResponse) {}
+  rpc AuthRecover(AuthRecoverRequest) returns (AuthRecoverResponse) {}
   rpc RuntimeStatus(RuntimeStatusRequest) returns (RuntimeStatusResponse) {}
   rpc Rand(RandRequest) returns (RandResponse) {}
   rpc RandPassword(RandPasswordRequest) returns (RandPasswordResponse) {}  
@@ -399,8 +401,8 @@ enum AuthStatus {
   option (go.enum) = {name: "AuthStatus"};
   
   AUTH_UNKNOWN = 0 [(go.value) = {name: "AuthUnknown"}];
-  // AuthSetup if setup needed.
-  AUTH_SETUP = 1 [(go.value) = {name: "AuthSetup"}];  
+  // AuthSetupNeeded if setup needed.
+  AUTH_SETUP_NEEDED = 1 [(go.value) = {name: "AuthSetupNeeded"}];  
   // AuthUnlocked if unlocked.
   AUTH_UNLOCKED = 2 [(go.value) = {name: "AuthUnlocked"}];  
   // AuthLocked if locked.
@@ -413,8 +415,11 @@ enum AuthType {
   UNKNOWN_AUTH = 0 [(go.value) = {name: "UnknownAuth"}];
   // PasswordAuth using argon2id.
   PASSWORD_AUTH = 10 [(go.value) = {name: "PasswordAuth"}];
+  // KeyPhraseAuth uses a key phrase (e.g. paper key).
+  KEY_PHRASE_AUTH = 11 [(go.value) = {name: "KeyPhraseAuth"}];
   // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension.
   FIDO2_HMAC_SECRET_AUTH = 20 [(go.value) = {name: "FIDO2HMACSecretAuth"}];
+
 }
 
 message AuthSetupRequest {
@@ -444,7 +449,7 @@ message AuthUnlockResponse {
 }
 
 message AuthProvisionRequest {
-  // Secret for auth depending on auth type, e.g. password, pin, etc.
+  // Secret for auth depending on auth type, e.g. password, phrase, pin, etc.
   string secret = 1;
   // Type for auth.
   AuthType type = 2;
@@ -484,6 +489,19 @@ message AuthProvisionsResponse {
 
 message AuthLockRequest {}
 message AuthLockResponse {}
+
+message AuthResetRequest {
+  string appName = 1;
+}
+message AuthResetResponse {}
+
+message AuthRecoverRequest {
+  string keyPhrase = 1;
+  string newPassword = 2;
+}
+message AuthRecoverResponse {
+  string authToken = 1;
+}
 
 message KeyGenerateRequest {
   KeyType type = 1;

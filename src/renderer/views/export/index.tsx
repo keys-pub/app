@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  IconButton,
   Input,
   InputLabel,
   FormControl,
@@ -13,11 +14,14 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
+import {Assignment as CopyIcon} from '@material-ui/icons'
 
 import {KeyLabel} from '../key/label'
+import {clipboard} from 'electron'
 
 import {DialogTitle} from '../../components'
 import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../../rpc/keys.d'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {keyExport} from '../../rpc/keys'
 
@@ -32,6 +36,8 @@ type State = {
   password: string
   passwordConfirm: string
   error?: Error
+  snackOpen: boolean
+  snack?: SnackProps
 }
 
 export default class KeyExportDialog extends React.Component<Props, State> {
@@ -39,6 +45,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     export: '',
     password: '',
     passwordConfirm: '',
+    snackOpen: false,
   }
 
   export = async () => {
@@ -91,9 +98,17 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     this.setState({passwordConfirm: target ? target.value : '', error: undefined})
   }
 
+  copyToClipboard = () => {
+    clipboard.writeText(this.state.export)
+    this.setState({
+      snack: {message: 'Copied to Clipboard', duration: 2000},
+      snackOpen: true,
+    })
+  }
+
   renderExport() {
     return (
-      <Box display="flex" flexDirection="column" style={{height: 200}}>
+      <Box display="flex" flexDirection="column">
         <Box style={{paddingBottom: 20}}>
           <KeyLabel k={this.props.k} full />
         </Box>
@@ -128,13 +143,11 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        style={{height: 200}}
+        style={{position: 'relative'}}
       >
         <Typography
           variant="body2"
           style={{
-            backgroundColor: 'black',
-            color: 'white',
             paddingTop: 10,
             paddingBottom: 10,
             paddingLeft: 10,
@@ -145,6 +158,15 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         >
           {this.state.export}
         </Typography>
+        <Box style={{position: 'absolute', right: 0, top: 0}}>
+          <IconButton
+            onClick={this.copyToClipboard}
+            size="small"
+            style={{padding: 4, backgroundColor: 'white'}}
+          >
+            <CopyIcon />
+          </IconButton>
+        </Box>
       </Box>
     )
   }
@@ -173,6 +195,11 @@ export default class KeyExportDialog extends React.Component<Props, State> {
             </Button>
           )}
         </DialogActions>
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Dialog>
     )
   }

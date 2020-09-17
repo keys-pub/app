@@ -263,7 +263,7 @@ export default (props: Props) => {
                   style={{display: 'inline', color: '#a2a2a2'}}
                   onClick={() => inputRef.current?.focus()}
                 >
-                  Type text or{' '}
+                  Type text to sign or{' '}
                 </Typography>
                 <Link inline onClick={openFile}>
                   select a file

@@ -2,8 +2,8 @@ import {createMuiTheme} from '@material-ui/core/styles'
 import {fade, lighten} from '@material-ui/core/styles/colorManipulator'
 import {CSSProperties} from 'react'
 
-const primary = '#2196f3'
-const secondary = '#f50057'
+export const primary = '#2196f3'
+export const secondary = '#f44336' // '#f50057' // '#9c27b0' // '#607d8b'
 
 const font = 'Open Sans'
 const monoFont = 'Roboto Mono'

@@ -4,15 +4,21 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 
 import Header from '../header'
 import Logo from '../logo'
+import {Link} from '../../components'
 
 import {ipcRenderer} from 'electron'
 
 import {authUnlock} from '../../rpc/keys'
-import {AuthUnlockRequest, AuthUnlockResponse, AuthType} from '../../rpc/keys.d'
+import {AuthType} from '../../rpc/keys.d'
+import AuthForgotView from './forgot'
 
-import {store, unlocked, setLocation} from '../store'
+import {store, unlocked} from '../store'
 
-export default (_: {}) => {
+type AuthUnlockProps = {
+  forgotPassword: () => void
+}
+
+const AuthUnlockView = (props: AuthUnlockProps) => {
   const [input, setInput] = React.useState('')
   const [error, setError] = React.useState<Error>()
   const [loading, setLoading] = React.useState(false)
@@ -41,17 +47,14 @@ export default (_: {}) => {
     setLoading(true)
     setError(undefined)
 
-    const req: AuthUnlockRequest = {
-      secret: input,
-      type: AuthType.PASSWORD_AUTH,
-      client: 'app',
-    }
-
     try {
-      const resp = await authUnlock(req)
-      ipcRenderer.send('authToken', {authToken: resp.authToken})
+      const resp = await authUnlock({
+        secret: input,
+        type: AuthType.PASSWORD_AUTH,
+        client: 'app',
+      })
       clearTimeout(timeout)
-      unlocked()
+      await unlocked(resp.authToken)
       setLoading(false)
       setProgress(false)
     } catch (err) {
@@ -106,6 +109,34 @@ export default (_: {}) => {
           Unlock
         </Button>
       </Box>
+      <Box style={{paddingTop: 10}}>
+        <Link style={{width: 550, marginTop: 10, textAlign: 'center'}} onClick={props.forgotPassword}>
+          Forgot password?
+        </Link>
+      </Box>
+    </Box>
+  )
+}
+
+type Props = {
+  refresh: () => void
+}
+
+export default (props: Props) => {
+  const [forgotPassword, setForgotPassword] = React.useState(false)
+
+  const close = () => {
+    props.refresh()
+    setForgotPassword(false)
+  }
+
+  if (forgotPassword) {
+    return <AuthForgotView close={close} />
+  }
+
+  return (
+    <Box display="flex" flex={1} flexDirection="column">
+      <AuthUnlockView forgotPassword={() => setForgotPassword(true)} />
     </Box>
   )
 }

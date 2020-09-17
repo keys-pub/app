@@ -64,37 +64,25 @@ export default (props: {}) => {
     {
       label: 'Keys',
       icon: KeysIcon,
-      location: 'keys',
+      location: '/keys',
       id: 'navKeysItemIcon',
     },
     {
       label: 'Secrets',
       icon: SecretsIcon,
-      location: 'secrets',
+      location: '/secrets',
       id: 'navSecretsItemIcon',
     },
     {
       label: 'Crypto',
       icon: CryptoToolsIcon,
-      location: 'tools',
+      location: '/tools',
       id: 'navToolsItemIcon',
-    },
-    {
-      label: 'Vault',
-      icon: VaultIcon,
-      location: 'vault',
-      id: 'navVaultItemIcon',
-    },
-    {
-      label: 'Authn',
-      icon: AuthnIcon,
-      location: 'authn',
-      id: 'navAuthnItemIcon',
     },
     {
       label: 'Settings',
       icon: SettingsIcon,
-      location: 'settings',
+      location: '/settings',
       id: 'navSettingsItemIcon',
     },
   ]
@@ -103,7 +91,7 @@ export default (props: {}) => {
     {
       label: 'Wormhole',
       icon: WormholeIcon,
-      location: 'wormhole',
+      location: '/wormhole',
       id: 'navWormholeItemIcon',
     },
   ]
@@ -115,8 +103,8 @@ export default (props: {}) => {
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
         <Box height={33} style={{backgroundColor: backgroundColor}} className="drag" />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
-          {navs.map((nav) => row(nav, location, !navMinimized, () => setLocation(nav.location)))}
-          {/* {experiments.map((nav) => row(nav, location, !navMinimized, () => setLocation(nav.location)))} */}
+          {navs.map((nav) => row(nav, location, !navMinimized, false, () => setLocation(nav.location)))}
+          {experiments.map((nav) => row(nav, location, !navMinimized, true, () => setLocation(nav.location)))}
         </List>
         <Box display="flex" flexDirection="row">
           {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
@@ -139,8 +127,9 @@ export default (props: {}) => {
   )
 }
 
-const row = (nav: NavRoute, location: string, open: boolean, onClick?: () => void) => {
+const row = (nav: NavRoute, location: string, open: boolean, experiment: boolean, onClick?: () => void) => {
   const selected = location.startsWith(nav.location)
+  if (experiment && !selected) return null
   return (
     <ListItem
       button

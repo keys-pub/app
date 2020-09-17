@@ -85,22 +85,21 @@ export default (_: {}) => {
     })
   }
 
-  const sync = () => {
+  const sync = async () => {
     setLoading(true)
-    const req: VaultSyncRequest = {}
-    vaultSync(req)
-      .then((resp: VaultSyncResponse) => {
-        setLoading(false)
-        reloadStatus()
-      })
-      .catch((err: Error) => {
-        setLoading(false)
-        setSnack({message: err.message, alert: 'error'})
-        setSnackOpen(true)
-      })
+    try {
+      const resp = await vaultSync({})
+      setLoading(false)
+      reloadStatus()
+    } catch (err) {
+      setLoading(false)
+      setSnack({message: err.message, alert: 'error'})
+      setSnackOpen(true)
+    }
   }
 
   const closeDisable = (snack: string) => {
+    setDisableOpen(false)
     setSnack({message: snack, duration: 4000})
     setSnackOpen(!!snack)
     reloadStatus()
@@ -223,20 +222,20 @@ export default (_: {}) => {
   const syncEnabled = !!status?.kid
 
   return (
-    <Box display="flex" flex={1} flexDirection="column">
-      <Header loading={loading} />
-      <Box style={{marginTop: 4}} />
+    <Box display="flex" flex={1} flexDirection="column" style={{position: 'relative'}}>
+      <Box style={{position: 'absolute', top: 0, width: '100%'}}>{loading && <LinearProgress />}</Box>
+      <Box display="flex" flex={1} flexDirection="column" style={{marginTop: 10}}>
+        {!syncEnabled && <Box style={{marginLeft: 15, marginBottom: 20}}>{renderEnable()}</Box>}
+        {syncEnabled && (
+          <Box>
+            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderInfo()}</Box>
+            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderAuth()}</Box>
+            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderDelete()}</Box>
+          </Box>
+        )}
+      </Box>
 
-      {!syncEnabled && <Box style={{marginLeft: 20, marginBottom: 20}}>{renderEnable()}</Box>}
-      {syncEnabled && (
-        <Box>
-          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderInfo()}</Box>
-          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderAuth()}</Box>
-          <Box style={{marginLeft: 20, marginBottom: 20}}>{renderDelete()}</Box>
-        </Box>
-      )}
-
-      <DisableDialog open={disableOpen} close={(snack) => closeDisable(snack)} />
+      <DisableDialog open={disableOpen} close={closeDisable} />
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )

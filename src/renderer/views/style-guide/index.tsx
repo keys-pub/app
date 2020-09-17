@@ -17,15 +17,31 @@ export default (_: {}) => {
   }
 
   return (
-    <Box display="flex" flex={1} flexDirection="column">
-      <Header />
-      <Box display="flex" flexDirection="column" marginLeft={2}>
+    <Box display="flex" flex={1} flexDirection="column" style={{position: 'relative'}}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        marginLeft={2}
+        style={{position: 'absolute', top: 0, left: 0, bottom: 0, overflowY: 'auto'}}
+      >
         <Box display="flex" flexDirection="column">
           <Typography variant="h3">Header3</Typography>
           <Typography variant="h4">Header4</Typography>
           <Typography variant="h5">Header5</Typography>
           <Typography variant="h6">Header6</Typography>
         </Box>
+
+        <Typography paragraph>
+          I'm baby church-key locavore helvetica narwhal cardigan cold-pressed vexillologist, mlkshk tousled
+          live-edge tumeric pop-up irony blue bottle taxidermy. Shaman aesthetic letterpress, gentrify
+          pitchfork plaid leggings 8-bit vinyl. Iceland green juice yr jianbing cronut. Man bun kogi franzen
+          adaptogen 90's.
+        </Typography>
+        <Typography variant="body2" paragraph>
+          Put a bird on it irony chillwave truffaut letterpress next level. Gentrify deep v gluten-free
+          mumblecore. Sustainable banh mi trust fund activated charcoal cloud bread photo booth street art af.
+          Mustache viral vexillologist lumbersexual, selvage sriracha lo-fi.
+        </Typography>
 
         <Box display="flex" flexDirection="row" flexWrap="wrap">
           <Button color="primary" style={cstyles.item}>

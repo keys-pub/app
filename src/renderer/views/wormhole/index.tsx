@@ -328,7 +328,7 @@ class WormholeView extends React.Component<Props, State> {
     const {loading, connected} = this.state
 
     return (
-      <Box display="flex" flexDirection="column" style={{height: '100%'}}>
+      <Box display="flex" flexDirection="column" flex={1} style={{height: '100%', position: 'relative'}}>
         <Header loading={loading} />
         <Divider />
         <Box display="flex" flexDirection="row">
@@ -374,11 +374,25 @@ class WormholeView extends React.Component<Props, State> {
           {this.renderStartStop()}
         </Box>
         <Divider />
-        <div ref={this.listRef} style={{height: 'calc(100vh - 137px)', overflowY: 'auto'}}>
+        <div
+          ref={this.listRef}
+          style={{
+            position: 'absolute',
+            top: 107,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            overflowY: 'auto',
+          }}
+        >
           {this.state.rows.map((row, index) => this.renderItem(index, 'wormhole-row-' + index))}
         </div>
 
-        <Box display="flex" flexDirection="column" style={{backgroundColor: 'white'}}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          style={{backgroundColor: 'white', position: 'absolute', bottom: 0, left: 0, right: 0}}
+        >
           <Divider />
           <TextInputView
             defaultValue=""

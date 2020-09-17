@@ -17,6 +17,8 @@ import {breakWords} from '../theme'
 import {DialogTitle} from '../../components/dialog'
 import {mono} from '../theme'
 import Snack, {SnackProps} from '../../components/snack'
+import {Error} from '../store'
+import ErrorView from './error'
 
 import {userAdd, userSign} from '../../rpc/keys'
 import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../../rpc/keys.d'
@@ -31,6 +33,8 @@ type Props = {
 type State = {
   name: string
   error?: Error
+  errorOpen: boolean
+  errorUsername?: Error
   loading: boolean
   signedMessage: string
   snack?: SnackProps
@@ -41,6 +45,7 @@ type State = {
 
 export default class UserSignDialog extends React.Component<Props, State> {
   state: State = {
+    errorOpen: false,
     loading: false,
     name: '',
     signedMessage: '',
@@ -50,7 +55,16 @@ export default class UserSignDialog extends React.Component<Props, State> {
   }
 
   clear = () => {
-    this.setState({name: '', error: undefined, signedMessage: '', loading: false, url: '', step: 'name'})
+    this.setState({
+      name: '',
+      error: undefined,
+      errorOpen: false,
+      errorUsername: undefined,
+      signedMessage: '',
+      loading: false,
+      url: '',
+      step: 'name',
+    })
   }
 
   close = (changed: boolean) => {
@@ -73,37 +87,35 @@ export default class UserSignDialog extends React.Component<Props, State> {
     this.setState({snack: {message: 'Copied to Clipboard', duration: 2000}, snackOpen: true})
   }
 
-  userSign = () => {
-    if (this.state.name === '') {
+  userSign = async () => {
+    if (!this.state.name) {
       this.setState({
-        error: new Error('Oops, name is empty'),
+        errorUsername: {message: 'Oops, name is empty'},
       })
       return
     }
 
-    this.setState({loading: true, error: undefined})
-    const req: UserSignRequest = {
-      kid: this.props.kid,
-      service: this.props.service,
-      name: this.state.name,
-    }
-    userSign(req)
-      .then((resp: UserSignResponse) => {
-        const name = resp.name || ''
-        const message = resp.message || ''
-        let url = this.defaultURL(this.props.service, this.props.kid, name, message)
+    this.setState({loading: true, error: undefined, errorOpen: false, errorUsername: undefined})
+    try {
+      const resp = await userSign({
+        kid: this.props.kid,
+        service: this.props.service,
+        name: this.state.name,
+      })
+      const name = resp.name || ''
+      const message = resp.message || ''
+      let url = this.defaultURL(this.props.service, this.props.kid, name, message)
 
-        this.setState({
-          loading: false,
-          name,
-          url,
-          signedMessage: message,
-          step: 'sign',
-        })
+      this.setState({
+        loading: false,
+        name,
+        url,
+        signedMessage: message,
+        step: 'sign',
       })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
+    } catch (err) {
+      this.setState({loading: false, error: err, errorOpen: true})
+    }
   }
 
   defaultURL = (service: string, kid: string, name: string, message: string) => {
@@ -119,29 +131,22 @@ export default class UserSignDialog extends React.Component<Props, State> {
     }
   }
 
-  userAdd = () => {
-    const req: UserAddRequest = {
-      kid: this.props.kid,
-      service: this.props.service,
-      name: this.state.name,
-      url: this.state.url,
-      local: false,
-    }
+  userAdd = async () => {
     this.setState({loading: true, error: undefined})
 
-    // setTimeout(() => {
-    //   this.props.dispatch(go(-2))
-    //   this.setState({loading: false})
-    // }, 2000)
-
-    userAdd(req)
-      .then((resp: UserAddResponse) => {
-        this.setState({loading: false})
-        this.close(true)
+    try {
+      const resp = await userAdd({
+        kid: this.props.kid,
+        service: this.props.service,
+        name: this.state.name,
+        url: this.state.url,
+        local: false,
       })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
+      this.setState({loading: false})
+      this.close(true)
+    } catch (err) {
+      this.setState({loading: false, error: err, errorOpen: true})
+    }
   }
 
   back = () => {
@@ -195,7 +200,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <Typography variant="subtitle1" style={{paddingBottom: 10}}>
           {question}
         </Typography>
-        <FormControl error={!!this.state.error}>
+        <FormControl error={!!this.state.errorUsername}>
           <TextField
             autoFocus
             placeholder={placeholder}
@@ -205,7 +210,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
             id="userNameTextField"
             inputProps={{spellCheck: 'false'}}
           />
-          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
+          <FormHelperText>{this.state.errorUsername?.message || ' '}</FormHelperText>
         </FormControl>
         <Typography>{next}</Typography>
       </Box>
@@ -326,8 +331,6 @@ export default class UserSignDialog extends React.Component<Props, State> {
                 placeholder={placeholder}
                 onChange={this.onURLChange}
                 value={this.state.url}
-                error={!!this.state.error}
-                helperText={this.state.error?.message || ' '}
                 FormHelperTextProps={{style: breakWords}}
                 disabled={this.state.loading}
                 style={{width: 500}}
@@ -336,15 +339,6 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Box>
           </Box>
         )}
-        {!urlLabel && (
-          <Typography style={{paddingLeft: 16, color: 'red'}}>{this.state.error?.message}</Typography>
-        )}
-
-        <Snack
-          open={this.state.snackOpen}
-          {...this.state.snack}
-          onClose={() => this.setState({snackOpen: false})}
-        />
       </Box>
     )
   }
@@ -379,8 +373,6 @@ export default class UserSignDialog extends React.Component<Props, State> {
         fullWidth
         disableBackdropClick
         transitionDuration={0}
-        // TransitionComponent={transition}
-        // keepMounted
       >
         <DialogTitle loading={this.state.loading} onClose={() => this.close(false)}>
           {title}
@@ -407,6 +399,16 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Box>
           )}
         </DialogActions>
+        <ErrorView
+          open={this.state.errorOpen}
+          error={this.state.error}
+          close={() => this.setState({errorOpen: false})}
+        />
+        <Snack
+          open={this.state.snackOpen}
+          {...this.state.snack}
+          onClose={() => this.setState({snackOpen: false})}
+        />
       </Dialog>
     )
   }

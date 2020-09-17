@@ -256,7 +256,7 @@ export default (_: {}) => {
   const buttonWidth = 80
 
   return (
-    <Box display="flex" flexDirection="column" flex={1} id="keysView">
+    <Box display="flex" flexDirection="column" flex={1} id="keysView" style={{position: 'relative'}}>
       <Box display="flex" flexDirection="column">
         <Header />
 
@@ -324,7 +324,11 @@ export default (_: {}) => {
         </Box>
         <Divider />
       </Box>
-      <Box display="flex" flexDirection="column" style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        style={{position: 'absolute', top: 77, left: 0, bottom: 0, overflow: 'auto'}}
+      >
         <Table size="small">
           <TableHead>
             <TableRow>

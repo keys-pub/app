@@ -76,60 +76,60 @@ export default class DBView extends React.Component<Props, State> {
   render() {
     const {collections, documents} = this.state
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
-        <Header />
-        <Divider />
-        <Box display="flex" flexDirection="row" flex={1} style={{height: 'calc(100% - 29px)'}}>
-          <Box>
-            <Table size="small">
-              <TableBody>
-                {(collections as Collection[]).map((col, index) => (
-                  <TableRow
-                    hover
-                    onClick={(event) => this.selectCollection(col)}
-                    key={col.path}
-                    style={{cursor: 'pointer'}}
-                  >
-                    <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
-                      <Typography variant="body2" style={{fontSize: 11}}>
-                        {col.path}
+      <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative'}}>
+        <Box style={{width: 90}}>
+          <Table size="small">
+            <TableBody>
+              {(collections as Collection[]).map((col, index) => (
+                <TableRow
+                  hover
+                  onClick={(event) => this.selectCollection(col)}
+                  key={col.path}
+                  style={{cursor: 'pointer'}}
+                >
+                  <TableCell style={{paddingLeft: 8, paddingRight: 8}}>
+                    <Typography variant="body2" style={{fontSize: 11}}>
+                      {col.path}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+        <Divider orientation="vertical" />
+        <Box
+          display="flex"
+          flex={1}
+          style={{position: 'absolute', top: 0, left: 90, bottom: 0, right: 0, overflow: 'auto'}}
+        >
+          <Table size="small">
+            <TableBody>
+              {documents.map((doc: Document, index: number) => (
+                <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
+                  <TableCell>
+                    <Box display="flex" flexDirection="column">
+                      <Typography
+                        variant="body2"
+                        style={{fontSize: 11, wordBreak: 'break-all', color: '#666'}}
+                      >
+                        {doc.path}
                       </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-          <Divider orientation="vertical" />
-          <Box display="flex" flexDirection="row" flex={1} style={{overflowY: 'auto'}}>
-            <Table size="small">
-              <TableBody>
-                {documents.map((doc: Document, index: number) => (
-                  <TableRow hover onClick={(event) => this.selectDocument(doc)} key={doc.path}>
-                    <TableCell>
-                      <Box display="flex" flexDirection="column">
-                        <Typography
-                          variant="body2"
-                          style={{fontSize: 11, wordBreak: 'break-all', color: '#666'}}
-                        >
-                          {doc.path}
-                        </Typography>
-                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
-                          {doc.value}
-                        </Typography>
-                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
-                          {dateString(doc.createdAt)}
-                        </Typography>
-                        <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
-                          {dateString(doc.updatedAt)}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
+                      <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
+                        {doc.value}
+                      </Typography>
+                      <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
+                        {dateString(doc.createdAt)}
+                      </Typography>
+                      <Typography variant="body2" style={{fontSize: 11, wordBreak: 'break-all'}}>
+                        {dateString(doc.updatedAt)}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </Box>
       </Box>
     )

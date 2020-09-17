@@ -6,7 +6,7 @@ import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
-import {Key, KeyType, User} from '../../rpc/keys.d'
+import {Key, KeyType, User, UserStatus} from '../../rpc/keys.d'
 import ServiceSelect from '../user/service'
 import {Link} from '../../components'
 import Snack, {SnackProps} from '../../components/snack'
@@ -51,6 +51,9 @@ const UserRow = (props: UserRowProps) => {
                 </Link>
               )}
             </Box>
+            {user.status != UserStatus.USER_OK && (
+              <Typography style={{color: 'red'}}>{user.status}</Typography>
+            )}
             {user.err && <Typography style={{color: 'red'}}>{user.err}</Typography>}
             <Link
               onClick={() => props.openURL(user.url!)}

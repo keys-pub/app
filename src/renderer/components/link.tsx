@@ -3,6 +3,7 @@ import {CSSProperties} from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 import {shell} from 'electron'
+import {primary, secondary} from '../views/theme'
 
 type Props = {
   onClick?: () => any
@@ -32,9 +33,9 @@ const Link = (props: Props) => {
     style.display = 'inline'
   }
   if (props.color == 'secondary') {
-    style.color = '#f50057'
+    style.color = secondary
   } else {
-    style.color = '#2196f3'
+    style.color = primary
   }
 
   let onClick = props.onClick

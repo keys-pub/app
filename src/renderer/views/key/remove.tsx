@@ -69,7 +69,7 @@ const PublicKey = (props: {k: Key}) => {
   return (
     <Box style={{paddingBottom: 10}}>
       <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
-      <KeyLabel k={props.k} />
+      <KeyLabel k={props.k} full />
     </Box>
   )
 }

@@ -13,8 +13,7 @@ export default (props: {}) => {
 
   const refresh = async () => {
     try {
-      const req: RuntimeStatusRequest = {}
-      const resp = await runtimeStatus(req)
+      const resp = await runtimeStatus({})
       setStatus(resp.authStatus!)
     } catch (err) {
       store.update((s) => {
@@ -32,9 +31,9 @@ export default (props: {}) => {
     return <AuthSplash />
   }
 
-  if (status == AuthStatus.AUTH_SETUP) {
+  if (status == AuthStatus.AUTH_SETUP_NEEDED) {
     return <AuthSetupView refresh={refresh} />
   } else {
-    return <AuthUnlockView />
+    return <AuthUnlockView refresh={refresh} />
   }
 }

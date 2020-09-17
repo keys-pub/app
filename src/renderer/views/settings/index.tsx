@@ -2,168 +2,88 @@ import * as React from 'react'
 
 import {
   Box,
-  Button,
-  Checkbox,
   Divider,
-  FormControlLabel,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Tooltip,
   Typography,
 } from '@material-ui/core'
 
-import {Link} from '../../components'
-import {ipcRenderer} from 'electron'
-
 import Header from '../header'
+
+import GeneralView from './general'
+import VaultView from '../vault'
+import AuthenticatorsView from '../authenticators'
+import DebugView from './debug'
+import StyleGuide from '../style-guide'
+import DBView from '../db'
+
 import {store, setLocation} from '../store'
 
-export default (props: {}) => {
-  const [prerelease, setPrerelease] = React.useState(false)
-  const [version, setVersion] = React.useState('')
+type Props = {}
 
-  const devTools = () => {
-    ipcRenderer.send('toggle-dev-tools', {})
-  }
+type Nav = {
+  label: string
+  name: string
+  location: string
+}
 
-  const forceUpdate = () => {
-    ipcRenderer.send('update-force')
-    store.update((s) => {
-      s.updating = true
-    })
-  }
+const navs: Array<Nav> = [
+  {label: 'General', name: '/general', location: '/settings/general'},
+  {label: 'Vault', name: '/vault', location: '/settings/vault'},
+  {label: 'FIDO2', name: '/fido2', location: '/settings/fido2'},
+  {label: 'Debug', name: '/debug', location: '/settings/debug'},
+]
 
-  const showError = () => {
-    store.update((s) => {
-      s.error = new Error('Test error '.repeat(1024))
-    })
-  }
+export default (props: Props) => {
+  const location = store.useState((s) => s.location)
+  let selected = location.replace(/^(\/settings)/, '')
+  if (selected == '') selected = '/general'
 
-  const onPrereleaseChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked
-    setPrerelease(checked)
-    ipcRenderer.send('electron-store-set', {key: 'prerelease', value: checked ? '1' : ''})
-  }, [])
-
-  React.useEffect(() => {
-    const isPrerelease = async () => {
-      const prerelease = await ipcRenderer.invoke('electron-store-get', 'prerelease')
-      setPrerelease(prerelease == '1')
-    }
-    isPrerelease()
-  }, [])
-
-  const restart = () => {
-    ipcRenderer.send('reload-app', {})
-  }
-
-  React.useEffect(() => {
-    const appVersion = async () => {
-      const version: string = await ipcRenderer.invoke('version')
-      setVersion(version)
-    }
-    appVersion()
-  }, [])
-
-  const labelWidth = 60
   return (
-    <Box display="flex" flex={1} flexDirection="column">
+    <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
       <Header />
-      <Table size="small">
-        <TableBody>
-          <TableRow>
-            <TableCell style={{...cstyles.cell, width: labelWidth}}>
-              <Typography align="right">Version</Typography>
-            </TableCell>
-            <TableCell style={cstyles.cell}>
-              <Typography>{version}</Typography>
-            </TableCell>
-          </TableRow>
-
-          <TableRow>
-            <TableCell style={{...cstyles.cell, width: labelWidth}}>
-              <Typography align="right">Updater</Typography>
-            </TableCell>
-            <TableCell style={cstyles.cell}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={prerelease}
-                    color="primary"
-                    onChange={onPrereleaseChange}
-                    style={{paddingTop: 0, paddingBottom: 0}}
-                  />
-                }
-                label="Prereleases"
-              />
-            </TableCell>
-          </TableRow>
-
-          <TableRow>
-            <TableCell style={cstyles.cell}>
-              <Typography align="right">Experimental</Typography>
-            </TableCell>
-            <TableCell style={cstyles.cell}>
-              <Box display="flex" flexDirection="column">
-                <Typography>
-                  <Link span onClick={() => setLocation('wormhole')}>
-                    Wormhole
-                  </Link>
-                </Typography>
-              </Box>
-            </TableCell>
-          </TableRow>
-
-          <TableRow>
-            <TableCell style={cstyles.cell}>
-              <Typography align="right">Debug</Typography>
-            </TableCell>
-            <TableCell style={cstyles.cell}>
-              <Box display="flex" flexDirection="column">
-                <Typography>
-                  <Link span onClick={() => setLocation('db/service')}>
-                    DB
-                  </Link>
-                  <br />
-                  <Link span onClick={() => setLocation('db/vault')}>
-                    Vault
-                  </Link>
-                  <br />
-                  <Link span onClick={devTools}>
-                    Toggle Dev Tools
-                  </Link>
-                  <br />
-                  <Link span onClick={forceUpdate}>
-                    Force Update
-                  </Link>
-                  <br />
-                  <Link span onClick={() => setLocation('style-guide')}>
-                    Style Guide
-                  </Link>
-                  <br />
-                  <Link span onClick={restart}>
-                    Restart
-                  </Link>
-                  <br />
-                  <Link span onClick={showError}>
-                    Show Error
-                  </Link>
-                  <br />
-                </Typography>
-              </Box>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <Divider />
+      <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
+        <List
+          style={{
+            height: '100%',
+            padding: 0,
+            backgroundColor: '#fafafa',
+          }}
+        >
+          {navs.map((nav, index) =>
+            row(nav, index, selected.startsWith(nav.name), () => {
+              setLocation(nav.location)
+            })
+          )}
+        </List>
+        <Divider orientation="vertical" />
+        <Box display="flex" flexDirection="column" flex={1}>
+          {selected == '/general' && <GeneralView />}
+          {selected == '/vault' && <VaultView />}
+          {selected == '/fido2' && <AuthenticatorsView />}
+          {selected == '/debug' && <DebugView />}
+          {selected == '/debug/db/service' && <DBView db="service" />}
+          {selected == '/debug/db/vault' && <DBView db="vault" />}
+          {selected == '/debug/style-guide' && <StyleGuide />}
+        </Box>
+      </Box>
     </Box>
   )
 }
 
-const cstyles = {
-  cell: {
-    borderBottom: 0,
-    paddingBottom: 10,
-    verticalAlign: 'top',
-  },
+const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
+  return (
+    <ListItem button style={{height: 42}} onClick={onClick} key={nav.name} divider>
+      <ListItemText
+        primary={nav.label}
+        primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}}
+      />
+    </ListItem>
+  )
 }

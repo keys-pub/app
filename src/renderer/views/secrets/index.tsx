@@ -235,10 +235,10 @@ export default (props: Props) => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" flex={1}>
+    <Box display="flex" flexDirection="column" flex={1} style={{}}>
       <Header />
       <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
-        <Box style={{width: 250}}>
+        <Box style={{width: 250, position: 'relative'}}>
           <Box
             display="flex"
             flexDirection="row"
@@ -276,38 +276,40 @@ export default (props: Props) => {
             )}
           </Box>
           <Divider />
-          <Box style={{height: 'calc(100vh - 77px)', overflowY: 'auto'}}>
-            <Box display="flex" flexDirection="row" style={{height: '100%'}}>
-              <Table size="small">
-                {/* <TableHead>
+          <Box
+            display="flex"
+            flexDirection="row"
+            style={{position: 'absolute', width: 250, top: 49, left: 0, bottom: 0, overflow: 'auto'}}
+          >
+            <Table size="small">
+              {/* <TableHead>
                   <TableRow>
                     <TableCell>
                       <Typography variant="body2">Name</Typography>
                     </TableCell>
                   </TableRow>
                 </TableHead> */}
-                <TableBody>
-                  {secrets.map((secret, index) => {
-                    return (
-                      <TableRow
-                        hover
-                        onClick={() => setSelected(secret)}
-                        key={secret.id}
-                        style={{cursor: 'pointer'}}
-                        selected={selected?.id == secret.id}
-                        component={(props: any) => {
-                          return <tr onContextMenu={onContextMenu} {...props} id={secret.id} />
-                        }}
-                      >
-                        <TableCell component="th" scope="row" style={{padding: 0}}>
-                          <Cell secret={secret} />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </Box>
+              <TableBody>
+                {secrets.map((secret, index) => {
+                  return (
+                    <TableRow
+                      hover
+                      onClick={() => setSelected(secret)}
+                      key={secret.id}
+                      style={{cursor: 'pointer'}}
+                      selected={selected?.id == secret.id}
+                      component={(props: any) => {
+                        return <tr onContextMenu={onContextMenu} {...props} id={secret.id} />
+                      }}
+                    >
+                      <TableCell component="th" scope="row" style={{padding: 0}}>
+                        <Cell secret={secret} />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           </Box>
         </Box>
 

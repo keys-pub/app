@@ -125,13 +125,11 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
-        <Header />
-        <Divider />
-        <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
+        <Box display="flex" flexDirection="row" flex={1} style={{height: '100%', position: 'relative'}}>
           <Box style={{width: 200}}>
             {this.renderHeader()}
             <Divider />
-            <Box style={{height: 'calc(100vh - 70px)', overflowY: 'auto'}}>
+            <Box style={{position: 'absolute', width: 200, left: 0, top: 41, bottom: 0, overflowY: 'auto'}}>
               <Table size="small">
                 <TableBody>
                   {this.state.devices.map((device, index) => {

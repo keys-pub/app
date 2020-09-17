@@ -30,7 +30,7 @@ export default class DeviceContentView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box style={{width: '100%'}}>
+      <Box style={{width: '100%', position: 'relative'}}>
         <Tabs
           value={this.state.tab}
           centered={true}
@@ -42,7 +42,7 @@ export default class DeviceContentView extends React.Component<Props, State> {
           <Tab label="credentials" />
         </Tabs>
 
-        <Box style={{height: 'calc(100vh - 70px)', overflowY: 'auto'}}>
+        <Box style={{position: 'absolute', left: 0, top: 40, right: 0, bottom: 0, overflowY: 'auto'}}>
           {this.state.tab == 0 && <Info device={this.props.device} />}
           {this.state.tab == 1 && <Credentials device={this.props.device} />}
         </Box>

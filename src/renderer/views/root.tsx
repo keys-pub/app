@@ -10,6 +10,7 @@ import {ipcRenderer, remote} from 'electron'
 import Auth from './auth'
 import AuthSplash from './auth/splash'
 import Nav from './nav'
+import App from './app'
 
 import {Box, Typography} from '@material-ui/core'
 import Errors from './errors'
@@ -23,36 +24,6 @@ import {configSet, setErrHandler, runtimeStatus} from '../rpc/keys'
 import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '../rpc/keys.d'
 
 import './app.css'
-
-const App = (_: {}) => {
-  React.useEffect(() => {
-    return store.createReaction(
-      (s) => ({
-        location: s.location,
-        history: s.history,
-        navMinimized: s.navMinimized,
-      }),
-      (s) => {
-        const config: Config = {
-          app: {
-            location: s.location,
-            history: s.history,
-            navMinimized: s.navMinimized,
-          },
-        }
-        const set = async () => await configSet({name: 'app', config})
-        set()
-      }
-    )
-  }, [])
-
-  return (
-    <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
-      <Nav />
-      <Routes />
-    </Box>
-  )
-}
 
 const Root = (_: {}) => {
   const {ready, unlocked, updating} = store.useState((s) => ({
@@ -82,9 +53,20 @@ const Root = (_: {}) => {
 }
 
 export default (_: {}) => {
+  const onContextMenu = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const labels = [] as string[]
+    ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
+      if (arg.close) {
+        ipcRenderer.removeAllListeners('context-menu')
+      }
+    })
+    ipcRenderer.send('context-menu', {labels: [], x: event.clientX, y: event.clientY})
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
-      <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
+      <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}} onContextMenu={onContextMenu}>
         <Root />
         <Errors />
         <UpdateAlert />

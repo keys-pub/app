@@ -181,18 +181,19 @@ export default class MakeCredentialView extends React.Component<Props, State> {
     if (!this.props.device) return null
 
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
         {this.renderEditActions()}
         <Divider />
         <Box
           display="flex"
           flexDirection="column"
           style={{
+            position: 'absolute',
+            left: 10,
+            top: 10,
+            right: 10,
+            bottom: 0,
             overflowY: 'auto',
-            height: 'calc(100vh - 94px)',
-            paddingLeft: 10,
-            paddingTop: 10,
-            paddingRight: 10,
           }}
         >
           {this.state.error && (

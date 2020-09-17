@@ -7,13 +7,14 @@ export enum EncryptMode {
 }
 export enum AuthStatus {
     AUTH_UNKNOWN = "AUTH_UNKNOWN",
-    AUTH_SETUP = "AUTH_SETUP",
+    AUTH_SETUP_NEEDED = "AUTH_SETUP_NEEDED",
     AUTH_UNLOCKED = "AUTH_UNLOCKED",
     AUTH_LOCKED = "AUTH_LOCKED",
 }
 export enum AuthType {
     UNKNOWN_AUTH = "UNKNOWN_AUTH",
     PASSWORD_AUTH = "PASSWORD_AUTH",
+    KEY_PHRASE_AUTH = "KEY_PHRASE_AUTH",
     FIDO2_HMAC_SECRET_AUTH = "FIDO2_HMAC_SECRET_AUTH",
 }
 export enum ExportType {
@@ -405,7 +406,7 @@ export interface AuthUnlockResponse {
 }
 
 export interface AuthProvisionRequest {
-    // Secret for auth depending on auth type, e.g. password, pin, etc.
+    // Secret for auth depending on auth type, e.g. password, phrase, pin, etc.
     secret?: string;
     // Type for auth.
     type?: AuthType;
@@ -453,6 +454,22 @@ export interface AuthLockRequest {
 }
 
 export interface AuthLockResponse {
+}
+
+export interface AuthResetRequest {
+    appName?: string;
+}
+
+export interface AuthResetResponse {
+}
+
+export interface AuthRecoverRequest {
+    keyPhrase?: string;
+    newPassword?: string;
+}
+
+export interface AuthRecoverResponse {
+    authToken?: string;
 }
 
 export interface KeyGenerateRequest {
@@ -935,6 +952,8 @@ export interface KeysService {
     AuthVault: (r:AuthVaultRequest) => AuthVaultResponse;
     AuthUnlock: (r:AuthUnlockRequest) => AuthUnlockResponse;
     AuthLock: (r:AuthLockRequest) => AuthLockResponse;
+    AuthReset: (r:AuthResetRequest) => AuthResetResponse;
+    AuthRecover: (r:AuthRecoverRequest) => AuthRecoverResponse;
     RuntimeStatus: (r:RuntimeStatusRequest) => RuntimeStatusResponse;
     Rand: (r:RandRequest) => RandResponse;
     RandPassword: (r:RandPasswordRequest) => RandPasswordResponse;

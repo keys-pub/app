@@ -5,6 +5,7 @@ import {loadStore as secretsLoadStore} from './secrets/store'
 import {loadStore as encryptLoadStore} from './encrypt/store'
 import {loadStore as signLoadStore} from './sign/store'
 
+import {ipcRenderer} from 'electron'
 import {configGet, keys} from '../rpc/keys'
 import {Key} from '../rpc/keys.d'
 
@@ -54,7 +55,11 @@ export const loadStore = async () => {
   signLoadStore()
 }
 
-export const unlocked = async () => {
+export const unlocked = async (authToken?: string) => {
+  if (!authToken) {
+    throw new Error('no auth token')
+  }
+  ipcRenderer.send('authToken', {authToken})
   await loadStore()
   store.update((s) => {
     s.unlocked = true

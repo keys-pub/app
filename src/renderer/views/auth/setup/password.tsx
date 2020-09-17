@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
+import {Link} from '../../../components'
 
 import {authSetup, authUnlock} from '../../../rpc/keys'
 import {
@@ -12,7 +13,7 @@ import {
 } from '../../../rpc/keys.d'
 import {ipcRenderer} from 'electron'
 
-import {store, unlocked} from '../../store'
+import {setLocation, store, unlocked} from '../../store'
 
 type Props = {}
 
@@ -57,8 +58,7 @@ export default (props: Props) => {
         type: AuthType.PASSWORD_AUTH,
         client: 'app',
       })
-      ipcRenderer.send('authToken', {authToken: resp.authToken})
-      unlocked()
+      await unlocked(resp.authToken)
       setLoading(false)
     } catch (err) {
       setLoading(false)

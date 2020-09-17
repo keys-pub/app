@@ -20,7 +20,8 @@ import DecryptView from '../decrypt'
 import SignView from '../sign'
 import VerifyView from '../verify'
 
-import {Store} from 'pullstate'
+import {store, setLocation} from '../store'
+import path from 'path'
 
 import {
   EnhancedEncryption as EncryptIcon,
@@ -35,25 +36,20 @@ type Nav = {
   label: string
   name: string
   icon: any
+  location: string
 }
 
 const navs: Array<Nav> = [
-  {label: 'Encrypt', icon: EncryptIcon, name: 'encrypt'},
-  {label: 'Decrypt', icon: DecryptIcon, name: 'decrypt'},
-  {label: 'Sign', icon: SignIcon, name: 'sign'},
-  {label: 'Verify', icon: VerifyIcon, name: 'verify'},
+  {label: 'Encrypt', icon: EncryptIcon, name: '/encrypt', location: '/tools/encrypt'},
+  {label: 'Decrypt', icon: DecryptIcon, name: '/decrypt', location: '/tools/decrypt'},
+  {label: 'Sign', icon: SignIcon, name: '/sign', location: '/tools/sign'},
+  {label: 'Verify', icon: VerifyIcon, name: '/verify', location: '/tools/verify'},
 ]
 
-type State = {
-  selected: string
-}
-
-const store = new Store<State>({
-  selected: 'encrypt',
-})
-
 export default (props: Props) => {
-  const {selected} = store.useState()
+  const location = store.useState((s) => s.location)
+  let selected = location.replace(/^(\/tools)/, '')
+  if (selected == '') selected = '/encrypt'
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
@@ -68,18 +64,16 @@ export default (props: Props) => {
         >
           {navs.map((nav, index) =>
             row(nav, index, selected == nav.name, () => {
-              store.update((s) => {
-                s.selected = nav.name
-              })
+              setLocation(nav.location)
             })
           )}
         </List>
         <Divider orientation="vertical" />
         <Box display="flex" flexDirection="column" flex={1}>
-          {selected == 'encrypt' && <EncryptView />}
-          {selected == 'decrypt' && <DecryptView />}
-          {selected == 'sign' && <SignView />}
-          {selected == 'verify' && <VerifyView />}
+          {selected == '/encrypt' && <EncryptView />}
+          {selected == '/decrypt' && <DecryptView />}
+          {selected == '/sign' && <SignView />}
+          {selected == '/verify' && <VerifyView />}
         </Box>
       </Box>
     </Box>
