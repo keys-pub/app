@@ -60,6 +60,7 @@ type Props = {
   children?: React.ReactNode
   close?: DialogAction
   actions?: DialogAction[]
+  disabled?: boolean
 }
 
 const Dialog = (props: Props) => {
@@ -84,8 +85,9 @@ const Dialog = (props: Props) => {
             {props.close.label}
           </Button>
         )}
+        <Box display="flex" flexGrow={1} />
         {props.actions?.map((action: DialogAction) => (
-          <Button onClick={action.action} color={action.color} key={action.label}>
+          <Button onClick={action.action} color={action.color} key={action.label} disabled={props.disabled}>
             {action.label}
           </Button>
         ))}

@@ -27,7 +27,7 @@ type Props = {
 
 export default (props: Props) => {
   const [loading, setLoading] = React.useState(false)
-  const [keyPhrase, setKeyPhrase] = React.useState('')
+  const [paperKey, setPaperKey] = React.useState('')
   const [newPassword, setNewPassword] = React.useState('')
 
   const [snack, setSnack] = React.useState<SnackProps>()
@@ -40,7 +40,7 @@ export default (props: Props) => {
 
   const onInputChangePhrase = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    setKeyPhrase(target.value)
+    setPaperKey(target.value)
   }, [])
 
   const onInputChangeNewPassword = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
@@ -53,7 +53,7 @@ export default (props: Props) => {
     setSnackOpen(false)
     try {
       const resp = await authRecover({
-        keyPhrase,
+        paperKey,
         newPassword,
       })
       await unlocked(resp.authToken)
@@ -62,22 +62,22 @@ export default (props: Props) => {
       setLoading(false)
       setError(err.message)
     }
-  }, [keyPhrase, newPassword])
+  }, [paperKey, newPassword])
 
   return (
     <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
       <Header noLock noBack />
       <Logo top={60} />
       <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
-        Enter in your backup key phrase and new password.
+        Enter in your paper key and new password.
       </Typography>
       <FormControl>
         <TextField
           autoFocus
-          label="Backup Phrase"
+          label="Paper Key"
           variant="outlined"
           onChange={onInputChangePhrase}
-          value={keyPhrase}
+          value={paperKey}
           multiline
           rows={4}
           disabled={loading}
@@ -91,6 +91,7 @@ export default (props: Props) => {
           label="New Password"
           variant="outlined"
           onChange={onInputChangeNewPassword}
+          type="password"
           value={newPassword}
           disabled={loading}
           InputProps={{

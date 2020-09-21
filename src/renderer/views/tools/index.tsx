@@ -20,6 +20,8 @@ import DecryptView from '../decrypt'
 import SignView from '../sign'
 import VerifyView from '../verify'
 
+import {withStyles, Theme, createStyles, makeStyles} from '@material-ui/core/styles'
+
 import {store, setLocation} from '../store'
 import path from 'path'
 
@@ -46,10 +48,17 @@ const navs: Array<Nav> = [
   {label: 'Verify', icon: VerifyIcon, name: '/verify', location: '/tools/verify'},
 ]
 
+let lastSelected = ''
+
 export default (props: Props) => {
   const location = store.useState((s) => s.location)
   let selected = location.replace(/^(\/tools)/, '')
-  if (selected == '') selected = '/encrypt'
+  if (selected == '') {
+    if (!lastSelected) lastSelected = '/encrypt'
+    selected = lastSelected
+  } else {
+    lastSelected = selected
+  }
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
@@ -80,23 +89,22 @@ export default (props: Props) => {
   )
 }
 
-// const LightTooltip = withStyles((theme: Theme) => ({
-//   tooltip: {
-//     backgroundColor: theme.palette.common.white,
-//     color: 'rgba(0, 0, 0, 0.87)',
-//     boxShadow: theme.shadows[1],
-//     fontSize: 11,
-//   },
-// }))(Tooltip)
+const LightTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.common.white,
+    color: 'rgba(0, 0, 0, 0.87)',
+    boxShadow: theme.shadows[4],
+  },
+}))(Tooltip)
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem button style={{height: 42}} onClick={onClick} key={nav.name}>
-      <Tooltip title={nav.label} placement="left">
+      <LightTooltip title={nav.label} placement="left">
         <ListItemIcon style={{minWidth: 0}}>
           <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
         </ListItemIcon>
-      </Tooltip>
+      </LightTooltip>
       {/* <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}} /> */}
     </ListItem>
   )

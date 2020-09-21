@@ -14,7 +14,7 @@ export enum AuthStatus {
 export enum AuthType {
     UNKNOWN_AUTH = "UNKNOWN_AUTH",
     PASSWORD_AUTH = "PASSWORD_AUTH",
-    KEY_PHRASE_AUTH = "KEY_PHRASE_AUTH",
+    PAPER_KEY_AUTH = "PAPER_KEY_AUTH",
     FIDO2_HMAC_SECRET_AUTH = "FIDO2_HMAC_SECRET_AUTH",
 }
 export enum ExportType {
@@ -375,10 +375,12 @@ export interface RuntimeStatusResponse {
 }
 
 export interface AuthSetupRequest {
-    // Secret for auth depending on auth type, e.g. password, pin, etc.
+    // Secret for auth depending on auth type, e.g. password, FIDO2 pin, etc.
     secret?: string;
     // Type for auth.
     type?: AuthType;
+    // Device path (for FIDO2).
+    device?: string;
 }
 
 export interface AuthSetupResponse {
@@ -406,12 +408,14 @@ export interface AuthUnlockResponse {
 }
 
 export interface AuthProvisionRequest {
-    // Secret for auth depending on auth type, e.g. password, phrase, pin, etc.
+    // Secret for auth depending on auth type, e.g. password, phrase, FIDO2 pin, etc.
     secret?: string;
     // Type for auth.
     type?: AuthType;
-    // Setup phase for auth (for FIDO2 make credential step).
-    setup?: boolean;
+    // Device path (for FIDO2).
+    device?: string;
+    // Generate (for FIDO2 make credential).
+    generate?: boolean;
 }
 
 export interface AuthProvisionResponse {
@@ -464,7 +468,7 @@ export interface AuthResetResponse {
 }
 
 export interface AuthRecoverRequest {
-    keyPhrase?: string;
+    paperKey?: string;
     newPassword?: string;
 }
 

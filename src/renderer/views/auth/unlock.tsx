@@ -55,8 +55,8 @@ const AuthUnlockView = (props: AuthUnlockProps) => {
       })
       clearTimeout(timeout)
       await unlocked(resp.authToken)
-      setLoading(false)
-      setProgress(false)
+      // setLoading(false)
+      // setProgress(false)
     } catch (err) {
       clearTimeout(timeout)
       setLoading(false)

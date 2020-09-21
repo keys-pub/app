@@ -25,6 +25,8 @@ export default (_: {}) => {
         style={{position: 'absolute', top: 0, left: 0, bottom: 0, overflowY: 'auto'}}
       >
         <Box display="flex" flexDirection="column">
+          <Typography variant="h1">Header1</Typography>
+          <Typography variant="h2">Header2</Typography>
           <Typography variant="h3">Header3</Typography>
           <Typography variant="h4">Header4</Typography>
           <Typography variant="h5">Header5</Typography>

@@ -413,20 +413,21 @@ enum AuthType {
   option (go.enum) = {name: "AuthType"};
   
   UNKNOWN_AUTH = 0 [(go.value) = {name: "UnknownAuth"}];
-  // PasswordAuth using argon2id.
+  // PasswordAuth uses password with salt (argon2id).
   PASSWORD_AUTH = 10 [(go.value) = {name: "PasswordAuth"}];
-  // KeyPhraseAuth uses a key phrase (e.g. paper key).
-  KEY_PHRASE_AUTH = 11 [(go.value) = {name: "KeyPhraseAuth"}];
-  // FIDO2HMACSecretAuth using FIDO2 hmac-secret extension.
+  // PaperKeyAuth uses a BIP39 phrase representing a key.
+  PAPER_KEY_AUTH = 11 [(go.value) = {name: "PaperKeyAuth"}];
+  // FIDO2HMACSecretAuth uses a FIDO2 HMAC-Secret extension.
   FIDO2_HMAC_SECRET_AUTH = 20 [(go.value) = {name: "FIDO2HMACSecretAuth"}];
-
 }
 
 message AuthSetupRequest {
-  // Secret for auth depending on auth type, e.g. password, pin, etc.
+  // Secret for auth depending on auth type, e.g. password, FIDO2 pin, etc.
   string secret = 1;
   // Type for auth.
   AuthType type = 2;  
+  // Device path (for FIDO2).
+  string device = 5;
 }
 message AuthSetupResponse {}
 
@@ -449,12 +450,14 @@ message AuthUnlockResponse {
 }
 
 message AuthProvisionRequest {
-  // Secret for auth depending on auth type, e.g. password, phrase, pin, etc.
+  // Secret for auth depending on auth type, e.g. password, phrase, FIDO2 pin, etc.
   string secret = 1;
   // Type for auth.
   AuthType type = 2;
-  // Setup phase for auth (for FIDO2 make credential step).
-  bool setup = 7;
+  // Device path (for FIDO2).
+  string device = 5;
+  // Generate (for FIDO2 make credential).
+  bool generate = 7;
 }
 message AuthProvisionResponse {
   AuthProvision provision = 1;
@@ -496,7 +499,7 @@ message AuthResetRequest {
 message AuthResetResponse {}
 
 message AuthRecoverRequest {
-  string keyPhrase = 1;
+  string paperKey = 1;
   string newPassword = 2;
 }
 message AuthRecoverResponse {
