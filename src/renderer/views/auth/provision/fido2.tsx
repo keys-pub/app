@@ -85,7 +85,7 @@ export default (props: Props) => {
     <Dialog
       open={props.open}
       title="FIDO2 Key"
-      close={{label: 'Cancel', color: 'secondary', action: () => props.close()}}
+      close={{label: 'Close', action: () => props.close()}}
       actions={[{label: 'Provision', color: 'primary', action: () => onAuthProvision()}]}
       disabled={loading}
     >

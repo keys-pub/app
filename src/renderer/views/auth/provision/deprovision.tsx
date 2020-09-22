@@ -28,7 +28,7 @@ export default (props: Props) => {
   return (
     <Dialog
       title="Deprovision"
-      close={{label: 'Cancel', color: 'secondary', action: () => props.close(false)}}
+      close={{label: 'Close', action: () => props.close(false)}}
       open={props.open}
       actions={[{label: 'Deprovision', color: 'primary', action: deprovision}]}
     >

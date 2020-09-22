@@ -74,7 +74,7 @@ export default (props: Props) => {
     <Dialog
       open={props.open}
       title="Password"
-      close={{label: 'Cancel', color: 'secondary', action: () => props.close()}}
+      close={{label: 'Close', action: () => props.close()}}
       actions={[{label: 'Provision', color: 'primary', action: () => onAuthProvision()}]}
     >
       <Box display="flex" flex={1} flexDirection="column" alignItems="center" style={{width: '100%'}}>
