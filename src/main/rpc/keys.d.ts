@@ -429,12 +429,12 @@ export interface AuthDeprovisionRequest {
 export interface AuthDeprovisionResponse {
 }
 
-export interface PasswordChangeRequest {
+export interface AuthPasswordChangeRequest {
     old?: string;
     new?: string;
 }
 
-export interface PasswordChangeResponse {
+export interface AuthPasswordChangeResponse {
 }
 
 export interface AuthProvision {
@@ -964,7 +964,7 @@ export interface KeysService {
     AuthProvision: (r:AuthProvisionRequest) => AuthProvisionResponse;
     AuthDeprovision: (r:AuthDeprovisionRequest) => AuthDeprovisionResponse;
     AuthProvisions: (r:AuthProvisionsRequest) => AuthProvisionsResponse;
-    PasswordChange: (r:PasswordChangeRequest) => PasswordChangeResponse;
+    AuthPasswordChange: (r:AuthPasswordChangeRequest) => AuthPasswordChangeResponse;
     VaultAuth: (r:VaultAuthRequest) => VaultAuthResponse;
     VaultSync: (r:VaultSyncRequest) => VaultSyncResponse;
     VaultUnsync: (r:VaultUnsyncRequest) => VaultUnsyncResponse;

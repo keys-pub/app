@@ -74,7 +74,7 @@ service Keys {
   rpc AuthProvision(AuthProvisionRequest) returns (AuthProvisionResponse) {}
   rpc AuthDeprovision(AuthDeprovisionRequest) returns (AuthDeprovisionResponse) {}
   rpc AuthProvisions(AuthProvisionsRequest) returns (AuthProvisionsResponse) {}  
-  rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse) {}
+  rpc AuthPasswordChange(AuthPasswordChangeRequest) returns (AuthPasswordChangeResponse) {}
   
   rpc VaultAuth(VaultAuthRequest) returns (VaultAuthResponse) {}
   rpc VaultSync(VaultSyncRequest) returns (VaultSyncResponse) {}  
@@ -468,11 +468,11 @@ message AuthDeprovisionRequest {
 }
 message AuthDeprovisionResponse {}
 
-message PasswordChangeRequest {
+message AuthPasswordChangeRequest {
   string old = 1;
   string new = 2;
 }
-message PasswordChangeResponse {}
+message AuthPasswordChangeResponse {}
 
 message AuthProvision {
   string id = 1 [(go.field) = {name: "ID"}];

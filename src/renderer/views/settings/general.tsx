@@ -15,12 +15,22 @@ import {
 
 import {Link} from '../../components'
 import {ipcRenderer} from 'electron'
+import Snack, {SnackProps} from '../../components/snack'
 
 import {store, setLocation} from '../store'
+import ChangePasswordDialog from '../auth/change-password'
 
 export default (props: {}) => {
   const [prerelease, setPrerelease] = React.useState(false)
   const [version, setVersion] = React.useState('')
+  const [changePasswordOpen, setChangePasswordOpen] = React.useState(false)
+
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const openSnack = (snack: SnackProps) => {
+    setSnack(snack)
+    setSnackOpen(true)
+  }
 
   const onPrereleaseChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
@@ -91,8 +101,29 @@ export default (props: {}) => {
               </Box>
             </TableCell>
           </TableRow>
+
+          <TableRow>
+            <TableCell style={cellStyles}>
+              <Typography align="right"></Typography>
+            </TableCell>
+            <TableCell style={cellStyles}>
+              <Box display="flex" flexDirection="column">
+                <Typography>
+                  <Link onClick={() => setChangePasswordOpen(true)}>Change Password</Link>
+                </Typography>
+              </Box>
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        close={(snack?: string) => {
+          if (snack) openSnack({message: snack, alert: 'success', duration: 4000})
+          setChangePasswordOpen(false)
+        }}
+      />
     </Box>
   )
 }

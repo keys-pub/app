@@ -25,11 +25,11 @@ export default (props: Props) => {
     case 'password':
       actions = [
         {label: 'Forgot Password?', action: () => setStep('forgot')},
-        {label: 'Switch to FIDO2', action: () => setStep('fido2')},
+        {label: 'Use FIDO2', action: () => setStep('fido2')},
       ]
       break
     case 'fido2':
-      actions = [{label: 'Switch to Password', action: () => setStep('password')}]
+      actions = [{label: 'Use Password', action: () => setStep('password')}]
       break
   }
 
