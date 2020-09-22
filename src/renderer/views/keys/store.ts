@@ -11,12 +11,11 @@ type State = {
   input: string
   intro: boolean
   keyOpen: boolean
-  keyShow?: Key
   keys: Key[]
   removeOpen?: boolean
   removeKey?: Key
   searchOpen: boolean
-  selected: string
+  selected?: Key
   sortField?: string
   sortDirection?: SortDirection
   syncEnabled: boolean
@@ -32,7 +31,6 @@ const initialState: State = {
   keyOpen: false,
   keys: [],
   searchOpen: false,
-  selected: '',
   syncEnabled: false,
   syncing: false,
 }
