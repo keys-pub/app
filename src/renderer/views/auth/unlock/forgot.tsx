@@ -20,12 +20,12 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import Header from '../header'
-import Logo from '../logo'
-import AuthRecover from './recover'
-import AuthReset from './reset'
-import {Link} from '../../components'
-import Dialog from '../../components/dialog'
+import Header from '../../header'
+import Logo from '../../logo'
+import AuthRecover from '../recover'
+import AuthReset from '../reset'
+import {Link} from '../../../components'
+import Dialog from '../../../components/dialog'
 
 type Props = {
   close: () => void

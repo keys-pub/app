@@ -19,6 +19,7 @@ import {authProvision} from '../../../rpc/keys'
 import {AuthType, Encoding} from '../../../rpc/keys.d'
 import {devices as listDevices} from '../../../rpc/fido2'
 import {Device} from '../../../rpc/fido2.d'
+import SelectDevice from '../../authenticators/select'
 
 type Props = {
   open: boolean
@@ -45,6 +46,8 @@ export default (props: Props) => {
       openSnack({message: 'No device selected.', duration: 4000, alert: 'error'})
       return
     }
+
+    console.log('Using device:', selectedDevice)
 
     setLoading(true)
     try {
@@ -77,28 +80,6 @@ export default (props: Props) => {
   }
 
   const [selectedDevice, setSelectedDevice] = React.useState<Device>()
-  const [devices, setDevices] = React.useState<Device[]>([])
-
-  const onFIDO2Devices = async () => {
-    try {
-      const resp = await listDevices({})
-      setDevices(resp.devices || [])
-    } catch (err) {
-      openSnack({message: err.message, duration: 6000, alert: 'error'})
-    }
-  }
-
-  React.useEffect(() => {
-    onFIDO2Devices()
-  }, [])
-
-  const onDeviceChange = (event: React.ChangeEvent<{value: unknown}>) => {
-    const value = event.target.value as string
-    const selected = devices.find((d: Device) => {
-      return d.path == value
-    })
-    setSelectedDevice(selected)
-  }
 
   return (
     <Dialog
@@ -108,33 +89,22 @@ export default (props: Props) => {
       actions={[{label: 'Provision', color: 'primary', action: () => onAuthProvision()}]}
       disabled={loading}
     >
-      <Box display="flex" flex={1} flexDirection="column" alignItems="center" style={{width: '100%'}}>
-        <FormControl style={{width: 200}}>
-          <Select
-            variant="outlined"
-            value={selectedDevice?.path || 'none'}
-            onChange={onDeviceChange}
-            style={{marginBottom: 20}}
-          >
-            <MenuItem value="none">Select a device</MenuItem>
-            {devices?.map((d: Device) => (
-              <MenuItem value={d.path}>
-                {d.product} ({d.manufacturer})
-              </MenuItem>
-            ))}
-          </Select>
-
-          <TextField
-            id="pinInput"
-            autoFocus
-            label="PIN"
-            variant="outlined"
-            type="password"
-            onChange={onInputChangePin}
-            value={pin}
-            disabled={loading}
-          />
-        </FormControl>
+      <Box display="flex" flex={1} flexDirection="column" alignItems="center">
+        <Box style={{marginLeft: 44.5}}>
+          <SelectDevice onChange={setSelectedDevice} />
+        </Box>
+        <Box marginBottom={2} />
+        <TextField
+          id="pinInput"
+          autoFocus
+          label="PIN"
+          variant="outlined"
+          type="password"
+          onChange={onInputChangePin}
+          value={pin}
+          disabled={loading}
+          style={{width: 200}}
+        />
       </Box>
       <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>

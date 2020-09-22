@@ -37,10 +37,6 @@ export default (props: Props) => {
           Do you want to remove the {authTypeDescription(provision.type)} created on{' '}
           <Box display="inline" style={mono}>
             {dateString(provision.createdAt)}
-          </Box>{' '}
-          with id{' '}
-          <Box display="inline" style={{...mono, ...breakWords}}>
-            {props.provision.id}
           </Box>
           ?
         </Typography>

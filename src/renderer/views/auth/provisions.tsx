@@ -265,6 +265,16 @@ export default (props: Props) => {
                     <Typography>{dateString(selected.createdAt)}</Typography>
                   </CTableCell>
                 </TableRow>
+                {selected.aaguid && (
+                  <TableRow>
+                    <CTableCell>
+                      <Typography align="right">AAGUID</Typography>
+                    </CTableCell>
+                    <CTableCell>
+                      <Typography variant="body2">{selected.aaguid}</Typography>
+                    </CTableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           )}
