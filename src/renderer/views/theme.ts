@@ -21,7 +21,7 @@ export const theme = createMuiTheme({
     body2: {
       fontFamily: monoFont,
       whiteSpace: 'pre-wrap',
-      fontSize: '0.81rem',
+      fontSize: '0.8rem',
     },
     h1: {
       fontSize: 26,
@@ -46,7 +46,7 @@ export const theme = createMuiTheme({
     h5: {
       fontSize: 18,
       lineHeight: 'normal',
-      fontWeight: 400,
+      fontWeight: 300,
     },
     h6: {
       fontSize: 16,
