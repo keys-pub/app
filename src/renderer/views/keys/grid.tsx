@@ -53,7 +53,6 @@ export default (_: {}) => {
     exportKey,
     importOpen,
     input,
-    intro,
     keyOpen,
     keys,
     removeOpen,
