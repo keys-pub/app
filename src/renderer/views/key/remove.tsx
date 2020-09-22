@@ -68,7 +68,7 @@ const PrivateKey = (props: {k: Key}) => {
 const PublicKey = (props: {k: Key}) => {
   return (
     <Box style={{paddingBottom: 10}}>
-      <Typography style={{paddingBottom: 10}}>Do you want to delete this public key?</Typography>
+      <Typography style={{paddingBottom: 10}}>Are you sure you want to delete this public key?</Typography>
       <KeyLabel k={props.k} full />
     </Box>
   )
