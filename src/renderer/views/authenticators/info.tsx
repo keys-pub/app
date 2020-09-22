@@ -188,7 +188,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
             onClick={() => this.setState({openSetPin: true})}
             disabled={this.state.clientPin == ''}
           >
-            {this.state.clientPin == 'false' ? 'Create PIN' : 'Change PIN'}
+            {this.state.clientPin == 'FALSE' ? 'Create PIN' : 'Change PIN'}
           </Button>
           <Button
             color="primary"
@@ -224,7 +224,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         </Box>
         <SetPinDialog
           open={this.state.openSetPin}
-          create={this.state.clientPin == 'false'}
+          create={this.state.clientPin == 'FALSE'}
           device={this.props.device}
           close={this.closePin}
         />

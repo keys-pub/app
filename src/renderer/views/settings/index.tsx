@@ -21,6 +21,7 @@ import AuthenticatorsView from '../authenticators'
 import DebugView from './debug'
 import StyleGuide from '../style-guide'
 import DBView from '../db'
+import AuthProvisionsView from '../auth/provisions'
 
 import {store, setLocation} from '../store'
 
@@ -35,14 +36,22 @@ type Nav = {
 const navs: Array<Nav> = [
   {label: 'General', name: '/general', location: '/settings/general'},
   {label: 'Vault', name: '/vault', location: '/settings/vault'},
+  {label: 'Auth', name: '/auth', location: '/settings/auth'},
   {label: 'FIDO2', name: '/fido2', location: '/settings/fido2'},
   {label: 'Debug', name: '/debug', location: '/settings/debug'},
 ]
 
+let lastSelected = ''
+
 export default (props: Props) => {
   const location = store.useState((s) => s.location)
   let selected = location.replace(/^(\/settings)/, '')
-  if (selected == '') selected = '/general'
+  if (selected == '') {
+    if (!lastSelected) lastSelected = '/general'
+    selected = lastSelected
+  } else {
+    lastSelected = selected
+  }
 
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
@@ -66,6 +75,7 @@ export default (props: Props) => {
         <Box display="flex" flexDirection="column" flex={1}>
           {selected == '/general' && <GeneralView />}
           {selected == '/vault' && <VaultView />}
+          {selected == '/auth' && <AuthProvisionsView />}
           {selected == '/fido2' && <AuthenticatorsView />}
           {selected == '/debug' && <DebugView />}
           {selected == '/debug/db/service' && <DBView db="service" />}
@@ -79,7 +89,7 @@ export default (props: Props) => {
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
-    <ListItem button style={{height: 42}} onClick={onClick} key={nav.name} divider>
+    <ListItem button style={{height: 42}} onClick={onClick} key={nav.name}>
       <ListItemText
         primary={nav.label}
         primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}}

@@ -80,7 +80,7 @@ export default class ResetDialog extends React.Component<Props, State> {
           issued later than 5 seconds after power-up or if the user fails to confirm the reset by touching the
           key within 30 seconds.
         </Typography>
-        <Typography style={{color: 'red'}}>{this.state.error?.message}&nbsp;</Typography>
+        <Typography style={{color: 'red'}}>{this.state.error?.message || ' '}</Typography>
       </Box>
     )
   }

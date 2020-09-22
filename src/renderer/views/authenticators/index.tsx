@@ -18,14 +18,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Publish as ExportIcon,
-  DataUsage as GenerateKeyIcon,
-  ArrowDownward as ImportKeyIcon,
-  Search as SearchIcon,
-} from '@material-ui/icons'
+import {Sync as RefreshIcon} from '@material-ui/icons'
 
 import Header from '../header'
 import {pluralize} from '../helper'
@@ -103,21 +96,18 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
         display="flex"
         flexDirection="row"
         flex={1}
-        style={{paddingLeft: 8, paddingTop: 4, paddingBottom: 6, height: 30}}
+        style={{paddingLeft: 8, height: 30, alignItems: 'center'}}
       >
-        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', paddingTop: 6, color: '#999'}}>
-          {pluralize(this.state.devices?.length, 'Device', 'Devices')}
-        </Typography>
-        <Button
+        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%'}}>Devices</Typography>
+        <IconButton
           color="primary"
-          variant="outlined"
           size="small"
           onClick={this.refresh}
           style={{marginTop: 2, marginRight: 10}}
           // startIcon={<AddIcon />}
         >
-          Refresh
-        </Button>
+          <RefreshIcon />
+        </IconButton>
       </Box>
     )
   }
@@ -129,7 +119,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
           <Box style={{width: 200}}>
             {this.renderHeader()}
             <Divider />
-            <Box style={{position: 'absolute', width: 200, left: 0, top: 41, bottom: 0, overflowY: 'auto'}}>
+            <Box style={{position: 'absolute', width: 200, left: 0, top: 31, bottom: 0, overflowY: 'auto'}}>
               <Table size="small">
                 <TableBody>
                   {this.state.devices.map((device, index) => {

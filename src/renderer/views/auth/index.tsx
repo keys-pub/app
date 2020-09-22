@@ -34,6 +34,6 @@ export default (props: {}) => {
   if (status == AuthStatus.AUTH_SETUP_NEEDED) {
     return <AuthSetupView refresh={refresh} />
   } else {
-    return <AuthUnlockView refresh={refresh} />
+    return <AuthUnlockView />
   }
 }

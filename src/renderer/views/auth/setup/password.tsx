@@ -59,7 +59,7 @@ export default (props: Props) => {
         client: 'app',
       })
       await unlocked(resp.authToken)
-      setLoading(false)
+      // setLoading(false)
     } catch (err) {
       setLoading(false)
       setError(err)

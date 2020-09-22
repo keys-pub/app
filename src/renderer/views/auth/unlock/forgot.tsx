@@ -20,12 +20,12 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import Header from '../header'
-import Logo from '../logo'
-import AuthRecover from './recover'
-import AuthReset from './reset'
-import {Link} from '../../components'
-import Dialog from '../../components/dialog'
+import Header from '../../header'
+import Logo from '../../logo'
+import AuthRecover from '../recover'
+import AuthReset from '../reset'
+import {Link} from '../../../components'
+import Dialog from '../../../components/dialog'
 
 type Props = {
   close: () => void
@@ -54,11 +54,11 @@ export default (props: Props) => {
         <Card style={{marginBottom: 20, width: 400}}>
           <CardActionArea onClick={() => setStep('recover')}>
             <CardContent>
-              <Typography gutterBottom variant="h6" component="h2" color="primary">
+              <Typography gutterBottom variant="h4" color="primary">
                 Recover
               </Typography>
               <Typography variant="body1" color="textSecondary" component="p">
-                Use your backup key phrase to create a new password.
+                Use your paper key to create a new password.
               </Typography>
             </CardContent>
           </CardActionArea>
@@ -67,7 +67,7 @@ export default (props: Props) => {
         <Card style={{marginBottom: 20, width: 400}}>
           <CardActionArea onClick={() => setStep('reset')}>
             <CardContent>
-              <Typography gutterBottom variant="h6" component="h2" color="primary">
+              <Typography gutterBottom variant="h4" color="primary">
                 Reset
               </Typography>
               <Typography variant="body1" color="textSecondary" component="p">

@@ -138,9 +138,7 @@ export default (props: Props) => {
               <Typography align="right">ID</Typography>
             </TableCell>
             <TableCell style={{...cstyles.cell, paddingBottom: 10, paddingTop: 1}}>
-              <Box display="flex" flexDirection="column">
-                <IDLabel k={key} />
-              </Box>
+              <IDLabel k={key} />
             </TableCell>
           </TableRow>
           <TableRow>

@@ -173,7 +173,7 @@ export default (props: Props) => {
 
   const snackError = (err: Error) => {
     console.error(err)
-    openSnack({message: err.message, alert: 'error'})
+    openSnack({message: err.message, alert: 'error', duration: 8000})
   }
 
   React.useEffect(() => {

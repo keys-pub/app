@@ -2,23 +2,22 @@ import * as React from 'react'
 
 import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 
-import Header from '../header'
-import Logo from '../logo'
-import {Link} from '../../components'
+import Header from '../../header'
+import Logo from '../../logo'
+import {Link} from '../../../components'
 
-import {ipcRenderer} from 'electron'
-
-import {authUnlock} from '../../rpc/keys'
-import {AuthType} from '../../rpc/keys.d'
+import {authUnlock} from '../../../rpc/keys'
+import {AuthType} from '../../../rpc/keys.d'
 import AuthForgotView from './forgot'
 
-import {store, unlocked} from '../store'
+import {store, unlocked} from '../../store'
+import ActionsView, {Action} from './actions'
 
-type AuthUnlockProps = {
-  forgotPassword: () => void
+type Props = {
+  actions?: Action[]
 }
 
-const AuthUnlockView = (props: AuthUnlockProps) => {
+export default (props: Props) => {
   const [input, setInput] = React.useState('')
   const [error, setError] = React.useState<Error>()
   const [loading, setLoading] = React.useState(false)
@@ -55,8 +54,8 @@ const AuthUnlockView = (props: AuthUnlockProps) => {
       })
       clearTimeout(timeout)
       await unlocked(resp.authToken)
-      setLoading(false)
-      setProgress(false)
+      // setLoading(false)
+      // setProgress(false)
     } catch (err) {
       clearTimeout(timeout)
       setLoading(false)
@@ -109,34 +108,7 @@ const AuthUnlockView = (props: AuthUnlockProps) => {
           Unlock
         </Button>
       </Box>
-      <Box style={{paddingTop: 10}}>
-        <Link style={{width: 550, marginTop: 10, textAlign: 'center'}} onClick={props.forgotPassword}>
-          Forgot password?
-        </Link>
-      </Box>
-    </Box>
-  )
-}
-
-type Props = {
-  refresh: () => void
-}
-
-export default (props: Props) => {
-  const [forgotPassword, setForgotPassword] = React.useState(false)
-
-  const close = () => {
-    props.refresh()
-    setForgotPassword(false)
-  }
-
-  if (forgotPassword) {
-    return <AuthForgotView close={close} />
-  }
-
-  return (
-    <Box display="flex" flex={1} flexDirection="column">
-      <AuthUnlockView forgotPassword={() => setForgotPassword(true)} />
+      <ActionsView actions={props.actions} />
     </Box>
   )
 }
