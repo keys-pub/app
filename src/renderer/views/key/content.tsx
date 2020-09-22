@@ -1,6 +1,8 @@
 import * as React from 'react'
 
-import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
+import {Box, Button, IconButton, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
+
+import {PersonAdd as LinkIcon} from '@material-ui/icons'
 
 import {IDLabel} from './label'
 
@@ -77,9 +79,9 @@ const UserRow = (props: UserRowProps) => {
           <Box display="flex" flexDirection="row">
             <ServiceSelect service={service} setService={setService} small />
             <Box marginRight={1} />
-            <Button variant="outlined" size="small" color="primary" onClick={() => props.userSign(service)}>
-              OK
-            </Button>
+            <IconButton size="small" color="primary" onClick={() => props.userSign(service)}>
+              <LinkIcon />
+            </IconButton>
           </Box>
         </TableCell>
       </TableRow>
