@@ -332,7 +332,7 @@ export default (_: {}) => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>
+              <TableCell style={{minWidth: 200}}>
                 <TableSortLabel
                   active={sortField == 'user'}
                   direction={tableDirection}
@@ -368,7 +368,7 @@ export default (_: {}) => {
                   <TableCell component="th" scope="row" style={{minWidth: 200}}>
                     {key.user && <UserLabel user={key.user} />}
                   </TableCell>
-                  <TableCell style={{verticalAlign: 'top'}}>
+                  <TableCell style={{verticalAlign: 'top', width: 530}}>
                     <IDLabel k={key} owner />
                   </TableCell>
                 </TableRow>
