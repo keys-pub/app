@@ -8,7 +8,7 @@ import {Link} from '../../../components'
 
 import {authUnlock} from '../../../rpc/keys'
 import {AuthType} from '../../../rpc/keys.d'
-import AuthForgotView from './forgot'
+import Snack, {SnackProps} from '../../../components/snack'
 
 import {store, unlocked} from '../../store'
 import ActionsView, {Action} from './actions'
@@ -19,20 +19,34 @@ type Props = {
 
 export default (props: Props) => {
   const [input, setInput] = React.useState('')
-  const [error, setError] = React.useState<Error>()
   const [loading, setLoading] = React.useState(false)
   const [progress, setProgress] = React.useState(false)
+
+  const [snackOpen, setSnackOpen] = React.useState(false)
+  const [snack, setSnack] = React.useState<SnackProps>()
+  const openSnack = (snack: SnackProps) => {
+    setSnack(snack)
+    setSnackOpen(true)
+  }
 
   const inputRef = React.useRef<HTMLInputElement>()
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     setInput(target.value)
-    setError(undefined)
+    setSnackOpen(false)
   }, [])
+
+  const setError = (err: Error) => {
+    let message = err.message
+    if (message == 'invalid password') {
+      message = 'Invalid password'
+    }
+    openSnack({message: message, alert: 'error', duration: 6000})
+  }
 
   const onUnlock = async () => {
     if (!input) {
-      setError(new Error('Oops, password is empty'))
+      openSnack({message: 'Empty password', alert: 'error', duration: 6000})
       inputRef.current?.focus()
       return
     }
@@ -44,7 +58,7 @@ export default (props: Props) => {
     }, 2000)
 
     setLoading(true)
-    setError(undefined)
+    setSnackOpen(false)
 
     try {
       const resp = await authUnlock({
@@ -77,25 +91,22 @@ export default (props: Props) => {
       <Header noLock noBack />
       <Logo loading={progress} top={60} />
       <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter your password to unlock.</Typography>
-      <FormControl error={!!error} style={{marginBottom: 10}}>
-        <TextField
-          id="unlockPasswordInput"
-          autoFocus
-          label="Password"
-          variant="outlined"
-          type="password"
-          onChange={onInputChange}
-          inputProps={{
-            ref: inputRef,
-            style: {fontSize: 32, height: 18},
-            onKeyDown: onKeyDown,
-          }}
-          value={input}
-          style={{fontSize: 48, width: 400}}
-          disabled={loading}
-        />
-        <FormHelperText>{error?.message || ' '}</FormHelperText>
-      </FormControl>
+      <TextField
+        id="unlockPasswordInput"
+        autoFocus
+        label="Password"
+        variant="outlined"
+        type="password"
+        onChange={onInputChange}
+        inputProps={{
+          ref: inputRef,
+          style: {fontSize: 32, height: 18},
+          onKeyDown: onKeyDown,
+        }}
+        value={input}
+        style={{fontSize: 48, width: 400, marginBottom: 20}}
+        disabled={loading}
+      />
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
         <Button
           color="primary"
@@ -109,6 +120,7 @@ export default (props: Props) => {
         </Button>
       </Box>
       <ActionsView actions={props.actions} />
+      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

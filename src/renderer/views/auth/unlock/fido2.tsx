@@ -69,25 +69,22 @@ export default (props: Props) => {
       <Header noLock noBack />
       <Logo top={60} />
       <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter PIN (if required).</Typography>
-      <FormControl style={{marginBottom: 10}}>
-        <TextField
-          id="pinInput"
-          autoFocus
-          label="PIN"
-          variant="outlined"
-          type="password"
-          onChange={onInputChange}
-          inputProps={{
-            ref: inputRef,
-            style: {fontSize: 32, height: 18},
-            onKeyDown: onKeyDown,
-          }}
-          value={input}
-          style={{fontSize: 48, width: 200}}
-          disabled={loading}
-        />
-        <FormHelperText> </FormHelperText>
-      </FormControl>
+      <TextField
+        id="pinInput"
+        autoFocus
+        label="PIN"
+        variant="outlined"
+        type="password"
+        onChange={onInputChange}
+        inputProps={{
+          ref: inputRef,
+          style: {fontSize: 32, height: 18},
+          onKeyDown: onKeyDown,
+        }}
+        value={input}
+        style={{fontSize: 48, width: 200, marginBottom: 20}}
+        disabled={loading}
+      />
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center">
         <Button
           color="primary"
