@@ -108,7 +108,7 @@ export default (_: {}) => {
   const renderEnable = () => {
     return (
       <Box>
-        <Typography variant="h5" style={{paddingBottom: 6}}>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
           Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 6}}>
@@ -130,7 +130,7 @@ export default (_: {}) => {
   const renderInfo = () => {
     return (
       <Box>
-        <Typography variant="h5" style={{paddingBottom: 6}}>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
           Vault Sync
         </Typography>
         <Typography>
@@ -152,7 +152,7 @@ export default (_: {}) => {
   const renderDelete = () => {
     return (
       <Box>
-        <Typography variant="h5" style={{paddingBottom: 6}}>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
           Delete Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 10}}>
@@ -182,7 +182,7 @@ export default (_: {}) => {
   const renderAuth = () => {
     return (
       <Box>
-        <Typography variant="h5" style={{paddingBottom: 6}}>
+        <Typography variant="h6" style={{paddingBottom: 6}}>
           Connect another Device
         </Typography>
         {phrase && (

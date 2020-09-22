@@ -168,9 +168,15 @@ export default (props: Props) => {
           <Box
             display="flex"
             flexDirection="row"
-            style={{paddingLeft: 8, height: 30, backgroundColor: '#fdfdfd', alignItems: 'center'}}
+            style={{
+              paddingLeft: 8,
+              height: 30,
+              alignItems: 'center',
+            }}
           >
-            <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%'}}>Provisions</Typography>
+            <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', color: '#666'}}>
+              Provisions
+            </Typography>
             <IconButton
               color="primary"
               // variant="outlined"

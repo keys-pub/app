@@ -26,32 +26,26 @@ export const theme = createMuiTheme({
     h1: {
       fontSize: 26,
       lineHeight: 'normal',
-      fontWeight: 400,
     },
     h2: {
-      fontSize: 24,
-      lineHeight: 'normal',
-      fontWeight: 400,
-    },
-    h3: {
       fontSize: 22,
       lineHeight: 'normal',
-      fontWeight: 400,
     },
-    h4: {
-      fontSize: 20,
-      lineHeight: 'normal',
-      fontWeight: 400,
-    },
-    h5: {
+    h3: {
       fontSize: 18,
       lineHeight: 'normal',
-      fontWeight: 300,
     },
-    h6: {
+    h4: {
+      fontSize: 17,
+      lineHeight: 'normal',
+    },
+    h5: {
       fontSize: 16,
       lineHeight: 'normal',
-      fontWeight: 400,
+    },
+    h6: {
+      fontSize: 15,
+      lineHeight: 'normal',
     },
   },
   palette: {

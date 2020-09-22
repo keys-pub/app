@@ -89,28 +89,11 @@ export default (props: {}) => {
 
           <TableRow>
             <TableCell style={cellStyles}>
-              <Typography align="right">Experiments</Typography>
-            </TableCell>
-            <TableCell style={cellStyles}>
-              <Box display="flex" flexDirection="column">
-                <Typography>
-                  <Link span onClick={() => setLocation('/wormhole')}>
-                    Wormhole
-                  </Link>
-                </Typography>
-              </Box>
-            </TableCell>
-          </TableRow>
-
-          <TableRow>
-            <TableCell style={cellStyles}>
               <Typography align="right"></Typography>
             </TableCell>
             <TableCell style={cellStyles}>
               <Box display="flex" flexDirection="column">
-                <Typography>
-                  <Link onClick={() => setChangePasswordOpen(true)}>Change Password</Link>
-                </Typography>
+                <Link onClick={() => setChangePasswordOpen(true)}>Change Password</Link>
               </Box>
             </TableCell>
           </TableRow>

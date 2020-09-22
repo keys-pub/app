@@ -42,39 +42,26 @@ export default (props: {}) => {
 
   const labelWidth = 60
   return (
-    <Box display="flex" flex={1} flexDirection="column" style={{marginTop: 10, marginLeft: 15}}>
-      <Box display="flex" flexDirection="column">
-        <Typography>
-          <Link span onClick={() => setLocation('/settings/debug/db/service')}>
-            DB
-          </Link>
-          <br />
-          <Link span onClick={() => setLocation('/settings/debug/db/vault')}>
-            Vault
-          </Link>
-          <br />
-          <Link span onClick={devTools}>
-            Toggle Dev Tools
-          </Link>
-          <br />
-          <Link span onClick={forceUpdate}>
-            Force Update
-          </Link>
-          <br />
-          <Link span onClick={() => setLocation('/settings/debug/style-guide')}>
-            Style Guide
-          </Link>
-          <br />
-          <Link span onClick={restart}>
-            Restart
-          </Link>
-          <br />
-          <Link span onClick={showError}>
-            Show Error
-          </Link>
-          <br />
-        </Typography>
-      </Box>
+    <Box display="flex" flexDirection="column" style={{marginTop: 10, marginLeft: 15}}>
+      <Typography>Experiments</Typography>
+      <Link onClick={() => setLocation('/wormhole')}>Wormhole</Link>
+      <Box margin={1} />
+
+      <Typography>DB</Typography>
+      <Link onClick={() => setLocation('/settings/debug/db/service')}>Service</Link>
+      <Link onClick={() => setLocation('/settings/debug/db/vault')}>Vault</Link>
+      <Box margin={1} />
+
+      <Typography>Styles</Typography>
+      <Link onClick={() => setLocation('/settings/debug/style-guide')}>Style Guide</Link>
+      <Box margin={1} />
+
+      <Typography>Testing</Typography>
+      <Link onClick={devTools}>Toggle Dev Tools</Link>
+      <Link onClick={forceUpdate}>Force Update</Link>
+      <Link onClick={restart}>Restart</Link>
+      <Link onClick={showError}>Show Error</Link>
+      <Box margin={1} />
     </Box>
   )
 }

@@ -29,8 +29,9 @@ const Link = (props: Props) => {
     style.cursor = 'default'
   }
 
+  let tstyle: CSSProperties = {}
   if (props.inline) {
-    style.display = 'inline'
+    tstyle.display = 'inline'
   }
   if (props.color == 'secondary') {
     style.color = secondary
@@ -56,8 +57,10 @@ const Link = (props: Props) => {
   }
 
   return (
-    <Typography onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={{...props.style, ...style}}>
-      {props.children}
+    <Typography style={{...tstyle, ...props.style}}>
+      <span onClick={onClick} onMouseEnter={on} onMouseLeave={off} style={style}>
+        {props.children}
+      </span>
     </Typography>
   )
 }

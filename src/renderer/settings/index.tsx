@@ -89,7 +89,7 @@ export default (props: Props) => {
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
-    <ListItem button style={{height: 42}} onClick={onClick} key={nav.name}>
+    <ListItem button style={{height: 40}} onClick={onClick} key={nav.name}>
       <ListItemText
         primary={nav.label}
         primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}}

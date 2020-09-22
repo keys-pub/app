@@ -98,7 +98,9 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
         flex={1}
         style={{paddingLeft: 8, height: 30, alignItems: 'center'}}
       >
-        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%'}}>Devices</Typography>
+        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', color: '#666'}}>
+          Devices
+        </Typography>
         <IconButton
           color="primary"
           size="small"

@@ -54,7 +54,7 @@ export default (props: Props) => {
         <Card style={{marginBottom: 20, width: 400}}>
           <CardActionArea onClick={() => setStep('recover')}>
             <CardContent>
-              <Typography gutterBottom variant="h4" color="primary">
+              <Typography gutterBottom variant="h5" color="primary">
                 Recover
               </Typography>
               <Typography variant="body1" color="textSecondary" component="p">
@@ -67,7 +67,7 @@ export default (props: Props) => {
         <Card style={{marginBottom: 20, width: 400}}>
           <CardActionArea onClick={() => setStep('reset')}>
             <CardContent>
-              <Typography gutterBottom variant="h4" color="primary">
+              <Typography gutterBottom variant="h5" color="primary">
                 Reset
               </Typography>
               <Typography variant="body1" color="textSecondary" component="p">
@@ -77,9 +77,7 @@ export default (props: Props) => {
           </CardActionArea>
         </Card>
 
-        <Link onClick={close} color="secondary">
-          Go back
-        </Link>
+        <Link onClick={close}>Go back</Link>
       </Box>
     </Box>
   )

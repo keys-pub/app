@@ -69,7 +69,7 @@ export default (props: Props) => {
       <Header noLock noBack />
       <Logo top={60} />
       <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
-        Enter in your paper key and new password.
+        Enter in your paper key and a new password.
       </Typography>
       <FormControl>
         <TextField
