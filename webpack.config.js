@@ -28,7 +28,7 @@ function createRenderConfig(isDev) {
 
     entry: {
       polyfill: '@babel/polyfill',
-      render: './renderer/app.tsx',
+      render: './renderer/renderer.tsx',
     },
 
     output: {

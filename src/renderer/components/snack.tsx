@@ -5,7 +5,7 @@ import {Box, IconButton, Snackbar, SnackbarContent, Typography} from '@material-
 import {Close as CloseIcon} from '@material-ui/icons'
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
-import {body1} from '../views/theme'
+import {body1} from '../theme'
 
 // import Slide from '@material-ui/core/Slide'
 

@@ -3,7 +3,7 @@ import {CSSProperties} from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 import {shell} from 'electron'
-import {primary, secondary} from '../views/theme'
+import {primary, secondary} from '../theme'
 
 type Props = {
   onClick?: () => any
