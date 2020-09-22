@@ -85,7 +85,6 @@ const Dialog = (props: Props) => {
             {props.close.label}
           </Button>
         )}
-        <Box display="flex" flexGrow={1} />
         {props.actions?.map((action: DialogAction) => (
           <Button onClick={action.action} color={action.color} key={action.label} disabled={props.disabled}>
             {action.label}
