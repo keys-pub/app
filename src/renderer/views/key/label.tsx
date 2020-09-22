@@ -8,12 +8,19 @@ import UserLabel from '../user/label'
 
 import {Key, KeyType, User} from '../../rpc/keys.d'
 
-export const IDLabel = (props: {k: Key; owner?: boolean}) => {
+type IDLabelProps = {
+  k: Key
+  owner?: boolean
+  style?: CSSProperties
+}
+
+export const IDLabel = (props: IDLabelProps) => {
   const key = props.k
   const isPrivate = key.type == KeyType.X25519 || key.type === KeyType.EDX25519
-  const style: CSSProperties = {}
+  let style: CSSProperties = {}
   if (props.owner && isPrivate) style.fontWeight = 500
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
+  if (props.style) style = {...style, ...props.style}
   return (
     <Typography variant="body2" style={{...style}}>
       {key.id}
