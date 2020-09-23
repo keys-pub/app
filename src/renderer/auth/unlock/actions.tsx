@@ -23,7 +23,7 @@ export default (props: Props) => {
             {a.label}
           </Link>
           {i + 1 < actions.length && (
-            <Typography display="inline" style={{paddingLeft: 6, paddingRight: 6, color: '#999'}}>
+            <Typography display="inline" style={{paddingLeft: 6, paddingRight: 6, color: '#aaa'}}>
               {'—'}
             </Typography>
           )}
