@@ -17,17 +17,14 @@ import {
 } from '@material-ui/core'
 
 import {
-  VpnKeyOutlined as KeysIcon,
-  ArrowLeft as LeftIcon,
-  ArrowRight as RightIcon,
-  Search as SearchIcon,
-  EnhancedEncryption as CryptoToolsIcon,
-  Settings as SettingsIcon,
-  Album as WormholeIcon,
-  Security as SecretsIcon,
-  Policy as AuthnIcon,
-  Backup as VaultIcon,
-} from '@material-ui/icons'
+  KeysIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  CryptoToolsIcon,
+  SettingsIcon,
+  WormholeIcon,
+  SecretsIcon,
+} from './icons'
 
 import {setLocation, store} from './store'
 
@@ -118,8 +115,8 @@ export default (props: {}) => {
             }
             style={{color: 'white', alignSelf: 'flex-end'}}
           >
-            {navMinimized && <LeftIcon />}
-            {!navMinimized && <RightIcon />}
+            {navMinimized && <LeftArrowIcon />}
+            {!navMinimized && <RightArrowIcon />}
           </IconButton>
         </Box>
       </Box>
@@ -144,9 +141,9 @@ const row = (nav: NavRoute, location: string, open: boolean, experiment: boolean
       <ListItemIcon style={{minWidth: 0, marginRight: 6}} id={nav.id}>
         <nav.icon
           style={{
-            fontSize: open ? 18 : 24,
+            fontSize: open ? 'inherit' : 24,
             marginLeft: open ? -1 : 4,
-            color: selected ? 'white' : '#999',
+            color: selected ? 'white' : '#dfdfdf',
           }}
         />
       </ListItemIcon>

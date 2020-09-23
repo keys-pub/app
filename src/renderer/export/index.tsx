@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
-import {Assignment as CopyIcon} from '@material-ui/icons'
+import {CopyIcon} from '../icons'
 
 import {KeyLabel} from '../key/label'
 import {clipboard} from 'electron'

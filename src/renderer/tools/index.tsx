@@ -25,12 +25,7 @@ import {withStyles, Theme, createStyles, makeStyles} from '@material-ui/core/sty
 import {store, setLocation} from '../store'
 import path from 'path'
 
-import {
-  EnhancedEncryption as EncryptIcon,
-  LockOpen as DecryptIcon,
-  CreateOutlined as SignIcon,
-  VisibilityOutlined as VerifyIcon,
-} from '@material-ui/icons'
+import {EncryptIcon, DecryptIcon, SignIcon, VerifyIcon} from '../icons'
 
 type Props = {}
 

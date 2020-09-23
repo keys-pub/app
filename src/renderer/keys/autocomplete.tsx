@@ -2,7 +2,6 @@ import * as React from 'react'
 import {CSSProperties} from 'react'
 
 import {Box, Divider, TextField, Typography} from '@material-ui/core'
-import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete, {
   createFilterOptions,

@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Sync as RefreshIcon} from '@material-ui/icons'
+import {RefreshIcon} from '../icons'
 
 import Header from '../header'
 import {pluralize} from '../helper'

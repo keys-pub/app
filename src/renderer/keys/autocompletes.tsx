@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
-// import {Face as FaceIcon} from '@material-ui/icons'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 

@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Add as AddIcon} from '@material-ui/icons'
+import {AddIcon} from '../icons'
 import {withStyles, Theme, createStyles, makeStyles} from '@material-ui/core/styles'
 
 import {pluralize} from '../helper'

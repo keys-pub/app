@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, IconButton, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
-import {PersonAdd as LinkIcon} from '@material-ui/icons'
+import {LinkIcon} from '../icons'
 
 import {IDLabel} from './label'
 
@@ -42,7 +42,7 @@ const UserRow = (props: UserRowProps) => {
         <TableCell style={{...cstyles.cell}}>
           <Typography align="right">User</Typography>
         </TableCell>
-        <TableCell style={{...cstyles.cell, paddingBottom: 10, paddingTop: 1}}>
+        <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
           <Box display="flex" flexDirection="column" key={'user-' + user.kid + '-' + user.seq}>
             <Box display="flex" flexDirection="row">
               <UserLabel user={user} />
@@ -135,7 +135,7 @@ export default (props: Props) => {
             <TableCell style={{...cstyles.cell}}>
               <Typography align="right">ID</Typography>
             </TableCell>
-            <TableCell style={{...cstyles.cell, paddingBottom: 10, paddingTop: 1}}>
+            <TableCell style={{...cstyles.cell, paddingBottom: 10}}>
               <IDLabel k={key} />
             </TableCell>
           </TableRow>

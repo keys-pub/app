@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
-import {Refresh as RefreshIcon} from '@material-ui/icons'
+import {RefreshIcon} from '../icons'
 
 import {Link} from '../components'
 import Dialog from '../components/dialog'

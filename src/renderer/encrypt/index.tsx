@@ -19,7 +19,7 @@ import {
   Box,
 } from '@material-ui/core'
 
-import {PersonAdd as AddRecipientIcon, CreateOutlined as SignIcon} from '@material-ui/icons'
+import {AddRecipientIcon, SignIcon} from '../icons'
 
 import {Link} from '../components'
 

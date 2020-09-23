@@ -11,7 +11,8 @@ const monoFont = 'Roboto Mono'
 export const mono: CSSProperties = {
   fontFamily: monoFont,
   whiteSpace: 'pre-wrap',
-  fontSize: '0.8rem',
+  fontSize: '0.8571428571428571rem',
+  // fontSize: 12,
 }
 
 export const theme = createMuiTheme({
@@ -21,31 +22,38 @@ export const theme = createMuiTheme({
     body2: {
       fontFamily: monoFont,
       whiteSpace: 'pre-wrap',
-      fontSize: '0.8rem',
+      fontSize: '0.8571428571428571rem',
+      lineHeight: '1.5',
     },
     h1: {
       fontSize: 26,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
     h2: {
       fontSize: 22,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
     h3: {
       fontSize: 18,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
     h4: {
       fontSize: 17,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
     h5: {
       fontSize: 16,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
     h6: {
       fontSize: 15,
       lineHeight: 'normal',
+      fontWeight: 300,
     },
   },
   palette: {

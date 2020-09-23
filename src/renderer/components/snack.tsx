@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, IconButton, Snackbar, SnackbarContent, Typography} from '@material-ui/core'
 
-import {Close as CloseIcon} from '@material-ui/icons'
+import {CloseIcon} from '../icons'
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 import {body1} from '../theme'

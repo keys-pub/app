@@ -6,7 +6,6 @@ import {KeyLabel} from '../key/label'
 
 import {keys} from '../rpc/keys'
 import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '../rpc/keys.d'
-import {ArrowDropDown} from '@material-ui/icons'
 
 export type Props = {
   value?: Key

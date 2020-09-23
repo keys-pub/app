@@ -1,12 +1,25 @@
 import * as React from 'react'
 
-import {Box, Button, FormControl, FormHelperText, Input, Typography} from '@material-ui/core'
+import {
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  Input,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+} from '@material-ui/core'
 
 import {Link} from '../components'
 import Header from '../header'
 import Snack, {SnackProps} from '../components/snack'
 import {UpdateAlertView} from '../update/alert'
 import {openSnack as appSnack} from '../snack'
+
+import * as icons from '../icons'
 
 export default (_: {}) => {
   const [updateAlert, setUpdateAlert] = React.useState(false)
@@ -23,9 +36,17 @@ export default (_: {}) => {
         display="flex"
         flexDirection="column"
         marginLeft={2}
-        style={{position: 'absolute', top: 0, left: 0, bottom: 0, overflowY: 'auto'}}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
       >
-        <Box display="flex" flexDirection="column">
+        <Box display="flex" flexDirection="column" marginBottom={2}>
           <Typography variant="h1">Header1</Typography>
           <Typography variant="h2">Header2</Typography>
           <Typography variant="h3">Header3</Typography>
@@ -142,7 +163,7 @@ export default (_: {}) => {
           />
         </Box>
 
-        <Box>
+        <Box marginBottom={2}>
           <Link onClick={() => setUpdateAlert(true)}>Update Alert</Link>
           <UpdateAlertView
             open={updateAlert}
@@ -153,11 +174,63 @@ export default (_: {}) => {
           />
         </Box>
 
-        <Box style={{marginBottom: 200}} />
+        <Box display="flex" flexDirection="row">
+          <Typography style={{zoom: '200%', marginRight: 20}}>kex1mnseg28xu6g3j</Typography>
+          <Typography style={{zoom: '200%'}} variant="body2">
+            kex1mnseg28xu6g3j
+          </Typography>
+        </Box>
+        <Box display="flex" flexDirection="row" marginBottom={2}>
+          <Typography style={{marginRight: 20}}>kex1mnseg28xu6g3j</Typography>
+          <Typography variant="body2">kex1mnseg28xu6g3j</Typography>
+        </Box>
+
+        <Box display="flex" flexDirection="column" marginTop={2}>
+          <Table size="small">
+            <TableBody>
+              {row('AddRecipientIcon', <icons.AddRecipientIcon />)}
+              {row('LinkIcon', <icons.LinkIcon />)}
+              {row('SyncIcon', <icons.SyncIcon />)}
+              {row('PasswordVisibleIcon', <icons.PasswordVisibleIcon />)}
+              {row('PasswordIcon', <icons.PasswordIcon />)}
+              {row('NoteIcon', <icons.NoteIcon />)}
+              {row('AddIcon', <icons.AddIcon />)}
+              {row('EncryptIcon', <icons.EncryptIcon />)}
+              {row('DecryptIcon', <icons.DecryptIcon />)}
+              {row('SignIcon', <icons.SignIcon />)}
+              {row('LeftArrowIcon', <icons.LeftArrowIcon />)}
+              {row('RightArrowIcon', <icons.RightArrowIcon />)}
+              {row('ScreenLockIcon', <icons.ScreenLockIcon />)}
+              {row('MinimizeIcon', <icons.MinimizeIcon />)}
+              {row('MaximizeIcon', <icons.MaximizeIcon />)}
+              {row('UnmaximizeIcon', <icons.UnmaximizeIcon />)}
+              {row('KeysIcon', <icons.KeysIcon />)}
+              {row('SearchIcon', <icons.SearchIcon />)}
+              {row('CryptoToolsIcon', <icons.CryptoToolsIcon />)}
+              {row('SettingsIcon', <icons.SettingsIcon />)}
+              {row('WormholeIcon', <icons.WormholeIcon />)}
+              {row('SecretsIcon', <icons.SecretsIcon />)}
+              {row('RefreshIcon', <icons.RefreshIcon />)}
+              {row('CloseIcon', <icons.CloseIcon />)}
+              {row('CopyIcon', <icons.CopyIcon />)}
+            </TableBody>
+          </Table>
+        </Box>
       </Box>
+
+      <Box marginTop={10} />
     </Box>
   )
 }
+
+const row = (name: string, icon: React.ReactElement): React.ReactElement => (
+  <TableRow>
+    <TableCell>
+      <Typography>{name}</Typography>
+    </TableCell>
+    <TableCell>{icon}</TableCell>
+  </TableRow>
+)
 
 const cstyles = {
   item: {

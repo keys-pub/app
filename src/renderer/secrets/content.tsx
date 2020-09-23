@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
 
-import {Visibility as PasswordVisibleIcon} from '@material-ui/icons'
+import {PasswordVisibleIcon} from '../icons'
 
 import {mono, breakWords} from '../theme'
 import {dateString} from '../helper'

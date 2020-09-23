@@ -1,7 +1,6 @@
 import {ipcMain, BrowserWindow} from 'electron'
 
 import {client, setAuthToken, close} from './rpc/client'
-import {Error} from '@material-ui/icons'
 import * as grpc from '@grpc/grpc-js'
 
 type RPC = {

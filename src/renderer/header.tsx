@@ -8,14 +8,7 @@ import {store, goBack} from './store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 
-import {
-  ChevronLeft,
-  NotInterested as ScreenLockIcon,
-  Close as CloseIcon,
-  Minimize as MinimizeIcon,
-  CropSquare as MaximizeIcon,
-  Crop75 as UnmaximizeIcon,
-} from '@material-ui/icons'
+import {LeftArrowIcon, ScreenLockIcon, CloseIcon, MinimizeIcon, MaximizeIcon, UnmaximizeIcon} from './icons'
 
 import {authLock} from './rpc/keys'
 
@@ -75,7 +68,7 @@ export default (props: Props) => {
           {!props.noBack && (
             <Box display="flex" flexDirection="row">
               <IconButton onClick={goBack} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-                <ChevronLeft />
+                <LeftArrowIcon />
               </IconButton>
             </Box>
           )}

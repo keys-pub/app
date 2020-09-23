@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, IconButton, Input, Typography, Box} from '@material-ui/core'
 
-import {Assignment as CopyIcon} from '@material-ui/icons'
+import {CopyIcon} from '../icons'
 
 import {mono} from '../theme'
 import {clipboard} from 'electron'

@@ -17,13 +17,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {
-  VpnLock as PasswordIcon,
-  EventNote as NoteIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Sync as SyncIcon,
-} from '@material-ui/icons'
+import {PasswordIcon, NoteIcon, AddIcon, SyncIcon} from '../icons'
 
 import Header from '../header'
 

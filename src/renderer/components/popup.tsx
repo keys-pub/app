@@ -11,7 +11,7 @@ import {
   LinearProgress,
   Typography,
 } from '@material-ui/core'
-import {Close as CloseIcon} from '@material-ui/icons'
+import {CloseIcon} from '../icons'
 
 type Props = {
   open: boolean

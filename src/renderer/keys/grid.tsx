@@ -17,15 +17,7 @@ import {
 
 import {clipboard, ipcRenderer} from 'electron'
 
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Publish as ExportIcon,
-  DataUsage as GenerateKeyIcon,
-  ArrowDownward as ImportKeyIcon,
-  Search as SearchIcon,
-  Sync as SyncIcon,
-} from '@material-ui/icons'
+import {SyncIcon} from '../icons'
 
 import UserLabel from '../user/label'
 import {IDLabel} from '../key/label'

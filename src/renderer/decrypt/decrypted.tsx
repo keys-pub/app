@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, Divider, IconButton, Input, Box, Typography} from '@material-ui/core'
 
-import {Assignment as CopyIcon} from '@material-ui/icons'
+import {CopyIcon} from '../icons'
 import SignerView from '../verify/signer'
 import {regular} from '../theme'
 import {clipboard} from 'electron'
