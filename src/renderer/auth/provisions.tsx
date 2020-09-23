@@ -25,9 +25,7 @@ import {pluralize} from '../helper'
 
 import {authProvisions} from '../rpc/keys'
 import {AuthProvision, AuthType} from '../rpc/keys.d'
-import {Error} from '../store'
 import {Store} from 'pullstate'
-import Snack, {SnackProps} from '../components/snack'
 import {dateString} from '../helper'
 import ProvisionPassword from './provision/password'
 import ProvisionPaperKey from './provision/paper-key'
@@ -36,6 +34,7 @@ import {ipcRenderer} from 'electron'
 import DeprovisionDialog from './provision/deprovision'
 import {authTypeDescription} from './helper'
 import {breakWords} from '../theme'
+import {openSnack, openSnackError} from '../snack'
 
 type Props = {}
 
@@ -62,13 +61,6 @@ const CTableCell = withStyles((theme: Theme) =>
 export default (props: Props) => {
   const {provisions, selected} = store.useState()
 
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
-
   const refresh = async () => {
     try {
       const resp = await authProvisions({})
@@ -80,7 +72,7 @@ export default (props: Props) => {
         s.selected = rselected
       })
     } catch (err) {
-      openSnack({message: err.message, alert: 'error', duration: 8000})
+      openSnackError(err)
     }
   }
 
@@ -111,11 +103,7 @@ export default (props: Props) => {
 
   const openRemove = (provision: AuthProvision) => {
     if (provisions.length == 1) {
-      openSnack({
-        message: 'Only one provision left, add another before removing',
-        alert: 'error',
-        duration: 6000,
-      })
+      openSnackError(new Error('Only one provision left, add another before removing'))
       return
     }
     setDeprovision(provision)
@@ -338,7 +326,6 @@ export default (props: Props) => {
         }}
       />
       <DeprovisionDialog open={deprovisionOpen} provision={deprovision} close={closeRemove} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

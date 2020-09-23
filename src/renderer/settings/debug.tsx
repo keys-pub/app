@@ -40,7 +40,6 @@ export default (props: {}) => {
     ipcRenderer.send('reload-app', {})
   }
 
-  const labelWidth = 60
   return (
     <Box display="flex" flexDirection="column" style={{marginTop: 10, marginLeft: 15}}>
       <Typography>Experiments</Typography>

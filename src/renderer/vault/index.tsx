@@ -6,8 +6,6 @@ import {shell} from 'electron'
 import {Link} from '../components'
 import {mono} from '../theme'
 
-import Snack, {SnackProps} from '../components/snack'
-
 // import EnableDialog from './enable'
 import DisableDialog from './disable'
 
@@ -15,6 +13,7 @@ import Header from '../header'
 
 import {dateString} from '../helper'
 import {Store} from 'pullstate'
+import {openSnack, openSnackError} from '../snack'
 
 import {vaultAuth, vaultStatus, vaultSync} from '../rpc/keys'
 import {
@@ -37,8 +36,6 @@ const store = new Store<State>({
 })
 
 export default (_: {}) => {
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [disableOpen, setDisableOpen] = React.useState(false)
 
@@ -57,8 +54,7 @@ export default (_: {}) => {
         s.status = resp
       })
     } catch (err) {
-      setSnack({message: err.message, alert: 'error'})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
@@ -74,8 +70,7 @@ export default (_: {}) => {
       })
       .catch((err: Error) => {
         setLoading(false)
-        setSnack({message: err.message, alert: 'error'})
-        setSnackOpen(true)
+        openSnackError(err)
       })
   }
 
@@ -93,15 +88,13 @@ export default (_: {}) => {
       reloadStatus()
     } catch (err) {
       setLoading(false)
-      setSnack({message: err.message, alert: 'error'})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
   const closeDisable = (snack: string) => {
     setDisableOpen(false)
-    setSnack({message: snack, duration: 4000})
-    setSnackOpen(!!snack)
+    if (snack) openSnack({message: snack, duration: 4000})
     reloadStatus()
   }
 
@@ -236,7 +229,6 @@ export default (_: {}) => {
       </Box>
 
       <DisableDialog open={disableOpen} close={closeDisable} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

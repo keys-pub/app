@@ -39,7 +39,6 @@ export default (_: Props) => {
     }
   })
   if (!route) route = routes[0]
-  console.log('Route:', location, route)
   return (
     <Box display="flex" flex={1} id={route?.location}>
       {route?.component()}

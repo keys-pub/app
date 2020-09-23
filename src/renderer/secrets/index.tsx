@@ -29,13 +29,12 @@ import Header from '../header'
 
 import {ipcRenderer, clipboard} from 'electron'
 
-import Snack, {SnackProps} from '../components/snack'
-
 import SecretRemoveDialog from './remove'
 import SecretEditView from './edit'
 import SecretContentView from './content'
 
 import {store, loadStore} from './store'
+import {openSnack, openSnackError} from '../snack'
 
 import {
   Secret,
@@ -68,13 +67,6 @@ export default (props: Props) => {
 
   const [remove, setRemove] = React.useState<Secret>()
   const [removeOpen, setRemoveOpen] = React.useState(false)
-
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
 
   const onInput = React.useCallback((e) => {
     let target = e.target
@@ -171,11 +163,6 @@ export default (props: Props) => {
     })
   }
 
-  const snackError = (err: Error) => {
-    console.error(err)
-    openSnack({message: err.message, alert: 'error', duration: 8000})
-  }
-
   React.useEffect(() => {
     reload()
   }, [input, sortField, sortDirection])
@@ -184,7 +171,7 @@ export default (props: Props) => {
     try {
       loadStore()
     } catch (err) {
-      snackError(err)
+      openSnackError(err)
     }
   }
 
@@ -203,7 +190,7 @@ export default (props: Props) => {
       store.update((s) => {
         s.syncing = false
       })
-      snackError(err)
+      openSnackError(err)
     }
   }
 
@@ -322,7 +309,6 @@ export default (props: Props) => {
       </Box>
 
       <SecretRemoveDialog open={removeOpen} secret={remove} close={closeRemove} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, DialogContentText, Divider, LinearProgress, Typography} from '@material-ui/core'
 import Dialog from '../components/dialog'
-import Snack, {SnackProps} from '../components/snack'
+import {openSnackError} from '../snack'
 
 import {statementRevoke} from '../rpc/keys'
 import {StatementRevokeRequest, StatementRevokeResponse} from '../rpc/keys.d'
@@ -16,8 +16,6 @@ type Props = {
 
 export default (props: Props) => {
   const [loading, setLoading] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
 
   const revoke = async () => {
     setLoading(true)
@@ -32,8 +30,7 @@ export default (props: Props) => {
       setLoading(false)
     } catch (err) {
       setLoading(false)
-      setSnack({message: err.message, alert: 'error', duration: 4000})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
@@ -49,7 +46,6 @@ export default (props: Props) => {
         Are you sure you want to revoke the user statement for key
         {props.kid}?
       </Typography>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }

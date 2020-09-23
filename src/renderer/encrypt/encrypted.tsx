@@ -5,21 +5,17 @@ import {Button, Divider, IconButton, LinearProgress, Input, Typography, Box} fro
 import {Assignment as CopyIcon} from '@material-ui/icons'
 
 import {mono} from '../theme'
-import Snack, {SnackProps} from '../components/snack'
 import {clipboard} from 'electron'
+import {openSnack} from '../snack'
 
 export type Props = {
   value: string
 }
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
-    setSnack({message: 'Copied to Clipboard', duration: 2000})
-    setSnackOpen(true)
+    openSnack({message: 'Copied to Clipboard', duration: 2000})
   }
   return (
     <Box style={{width: '100%', height: '100%', position: 'relative'}}>
@@ -47,7 +43,6 @@ export default (props: Props) => {
           </IconButton>
         </Box>
       )}
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

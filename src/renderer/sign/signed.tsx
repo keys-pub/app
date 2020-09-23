@@ -4,9 +4,9 @@ import {Button, IconButton, Input, Typography, Box} from '@material-ui/core'
 
 import {Assignment as CopyIcon} from '@material-ui/icons'
 
-import Snack, {SnackProps} from '../components/snack'
 import {mono} from '../theme'
 import {clipboard} from 'electron'
+import {openSnack, openSnackError} from '../snack'
 
 export type Props = {
   value: string
@@ -15,13 +15,9 @@ export type Props = {
 // TODO: This is a copy of encrypted.tsx
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
-    setSnack({message: 'Copied to Clipboard', duration: 2000})
-    setSnackOpen(true)
+    openSnack({message: 'Copied to Clipboard', duration: 2000})
   }
   const disabled = !props.value
 
@@ -58,7 +54,6 @@ export default (props: Props) => {
           </IconButton>
         </Box>
       )}
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

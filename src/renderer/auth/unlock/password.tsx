@@ -8,9 +8,9 @@ import {Link} from '../../components'
 
 import {authUnlock} from '../../rpc/keys'
 import {AuthType} from '../../rpc/keys.d'
-import Snack, {SnackProps} from '../../components/snack'
 
 import {store, unlocked} from '../../store'
+import {openSnackError, closeSnack} from '../../snack'
 import ActionsView, {Action} from './actions'
 
 type Props = {
@@ -22,31 +22,16 @@ export default (props: Props) => {
   const [loading, setLoading] = React.useState(false)
   const [progress, setProgress] = React.useState(false)
 
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
-
   const inputRef = React.useRef<HTMLInputElement>()
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     setInput(target.value)
-    setSnackOpen(false)
+    closeSnack()
   }, [])
-
-  const setError = (err: Error) => {
-    let message = err.message
-    if (message == 'invalid password') {
-      message = 'Invalid password'
-    }
-    openSnack({message: message, alert: 'error', duration: 6000})
-  }
 
   const onUnlock = async () => {
     if (!input) {
-      openSnack({message: 'Empty password', alert: 'error', duration: 6000})
+      openSnackError(new Error('Empty password'))
       inputRef.current?.focus()
       return
     }
@@ -58,7 +43,7 @@ export default (props: Props) => {
     }, 2000)
 
     setLoading(true)
-    setSnackOpen(false)
+    closeSnack()
 
     try {
       const resp = await authUnlock({
@@ -74,7 +59,7 @@ export default (props: Props) => {
       clearTimeout(timeout)
       setLoading(false)
       setProgress(false)
-      setError(err)
+      openSnackError(err)
       inputRef.current?.focus()
       inputRef.current?.select()
     }
@@ -120,7 +105,6 @@ export default (props: Props) => {
         </Button>
       </Box>
       <ActionsView actions={props.actions} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

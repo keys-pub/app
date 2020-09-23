@@ -8,6 +8,7 @@ import {loadStore as signLoadStore} from './sign/store'
 import {ipcRenderer} from 'electron'
 import {configGet, keys} from './rpc/keys'
 import {Key} from './rpc/keys.d'
+import {SnackProps} from './components/snack'
 
 export interface Error {
   message: string
@@ -26,6 +27,9 @@ export type State = {
   history: string[]
 
   navMinimized: boolean
+
+  snackOpen: boolean
+  snack?: SnackProps
 }
 
 export const store = new Store<State>({
@@ -37,6 +41,7 @@ export const store = new Store<State>({
   history: [],
 
   navMinimized: false,
+  snackOpen: false,
 })
 
 export const loadStore = async () => {
@@ -70,6 +75,7 @@ export const unlocked = async (authToken?: string) => {
 }
 
 export const setLocation = (location: string) => {
+  console.log('Set location:', location)
   store.update((s) => {
     let history = [...s.history, location]
     if (history.length > 10) {

@@ -10,10 +10,10 @@ import matchSorter, {rankings} from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
-import Snack, {SnackProps} from '../components/snack'
 
 import {keys as listKeys} from '../rpc/keys'
 import {Key, KeysRequest, KeysResponse, SortDirection} from '../rpc/keys.d'
+import {openSnackError} from '../snack'
 
 type Props = {
   keys: Key[]
@@ -78,8 +78,6 @@ export default (props: Props) => {
   const [options, setOptions] = React.useState(props.keys)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [importOpen, setImportOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
 
   React.useEffect(() => {
     search()
@@ -102,8 +100,7 @@ export default (props: Props) => {
       const keys = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
       setOptions(keys || [])
     } catch (err) {
-      setSnack({message: err.message, alert: 'error', duration: 4000})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
@@ -173,7 +170,6 @@ export default (props: Props) => {
       />
       <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={search} />
       <KeyImportDialog open={importOpen} close={closeImport} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

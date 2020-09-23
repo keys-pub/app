@@ -3,8 +3,8 @@ import * as React from 'react'
 import {Box, Button, Typography} from '@material-ui/core'
 
 import Dialog from '../components/dialog'
-import Snack, {SnackProps} from '../components/snack'
 import {KeyLabel} from './label'
+import {openSnack, openSnackError} from '../snack'
 
 import {keyRemove} from '../rpc/keys'
 import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '../rpc/keys.d'
@@ -16,17 +16,13 @@ type Props = {
 }
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
   const removeKey = async () => {
     try {
       const req: KeyRemoveRequest = {kid: props.k.id}
       const resp = await keyRemove(req)
       props.close(true)
     } catch (err) {
-      setSnack({message: err.message, alert: 'error', duration: 4000})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
@@ -42,7 +38,6 @@ export default (props: Props) => {
       actions={[{label: 'Delete', action: removeKey, color: 'secondary'}]}
     >
       {isPrivate ? <PrivateKey k={props.k} /> : <PublicKey k={props.k} />}
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }

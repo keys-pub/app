@@ -5,7 +5,9 @@ import {theme} from './theme'
 
 import Routes from './routes'
 import {store, loadStore, setLocation, Error} from './store'
+import {closeSnack} from './snack'
 import {ipcRenderer, remote} from 'electron'
+import Snack, {SnackProps} from './components/snack'
 
 import Auth from './auth'
 import AuthSplash from './auth/splash'
@@ -64,12 +66,18 @@ export default (_: {}) => {
     ipcRenderer.send('context-menu', {labels: [], x: event.clientX, y: event.clientY})
   }, [])
 
+  const {snack, snackOpen} = store.useState((s) => ({
+    snack: s.snack,
+    snackOpen: s.snackOpen,
+  }))
+
   return (
     <ThemeProvider theme={theme}>
       <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}} onContextMenu={onContextMenu}>
         <Root />
         <Errors />
         <UpdateAlert />
+        <Snack open={snackOpen} {...snack} onClose={closeSnack} />
       </Box>
     </ThemeProvider>
   )

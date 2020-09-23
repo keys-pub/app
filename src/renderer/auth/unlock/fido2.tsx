@@ -9,10 +9,10 @@ import {Link} from '../../components'
 import {authUnlock} from '../../rpc/keys'
 import {AuthType} from '../../rpc/keys.d'
 import SelectDevice from '../../authenticators/select'
-import Snack, {SnackProps} from '../../components/snack'
 import {Device} from '../../rpc/fido2.d'
 
 import {store, unlocked} from '../../store'
+import {openSnack, openSnackError, closeSnack} from '../../snack'
 import ActionsView, {Action} from './actions'
 
 type Props = {
@@ -23,23 +23,16 @@ export default (props: Props) => {
   const [input, setInput] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
-
   const inputRef = React.useRef<HTMLInputElement>()
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     setInput(target.value)
-    setSnackOpen(false)
+    closeSnack()
   }, [])
 
   const onUnlock = async () => {
     setLoading(true)
-    setSnackOpen(false)
+    closeSnack()
 
     try {
       openSnack({message: 'You may need to interact with the device', alert: 'info'})
@@ -48,7 +41,7 @@ export default (props: Props) => {
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         client: 'app',
       })
-      setSnackOpen(false)
+      closeSnack()
       await unlocked(resp.authToken)
     } catch (err) {
       openSnack({message: err.message, alert: 'error', duration: 6000})
@@ -98,7 +91,6 @@ export default (props: Props) => {
         </Button>
       </Box>
       <ActionsView actions={props.actions} />
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

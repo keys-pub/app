@@ -6,6 +6,7 @@ import {Link} from '../components'
 import Header from '../header'
 import Snack, {SnackProps} from '../components/snack'
 import {UpdateAlertView} from '../update/alert'
+import {openSnack as appSnack} from '../snack'
 
 export default (_: {}) => {
   const [updateAlert, setUpdateAlert] = React.useState(false)
@@ -121,6 +122,17 @@ export default (_: {}) => {
           >
             Snack Test (alert, error)
           </Link>
+          <Link onClick={() => appSnack({message: 'Testing ' + new Date(), alert: 'info', duration: 2000})}>
+            Snack Test (store)
+          </Link>
+          <Link
+            onClick={() => {
+              appSnack({message: 'Testing ' + new Date(), alert: 'info', duration: 2000})
+              appSnack({message: 'Testing2 ' + new Date(), alert: 'success', duration: 2000})
+            }}
+          >
+            Snack Test (store, double)
+          </Link>
           <Snack
             open={snackOpen}
             {...snack}
@@ -140,6 +152,8 @@ export default (_: {}) => {
             actionLabel="Download &amp; restart"
           />
         </Box>
+
+        <Box style={{marginBottom: 200}} />
       </Box>
     </Box>
   )

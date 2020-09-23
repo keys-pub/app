@@ -14,11 +14,11 @@ import {
 import Header from '../header'
 import Logo from '../logo'
 import {mono} from '../theme'
-import Snack, {SnackProps} from '../components/snack'
 import {ipcRenderer} from 'electron'
 
 import {runtimeStatus, authReset, rand} from '../rpc/keys'
 import {Encoding} from '../rpc/keys.d'
+import {openSnackError, closeSnack} from '../snack'
 
 type Props = {
   close: () => void
@@ -28,14 +28,6 @@ export default (props: Props) => {
   const [loading, setLoading] = React.useState(false)
   const [confirm, setConfirm] = React.useState('')
 
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
-  const setError = (message: string) => {
-    setSnack({message, alert: 'error', duration: 4000})
-    setSnackOpen(true)
-  }
-
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     setConfirm(target.value)
@@ -43,11 +35,11 @@ export default (props: Props) => {
 
   const onAuthReset = React.useCallback(async () => {
     if (confirm != 'ok reset') {
-      setError('Type ok reset to confirm.')
+      openSnackError(new Error('Type ok reset to confirm'))
       return
     }
     setLoading(true)
-    setSnackOpen(false)
+    closeSnack()
     try {
       const status = await runtimeStatus({})
       const resp = await authReset({appName: status.appName})
@@ -55,7 +47,7 @@ export default (props: Props) => {
       props.close()
     } catch (err) {
       setLoading(false)
-      setError(err.message)
+      openSnackError(err)
     }
   }, [confirm])
 
@@ -110,7 +102,6 @@ export default (props: Props) => {
           </Button>
         </Box>
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

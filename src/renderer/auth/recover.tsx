@@ -14,12 +14,12 @@ import {
 import Header from '../header'
 import Logo from '../logo'
 import {mono} from '../theme'
-import Snack, {SnackProps} from '../components/snack'
 
 import {authRecover} from '../rpc/keys'
 import {AuthType} from '../rpc/keys.d'
 
 import {store, unlocked} from '../store'
+import {openSnack, openSnackError, closeSnack} from '../snack'
 
 type Props = {
   close: () => void
@@ -29,14 +29,6 @@ export default (props: Props) => {
   const [loading, setLoading] = React.useState(false)
   const [paperKey, setPaperKey] = React.useState('')
   const [newPassword, setNewPassword] = React.useState('')
-
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
-  const setError = (message: string) => {
-    setSnack({message, alert: 'error', duration: 4000})
-    setSnackOpen(true)
-  }
 
   const onInputChangePhrase = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -50,7 +42,7 @@ export default (props: Props) => {
 
   const onAuthRecover = React.useCallback(async () => {
     setLoading(true)
-    setSnackOpen(false)
+    closeSnack()
     try {
       const resp = await authRecover({
         paperKey,
@@ -60,7 +52,7 @@ export default (props: Props) => {
       setLoading(false)
     } catch (err) {
       setLoading(false)
-      setError(err.message)
+      openSnackError(err)
     }
   }, [paperKey, newPassword])
 
@@ -110,7 +102,6 @@ export default (props: Props) => {
           </Button>
         </Box>
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

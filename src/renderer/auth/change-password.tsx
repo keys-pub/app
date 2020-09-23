@@ -3,9 +3,9 @@ import * as React from 'react'
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 import {Link} from '../components'
 import Dialog from '../components/dialog'
-import Snack, {SnackProps} from '../components/snack'
 
 import {authPasswordChange} from '../rpc/keys'
+import {openSnack, openSnackError, closeSnack} from '../snack'
 
 type Props = {
   open: boolean
@@ -17,16 +17,6 @@ export default (props: Props) => {
   const [password, setPassword] = React.useState('')
   const [passwordConfirm, setPasswordConfirm] = React.useState('')
   const [loading, setLoading] = React.useState(false)
-
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
-  const setError = (err: Error) => {
-    openSnack({message: err.message, alert: 'error', duration: 6000})
-  }
 
   const onInputChangeOldPassword = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -45,31 +35,34 @@ export default (props: Props) => {
 
   const changePassword = async () => {
     if (password != passwordConfirm) {
-      setError(new Error("Passwords don't match"))
+      openSnackError(new Error("Passwords don't match"))
       return
     }
     if (password == '') {
-      setError(new Error('Password is empty'))
+      openSnackError(new Error('Password is empty'))
       return
     }
     if (oldPassword == '') {
-      setError(new Error('Old password is empty'))
+      openSnackError(new Error('Old password is empty'))
       return
     }
     if (oldPassword == password) {
-      setError(new Error('Passwords are the same'))
+      openSnackError(new Error('Passwords are the same'))
       return
     }
 
-    setSnackOpen(false)
+    setLoading(true)
+    closeSnack()
     try {
       await authPasswordChange({
         old: oldPassword,
         new: password,
       })
-      props.close('Password changed.')
+      setLoading(false)
+      props.close('Password changed')
     } catch (err) {
-      setError(err)
+      setLoading(false)
+      openSnackError(err)
     }
   }
 
@@ -77,7 +70,7 @@ export default (props: Props) => {
     <Dialog
       title="Change Password"
       open={props.open}
-      close={{label: 'Close', action: props.close}}
+      close={{label: 'Close', action: () => props.close()}}
       actions={[{label: 'Change', color: 'primary', action: changePassword}]}
       disabled={loading}
     >
@@ -115,7 +108,6 @@ export default (props: Props) => {
           style={{width: 400}}
           disabled={loading}
         />
-        <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
       </Box>
     </Dialog>
   )

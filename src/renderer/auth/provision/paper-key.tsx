@@ -3,10 +3,10 @@ import * as React from 'react'
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 import {Link} from '../../components'
 import Dialog from '../../components/dialog'
-import Snack, {SnackProps} from '../../components/snack'
 
 import {authProvision, rand} from '../../rpc/keys'
 import {AuthType, Encoding} from '../../rpc/keys.d'
+import {openSnackError, closeSnack} from '../../snack'
 
 type Props = {
   open: boolean
@@ -16,12 +16,6 @@ type Props = {
 export default (props: Props) => {
   const [paperKey, setPaperKey] = React.useState('')
   const [loading, setLoading] = React.useState(false)
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
 
   React.useEffect(() => {
     const init = async () => {
@@ -29,7 +23,7 @@ export default (props: Props) => {
         const resp = await rand({numBytes: 32, encoding: Encoding.BIP39})
         setPaperKey(resp.data || '')
       } catch (err) {
-        openSnack({message: err.message, duration: 6000, alert: 'error'})
+        openSnackError(err)
       }
     }
     init()
@@ -37,16 +31,17 @@ export default (props: Props) => {
 
   const onAuthProvision = async () => {
     setLoading(true)
+    closeSnack()
     try {
       const resp = await authProvision({
         secret: paperKey,
         type: AuthType.PAPER_KEY_AUTH,
       })
       setLoading(false)
-      props.close('Paper key saved.')
+      props.close('Paper key saved')
     } catch (err) {
       setLoading(false)
-      openSnack({message: err.message, duration: 6000, alert: 'error'})
+      openSnackError(err)
     }
   }
 
@@ -72,7 +67,6 @@ export default (props: Props) => {
           {paperKey}
         </Typography>
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }

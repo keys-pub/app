@@ -5,9 +5,9 @@ import {Button, Divider, Input, Box, IconButton, Typography} from '@material-ui/
 import {Assignment as CopyIcon} from '@material-ui/icons'
 import SignerView from '../verify/signer'
 import {regular} from '../theme'
-import Snack, {SnackProps} from '../components/snack'
 
 import {clipboard} from 'electron'
+import {openSnack} from '../snack'
 
 import {Key} from '../rpc/keys.d'
 
@@ -20,13 +20,9 @@ export type Props = {
 // TODO: Mostly copied from decrypted.tsx
 
 export default (props: Props) => {
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
   const copyToClipboard = () => {
     clipboard.writeText(props.value)
-    setSnack({message: 'Copied to Clipboard', duration: 2000})
-    setSnackOpen(true)
+    openSnack({message: 'Copied to Clipboard', duration: 2000})
   }
 
   const disabled = !props.value
@@ -62,7 +58,6 @@ export default (props: Props) => {
           </Box>
         )}
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

@@ -27,7 +27,6 @@ import {
   Sync as SyncIcon,
 } from '@material-ui/icons'
 
-import Snack, {SnackProps} from '../components/snack'
 import UserLabel from '../user/label'
 import {IDLabel} from '../key/label'
 
@@ -45,6 +44,7 @@ import {keys as listKeys, runtimeStatus, vaultUpdate} from '../rpc/keys'
 import {Key, KeyType, SortDirection, KeysRequest} from '../rpc/keys.d'
 
 import {store, loadStore} from './store'
+import {openSnack, openSnackError} from '../snack'
 
 export default (_: {}) => {
   const {
@@ -65,9 +65,6 @@ export default (_: {}) => {
     syncing,
   } = store.useState()
 
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-
   const tableDirection = directionString(sortDirection)
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
@@ -76,11 +73,6 @@ export default (_: {}) => {
       s.input = target.value || ''
     })
   }, [])
-
-  const setSnackErr = (err: Error) => {
-    setSnackOpen(true)
-    setSnack({message: err.message, alert: 'error', duration: 4000})
-  }
 
   const sort = (field: string, sortField?: string, sortDirection?: SortDirection) => {
     const active = sortField === field
@@ -178,7 +170,7 @@ export default (_: {}) => {
     try {
       loadStore()
     } catch (err) {
-      setSnackErr(err)
+      openSnackError(err)
     }
   }
 
@@ -196,7 +188,7 @@ export default (_: {}) => {
       store.update((s) => {
         s.syncing = false
       })
-      setSnackErr(err)
+      openSnackError(err)
     }
   }
 
@@ -384,8 +376,6 @@ export default (_: {}) => {
       <KeyImportDialog open={importOpen} close={closeImport} />
       {removeKey && <KeyRemoveDialog open={removeOpen} k={removeKey} close={closeRemove} />}
       {exportKey && <KeyExportDialog open={exportOpen} k={exportKey} close={closeExport} />}
-
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

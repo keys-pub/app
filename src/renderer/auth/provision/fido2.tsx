@@ -13,13 +13,13 @@ import {
 } from '@material-ui/core'
 import {Link} from '../../components'
 import Dialog from '../../components/dialog'
-import Snack, {SnackProps} from '../../components/snack'
 
 import {authProvision} from '../../rpc/keys'
 import {AuthType, Encoding} from '../../rpc/keys.d'
 import {devices as listDevices} from '../../rpc/fido2'
 import {Device} from '../../rpc/fido2.d'
 import SelectDevice from '../../authenticators/select'
+import {openSnack, openSnackError, closeSnack} from '../../snack'
 
 type Props = {
   open: boolean
@@ -29,12 +29,6 @@ type Props = {
 export default (props: Props) => {
   const [pin, setPin] = React.useState('')
   const [loading, setLoading] = React.useState(false)
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
 
   const onInputChangePin = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -43,7 +37,7 @@ export default (props: Props) => {
 
   const onAuthProvision = async () => {
     if (!selectedDevice?.path) {
-      openSnack({message: 'No device selected.', duration: 4000, alert: 'error'})
+      openSnackError(new Error('No device selected'))
       return
     }
 
@@ -71,11 +65,11 @@ export default (props: Props) => {
       })
 
       setLoading(false)
-      setSnackOpen(false)
-      props.close('FIDO2 key saved.')
+      closeSnack()
+      props.close('FIDO2 key saved')
     } catch (err) {
       setLoading(false)
-      openSnack({message: err.message, duration: 6000, alert: 'error'})
+      openSnackError(err)
     }
   }
 
@@ -106,7 +100,6 @@ export default (props: Props) => {
           style={{width: 200}}
         />
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }

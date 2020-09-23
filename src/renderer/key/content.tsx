@@ -11,10 +11,10 @@ import {shell} from 'electron'
 import {Key, KeyType, User, UserStatus} from '../rpc/keys.d'
 import ServiceSelect from '../user/service'
 import {Link} from '../components'
-import Snack, {SnackProps} from '../components/snack'
 import UserLabel from '../user/label'
 
 import {keyTypeLabel, dateString} from '../helper'
+import {openSnackError} from '../snack'
 
 export const KeyTypeLabel = (props: {k: Key}) => {
   return <Typography>{keyTypeLabel(props.k)}</Typography>
@@ -116,15 +116,11 @@ export default (props: Props) => {
   const kid = key.id!
   const sigchainURL = 'https://keys.pub/sigchain/' + key.id
 
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const [snackOpen, setSnackOpen] = React.useState(false)
-
   const openURL = async (url: string) => {
     try {
       await shell.openExternal(url)
     } catch (err) {
-      setSnack({message: err.message, duration: 4000, alert: 'error'})
-      setSnackOpen(true)
+      openSnackError(err)
     }
   }
 
@@ -193,7 +189,6 @@ export default (props: Props) => {
           )}
         </TableBody>
       </Table>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }

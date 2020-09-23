@@ -6,7 +6,7 @@ import Dialog from '../../components/dialog'
 
 import {authProvision} from '../../rpc/keys'
 import {AuthType} from '../../rpc/keys.d'
-import Snack, {SnackProps} from '../../components/snack'
+import {openSnackError} from '../../snack'
 
 type Props = {
   open: boolean
@@ -19,12 +19,6 @@ export default (props: Props) => {
   const [password, setPassword] = React.useState('')
   const [passwordConfirm, setPasswordConfirm] = React.useState('')
   const [loading, setLoading] = React.useState(false)
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
 
   const onInputChangePassword = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
@@ -38,11 +32,11 @@ export default (props: Props) => {
 
   const onAuthProvision = async () => {
     if (password != passwordConfirm) {
-      openSnack({message: "Passwords don't match", duration: 6000, alert: 'error'})
+      openSnackError(new Error("Passwords don't match"))
       return
     }
     if (password == '') {
-      openSnack({message: 'Oops, password is empty', duration: 6000, alert: 'error'})
+      openSnackError(new Error('Oops, password is empty'))
       return
     }
 
@@ -55,7 +49,7 @@ export default (props: Props) => {
       props.close('Password saved.')
     } catch (err) {
       setLoading(false)
-      openSnack({message: err.message, duration: 6000, alert: 'error'})
+      openSnackError(err)
     }
   }
 
@@ -108,7 +102,6 @@ export default (props: Props) => {
           />
         </FormControl>
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Dialog>
   )
 }

@@ -7,8 +7,6 @@ import AuthUnlockPasswordView from './password'
 import AuthUnlockFIDO2View from './fido2'
 import AuthForgotView from './forgot'
 
-import Snack, {SnackProps} from '../../components/snack'
-
 import {store, unlocked} from '../../store'
 import {authUnlock} from '../../rpc/keys'
 import {AuthType} from '../../rpc/keys.d'

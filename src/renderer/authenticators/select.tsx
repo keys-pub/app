@@ -16,12 +16,12 @@ import {Refresh as RefreshIcon} from '@material-ui/icons'
 
 import {Link} from '../components'
 import Dialog from '../components/dialog'
-import Snack, {SnackProps} from '../components/snack'
 
 import {authProvision} from '../rpc/keys'
 import {AuthType, Encoding} from '../rpc/keys.d'
 import {devices as listDevices} from '../rpc/fido2'
 import {Device} from '../rpc/fido2.d'
+import {openSnackError} from '../snack'
 
 type Props = {
   onChange: (device?: Device) => void
@@ -30,13 +30,6 @@ type Props = {
 export default (props: Props) => {
   const [selectedDevice, setSelectedDevice] = React.useState<Device>()
   const [devices, setDevices] = React.useState<Device[]>([])
-
-  const [snackOpen, setSnackOpen] = React.useState(false)
-  const [snack, setSnack] = React.useState<SnackProps>()
-  const openSnack = (snack: SnackProps) => {
-    setSnack(snack)
-    setSnackOpen(true)
-  }
 
   const onFIDO2Devices = async () => {
     try {
@@ -48,7 +41,7 @@ export default (props: Props) => {
         setSelectedDevice(devices[0])
       }
     } catch (err) {
-      openSnack({message: err.message, duration: 6000, alert: 'error'})
+      openSnackError(err)
     }
   }
 
@@ -85,7 +78,6 @@ export default (props: Props) => {
           <RefreshIcon />
         </IconButton>
       </Box>
-      <Snack open={snackOpen} {...snack} onClose={() => setSnackOpen(false)} />
     </Box>
   )
 }
