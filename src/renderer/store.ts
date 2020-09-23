@@ -6,7 +6,7 @@ import {loadStore as encryptLoadStore} from './encrypt/store'
 import {loadStore as signLoadStore} from './sign/store'
 
 import {ipcRenderer} from 'electron'
-import {configGet, keys} from './rpc/keys'
+import {configGet, runtimeStatus} from './rpc/keys'
 import {Key} from './rpc/keys.d'
 import {SnackProps} from './components/snack'
 
@@ -27,6 +27,7 @@ export type State = {
   history: string[]
 
   navMinimized: boolean
+  fido2Enabled: boolean
 
   snackOpen: boolean
   snack?: SnackProps
@@ -36,6 +37,7 @@ export const store = new Store<State>({
   ready: false,
   unlocked: false,
   updating: false,
+  fido2Enabled: false,
 
   location: '',
   history: [],
@@ -43,6 +45,13 @@ export const store = new Store<State>({
   navMinimized: false,
   snackOpen: false,
 })
+
+export const loadStatus = async () => {
+  const status = await runtimeStatus({})
+  store.update((s) => {
+    s.fido2Enabled = !!status.fido2
+  })
+}
 
 export const loadStore = async () => {
   const configResp = await configGet({name: 'app'})

@@ -35,6 +35,7 @@ import DeprovisionDialog from './provision/deprovision'
 import {authTypeDescription} from './helper'
 import {breakWords} from '../theme'
 import {openSnack, openSnackError} from '../snack'
+import {store as appStore} from '../store'
 
 type Props = {}
 
@@ -58,26 +59,28 @@ const CTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell)
 
+const refresh = async (selected?: AuthProvision) => {
+  try {
+    const resp = await authProvisions({})
+    const provisions = resp.provisions || []
+    let selectedProvision = provisions.find((p: AuthProvision) => p.id == selected?.id)
+
+    if (!selectedProvision && provisions.length > 0) selectedProvision = provisions[0]
+    store.update((s) => {
+      s.provisions = provisions
+      s.selected = selectedProvision
+    })
+  } catch (err) {
+    openSnackError(err)
+  }
+}
+
 export default (props: Props) => {
   const {provisions, selected} = store.useState()
-
-  const refresh = async () => {
-    try {
-      const resp = await authProvisions({})
-      const rprovisions = resp.provisions || []
-      let rselected = rprovisions.find((p: AuthProvision) => p.id == selected?.id)
-      if (!rselected && rprovisions.length > 0) rselected = rprovisions[0]
-      store.update((s) => {
-        s.provisions = resp.provisions || []
-        s.selected = rselected
-      })
-    } catch (err) {
-      openSnackError(err)
-    }
-  }
+  const fido2Enabled = appStore.useState((s) => s.fido2Enabled)
 
   React.useEffect(() => {
-    refresh()
+    refresh(selected)
   }, [])
 
   const select = (provision: AuthProvision) => {
@@ -205,7 +208,7 @@ export default (props: Props) => {
                       <TableCell>
                         <Typography noWrap>{authTypeDescription(provision.type, true)}</Typography>
                         <Typography noWrap style={{color: '#777777'}}>
-                          {dateString(provision.createdAt)}
+                          {dateString(provision.createdAt) || '-'}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -223,7 +226,7 @@ export default (props: Props) => {
           style={{
             position: 'absolute',
             left: 204,
-            top: 15,
+            top: 10,
             bottom: 0,
             right: 0,
             overflowX: 'hidden',
@@ -234,7 +237,7 @@ export default (props: Props) => {
             <Table size="small">
               <TableBody>
                 <TableRow style={{borderBottom: 0}}>
-                  <CTableCell>
+                  <CTableCell style={{width: 70}}>
                     <Typography align="right">ID</Typography>
                   </CTableCell>
                   <CTableCell>
@@ -256,7 +259,7 @@ export default (props: Props) => {
                     <Typography align="right">Created</Typography>
                   </CTableCell>
                   <CTableCell>
-                    <Typography>{dateString(selected.createdAt)}</Typography>
+                    <Typography>{dateString(selected.createdAt) || 'Unknown'}</Typography>
                   </CTableCell>
                 </TableRow>
                 {selected.aaguid && (
@@ -294,6 +297,11 @@ export default (props: Props) => {
         </MenuItem>
         <MenuItem
           onClick={() => {
+            if (!fido2Enabled) {
+              openSnackError(new Error('FIDO2 is not available'))
+              onAddClose()
+              return
+            }
             setFIDO2Open(true)
             onAddClose()
           }}

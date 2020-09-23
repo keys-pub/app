@@ -4,7 +4,7 @@ import {ThemeProvider} from '@material-ui/styles'
 import {theme} from './theme'
 
 import Routes from './routes'
-import {store, loadStore, setLocation, Error} from './store'
+import {store, loadStore, loadStatus, setLocation, Error} from './store'
 import {closeSnack} from './snack'
 import {ipcRenderer, remote} from 'electron'
 import Snack, {SnackProps} from './components/snack'
@@ -70,6 +70,10 @@ export default (_: {}) => {
     snack: s.snack,
     snackOpen: s.snackOpen,
   }))
+
+  React.useEffect(() => {
+    loadStatus()
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>

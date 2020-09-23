@@ -17,14 +17,16 @@ type Props = {}
 export default (props: Props) => {
   const [step, setStep] = React.useState('password')
 
+  const fido2Enabled = store.useState((s) => s.fido2Enabled)
+
   let actions = [] as Action[]
 
   switch (step) {
     case 'password':
-      actions = [
-        {label: 'Forgot Password?', action: () => setStep('forgot')},
-        {label: 'Use FIDO2', action: () => setStep('fido2')},
-      ]
+      actions = [{label: 'Forgot Password?', action: () => setStep('forgot')}]
+      if (fido2Enabled) {
+        actions.push({label: 'Use FIDO2', action: () => setStep('fido2')})
+      }
       break
     case 'fido2':
       actions = [{label: 'Use Password', action: () => setStep('password')}]
