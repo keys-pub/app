@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
+import {Box, Button, Divider, CircularProgress, TextField, Typography} from '@material-ui/core'
 
 import Snack, {SnackProps} from '../components/snack'
 import {dateString} from '../helper'
@@ -236,6 +236,11 @@ export default class DeviceInfoView extends React.Component<Props, State> {
   render() {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
+        {this.state.loading && (
+          <Box display="flex" flexDirection="row" flex={1} justifyContent="center" style={{marginTop: 20}}>
+            <CircularProgress />
+          </Box>
+        )}
         {/* {this.renderActions()}
         <Divider /> */}
 

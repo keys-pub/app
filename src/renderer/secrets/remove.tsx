@@ -33,7 +33,6 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
         maxWidth="sm"
         fullWidth
         disableBackdropClick
-        // TransitionComponent={transition}
         // keepMounted
       >
         <DialogTitle onClose={() => this.props.close(false)}>Delete Secret</DialogTitle>

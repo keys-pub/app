@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, IconButton, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
-import {LinkIcon} from '../icons'
+import {UserLinkIcon} from '../icons'
 
 import {IDLabel} from './label'
 
@@ -80,7 +80,7 @@ const UserRow = (props: UserRowProps) => {
             <ServiceSelect service={service} setService={setService} small />
             <Box marginRight={1} />
             <IconButton size="small" color="primary" onClick={() => props.userSign(service)}>
-              <LinkIcon />
+              <UserLinkIcon />
             </IconButton>
           </Box>
         </TableCell>

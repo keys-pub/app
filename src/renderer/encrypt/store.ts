@@ -4,7 +4,6 @@ import {configGet, keys} from '../rpc/keys'
 import {Key} from '../rpc/keys.d'
 
 type State = {
-  error?: Error
   fileIn: string
   fileOut: string
   input: string

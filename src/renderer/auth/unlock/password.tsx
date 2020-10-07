@@ -73,8 +73,8 @@ export default (props: Props) => {
 
   return (
     <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
-      <Header noLock noBack />
-      <Logo loading={progress} top={60} />
+      <Header noBack />
+      <Logo loading={progress} top={100} />
       <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter your password to unlock.</Typography>
       <TextField
         id="unlockPasswordInput"

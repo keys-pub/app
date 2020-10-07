@@ -26,9 +26,7 @@ const DialogTitle = (props: DialogTitleProps) => {
     <Box display="flex" flexDirection="column">
       <Box display="flex" flexGrow={1} flexDirection="row">
         <Box className="drag">
-          <Typography
-            style={{paddingBottom: 3, paddingLeft: 20, paddingTop: 10, fontSize: 20, fontWeight: 500}}
-          >
+          <Typography variant="h4" style={{paddingBottom: 3, paddingLeft: 20, paddingTop: 10}}>
             {props.children}
           </Typography>
         </Box>
@@ -71,7 +69,6 @@ const Dialog = (props: Props) => {
       fullWidth
       maxWidth="sm"
       disableBackdropClick
-      // keepMounted
     >
       {props.title && (
         <DialogTitle loading={props.loading} onClose={props.close?.action}>

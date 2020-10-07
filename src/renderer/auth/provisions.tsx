@@ -19,9 +19,7 @@ import {
 } from '@material-ui/core'
 
 import {AddIcon} from '../icons'
-import {withStyles, Theme, createStyles, makeStyles} from '@material-ui/core/styles'
-
-import {pluralize} from '../helper'
+import {column2Color} from '../theme'
 
 import {authProvisions} from '../rpc/keys'
 import {AuthProvision, AuthType} from '../rpc/keys.d'
@@ -33,7 +31,7 @@ import ProvisionFIDO2 from './provision/fido2'
 import {ipcRenderer} from 'electron'
 import DeprovisionDialog from './provision/deprovision'
 import {authTypeDescription} from './helper'
-import {breakWords} from '../theme'
+import {breakWords, contentTop} from '../theme'
 import {openSnack, openSnackError} from '../snack'
 import {store as appStore} from '../store'
 
@@ -49,15 +47,6 @@ const initialState: State = {
 }
 
 export const store = new Store(initialState)
-
-const CTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    body: {
-      borderBottom: 'none',
-      verticalAlign: 'top',
-    },
-  })
-)(TableCell)
 
 const refresh = async (selected?: AuthProvision) => {
   try {
@@ -97,6 +86,7 @@ export default (props: Props) => {
   const [deprovisionOpen, setDeprovisionOpen] = React.useState(false)
 
   const onAddOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('open')
     setAnchorEl(event.currentTarget)
   }
 
@@ -152,6 +142,8 @@ export default (props: Props) => {
     [provisions]
   )
 
+  const col1 = 204
+
   return (
     <Box display="flex" flexDirection="column" flex={1}>
       <Box display="flex" flexDirection="row" flex={1} style={{height: '100%', position: 'relative'}}>
@@ -159,74 +151,68 @@ export default (props: Props) => {
           <Box
             display="flex"
             flexDirection="row"
+            alignItems="center"
             style={{
               paddingLeft: 8,
-              height: 30,
-              alignItems: 'center',
+              paddingTop: contentTop,
             }}
           >
-            <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', color: '#666'}}>
+            <Typography variant="h6" style={{marginRight: 10, paddingLeft: 8, width: '100%'}}>
               Provisions
             </Typography>
-            <IconButton
-              color="primary"
-              // variant="outlined"
-              size="small"
-              style={{marginTop: 2, marginBottom: 2, marginRight: 8}}
-              // startIcon={<AddIcon />}
-              onClick={onAddOpen}
-            >
+            <IconButton color="primary" size="small" onClick={onAddOpen}>
               <AddIcon />
             </IconButton>
           </Box>
-          <Divider />
-          <Box
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 31,
-              bottom: 0,
-              width: 204,
-              overflowX: 'hidden',
-              overflowY: 'auto',
-            }}
-          >
-            <Table size="small">
-              <TableBody>
-                {provisions.map((provision, index) => {
-                  return (
-                    <TableRow
-                      hover
-                      onClick={() => select(provision)}
-                      key={provision.id}
-                      style={{cursor: 'pointer'}}
-                      selected={provision.id == selected?.id}
-                      component={(props: any) => {
-                        return <tr onContextMenu={onContextMenu} {...props} id={provision.id} />
-                      }}
-                    >
-                      <TableCell>
-                        <Typography noWrap>{authTypeDescription(provision.type, true)}</Typography>
-                        <Typography noWrap style={{color: '#777777'}}>
-                          {dateString(provision.createdAt) || '-'}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+          <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+            <Box
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: col1,
+                overflowX: 'hidden',
+                overflowY: 'auto',
+                background: column2Color,
+              }}
+            >
+              <Table size="small">
+                <TableBody>
+                  {provisions.map((provision, index) => {
+                    return (
+                      <TableRow
+                        hover
+                        onClick={() => select(provision)}
+                        key={provision.id}
+                        style={{cursor: 'pointer'}}
+                        selected={provision.id == selected?.id}
+                        component={(props: any) => {
+                          return <tr onContextMenu={onContextMenu} {...props} id={provision.id} />
+                        }}
+                      >
+                        <TableCell>
+                          <Typography noWrap>{authTypeDescription(provision.type, true)}</Typography>
+                          <Typography noWrap style={{color: '#777777'}}>
+                            {dateString(provision.createdAt) || '-'}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </Box>
           </Box>
         </Box>
-        <Divider orientation="vertical" />
         <Box
           display="flex"
           flexDirection="column"
           flex={1}
           style={{
             position: 'absolute',
-            left: 204,
-            top: 10,
+            left: col1,
+            top: 28,
             bottom: 0,
             right: 0,
             overflowX: 'hidden',
@@ -237,39 +223,39 @@ export default (props: Props) => {
             <Table size="small">
               <TableBody>
                 <TableRow style={{borderBottom: 0}}>
-                  <CTableCell style={{width: 70}}>
+                  <TableCell style={{width: 70}}>
                     <Typography align="right">ID</Typography>
-                  </CTableCell>
-                  <CTableCell>
+                  </TableCell>
+                  <TableCell>
                     <Typography variant="body2" style={{...breakWords}}>
                       {selected.id}
                     </Typography>
-                  </CTableCell>
+                  </TableCell>
                 </TableRow>
                 <TableRow style={{borderBottom: 0}}>
-                  <CTableCell>
+                  <TableCell>
                     <Typography align="right">Type</Typography>
-                  </CTableCell>
-                  <CTableCell>
+                  </TableCell>
+                  <TableCell>
                     <Typography>{authTypeDescription(selected.type, true)}</Typography>
-                  </CTableCell>
+                  </TableCell>
                 </TableRow>
                 <TableRow style={{borderBottom: 0}}>
-                  <CTableCell>
+                  <TableCell>
                     <Typography align="right">Created</Typography>
-                  </CTableCell>
-                  <CTableCell>
+                  </TableCell>
+                  <TableCell>
                     <Typography>{dateString(selected.createdAt) || 'Unknown'}</Typography>
-                  </CTableCell>
+                  </TableCell>
                 </TableRow>
                 {selected.aaguid && (
                   <TableRow>
-                    <CTableCell>
+                    <TableCell>
                       <Typography align="right">AAGUID</Typography>
-                    </CTableCell>
-                    <CTableCell>
+                    </TableCell>
+                    <TableCell>
                       <Typography variant="body2">{selected.aaguid}</Typography>
-                    </CTableCell>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -309,30 +295,36 @@ export default (props: Props) => {
           FIDO2 Key
         </MenuItem>
       </Menu>
-      <ProvisionPassword
-        open={passwordOpen}
-        close={(snack?: string) => {
-          setPasswordOpen(false)
-          if (snack) openSnack({message: snack, duration: 4000})
-          refresh()
-        }}
-      />
-      <ProvisionPaperKey
-        open={paperKeyOpen}
-        close={(snack?: string) => {
-          setPaperKeyOpen(false)
-          if (snack) openSnack({message: snack, duration: 4000})
-          refresh()
-        }}
-      />
-      <ProvisionFIDO2
-        open={fido2Open}
-        close={(snack?: string) => {
-          setFIDO2Open(false)
-          if (snack) openSnack({message: snack, duration: 4000})
-          refresh()
-        }}
-      />
+      {passwordOpen && (
+        <ProvisionPassword
+          open={passwordOpen}
+          close={(snack?: string) => {
+            setPasswordOpen(false)
+            if (snack) openSnack({message: snack, duration: 4000})
+            refresh()
+          }}
+        />
+      )}
+      {paperKeyOpen && (
+        <ProvisionPaperKey
+          open={paperKeyOpen}
+          close={(snack?: string) => {
+            setPaperKeyOpen(false)
+            if (snack) openSnack({message: snack, duration: 4000})
+            refresh()
+          }}
+        />
+      )}
+      {fido2Open && (
+        <ProvisionFIDO2
+          open={fido2Open}
+          close={(snack?: string) => {
+            setFIDO2Open(false)
+            if (snack) openSnack({message: snack, duration: 4000})
+            refresh()
+          }}
+        />
+      )}
       <DeprovisionDialog open={deprovisionOpen} provision={deprovision} close={closeRemove} />
     </Box>
   )

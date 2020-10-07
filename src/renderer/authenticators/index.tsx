@@ -20,14 +20,12 @@ import {
 
 import {RefreshIcon} from '../icons'
 
-import Header from '../header'
-import {pluralize} from '../helper'
-
 import DeviceContentView from './content'
 
-import {devices} from '../rpc/fido2'
+import {devices as listDevices} from '../rpc/fido2'
 import {Device, DevicesRequest, DevicesResponse} from '../rpc/fido2.d'
 import {Error} from '../store'
+import {contentTop, column2Color} from '../theme'
 
 type Props = {}
 
@@ -63,10 +61,14 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   list = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await devices({})
-      const selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
+      const resp = await listDevices({})
+      let selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
+      const devices = resp.devices || []
+      if (devices.length > 0 && !selected) {
+        selected = devices[0]
+      }
       this.setState({
-        devices: resp.devices || [],
+        devices: devices,
         selected: selected,
         loading: false,
       })
@@ -95,19 +97,13 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
       <Box
         display="flex"
         flexDirection="row"
-        flex={1}
-        style={{paddingLeft: 8, height: 30, alignItems: 'center'}}
+        style={{paddingLeft: 8, paddingTop: contentTop}}
+        alignItems="center"
       >
-        <Typography style={{marginRight: 10, paddingLeft: 8, width: '100%', color: '#666'}}>
+        <Typography variant="h6" style={{marginRight: 10, paddingLeft: 8, width: '100%'}}>
           Devices
         </Typography>
-        <IconButton
-          color="primary"
-          size="small"
-          onClick={this.refresh}
-          style={{marginTop: 2, marginRight: 10}}
-          // startIcon={<AddIcon />}
-        >
+        <IconButton color="primary" size="small" onClick={this.refresh}>
           <RefreshIcon />
         </IconButton>
       </Box>
@@ -118,47 +114,58 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%', position: 'relative'}}>
-          <Box style={{width: 200}}>
+          <Box display="flex" flexDirection="column" style={{width: 200}}>
             {this.renderHeader()}
-            <Divider />
-            <Box style={{position: 'absolute', width: 200, left: 0, top: 31, bottom: 0, overflowY: 'auto'}}>
-              <Table size="small">
-                <TableBody>
-                  {this.state.devices.map((device, index) => {
-                    return (
-                      <TableRow
-                        hover
-                        onClick={() => this.select(device)}
-                        key={device.path}
-                        style={{cursor: 'pointer'}}
-                        selected={this.isSelected(device)}
-                        component={(props: any) => {
-                          return <tr {...props} id={device.path} />
-                        }}
-                      >
-                        <TableCell component="th" scope="row" style={{verticalAlign: 'top'}}>
-                          <Typography
-                            noWrap
-                            style={{
-                              ...nowrapStyle,
-                              paddingBottom: 2,
-                            }}
-                          >
-                            {device.product}
-                          </Typography>
-                          <Typography noWrap style={{...nowrapStyle, color: '#777777'}}>
-                            {device.manufacturer}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+            <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+              <Box
+                style={{
+                  position: 'absolute',
+                  width: 200,
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  overflowX: 'hidden',
+                  overflowY: 'auto',
+                  backgroundColor: column2Color,
+                }}
+              >
+                <Table size="small">
+                  <TableBody>
+                    {this.state.devices.map((device, index) => {
+                      return (
+                        <TableRow
+                          hover
+                          onClick={() => this.select(device)}
+                          key={device.path}
+                          style={{cursor: 'pointer'}}
+                          selected={this.isSelected(device)}
+                          component={(props: any) => {
+                            return <tr {...props} id={device.path} />
+                          }}
+                        >
+                          <TableCell component="th" scope="row" style={{verticalAlign: 'top'}}>
+                            <Typography
+                              noWrap
+                              style={{
+                                ...nowrapStyle,
+                                paddingBottom: 2,
+                              }}
+                            >
+                              {device.product}
+                            </Typography>
+                            <Typography noWrap style={{...nowrapStyle, color: '#777777'}}>
+                              {device.manufacturer}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Box>
             </Box>
           </Box>
-          <Divider orientation="vertical" />
-          <Box display="flex" flex={1}>
+          <Box display="flex" flex={1} style={{paddingTop: 12}}>
             {this.state.error?.message && (
               <Box display="flex" flex={1}>
                 <Typography

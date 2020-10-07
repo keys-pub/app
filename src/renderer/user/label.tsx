@@ -44,6 +44,7 @@ export default (props: Props) => {
       variant="body2"
       style={{
         color: textColor,
+        zoom: '96%',
       }}
     >
       <span style={{wordWrap: 'break-word', wordBreak: 'break-all'}}>{name}</span>

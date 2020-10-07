@@ -24,9 +24,13 @@ import {
   SettingsIcon,
   WormholeIcon,
   SecretsIcon,
+  ScreenLockIcon,
 } from './icons'
+import Tooltip from './components/tooltip'
 
 import {setLocation, store} from './store'
+import {authLock} from './rpc/keys'
+import {ipcRenderer} from 'electron'
 
 type NavRoute = {
   label: string
@@ -40,13 +44,21 @@ const backgroundColorSelected = '#1a1a1a'
 
 // TODO: Nav hover
 
+const lock = async () => {
+  ipcRenderer.send('authToken', {authToken: ''})
+  store.update((s) => {
+    s.unlocked = false
+  })
+  await authLock({})
+}
+
 export default (props: {}) => {
   const {location, navMinimized} = store.useState((s) => ({
     location: s.location,
     navMinimized: s.navMinimized,
   }))
 
-  const width = navMinimized ? 68 : 120
+  const width = navMinimized ? 68 : 106
   const drawerStyles: CSSProperties = !navMinimized
     ? {width, border: 0, height: '100%'}
     : {
@@ -98,7 +110,7 @@ export default (props: {}) => {
   return (
     <Drawer variant="permanent" style={drawerStyles} PaperProps={{style: drawerStyles}} open={true}>
       <Box display="flex" flexGrow={1} flexDirection="column" style={{backgroundColor}}>
-        <Box height={33} style={{backgroundColor: backgroundColor}} className="drag" />
+        <Box height={30} style={{backgroundColor: backgroundColor}} className="drag" />
         <List style={{minWidth: width, height: '100%', padding: 0}}>
           {navs.map((nav) => row(nav, location, !navMinimized, false, () => setLocation(nav.location)))}
           {experiments.map((nav) => row(nav, location, !navMinimized, true, () => setLocation(nav.location)))}
@@ -106,6 +118,11 @@ export default (props: {}) => {
         <Box display="flex" flexDirection="row">
           {/* <Typography style={{color: '#999', paddingLeft: 10, paddingBottom: 10, alignSelf: 'flex-end'}}>              
             </Typography> */}
+          <IconButton size="small" onClick={lock} id="lockButton">
+            <Tooltip title="Lock App" dark>
+              <ScreenLockIcon fontSize="small" style={{marginLeft: 10, color: '#999'}} />
+            </Tooltip>
+          </IconButton>
           <Box display="flex" flexGrow={1} />
           <IconButton
             onClick={() =>
@@ -113,10 +130,10 @@ export default (props: {}) => {
                 s.navMinimized = !navMinimized
               })
             }
-            style={{color: 'white', alignSelf: 'flex-end'}}
+            style={{color: '#999', alignSelf: 'flex-end'}}
           >
-            {navMinimized && <LeftArrowIcon />}
-            {!navMinimized && <RightArrowIcon />}
+            {navMinimized && <RightArrowIcon />}
+            {!navMinimized && <LeftArrowIcon />}
           </IconButton>
         </Box>
       </Box>

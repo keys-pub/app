@@ -5,6 +5,7 @@ import {
   Button,
   FormControl,
   FormHelperText,
+  IconButton,
   Input,
   Table,
   TableBody,
@@ -16,6 +17,7 @@ import {
 import {Link} from '../components'
 import Header from '../header'
 import Snack, {SnackProps} from '../components/snack'
+import Tooltip from '../components/tooltip'
 import {UpdateAlertView} from '../update/alert'
 import {openSnack as appSnack} from '../snack'
 
@@ -42,6 +44,7 @@ export default (_: {}) => {
           left: 0,
           right: 0,
           bottom: 0,
+          paddingTop: 20,
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
@@ -67,54 +70,75 @@ export default (_: {}) => {
           Mustache viral vexillologist lumbersexual, selvage sriracha lo-fi.
         </Typography>
 
-        <Box display="flex" flexDirection="row" flexWrap="wrap">
-          <Button color="primary" style={cstyles.item}>
-            Primary
-          </Button>
-          <Button color="secondary" style={cstyles.item}>
-            Secondary
-          </Button>
-          <Button variant="contained" color="primary" style={cstyles.item}>
-            Primary
-          </Button>
-          <Button variant="contained" color="secondary" style={cstyles.item}>
-            Secondary
-          </Button>
-          <Button variant="outlined" color="primary" style={cstyles.item}>
-            Primary
-          </Button>
-          <Button variant="outlined" color="secondary" style={cstyles.item}>
-            Secondary
-          </Button>
-          <Button variant="contained" color="primary" disabled={true} style={cstyles.item}>
-            Primary
-          </Button>
-          <Button variant="contained" color="secondary" disabled={true} style={cstyles.item}>
-            Secondary
-          </Button>
-          <Box>
-            <Button variant="contained" color="primary" size="small" style={cstyles.item}>
+        <Typography variant="h1">Buttons</Typography>
+        <Box display="flex" flexDirection="column" style={{gap: 10, marginBottom: 20}}>
+          <Box display="flex" style={{gap: 10}}>
+            <Button>Default</Button>
+            <Button color="primary">Primary</Button>
+            <Button color="secondary">Secondary</Button>
+          </Box>
+          <Box display="flex" style={{gap: 10}}>
+            <Button variant="contained">Default</Button>
+            <Button variant="contained" color="primary">
+              Primary
+            </Button>
+            <Button variant="contained" color="secondary">
+              Secondary
+            </Button>
+          </Box>
+          <Box display="flex" style={{gap: 10}}>
+            <Button variant="outlined">Default</Button>
+            <Button variant="outlined" color="primary">
+              Primary
+            </Button>
+            <Button variant="outlined" color="secondary">
+              Secondary
+            </Button>
+          </Box>
+          <Box display="flex" style={{gap: 10}}>
+            <Button variant="contained" disabled={true}>
+              Default
+            </Button>
+            <Button variant="contained" color="primary" disabled={true}>
+              Primary
+            </Button>
+            <Button variant="contained" color="secondary" disabled={true}>
+              Secondary
+            </Button>
+          </Box>
+          <Box display="flex" style={{gap: 10}}>
+            <Button variant="contained" size="small">
+              Default Small
+            </Button>
+            <Button variant="contained" color="primary" size="small">
               Primary Small
             </Button>
-            <Button variant="contained" color="secondary" size="small" style={cstyles.item}>
+            <Button variant="contained" color="secondary" size="small">
               Secondary Small
             </Button>
           </Box>
-          <Button variant="contained" color="primary" size="large" style={cstyles.item}>
-            Primary Large
-          </Button>
-          <Button variant="contained" color="secondary" size="large" style={cstyles.item}>
-            Secondary Large
-          </Button>
-
-          <Button color="primary" fullWidth={true} style={cstyles.item}>
-            Primary (Full Width)
-          </Button>
-          <Button color="secondary" fullWidth={true} style={cstyles.item}>
-            Secondary (Full Width)
-          </Button>
+          <Box display="flex" style={{gap: 10}}>
+            <Button variant="contained" size="large">
+              Default Large
+            </Button>
+            <Button variant="contained" color="primary" size="large">
+              Primary Large
+            </Button>
+            <Button variant="contained" color="secondary" size="large">
+              Secondary Large
+            </Button>
+          </Box>
+          <Box display="flex" style={{gap: 10}}>
+            <Button color="primary" fullWidth={true}>
+              Primary (Full Width)
+            </Button>
+            <Button color="secondary" fullWidth={true}>
+              Secondary (Full Width)
+            </Button>
+          </Box>
         </Box>
 
+        <Typography variant="h1">Input</Typography>
         <Box style={{width: 300, marginBottom: 20}}>
           <FormControl>
             <Input placeholder="placeholder" />
@@ -122,6 +146,16 @@ export default (_: {}) => {
           </FormControl>
         </Box>
 
+        <Typography variant="h1">Icon Buttons</Typography>
+        <Box display="flex" flexDirection="row">
+          <IconButton color="primary" onClick={() => {}}>
+            <Tooltip title="Generate Key" placement="top">
+              <icons.AddIcon />
+            </Tooltip>
+          </IconButton>
+        </Box>
+
+        <Typography variant="h1">Snacks</Typography>
         <Box marginBottom={2}>
           <Link onClick={() => openSnack({message: 'Testing'})}>Snack Test</Link>
           <Link onClick={() => openSnack({message: 'Testing', alert: 'success', duration: 1000})}>
@@ -185,34 +219,39 @@ export default (_: {}) => {
           <Typography variant="body2">kex1mnseg28xu6g3j</Typography>
         </Box>
 
+        <Typography variant="h1">Icons</Typography>
         <Box display="flex" flexDirection="column" marginTop={2}>
           <Table size="small">
             <TableBody>
-              {row('AddRecipientIcon', <icons.AddRecipientIcon />)}
-              {row('LinkIcon', <icons.LinkIcon />)}
-              {row('SyncIcon', <icons.SyncIcon />)}
-              {row('PasswordVisibleIcon', <icons.PasswordVisibleIcon />)}
-              {row('PasswordIcon', <icons.PasswordIcon />)}
-              {row('NoteIcon', <icons.NoteIcon />)}
               {row('AddIcon', <icons.AddIcon />)}
-              {row('EncryptIcon', <icons.EncryptIcon />)}
-              {row('DecryptIcon', <icons.DecryptIcon />)}
-              {row('SignIcon', <icons.SignIcon />)}
-              {row('LeftArrowIcon', <icons.LeftArrowIcon />)}
-              {row('RightArrowIcon', <icons.RightArrowIcon />)}
-              {row('ScreenLockIcon', <icons.ScreenLockIcon />)}
-              {row('MinimizeIcon', <icons.MinimizeIcon />)}
-              {row('MaximizeIcon', <icons.MaximizeIcon />)}
-              {row('UnmaximizeIcon', <icons.UnmaximizeIcon />)}
-              {row('KeysIcon', <icons.KeysIcon />)}
-              {row('SearchIcon', <icons.SearchIcon />)}
-              {row('CryptoToolsIcon', <icons.CryptoToolsIcon />)}
-              {row('SettingsIcon', <icons.SettingsIcon />)}
-              {row('WormholeIcon', <icons.WormholeIcon />)}
-              {row('SecretsIcon', <icons.SecretsIcon />)}
-              {row('RefreshIcon', <icons.RefreshIcon />)}
+              {row('BackIcon', <icons.BackIcon />)}
               {row('CloseIcon', <icons.CloseIcon />)}
               {row('CopyIcon', <icons.CopyIcon />)}
+              {row('CryptoToolsIcon', <icons.CryptoToolsIcon />)}
+              {row('DecryptIcon', <icons.DecryptIcon />)}
+              {row('EditIcon', <icons.EditIcon />)}
+              {row('EncryptIcon', <icons.EncryptIcon />)}
+              {row('ImportIcon', <icons.ImportIcon />)}
+              {row('KeysIcon', <icons.KeysIcon />)}
+              {row('LeftArrowIcon', <icons.LeftArrowIcon />)}
+              {row('MaximizeIcon', <icons.MaximizeIcon />)}
+              {row('MinimizeIcon', <icons.MinimizeIcon />)}
+              {row('NoteIcon', <icons.NoteIcon />)}
+              {row('PasswordIcon', <icons.PasswordIcon />)}
+              {row('PasswordVisibleIcon', <icons.PasswordVisibleIcon />)}
+              {row('RefreshIcon', <icons.RefreshIcon />)}
+              {row('RightArrowIcon', <icons.RightArrowIcon />)}
+              {row('ScreenLockIcon', <icons.ScreenLockIcon />)}
+              {row('SearchIcon', <icons.SearchIcon />)}
+              {row('SecretsIcon', <icons.SecretsIcon />)}
+              {row('SettingsIcon', <icons.SettingsIcon />)}
+              {row('SignIcon', <icons.SignIcon />)}
+              {row('SyncIcon', <icons.SyncIcon />)}
+              {row('UnmaximizeIcon', <icons.UnmaximizeIcon />)}
+              {row('UserIcon', <icons.UserIcon />)}
+              {row('UserLinkIcon', <icons.UserLinkIcon />)}
+              {row('VerifyIcon', <icons.VerifyIcon />)}
+              {row('WormholeIcon', <icons.WormholeIcon />)}
             </TableBody>
           </Table>
         </Box>
@@ -225,10 +264,12 @@ export default (_: {}) => {
 
 const row = (name: string, icon: React.ReactElement): React.ReactElement => (
   <TableRow>
+    <TableCell style={{width: 40}}>
+      <Box>{icon}</Box>
+    </TableCell>
     <TableCell>
       <Typography>{name}</Typography>
     </TableCell>
-    <TableCell>{icon}</TableCell>
   </TableRow>
 )
 

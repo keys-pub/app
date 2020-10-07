@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Avatar, Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@material-ui/core'
+import {Avatar, Box, Button, Dialog, Fade, DialogActions, DialogContent, Typography} from '@material-ui/core'
 
 import {breakWords} from '../theme'
 
@@ -13,7 +13,7 @@ import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../rpc/ke
 type Props = {
   open: boolean
   close: (snack: string) => void
-  kid: string
+  kid?: string
   search?: boolean
   update?: boolean
   import?: boolean
@@ -27,10 +27,6 @@ type State = {
   openExport: boolean
   openRemove: boolean
 }
-
-// const transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
-//   return <Slide direction="up" ref={ref} {...props} />
-// })
 
 export default class KeyDialog extends React.Component<Props, State> {
   state: State = {
@@ -48,7 +44,7 @@ export default class KeyDialog extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: any, snapshot: any) {
-    if (this.props.kid !== prevProps.kid) {
+    if (this.props.kid != prevProps.kid) {
       this.loadKey(!!this.props.update, false)
     }
   }
@@ -116,6 +112,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         PaperProps={{
           style: {minWidth: 620},
         }}
+        // transitionDuration={4000}
       >
         <DialogTitle loading={this.state.loading} onClose={() => this.close('')}>
           Key

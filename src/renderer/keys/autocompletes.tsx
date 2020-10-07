@@ -73,7 +73,6 @@ export default (props: Props) => {
   }
 
   const [open, setOpen] = React.useState(false)
-  const [input, setInput] = React.useState('')
   const [options, setOptions] = React.useState(props.keys)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [importOpen, setImportOpen] = React.useState(false)
@@ -85,12 +84,6 @@ export default (props: Props) => {
   const openAutoComplete = () => {
     setOpen(true)
   }
-
-  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    const q = target.value || ''
-    setInput(q)
-  }, [])
 
   const search = async () => {
     try {
@@ -135,7 +128,6 @@ export default (props: Props) => {
         multiple
         filterSelectedOptions
         filterOptions={filterOptions}
-        onInputChange={onInputChange}
         onChange={onChange}
         value={props.keys}
         getOptionSelected={optionSelected}

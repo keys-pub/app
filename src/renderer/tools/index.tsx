@@ -23,7 +23,7 @@ import VerifyView from '../verify'
 import {withStyles, Theme, createStyles, makeStyles} from '@material-ui/core/styles'
 
 import {store, setLocation} from '../store'
-import path from 'path'
+import {column1Color} from '../theme'
 
 import {EncryptIcon, DecryptIcon, SignIcon, VerifyIcon} from '../icons'
 
@@ -58,12 +58,12 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
       <Header />
-      <Divider />
       <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
         <List
           style={{
-            height: '100%',
             padding: 0,
+            paddingTop: 26,
+            backgroundColor: column1Color,
           }}
         >
           {navs.map((nav, index) =>
@@ -72,7 +72,6 @@ export default (props: Props) => {
             })
           )}
         </List>
-        <Divider orientation="vertical" />
         <Box display="flex" flexDirection="column" flex={1}>
           {selected == '/encrypt' && <EncryptView />}
           {selected == '/decrypt' && <DecryptView />}
@@ -84,22 +83,22 @@ export default (props: Props) => {
   )
 }
 
-const LightTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: theme.palette.common.white,
-    color: 'rgba(0, 0, 0, 0.87)',
-    boxShadow: theme.shadows[4],
-  },
-}))(Tooltip)
+// const LightTooltip = withStyles((theme: Theme) => ({
+//   tooltip: {
+//     backgroundColor: theme.palette.common.white,
+//     color: 'rgba(0, 0, 0, 0.87)',
+//     boxShadow: theme.shadows[4],
+//   },
+// }))(Tooltip)
 
 const row = (nav: Nav, index: number, selected: boolean, onClick: any) => {
   return (
     <ListItem button style={{height: 40}} onClick={onClick} key={nav.name}>
-      <LightTooltip title={nav.label} placement="left">
-        <ListItemIcon style={{minWidth: 0}}>
-          <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
-        </ListItemIcon>
-      </LightTooltip>
+      {/* <LightTooltip title={nav.label} placement="left"> */}
+      <ListItemIcon style={{minWidth: 0}}>
+        <nav.icon style={{fontSize: 20, color: selected ? '#2196f3' : ''}} />
+      </ListItemIcon>
+      {/* </LightTooltip> */}
       {/* <ListItemText primary={nav.name} primaryTypographyProps={{style: {color: selected ? '#2196f3' : ''}}} /> */}
     </ListItem>
   )

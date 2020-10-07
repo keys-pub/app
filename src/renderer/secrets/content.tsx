@@ -1,8 +1,8 @@
 import * as React from 'react'
 
-import {Box, Button, Divider, TextField, Typography} from '@material-ui/core'
+import {Box, Button, Divider, IconButton, TextField, Tooltip, Typography} from '@material-ui/core'
 
-import {PasswordVisibleIcon} from '../icons'
+import {PasswordVisibleIcon, EditIcon, AddIcon} from '../icons'
 
 import {mono, breakWords} from '../theme'
 import {dateString} from '../helper'
@@ -18,34 +18,23 @@ type Props = {
 
 type State = {
   passwordVisible: boolean
-  copySnackOpen: boolean
 }
 
 export default class SecretContentView extends React.Component<Props, State> {
   state = {
     passwordVisible: false,
-    copySnackOpen: false,
   }
 
   renderActions() {
     return (
-      <Box
-        display="flex"
-        flexDirection="row"
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
-      >
+      <Box display="flex" flexDirection="row">
         {this.props.secret && (
           <Box display="flex" flexDirection="row">
-            <Button
-              onClick={this.props.edit}
-              variant="outlined"
-              size="small"
-              style={{marginTop: 2, width: 55, marginRight: 10}}
-            >
-              Edit
-            </Button>
-
-            <Box display="flex" flexGrow={1} />
+            <IconButton size="small" onClick={this.props.edit}>
+              <Tooltip title="Edit">
+                <EditIcon />
+              </Tooltip>
+            </IconButton>
           </Box>
         )}
       </Box>
@@ -109,7 +98,7 @@ export default class SecretContentView extends React.Component<Props, State> {
         display="flex"
         flexDirection="column"
         flex={1}
-        style={{position: 'absolute', top: 10, left: 14, bottom: 0, right: 0}}
+        style={{position: 'absolute', top: 67, left: 14, bottom: 0, right: 0}}
       >
         {secret.type == SecretType.PASSWORD_SECRET && this.renderPassword(secret)}
         {secret.type == SecretType.NOTE_SECRET && this.renderNote(secret)}
@@ -128,13 +117,21 @@ export default class SecretContentView extends React.Component<Props, State> {
 
   render() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
-        {this.renderActions()}
-        <Divider />
-        <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative'}}>
-          <Divider orientation="vertical" />
-          {this.props.secret && this.renderSecret(this.props.secret)}
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          flex={1}
+          style={{
+            position: 'absolute',
+            top: 27,
+            right: 0,
+            left: 10,
+          }}
+        >
+          {this.renderActions()}
         </Box>
+        {this.props.secret && this.renderSecret(this.props.secret)}
       </Box>
     )
   }

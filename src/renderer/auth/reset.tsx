@@ -53,8 +53,8 @@ export default (props: Props) => {
 
   return (
     <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
-      <Header noLock noBack />
-      <Logo top={60} />
+      <Header noBack />
+      <Logo top={100} />
       <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
         Are you sure you want to reset auth? <br />
         <span style={{fontWeight: 600}}>

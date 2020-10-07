@@ -19,6 +19,7 @@ import {ipcRenderer} from 'electron'
 import {store, setLocation} from '../store'
 import {openSnack} from '../snack'
 import ChangePasswordDialog from '../auth/change-password'
+import {contentTop} from '../theme'
 
 export default (props: {}) => {
   const [prerelease, setPrerelease] = React.useState(false)
@@ -49,7 +50,11 @@ export default (props: {}) => {
 
   const labelWidth = 60
   return (
-    <Box display="flex" flex={1} flexDirection="column" style={{marginTop: 10}}>
+    <Box display="flex" flex={1} flexDirection="column" style={{marginTop: contentTop}}>
+      <Typography variant="h4" style={{marginLeft: 10, paddingBottom: 10}}>
+        Settings
+      </Typography>
+
       <Table size="small">
         <TableBody>
           <TableRow>

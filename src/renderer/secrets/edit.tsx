@@ -103,27 +103,21 @@ export default class SecretEditView extends React.Component<Props, State> {
 
   renderEditActions() {
     return (
-      <Box
-        display="flex"
-        flexDirection="row"
-        style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
-      >
+      <Box display="flex" flexDirection="row">
         <Button
           onClick={this.props.cancel}
           color="secondary"
-          variant="outlined"
           size="small"
-          style={{marginTop: 2, width: 55}}
+          style={{marginRight: 10, width: 60}}
         >
           Cancel
         </Button>
-        <Box display="flex" flexGrow={1} />
         <Button
           color="primary"
-          variant="outlined"
+          variant="contained"
           size="small"
           onClick={this.save}
-          style={{marginTop: 2, width: 55, marginRight: 10}}
+          style={{width: 60, marginRight: 10}}
         >
           Save
         </Button>
@@ -233,10 +227,10 @@ export default class SecretEditView extends React.Component<Props, State> {
           onChange={(e) => this.onChange(e, 'name')}
           value={this.state.secret.name}
           inputProps={{maxLength: 128}}
-          style={{marginBottom: 20}}
+          style={{...valueStyle, marginBottom: 20}}
         />
 
-        <FormControl style={{marginBottom: 10}}>
+        <FormControl>
           <TextField
             label="Notes"
             variant="outlined"
@@ -247,38 +241,47 @@ export default class SecretEditView extends React.Component<Props, State> {
             // InputProps={{style: {paddingRight: 0}}}
           />
         </FormControl>
+        <Box display="flex" flexGrow={1} />
       </Box>
     )
   }
 
   render() {
     return (
-      <Box display="flex" flexDirection="column" flex={1}>
-        {this.renderEditActions()}
-        <Divider />
-        <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative'}}>
-          <Divider orientation="vertical" />
-          <Box
-            display="flex"
-            flexDirection="column"
-            flex={1}
-            style={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              left: 0,
-              bottom: 0,
-              overflowY: 'auto',
-            }}
-          >
-            {this.props.isNew && (
-              <FormControl style={{marginLeft: 14, marginBottom: 20}}>{this.renderTypeSelect()}</FormControl>
-            )}
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          flex={1}
+          style={{
+            position: 'absolute',
+            top: 27,
+            right: 0,
+            left: 10,
+          }}
+        >
+          {this.renderEditActions()}
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="column"
+          flex={1}
+          style={{
+            position: 'absolute',
+            top: 67,
+            right: 10,
+            left: 14,
+            bottom: 10,
+            overflowY: 'auto',
+          }}
+        >
+          {this.props.isNew && (
+            <FormControl style={{marginBottom: 16}}>{this.renderTypeSelect()}</FormControl>
+          )}
 
-            <Box display="flex" flexDirection="column" flex={1} style={{marginLeft: 14}}>
-              {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
-              {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
-            </Box>
+          <Box display="flex" flexDirection="column" flex={1}>
+            {this.state.secret.type == SecretType.PASSWORD_SECRET && this.renderPassword()}
+            {this.state.secret.type == SecretType.NOTE_SECRET && this.renderNote()}
           </Box>
         </Box>
       </Box>

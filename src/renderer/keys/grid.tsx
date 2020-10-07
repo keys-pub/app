@@ -17,10 +17,10 @@ import {
 
 import {clipboard, ipcRenderer} from 'electron'
 
-import {SyncIcon} from '../icons'
+import {AddIcon, ImportIcon, SyncIcon, SearchIcon, UserIcon} from '../icons'
 
 import UserLabel from '../user/label'
-import {IDLabel} from '../key/label'
+import {IDLabel, isKeyPrivate} from '../key/label'
 
 import Header from '../header'
 
@@ -37,6 +37,8 @@ import {Key, KeyType, SortDirection, KeysRequest} from '../rpc/keys.d'
 
 import {store, loadStore} from './store'
 import {openSnackError} from '../snack'
+import {column2Color} from '../theme'
+import Tooltip from '../components/tooltip'
 
 export default (_: {}) => {
   const {
@@ -45,8 +47,9 @@ export default (_: {}) => {
     exportKey,
     importOpen,
     input,
-    keyOpen,
     keys,
+    keyOpen,
+    keyShow,
     removeOpen,
     removeKey,
     searchOpen,
@@ -87,6 +90,7 @@ export default (_: {}) => {
   const openKey = (key: Key) => {
     store.update((s) => {
       s.keyOpen = true
+      s.keyShow = key
       s.selected = key
     })
   }
@@ -234,64 +238,39 @@ export default (_: {}) => {
     [keys]
   )
 
-  const buttonWidth = 80
-
   return (
-    <Box display="flex" flexDirection="column" flex={1} id="keysView" style={{position: 'relative'}}>
+    <Box display="flex" flexDirection="column" flex={1} id="keysView">
       <Box display="flex" flexDirection="column">
         <Header />
 
         <Box
           display="flex"
           flexDirection="row"
-          flex={1}
-          style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
+          style={{paddingLeft: 8, paddingTop: 20, position: 'relative'}}
         >
-          <Button
-            color="primary"
-            variant="outlined"
-            size="small"
-            onClick={() => setCreateOpen(true)}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<AddIcon />}
-            id="newKeyButton"
-          >
-            New
-          </Button>
-          <Box paddingLeft={1} />
-          <Button
-            // color="primary"
-            variant="outlined"
-            size="small"
-            onClick={openImport}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<ImportKeyIcon />}
-          >
-            Import
-          </Button>
-          <Box paddingLeft={1} />
-          <Button
-            // color="primary"
-            variant="outlined"
-            size="small"
-            onClick={() => setSearchOpen(true)}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<SearchIcon />}
-          >
-            Search
-          </Button>
-          <Box paddingLeft={1} />
+          <IconButton color="primary" onClick={() => setCreateOpen(true)} id="newKeyButton">
+            <Tooltip title="Generate Key" placement="top">
+              <AddIcon />
+            </Tooltip>
+          </IconButton>
+          <IconButton onClick={openImport}>
+            <Tooltip title="Import Key" placement="top">
+              <ImportIcon />
+            </Tooltip>
+          </IconButton>
+          <IconButton onClick={() => setSearchOpen(true)}>
+            <Tooltip title="Search Keys" placement="top">
+              <SearchIcon />
+            </Tooltip>
+          </IconButton>
           {syncEnabled && (
-            <Button
-              onClick={sync}
-              size="small"
-              variant="outlined"
-              style={{marginTop: 2, minWidth: 'auto'}}
-              disabled={syncing}
-            >
-              <SyncIcon />
-            </Button>
+            <IconButton onClick={sync} disabled={syncing}>
+              <Tooltip title="Sync Vault" placement="top">
+                <SyncIcon />
+              </Tooltip>
+            </IconButton>
           )}
+
           <Box display="flex" flexDirection="row" flexGrow={1} />
           <TextField
             placeholder="Filter"
@@ -299,71 +278,50 @@ export default (_: {}) => {
             value={input}
             onChange={onInputChange}
             inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-            style={{marginTop: 2, width: 300, marginRight: 10}}
+            style={{marginTop: 8, marginBottom: 8, marginRight: 10, width: 300}}
           />
+
           <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
         </Box>
-        <Divider />
       </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        style={{position: 'absolute', top: 77, left: 0, bottom: 0, right: 0, overflow: 'auto'}}
-      >
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell style={{minWidth: 200}}>
-                <TableSortLabel
-                  active={sortField == 'user'}
-                  direction={tableDirection}
-                  onClick={() => sort('user', sortField, sortDirection)}
-                >
-                  <Typography>User</Typography>
-                </TableSortLabel>
-              </TableCell>
-              <TableCell style={{width: 530}}>
-                <TableSortLabel
-                  active={sortField == 'kid'}
-                  direction={tableDirection}
-                  onClick={() => sort('kid', sortField, sortDirection)}
-                >
-                  <Typography>Key</Typography>
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {keys.map((key, index) => {
-              return (
-                <TableRow
-                  hover
-                  onClick={() => openKey(key)}
-                  key={key.id}
-                  style={{cursor: 'pointer'}}
-                  selected={selected == key.id}
-                  component={(props: any) => {
-                    return <tr onContextMenu={onContextMenu} {...props} id={key.id} />
-                  }}
-                >
-                  <TableCell component="th" scope="row" style={{minWidth: 200}}>
-                    {key.user && <UserLabel user={key.user} />}
-                  </TableCell>
-                  <TableCell style={{verticalAlign: 'top', width: 530}}>
-                    <IDLabel k={key} owner />
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+        <Divider />
+        <Box style={{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0, overflowY: 'auto'}}>
+          <Table size="small">
+            <TableBody>
+              {keys.map((key, index) => {
+                // const isPrivate = isKeyPrivate(key)
+                return (
+                  <TableRow
+                    hover
+                    onClick={() => openKey(key)}
+                    key={key.id}
+                    style={{cursor: 'pointer'}}
+                    selected={selected?.id == key.id}
+                    component={(props: any) => {
+                      return <tr onContextMenu={onContextMenu} {...props} id={key.id} />
+                    }}
+                  >
+                    <TableCell component="th" scope="row" style={{minWidth: 200}}>
+                      {key.user && <UserLabel user={key.user} />}
+                      {!key.user && <Typography style={{color: '#afafaf'}}>—</Typography>}
+                    </TableCell>
+                    <TableCell style={{verticalAlign: 'top', width: 530}}>
+                      <IDLabel em k={key} />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Box>
       </Box>
 
       <KeyCreateDialog open={createOpen} close={() => setCreateOpen(false)} onChange={reload} />
       <KeyImportDialog open={importOpen} close={closeImport} />
       {removeKey && <KeyRemoveDialog open={removeOpen} k={removeKey} close={closeRemove} />}
       {exportKey && <KeyExportDialog open={exportOpen} k={exportKey} close={closeExport} />}
-      {selected && <KeyDialog open={keyOpen} close={closeKey} kid={selected.id!} reload={reload} />}
+      <KeyDialog open={keyOpen} close={closeKey} kid={keyShow?.id} reload={reload} />
     </Box>
   )
 }

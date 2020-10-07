@@ -10,8 +10,9 @@ type State = {
   importOpen: boolean
   input: string
   intro: boolean
-  keyOpen: boolean
   keys: Key[]
+  keyOpen: boolean
+  keyShow?: Key
   removeOpen?: boolean
   removeKey?: Key
   searchOpen: boolean

@@ -8,7 +8,6 @@ type State = {
   fileIn: string
   fileOut: string
   signer?: Key
-  error?: Error
   loading: boolean
 }
 

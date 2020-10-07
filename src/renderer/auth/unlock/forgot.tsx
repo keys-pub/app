@@ -48,8 +48,8 @@ export default (props: Props) => {
 
   return (
     <Box display="flex" flexGrow={1} flexDirection="column">
-      <Header noLock noBack />
-      <Logo top={60} />
+      <Header noBack />
+      <Logo top={100} />
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Card style={{marginBottom: 20, width: 400}}>
           <CardActionArea onClick={() => setStep('recover')}>

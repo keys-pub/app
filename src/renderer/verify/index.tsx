@@ -1,16 +1,16 @@
 import * as React from 'react'
 
-import {Divider, Button, Box, Input, LinearProgress, Typography} from '@material-ui/core'
+import {Divider, Button, Box, IconButton, Input, LinearProgress, Typography} from '@material-ui/core'
 
-import VerifiedView from './verified'
-import VerifiedFileView from './verifiedfile'
-
+import {AddRecipientIcon, SignIcon, CopyIcon} from '../icons'
 import {Link} from '../components'
 import {mono} from '../theme'
-
-import {ipcRenderer, OpenDialogReturnValue} from 'electron'
+import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
+import {column2Color, contentTop} from '../theme'
+import {closeSnack, openSnack, openSnackError} from '../snack'
+import SignerView from '../verify/signer'
 
 import {verify, verifyFile, key, VerifyFileEvent} from '../rpc/keys'
 import {
@@ -30,7 +30,6 @@ type State = {
   fileIn: string
   fileOut: string
   signer?: Key
-  error?: Error
   loading: boolean
 }
 
@@ -43,8 +42,9 @@ const store = new Store<State>({
 })
 
 const openFile = async () => {
-  clearOut()
-  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog', {})
+  clear(true)
+
+  const open: OpenDialogReturnValue = await ipcRenderer.invoke('open-dialog')
   if (open.canceled) {
     return
   }
@@ -57,80 +57,79 @@ const openFile = async () => {
   }
 }
 
-const clear = () => {
+const clear = (outOnly: boolean) => {
+  closeSnack()
   // TODO: Stream cancel?
-  store.update((s) => {
-    s.input = ''
-    s.output = ''
-    s.fileIn = ''
-    s.fileOut = ''
-    s.signer = undefined
-    s.error = undefined
-  })
-}
-
-const clearOut = () => {
-  store.update((s) => {
-    s.output = ''
-    s.fileOut = ''
-    s.signer = undefined
-    s.error = undefined
-  })
-}
-
-const setError = (err: Error) => {
-  store.update((s) => {
-    s.error = err
-  })
-}
-
-const reloadSigner = (kid?: string) => {
-  if (!kid) {
+  if (outOnly) {
     store.update((s) => {
+      s.output = ''
+      s.fileOut = ''
       s.signer = undefined
     })
-    return
-  }
-  const req: KeyRequest = {
-    key: kid,
-    search: false,
-    update: false,
-  }
-  key(req)
-    .then((resp: KeyResponse) => {
-      store.update((s) => {
-        s.signer = resp.key
-      })
+  } else {
+    store.update((s) => {
+      s.input = ''
+      s.output = ''
+      s.fileIn = ''
+      s.fileOut = ''
+      s.signer = undefined
+      s.loading = false
     })
-    .catch(setError)
+  }
 }
 
-const verifyInput = (input: string) => {
+const copyToClipboard = (value: string) => {
+  clipboard.writeText(value)
+  openSnack({message: 'Copied to Clipboard', duration: 2000})
+}
+
+const openFolder = (value: string) => {
+  shell.showItemInFolder(value)
+}
+
+const reloadSender = async (kid: string) => {
+  try {
+    const resp = await key({
+      key: kid,
+      search: false,
+      update: false,
+    })
+    store.update((s) => {
+      s.signer = resp.key
+    })
+  } catch (err) {
+    openSnackError(err)
+  }
+}
+
+const verifyInput = async (input: string) => {
   if (input == '') {
-    clearOut()
+    clear(true)
     return
   }
+  closeSnack()
 
   console.log('Verifying...')
-  const data = new TextEncoder().encode(input)
-  const req: VerifyRequest = {
-    data: data,
-  }
-  verify(req)
-    .then((resp: VerifyResponse) => {
-      const verified = new TextDecoder().decode(resp.data)
-      store.update((s) => {
-        s.signer = resp.signer
-        s.error = undefined
-        s.output = verified
-        s.fileOut = ''
-      })
+  try {
+    const data = new TextEncoder().encode(input)
+    const req: VerifyRequest = {
+      data: data,
+    }
+    const resp = await verify(req)
+    const verifyed = new TextDecoder().decode(resp.data)
+    store.update((s) => {
+      s.signer = resp.signer
+      s.output = verifyed
+      s.fileOut = ''
     })
-    .catch(setError)
+  } catch (err) {
+    clear(true)
+    openSnackError(err)
+  }
 }
 
 const verifyFileIn = (fileIn: string, dir: string) => {
-  clearOut()
+  clear(true)
 
   if (fileIn == '') return
 
@@ -151,7 +150,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
         })
       } else {
         store.update((s) => {
-          s.error = err
+          openSnackError(err)
           s.loading = false
         })
       }
@@ -161,7 +160,6 @@ const verifyFileIn = (fileIn: string, dir: string) => {
       store.update((s) => {
         s.fileOut = res?.out || ''
         s.signer = res?.signer
-        s.error = undefined
         s.output = ''
       })
     }
@@ -187,15 +185,7 @@ const verifyFileTo = async (fileIn: string) => {
   }
 }
 
-const VerifyToButton = (props: {onClick: () => void; disabled: boolean}) => (
-  <Box style={{marginLeft: 10, marginTop: 10}}>
-    <Button color="primary" variant="outlined" disabled={props.disabled} onClick={props.onClick}>
-      Verify to
-    </Button>
-  </Box>
-)
-
-export default (props: {}) => {
+export default (_: {}) => {
   const inputRef = React.useRef<HTMLTextAreaElement>()
 
   const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
@@ -205,7 +195,7 @@ export default (props: {}) => {
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, signer, loading} = store.useState()
+  const {input, output, fileIn, fileOut, signer, loading} = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -214,84 +204,124 @@ export default (props: {}) => {
   }, [input])
 
   const showVerifyFileButton = fileIn && !fileOut
+  const left = 10
 
   return (
-    <Box display="flex" flex={1} flexDirection="column" style={{overflow: 'hidden'}}>
-      <Box style={{position: 'relative', height: '40%'}}>
+    <Box display="flex" flex={1} flexDirection="column">
+      <Box style={{marginLeft: left, marginTop: contentTop, marginBottom: 4}}>
+        <Typography variant="h4">Verify</Typography>
+      </Box>
+      <Box display="flex" flexDirection="column" flex={0.75} style={{position: 'relative'}}>
         {fileIn && (
-          <Box style={{paddingTop: 8, paddingLeft: 8}}>
-            <Typography variant="body2" style={{display: 'inline'}}>
-              {fileIn}&nbsp;
-            </Typography>
-            <Link inline onClick={clear}>
-              Clear
-            </Link>
+          <Box display="flex" flexDirection="column" style={{paddingTop: 8, paddingLeft: left}}>
+            <Box>
+              <Typography variant="body2" style={{display: 'inline'}}>
+                {fileIn}&nbsp;
+              </Typography>
+              <Link inline onClick={() => clear(false)} disabled={loading}>
+                Clear
+              </Link>
+            </Box>
+            {showVerifyFileButton && (
+              <Box marginTop={1}>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  onClick={() => verifyFileTo(fileIn)}
+                  disabled={loading}
+                >
+                  Verify to
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
         {!fileIn && (
           <Box style={{height: '100%'}}>
             <textarea
+              autoFocus
               ref={inputRef as React.RefObject<HTMLTextAreaElement>}
               value={input}
               onChange={onInputChange}
               spellCheck="false"
               style={{
-                height: 'calc(100% - 16px)',
-                width: 'calc(100% - 8px)',
-                overflow: 'auto',
-                border: 'none',
-                padding: 0,
                 ...mono,
+                height: 'calc(100% - 16px)',
+                width: 'calc(100% - ' + left + 'px)',
+                overflowY: 'auto',
+                border: 'none',
                 outline: 0,
                 resize: 'none',
+                paddingRight: 0,
                 paddingTop: 8,
-                paddingLeft: 8,
+                paddingLeft: left,
                 paddingBottom: 8,
+                backgroundColor: 'white',
               }}
             />
             {!input && (
-              <Box style={{position: 'absolute', top: 6, left: 8}}>
+              <Box style={{position: 'absolute', top: 6, left: left}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
                   onClick={() => inputRef.current?.focus()}
                 >
                   Enter signed text or{' '}
                 </Typography>
-                <Link inline onClick={openFile}>
-                  select a file
+                <Link inline onClick={() => openFile()}>
+                  select a signed file
                 </Link>
                 <Typography style={{display: 'inline'}}>.</Typography>
               </Box>
             )}
           </Box>
         )}
-        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
-          {!loading && <Divider />}
-          {loading && <LinearProgress />}
-        </Box>
+        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>{loading && <LinearProgress />}</Box>
       </Box>
-      <Box
-        style={{
-          height: '60%',
-          width: '100%',
-        }}
-      >
-        {error && (
-          <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
-              {error.message}
-            </Typography>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <SignerView signer={signer} reload={reloadSender} />
+        <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+          {output && (
+            <Box style={{position: 'absolute', right: 16, top: 4, zIndex: 10}}>
+              <IconButton
+                onClick={() => copyToClipboard(output)}
+                size="small"
+                style={{padding: 4, backgroundColor: 'white'}}
+              >
+                <CopyIcon />
+              </IconButton>
+            </Box>
+          )}
+          <Box
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              overflowY: 'auto',
+              paddingTop: 8,
+              paddingBottom: 8,
+              paddingLeft: 10,
+              // borderRadius: 10,
+              backgroundColor: column2Color,
+            }}
+          >
+            {output && (
+              <Typography style={{whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>{output}</Typography>
+            )}
+            {fileOut && (
+              <Box display="flex" flex={1}>
+                <Typography variant="body2" style={{display: 'inline'}}>
+                  {fileOut}&nbsp;
+                </Typography>
+                <Link inline onClick={() => openFolder(fileOut)}>
+                  Open Folder
+                </Link>
+              </Box>
+            )}
           </Box>
-        )}
-        {!error && showVerifyFileButton && (
-          <VerifyToButton onClick={() => verifyFileTo(fileIn)} disabled={loading} />
-        )}
-        {!error && !showVerifyFileButton && fileOut && (
-          <VerifiedFileView fileOut={fileOut} signer={signer} reloadKey={() => reloadSigner(signer?.id)} />
-        )}
-        {!error && !showVerifyFileButton && !fileOut && (
-          <VerifiedView value={output} signer={signer} reloadSigner={() => reloadSigner(signer?.id)} />
-        )}
+        </Box>
       </Box>
     </Box>
   )

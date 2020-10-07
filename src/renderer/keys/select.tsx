@@ -13,7 +13,8 @@ export type Props = {
   disabled?: boolean
   placeholder?: string
   placeholderDisabled?: boolean
-  itemLabel?: string
+  label?: string
+  SelectDisplayProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
 const empty = (_: {}) => {
@@ -46,7 +47,7 @@ export default (props: Props) => {
   }, [])
 
   return (
-    <Box display="flex" flex={1} style={{marginRight: 8}}>
+    <Box display="flex" flex={1} style={{overflow: 'hidden'}}>
       <Select
         onChange={onChange}
         value={props.value?.id || ''}
@@ -56,13 +57,8 @@ export default (props: Props) => {
         displayEmpty
         IconComponent={empty}
         SelectDisplayProps={{
-          style: {
-            paddingLeft: 8,
-            paddingTop: 11,
-            paddingBottom: 10,
-            backgroundColor: 'white',
-            // color: '#666',
-          },
+          style: {},
+          ...(props.SelectDisplayProps || {}),
         }}
       >
         {props.placeholder && (
@@ -73,9 +69,9 @@ export default (props: Props) => {
         {options.map((k: Key) => (
           <MenuItem key={k.id} value={k.id}>
             <Box>
-              {props.itemLabel && (
+              {props.label && (
                 <Typography display="inline" style={{color: '#a2a2a2'}}>
-                  {props.itemLabel}&nbsp;
+                  {props.label}&nbsp;
                 </Typography>
               )}
               <KeyLabel k={k} />

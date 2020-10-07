@@ -12,12 +12,13 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
+  Tooltip,
   Typography,
 } from '@material-ui/core'
 
 import {clipboard, ipcRenderer} from 'electron'
 
-import {SyncIcon} from '../icons'
+import {AddIcon, ImportIcon, SyncIcon, SearchIcon} from '../icons'
 
 import UserLabel from '../user/label'
 import {IDLabel} from '../key/label'
@@ -236,57 +237,32 @@ export default (_: {}) => {
       <Box display="flex" flexDirection="column">
         <Header />
 
-        <Box
-          display="flex"
-          flexDirection="row"
-          flex={1}
-          style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8}}
-        >
-          <Button
-            color="primary"
-            variant="outlined"
-            size="small"
-            onClick={() => setCreateOpen(true)}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<AddIcon />}
-            id="newKeyButton"
-          >
-            New
-          </Button>
-          <Box paddingLeft={1} />
-          <Button
-            // color="primary"
-            variant="outlined"
-            size="small"
-            onClick={openImport}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<ImportKeyIcon />}
-          >
-            Import
-          </Button>
-          <Box paddingLeft={1} />
-          <Button
-            // color="primary"
-            variant="outlined"
-            size="small"
-            onClick={() => setSearchOpen(true)}
-            style={{marginTop: 2, minWidth: buttonWidth}}
-            // startIcon={<SearchIcon />}
-          >
-            Search
-          </Button>
-          <Box paddingLeft={1} />
-          {syncEnabled && (
-            <Button
-              onClick={sync}
-              size="small"
-              variant="outlined"
-              style={{marginTop: 2, minWidth: 'auto'}}
-              disabled={syncing}
-            >
-              <SyncIcon />
-            </Button>
-          )}
+        <Box display="flex" flexDirection="row" style={{paddingLeft: 8, marginTop: 26}}>
+          <Box>
+            <IconButton color="primary" onClick={() => setCreateOpen(true)} id="newKeyButton">
+              <Tooltip title="Generate Key" placement="top">
+                <AddIcon />
+              </Tooltip>
+            </IconButton>
+
+            <IconButton onClick={openImport}>
+              <Tooltip title="Import Key" placement="top">
+                <ImportIcon />
+              </Tooltip>
+            </IconButton>
+            <IconButton onClick={() => setSearchOpen(true)}>
+              <Tooltip title="Search Keys" placement="top">
+                <SearchIcon />
+              </Tooltip>
+            </IconButton>
+            {syncEnabled && (
+              <IconButton onClick={sync} disabled={syncing}>
+                <Tooltip title="Sync Vault" placement="top">
+                  <SyncIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+          </Box>
           <Box display="flex" flexDirection="row" flexGrow={1} />
           <TextField
             placeholder="Filter"
@@ -294,12 +270,13 @@ export default (_: {}) => {
             value={input}
             onChange={onInputChange}
             inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-            style={{marginTop: 2, width: 300, marginRight: 10}}
+            style={{marginTop: 6, width: 300, marginRight: 10}}
           />
+
           <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />
         </Box>
-        <Divider />
       </Box>
+      <Divider />
       <Box display="flex" flexDirection="row" flex={1} style={{position: 'relative'}}>
         <Box
           display="flex"
@@ -329,18 +306,20 @@ export default (_: {}) => {
                     }}
                   >
                     <TableCell component="th" scope="row">
-                      {key.user && <UserLabel user={key.user} />}
-                      {!key.user && <Typography>-</Typography>}
-                      <IDLabel
-                        k={key}
-                        owner
-                        style={{
-                          width: 210,
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      />
+                      <Box display="flex" flexDirection="column">
+                        {key.user && <UserLabel user={key.user} />}
+                        {!key.user && <Typography>-</Typography>}
+                        <IDLabel
+                          k={key}
+                          owner
+                          style={{
+                            width: 210,
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
+                        />
+                      </Box>
                     </TableCell>
                   </TableRow>
                 )
@@ -352,8 +331,8 @@ export default (_: {}) => {
         <Box
           style={{
             position: 'absolute',
-            top: 0,
-            left: 250,
+            top: 16,
+            left: 260,
             right: 0,
             bottom: 0,
             overflowY: 'auto',

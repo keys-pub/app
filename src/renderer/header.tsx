@@ -8,26 +8,15 @@ import {store, goBack} from './store'
 import {ipcRenderer} from 'electron'
 import {platform} from 'os'
 
-import {LeftArrowIcon, ScreenLockIcon, CloseIcon, MinimizeIcon, MaximizeIcon, UnmaximizeIcon} from './icons'
-
-import {authLock} from './rpc/keys'
+import {BackIcon, CloseIcon, MinimizeIcon, MaximizeIcon, UnmaximizeIcon} from './icons'
 
 type Props = {
-  noLock?: boolean
   noBack?: boolean
   loading?: boolean
 }
 
 export default (props: Props) => {
   const [maximized, setMaximized] = React.useState(false)
-
-  const lock = async () => {
-    ipcRenderer.send('authToken', {authToken: ''})
-    store.update((s) => {
-      s.unlocked = false
-    })
-    await authLock({})
-  }
 
   const osname = platform()
 
@@ -61,42 +50,41 @@ export default (props: Props) => {
   }, [])
 
   return (
-    <Box display="flex" flexDirection="column" style={{width: '100%'}}>
-      <Box display="flex" flexDirection="column" style={{height: 28}}>
-        <Box style={{position: 'fixed', top: 0, width: '100%'}}>{props.loading && <LinearProgress />}</Box>
-        <Box display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="column" style={{position: 'relative', width: '100%'}}>
+      <Box style={{position: 'fixed', top: 0, left: 0, right: 0, width: '100%', zIndex: 10}}>
+        {props.loading && <LinearProgress />}
+      </Box>
+      <Box display="flex" flexDirection="column" style={{position: 'absolute', top: 0, left: 0, right: 0}}>
+        <Box display="flex" flexDirection="row" flex={1}>
           {!props.noBack && (
-            <Box display="flex" flexDirection="row">
-              <IconButton onClick={goBack} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-                <LeftArrowIcon />
-              </IconButton>
-            </Box>
-          )}
-          <Box display="flex" flexGrow={1} className="drag" />
-          {!props.noLock && (
-            <IconButton onClick={lock} style={{marginTop: -6, marginBottom: -2, height: 41}} id="lockButton">
-              <ScreenLockIcon fontSize="small" style={{fontSize: 14, color: '#666'}} />
-            </IconButton>
-          )}
-          {showSystemButtons && (
             <Box>
-              <IconButton onClick={minimize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-                <MinimizeIcon fontSize="small" style={{color: '#666'}} />
-              </IconButton>
-              <IconButton onClick={maximize} style={{marginTop: -6, marginBottom: -2, height: 41}}>
-                {!maximized && <MaximizeIcon fontSize="small" style={{color: '#666'}} />}
-                {maximized && <UnmaximizeIcon fontSize="small" style={{color: '#666'}} />}
-              </IconButton>
-              <IconButton
-                color="secondary"
-                onClick={close}
-                style={{marginTop: -6, marginBottom: -2, height: 41}}
-              >
-                <CloseIcon fontSize="small" style={{color: '#666'}} />
+              <IconButton size="small" onClick={goBack} style={{marginLeft: 4, zIndex: 10}}>
+                <BackIcon fontSize="small" />
               </IconButton>
             </Box>
           )}
-          {!showSystemButtons && <Box style={{marginTop: -6, marginBottom: -2, height: 41}} />}
+          <Box display="flex" flexGrow={1} className="drag" style={{height: 20, cursor: 'pointer'}} />
+          {showSystemButtons && (
+            <Box display="flex" flexDirection="row" style={{zIndex: 10}}>
+              <Box>
+                <IconButton size="small" onClick={minimize} style={{zIndex: 10}}>
+                  <MinimizeIcon fontSize="small" style={{color: '#666'}} />
+                </IconButton>
+                <IconButton size="small" onClick={maximize} style={{zIndex: 10}}>
+                  {!maximized && <MaximizeIcon fontSize="small" style={{color: '#666'}} />}
+                  {maximized && <UnmaximizeIcon fontSize="small" style={{color: '#666'}} />}
+                </IconButton>
+                <IconButton
+                  size="small"
+                  color="secondary"
+                  onClick={close}
+                  style={{marginRight: 4, zIndex: 10}}
+                >
+                  <CloseIcon fontSize="small" style={{color: '#666'}} />
+                </IconButton>
+              </Box>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

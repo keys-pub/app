@@ -29,6 +29,31 @@ body {
   right: 0;
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0);
+}
+::-webkit-scrollbar:hover {
+  /* background-color: rgba(0, 0, 0, 0.09); */
+  background-color: #f5f5f5;
+}
+::-webkit-scrollbar-thumb {
+  /* background: rgba(0, 0, 0, 0.2); */
+  background: #e0e0e0;
+  /* border-radius: 16px; */
+}
+::-webkit-scrollbar-thumb:active {
+  /* background: rgba(0, 0, 0, 0.61); */
+  background: #bdbdbd;
+}
+::-webkit-scrollbar-thumb:vertical {
+  min-height: 10px;
+}
+::-webkit-scrollbar-thumb:horizontal {
+  min-width: 10px;
+}
+
 .message-owner,
 .message-other {
   border-radius: 10px;

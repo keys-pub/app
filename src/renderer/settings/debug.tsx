@@ -17,6 +17,7 @@ import {Link} from '../components'
 import {ipcRenderer} from 'electron'
 
 import {store, setLocation} from '../store'
+import {contentTop} from '../theme'
 
 export default (props: {}) => {
   const devTools = () => {
@@ -41,7 +42,10 @@ export default (props: {}) => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" style={{marginTop: 10, marginLeft: 15}}>
+    <Box display="flex" flexDirection="column" style={{marginTop: contentTop, marginLeft: 15}}>
+      <Typography variant="h4" style={{marginBottom: 10}}>
+        Debug
+      </Typography>
       <Typography>Experiments</Typography>
       <Link onClick={() => setLocation('/wormhole')}>Wormhole</Link>
       <Box margin={1} />

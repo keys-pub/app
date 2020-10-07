@@ -42,22 +42,10 @@ export default (props: Props) => {
       <TableHead>
         <TableRow>
           <TableCell>
-            <TableSortLabel
-              active={sortField == 'id'}
-              direction={direction}
-              // onClick={() => this.sort(sortField, 'id', sortDirection)}
-            >
-              <Typography variant="body2">RP</Typography>
-            </TableSortLabel>
+            <Typography>RP</Typography>
           </TableCell>
           <TableCell>
-            <TableSortLabel
-              active={sortField == 'name'}
-              direction={direction}
-              // onClick={() => this.sort(sortField, '???', sortDirection)}
-            >
-              <Typography variant="body2">User</Typography>
-            </TableSortLabel>
+            <Typography>User</Typography>
           </TableCell>
         </TableRow>
       </TableHead>

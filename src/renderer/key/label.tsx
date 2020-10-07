@@ -10,19 +10,23 @@ import {Key, KeyType, User} from '../rpc/keys.d'
 
 type IDLabelProps = {
   k: Key
-  owner?: boolean
+  em?: boolean
   style?: CSSProperties
+}
+
+export const isKeyPrivate = (key: Key): boolean => {
+  return key.type == KeyType.X25519 || key.type == KeyType.EDX25519
 }
 
 export const IDLabel = (props: IDLabelProps) => {
   const key = props.k
-  const isPrivate = key.type == KeyType.X25519 || key.type === KeyType.EDX25519
+  const isPrivate = isKeyPrivate(key)
   let style: CSSProperties = {}
-  if (props.owner && isPrivate) style.fontWeight = 500
+  if (isPrivate && props.em) style.fontWeight = 500
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'
   if (props.style) style = {...style, ...props.style}
   return (
-    <Typography variant="body2" style={{...style}}>
+    <Typography display="inline" variant="body2" style={{...style}}>
       {key.id}
     </Typography>
   )
@@ -31,7 +35,7 @@ export const IDLabel = (props: IDLabelProps) => {
 export const KeyLabel = (props: {k: Key; full?: boolean}) => {
   if (props.full) {
     return (
-      <Box>
+      <Box display="flex" flexDirection="column">
         {props.k.user && <UserLabel user={props.k.user} />}
         <IDLabel k={props.k} />
       </Box>

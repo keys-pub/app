@@ -10,12 +10,13 @@ import KeyDialog from '../key'
 
 import {Key, EncryptMode} from '../rpc/keys.d'
 import {KeyLabel} from '../key/label'
+import {column2Color} from '../theme'
 
 type Props = {
   signer?: Key
   unsigned?: boolean
   mode?: EncryptMode
-  reload: () => void
+  reload: (kid: string) => void
 }
 
 type State = {
@@ -41,7 +42,9 @@ export default class SignerView extends React.Component<Props, State> {
       snack: {message: snack, alert: 'success', duration: 4000},
       snackOpen: !!snack,
     })
-    this.props.reload()
+    if (this.state.keyShow?.id) {
+      this.props.reload(this.state.keyShow?.id)
+    }
   }
 
   renderSigner() {
@@ -81,7 +84,14 @@ export default class SignerView extends React.Component<Props, State> {
 const NoSigner = (props: {unsigned: boolean}) => {
   const {unsigned} = props
   return (
-    <Box style={{paddingLeft: 10, paddingTop: 8, paddingBottom: 8, backgroundColor: '#efefef'}}>
+    <Box
+      style={{
+        paddingLeft: 10,
+        paddingTop: 8,
+        paddingBottom: 8,
+        backgroundColor: unsigned ? '#eeeebb' : column2Color,
+      }}
+    >
       {!unsigned && <Typography display="inline">&nbsp;</Typography>}
       {unsigned && <Typography display="inline">Unsigned</Typography>}
     </Box>
@@ -135,9 +145,9 @@ const SignerUserUnknown = (props: {signer: Key; lookup: () => void}) => {
 const encryptModeDescription = (mode?: EncryptMode): string => {
   switch (mode) {
     case EncryptMode.SALTPACK_ENCRYPT:
-      return ' (saltpack encrypt)'
+      return ' (Saltpack Encrypt)'
     case EncryptMode.SALTPACK_SIGNCRYPT:
-      return ' (saltpack signcrypt)'
+      return ' (Saltpack Signcrypt)'
     default:
       return ''
   }

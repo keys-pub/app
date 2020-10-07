@@ -23,6 +23,7 @@ import StyleGuide from '../style-guide'
 import DBView from '../db'
 import AuthProvisionsView from '../auth/provisions'
 
+import {column1Color} from '../theme'
 import {store, setLocation} from '../store'
 
 type Props = {}
@@ -56,13 +57,12 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" flex={1} style={{height: '100%'}}>
       <Header />
-      <Divider />
       <Box display="flex" flexGrow={1} flexDirection="row" style={{height: '100%'}}>
         <List
           style={{
-            height: '100%',
             padding: 0,
-            backgroundColor: '#fafafa',
+            backgroundColor: column1Color,
+            paddingTop: 26,
           }}
         >
           {navs.map((nav, index) =>
@@ -71,7 +71,6 @@ export default (props: Props) => {
             })
           )}
         </List>
-        <Divider orientation="vertical" />
         <Box display="flex" flexDirection="column" flex={1}>
           {selected == '/general' && <GeneralView />}
           {selected == '/vault' && <VaultView />}

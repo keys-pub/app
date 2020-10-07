@@ -51,7 +51,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center">
         <Header noLock noBack />
-        <Logo loading={this.state.loading} top={60} />
+        <Logo loading={this.state.loading} top={100} />
         <Typography style={{paddingTop: 0, width: 550, textAlign: 'center'}} paragraph>
           Enter in a vault auth phrase to connect to your vault.
           <br />

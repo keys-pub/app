@@ -59,8 +59,8 @@ export default (props: Props) => {
 
   return (
     <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
-      <Header noLock noBack />
-      <Logo top={60} />
+      <Header noBack />
+      <Logo top={100} />
       <Typography style={{paddingTop: 10, paddingBottom: 20}}>Enter PIN (if required).</Typography>
       <TextField
         id="pinInput"

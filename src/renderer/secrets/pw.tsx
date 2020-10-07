@@ -31,24 +31,18 @@ export default (props: Props) => {
       {/* <IconButton onClick={() => this.setState({passwordVisible: !this.state.passwordVisible})}>
       <PasswordVisibleIcon />
     </IconButton> */}
-      <Button
-        size="small"
-        variant="outlined"
-        style={buttonStyle}
-        onClick={() => props.setVisible(!props.visible)}
-      >
-        {props.visible ? 'Hide' : 'Show'}
-      </Button>
-      <Button size="small" variant="outlined" style={{...buttonStyle, marginLeft: 10}} onClick={copyPassword}>
-        Copy
-      </Button>
+      {props.password && (
+        <Button size="small" style={buttonStyle} onClick={() => props.setVisible(!props.visible)}>
+          {props.visible ? 'Hide' : 'Show'}
+        </Button>
+      )}
+      {props.password && (
+        <Button size="small" style={{...buttonStyle, marginLeft: 8}} onClick={copyPassword}>
+          Copy
+        </Button>
+      )}
       {props.generate && (
-        <Button
-          size="small"
-          variant="outlined"
-          style={{...buttonStyle, marginLeft: 10}}
-          onClick={props.generate}
-        >
+        <Button size="small" style={{...buttonStyle, marginLeft: 8}} onClick={props.generate}>
           Gen
         </Button>
       )}

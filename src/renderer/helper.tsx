@@ -27,7 +27,7 @@ var dateOptions = {
   hour: 'numeric',
   minute: 'numeric',
   second: 'numeric',
-  timeZoneName: 'short',
+  timeZoneName: undefined, // 'short',
 }
 
 export const date = (ms?: any): Date | null => {

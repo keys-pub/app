@@ -5,14 +5,19 @@ import {CSSProperties} from 'react'
 export const primary = '#2196f3'
 export const secondary = '#f44336' // '#f50057' // '#9c27b0' // '#607d8b'
 
+export const column1Color = '#F5F5F5'
+export const column2Color = '#FAFAFA'
+
 const font = 'Open Sans'
 const monoFont = 'Roboto Mono'
+
+export const contentTop = 18
 
 export const mono: CSSProperties = {
   fontFamily: monoFont,
   whiteSpace: 'pre-wrap',
   fontSize: '0.8571428571428571rem',
-  // fontSize: 12,
+  fontWeight: 400,
 }
 
 export const theme = createMuiTheme({
@@ -36,22 +41,22 @@ export const theme = createMuiTheme({
       fontWeight: 300,
     },
     h3: {
-      fontSize: 18,
+      fontSize: 19,
       lineHeight: 'normal',
       fontWeight: 300,
     },
     h4: {
-      fontSize: 17,
+      fontSize: 18,
       lineHeight: 'normal',
       fontWeight: 300,
     },
     h5: {
-      fontSize: 16,
+      fontSize: 17,
       lineHeight: 'normal',
       fontWeight: 300,
     },
     h6: {
-      fontSize: 15,
+      fontSize: 16,
       lineHeight: 'normal',
       fontWeight: 300,
     },
@@ -69,7 +74,7 @@ export const theme = createMuiTheme({
       root: {},
       underline: {
         '&:after': {
-          borderBottomColor: `#2196f3`,
+          borderBottomColor: primary,
           // borderBottomWidth: 1,
         },
         // '&:hover:not($disabled):not($focused):not($error):before': {
@@ -91,30 +96,26 @@ export const theme = createMuiTheme({
       startIcon: {
         marginRight: 4,
       },
-      outlinedPrimary: {
-        'not($disabled)': {
-          backgroundColor: fade('#2196f3', 0.05),
-        },
-      },
-      outlinedSecondary: {
-        'not($disabled)': {
-          backgroundColor: fade('#f50057', 0.05),
-        },
-      },
     },
     MuiTableRow: {
       root: {
         '&$selected': {
-          backgroundColor: lighten(primary, 0.95),
+          backgroundColor: lighten(primary, 0.8),
         },
         '&$selected, &$selected:hover': {
-          backgroundColor: lighten(primary, 0.9),
+          backgroundColor: lighten(primary, 0.75),
         },
       },
       hover: {
         '&:hover': {
           backgroundColor: '#eaeaea',
         },
+      },
+    },
+    MuiTableCell: {
+      body: {
+        borderBottom: 'none',
+        verticalAlign: 'top',
       },
     },
     MuiTabs: {

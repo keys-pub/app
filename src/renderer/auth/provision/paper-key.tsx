@@ -37,6 +37,7 @@ export default (props: Props) => {
         secret: paperKey,
         type: AuthType.PAPER_KEY_AUTH,
       })
+      setPaperKey('')
       setLoading(false)
       props.close('Paper key saved')
     } catch (err) {

@@ -4,7 +4,7 @@ import {Box, Button, Divider, LinearProgress, Typography} from '@material-ui/cor
 
 import {shell} from 'electron'
 import {Link} from '../components'
-import {mono} from '../theme'
+import {mono, contentTop} from '../theme'
 
 // import EnableDialog from './enable'
 import DisableDialog from './disable'
@@ -101,7 +101,7 @@ export default (_: {}) => {
   const renderEnable = () => {
     return (
       <Box>
-        <Typography variant="h6" style={{paddingBottom: 6}}>
+        <Typography variant="h4" style={{paddingBottom: 6}}>
           Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 6}}>
@@ -123,7 +123,7 @@ export default (_: {}) => {
   const renderInfo = () => {
     return (
       <Box>
-        <Typography variant="h6" style={{paddingBottom: 6}}>
+        <Typography variant="h4" style={{paddingBottom: 6}}>
           Vault Sync
         </Typography>
         <Typography>
@@ -145,7 +145,7 @@ export default (_: {}) => {
   const renderDelete = () => {
     return (
       <Box>
-        <Typography variant="h6" style={{paddingBottom: 6}}>
+        <Typography variant="h4" style={{paddingBottom: 6}}>
           Delete Vault Sync
         </Typography>
         <Typography style={{paddingBottom: 10}}>
@@ -175,7 +175,7 @@ export default (_: {}) => {
   const renderAuth = () => {
     return (
       <Box>
-        <Typography variant="h6" style={{paddingBottom: 6}}>
+        <Typography variant="h4" style={{paddingBottom: 6}}>
           Connect another Device
         </Typography>
         {phrase && (
@@ -214,16 +214,18 @@ export default (_: {}) => {
   if (!status) return null
   const syncEnabled = !!status?.kid
 
+  const left = 12
+
   return (
     <Box display="flex" flex={1} flexDirection="column" style={{position: 'relative'}}>
       <Box style={{position: 'absolute', top: 0, width: '100%'}}>{loading && <LinearProgress />}</Box>
-      <Box display="flex" flex={1} flexDirection="column" style={{marginTop: 10}}>
-        {!syncEnabled && <Box style={{marginLeft: 15, marginBottom: 20}}>{renderEnable()}</Box>}
+      <Box display="flex" flex={1} flexDirection="column" style={{marginTop: contentTop}}>
+        {!syncEnabled && <Box style={{marginLeft: left, marginBottom: 20}}>{renderEnable()}</Box>}
         {syncEnabled && (
           <Box>
-            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderInfo()}</Box>
-            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderAuth()}</Box>
-            <Box style={{marginLeft: 15, marginBottom: 20}}>{renderDelete()}</Box>
+            <Box style={{marginLeft: left, marginBottom: 20}}>{renderInfo()}</Box>
+            <Box style={{marginLeft: left, marginBottom: 20}}>{renderAuth()}</Box>
+            <Box style={{marginLeft: left, marginBottom: 20}}>{renderDelete()}</Box>
           </Box>
         )}
       </Box>

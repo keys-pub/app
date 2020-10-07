@@ -65,6 +65,7 @@ export default (props: Props) => {
       })
 
       setLoading(false)
+      setPin('')
       closeSnack()
       props.close('FIDO2 key saved')
     } catch (err) {

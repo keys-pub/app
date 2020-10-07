@@ -19,18 +19,18 @@ import {
   Box,
 } from '@material-ui/core'
 
-import {AddRecipientIcon, SignIcon} from '../icons'
+import {AddRecipientIcon, SignIcon, CopyIcon} from '../icons'
 
 import {Link} from '../components'
 
 import AutocompletesView from '../keys/autocompletes'
-import EncryptedView from './encrypted'
-import EncryptedFileView from './encryptedfile'
 import SignKeySelectView from '../keys/select'
 
-import {ipcRenderer, OpenDialogReturnValue} from 'electron'
+import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {store, loadStore} from './store'
+import {closeSnack, openSnack, openSnackError} from '../snack'
+import {contentTop, column2Color} from '../theme'
 
 import {configSet, configGet, keys, encrypt, encryptFile, EncryptFileEvent} from '../rpc/keys'
 import {
@@ -59,11 +59,11 @@ const openFile = async () => {
 }
 
 const clear = (outOnly: boolean) => {
+  closeSnack()
   if (outOnly) {
     store.update((s) => {
       s.output = ''
       s.fileOut = ''
-      s.error = undefined
     })
   } else {
     store.update((s) => {
@@ -71,10 +71,18 @@ const clear = (outOnly: boolean) => {
       s.output = ''
       s.fileIn = ''
       s.fileOut = ''
-      s.error = undefined
       s.loading = false
     })
   }
+}
+
+const copyToClipboard = (value: string) => {
+  clipboard.writeText(value)
+  openSnack({message: 'Copied to Clipboard', duration: 2000})
+}
+
+const openFolder = (value: string) => {
+  shell.showItemInFolder(value)
 }
 
 const encryptFileIn = (
@@ -121,8 +129,8 @@ const encryptFileIn = (
       } else {
         store.update((s) => {
           s.loading = false
-          s.error = err
         })
+        openSnackError(err)
       }
       return
     }
@@ -130,7 +138,6 @@ const encryptFileIn = (
       store.update((s) => {
         s.output = ''
         s.fileOut = res.out || ''
-        s.error = undefined
       })
     }
     if (done) {
@@ -140,6 +147,44 @@ const encryptFileIn = (
     }
   })
   send(req, false)
+}
+
+const encryptInput = async (
+  input: string,
+  recipients: Key[],
+  sender: Key | undefined,
+  noSenderRecipient: boolean,
+  noSign: boolean
+) => {
+  if (!input || recipients.length == 0) {
+    clear(true)
+    return
+  }
+
+  if (noSenderRecipient && noSign) {
+    sender = undefined
+  }
+
+  const recs = recipients.map((k: Key) => k.id!)
+
+  console.log('Encrypting...')
+  try {
+    const data = new TextEncoder().encode(input)
+    const req: EncryptRequest = {
+      data: data,
+      recipients: recs,
+      sender: sender?.id,
+      options: {armored: true, noSenderRecipient, noSign},
+    }
+    const resp = await encrypt(req)
+    const encrypted = new TextDecoder().decode(resp.data)
+    store.update((s) => {
+      s.output = encrypted
+      s.fileOut = ''
+    })
+  } catch (err) {
+    openSnackError(err)
+  }
 }
 
 const encryptFileTo = async (
@@ -161,28 +206,34 @@ const encryptFileTo = async (
   }
 }
 
-const EncryptToButton = (props: {onClick: () => void; disabled: boolean}) => (
-  <Box style={{marginLeft: 10, marginTop: 10}}>
-    <Button color="primary" variant="outlined" disabled={props.disabled} onClick={props.onClick}>
-      Encrypt to
-    </Button>
-  </Box>
-)
+const createReaction = (): (() => void) => {
+  return store.createReaction(
+    (s) => ({
+      recipients: s.recipients,
+      sender: s.sender,
+      noSenderRecipient: s.noSenderRecipient,
+      noSign: s.noSign,
+    }),
+    (s) => {
+      const recs = s.recipients.map((k: Key) => k.id!)
+      const config: Config = {
+        encrypt: {
+          recipients: recs,
+          sender: s.sender?.id,
+          noSenderRecipient: s.noSenderRecipient,
+          noSign: s.noSign,
+        },
+      }
+      const set = async () => await configSet({name: 'encrypt', config})
+      set()
+    }
+  )
+}
 
 type Props = {}
 
 export default (props: Props) => {
-  const inputRef = React.useRef<HTMLTextAreaElement>()
-
-  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
-    let target = e.target as HTMLInputElement
-    store.update((s) => {
-      s.input = target.value || ''
-    })
-  }, [])
-
   const {
-    error,
     fileIn,
     fileOut,
     input,
@@ -194,40 +245,18 @@ export default (props: Props) => {
     sender,
   } = store.useState()
 
+  const inputRef = React.useRef<HTMLTextAreaElement>()
+
+  const onInputChange = React.useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    store.update((s) => {
+      s.input = target.value || ''
+    })
+  }, [])
+
   React.useEffect(() => {
-    const encryptInput = async () => {
-      if (!input || recipients.length == 0) {
-        clear(true)
-        return
-      }
-
-      const recs = recipients.map((k: Key) => k.id!)
-
-      console.log('Encrypting...')
-      try {
-        const data = new TextEncoder().encode(input)
-        const req: EncryptRequest = {
-          data: data,
-          recipients: recs,
-          sender: sender?.id,
-          options: {armored: true, noSenderRecipient, noSign},
-        }
-        const resp = await encrypt(req)
-        const encrypted = new TextDecoder().decode(resp.data)
-        store.update((s) => {
-          s.output = encrypted
-          s.fileOut = ''
-          s.error = undefined
-        })
-      } catch (err) {
-        store.update((s) => {
-          s.error = err
-        })
-      }
-    }
-
     if (fileIn == '') {
-      encryptInput()
+      encryptInput(input, recipients, sender, noSenderRecipient, noSign)
     } else if (fileOut != '') {
       store.update((s) => {
         s.fileOut = ''
@@ -237,35 +266,28 @@ export default (props: Props) => {
 
   React.useEffect(() => {
     loadStore()
-
-    return store.createReaction(
-      (s) => ({
-        recipients: s.recipients,
-        sender: s.sender,
-        noSenderRecipient: s.noSenderRecipient,
-        noSign: s.noSign,
-      }),
-      (s) => {
-        const recs = s.recipients.map((k: Key) => k.id!)
-        const config: Config = {
-          encrypt: {
-            recipients: recs,
-            sender: s.sender?.id,
-            noSenderRecipient: s.noSenderRecipient,
-            noSign: s.noSign,
-          },
-        }
-        const set = async () => await configSet({name: 'encrypt', config})
-        set()
-      }
-    )
+    return createReaction()
   }, [])
+
+  let senderSelect = sender
+  let senderLabel = 'Signed by'
+  if (noSign && noSenderRecipient) {
+    senderSelect = undefined
+    senderLabel = ''
+  } else if (noSign) {
+    senderLabel = 'Including'
+  }
+
+  const left = 10
 
   const canEncryptFile = fileIn && recipients.length > 0
   const showEncryptFileButton = canEncryptFile && fileIn && !fileOut
   return (
     <Box display="flex" flex={1} flexDirection="column">
-      <Box style={{paddingLeft: 8, paddingTop: 5, paddingBottom: 5, paddingRight: 8}}>
+      <Box style={{marginLeft: left, marginTop: contentTop, marginBottom: 8}}>
+        <Typography variant="h4">Encrypt</Typography>
+      </Box>
+      <Box style={{paddingLeft: left, paddingRight: 8}}>
         <AutocompletesView
           keys={recipients}
           disabled={loading}
@@ -280,89 +302,118 @@ export default (props: Props) => {
           importOption
         />
       </Box>
-      <Divider />
       <Box display="flex" style={{position: 'relative'}}>
         <Box display="flex" flex={1} flexDirection="row">
           <SignKeySelectView
-            value={sender}
-            onChange={(sender?: Key) =>
+            value={senderSelect}
+            onChange={(sender?: Key) => {
               store.update((s) => {
                 s.sender = sender
+                if (noSign && noSenderRecipient) {
+                  s.noSign = false
+                  s.noSenderRecipient = false
+                }
               })
-            }
+            }}
+            label={senderLabel}
             disabled={loading}
             placeholder="Anonymous"
+            SelectDisplayProps={{
+              style: {
+                paddingLeft: left,
+              },
+            }}
           />
 
-          <IconButton
-            color={!noSenderRecipient ? 'primary' : 'inherit'}
-            style={{paddingTop: 10, paddingBottom: 10}}
-            onClick={() =>
-              store.update((s) => {
-                s.noSenderRecipient = !noSenderRecipient
-              })
-            }
-            disabled={!sender || loading}
-          >
-            <Tooltip title="Add to Recipients">
-              <AddRecipientIcon style={{color: !noSenderRecipient ? '' : '#999'}} />
-            </Tooltip>
-          </IconButton>
+          <Box style={{position: 'absolute', right: 0, top: -5}}>
+            <IconButton
+              color={!noSenderRecipient ? 'primary' : 'inherit'}
+              style={{}}
+              onClick={() =>
+                store.update((s) => {
+                  s.noSenderRecipient = !noSenderRecipient
+                })
+              }
+              disabled={!sender || loading}
+            >
+              <Tooltip title="Include as Recipient">
+                <AddRecipientIcon style={{color: !noSenderRecipient ? '' : '#999'}} />
+              </Tooltip>
+            </IconButton>
 
-          <IconButton
-            color={!noSign ? 'primary' : 'inherit'}
-            style={{paddingTop: 10, paddingBottom: 10}}
-            onClick={() =>
-              store.update((s) => {
-                s.noSign = !noSign
-              })
-            }
-            disabled={!sender || loading}
-          >
-            <Tooltip title="Sign">
-              <SignIcon style={{color: !noSign ? '' : '#999'}} />
-            </Tooltip>
-          </IconButton>
+            <IconButton
+              color={!noSign ? 'primary' : 'inherit'}
+              style={{}}
+              onClick={() =>
+                store.update((s) => {
+                  s.noSign = !noSign
+                })
+              }
+              disabled={!sender || loading}
+            >
+              <Tooltip title="Sign">
+                <SignIcon style={{color: !noSign ? '' : '#999'}} />
+              </Tooltip>
+            </IconButton>
+          </Box>
         </Box>
       </Box>
-      <Divider />
-      <Box style={{position: 'relative', height: '47%'}}>
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+        <Box style={{width: '100%', height: 1, backgroundColor: '#eee'}} />
+        <Box style={{position: 'absolute', top: 0, width: '100%'}}>{loading && <LinearProgress />}</Box>
         {fileIn && (
-          <Box style={{paddingTop: 6, paddingLeft: 8}}>
-            <Typography variant="body2" style={{display: 'inline'}}>
-              {fileIn}&nbsp;
-            </Typography>
-            <Link inline onClick={() => clear(false)} disabled={loading}>
-              Clear
-            </Link>
+          <Box display="flex" flexDirection="column" style={{paddingTop: 8, paddingLeft: left}}>
+            <Box>
+              <Typography variant="body2" style={{display: 'inline'}}>
+                {fileIn}&nbsp;
+              </Typography>
+              <Link inline onClick={() => clear(false)} disabled={loading}>
+                Clear
+              </Link>
+            </Box>
+            {showEncryptFileButton && (
+              <Box marginTop={1}>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  onClick={() => encryptFileTo(fileIn, recipients, sender, noSenderRecipient, noSign)}
+                  disabled={loading}
+                >
+                  Encrypt to
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
         {!fileIn && (
           <Box style={{height: '100%'}}>
             <textarea
+              autoFocus
               ref={inputRef as React.RefObject<HTMLTextAreaElement>}
               value={input}
               onChange={onInputChange}
               spellCheck="false"
               style={{
                 height: 'calc(100% - 16px)',
-                width: 'calc(100% - 8px)',
-                overflow: 'auto',
+                width: 'calc(100% - ' + left + 'px)',
+                overflowY: 'auto',
                 border: 'none',
-                padding: 0,
                 color: 'rgba(0, 0, 0, 0.87)',
                 fontSize: '0.857rem',
                 fontFamily: 'Open Sans',
                 fontWeight: 400,
                 outline: 0,
                 resize: 'none',
+                paddingRight: 0,
                 paddingTop: 8,
-                paddingLeft: 8,
+                paddingLeft: left,
                 paddingBottom: 8,
+                backgroundColor: 'white',
               }}
             />
             {!input && (
-              <Box style={{position: 'absolute', top: 6, left: 8}}>
+              <Box style={{position: 'absolute', top: 9, left: left}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
                   onClick={() => inputRef.current?.focus()}
@@ -377,32 +428,45 @@ export default (props: Props) => {
             )}
           </Box>
         )}
-        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
-          {!loading && <Divider />}
-          {loading && <LinearProgress />}
-        </Box>
       </Box>
-      <Box
-        style={{
-          height: '53%',
-          width: '100%',
-        }}
-      >
-        {error && (
-          <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
-              {error.message}
-            </Typography>
+      <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+        {output && (
+          <Box style={{position: 'absolute', right: 16, top: 4, zIndex: 10}}>
+            <IconButton
+              onClick={() => copyToClipboard(output)}
+              size="small"
+              style={{padding: 4, backgroundColor: 'white'}}
+            >
+              <CopyIcon />
+            </IconButton>
           </Box>
         )}
-        {!error && showEncryptFileButton && (
-          <EncryptToButton
-            onClick={() => encryptFileTo(fileIn, recipients, sender, noSenderRecipient, noSign)}
-            disabled={loading}
-          />
-        )}
-        {!error && !showEncryptFileButton && fileOut && <EncryptedFileView fileOut={fileOut} />}
-        {!error && !showEncryptFileButton && !fileOut && <EncryptedView value={output} />}
+        <Box
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            overflowY: 'auto',
+            padding: 12,
+            // borderRadius: 10,
+            backgroundColor: column2Color,
+          }}
+        >
+          {output && <Typography variant="body2">{output}</Typography>}
+
+          {fileOut && (
+            <Box display="flex" flex={1}>
+              <Typography variant="body2" style={{display: 'inline'}}>
+                {fileOut}&nbsp;
+              </Typography>
+              <Link inline onClick={() => openFolder(fileOut)}>
+                Open Folder
+              </Link>
+            </Box>
+          )}
+        </Box>
       </Box>
     </Box>
   )

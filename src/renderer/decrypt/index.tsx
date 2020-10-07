@@ -1,15 +1,16 @@
 import * as React from 'react'
 
-import {Divider, Button, Box, Input, LinearProgress, Typography} from '@material-ui/core'
+import {Divider, Button, Box, IconButton, Input, LinearProgress, Typography} from '@material-ui/core'
 
-import DecryptedView from './decrypted'
-import DecryptedFileView from './decryptedfile'
-
+import {SignIcon, CopyIcon} from '../icons'
 import {Link} from '../components'
 import {mono} from '../theme'
-import {ipcRenderer, OpenDialogReturnValue} from 'electron'
+import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
 import {Store} from 'pullstate'
+import {contentTop, column2Color} from '../theme'
+import {closeSnack, openSnack, openSnackError} from '../snack'
+import SignerView from '../verify/signer'
 
 import {decrypt, decryptFile, key, DecryptFileEvent} from '../rpc/keys'
 import {
@@ -30,7 +31,6 @@ type State = {
   fileOut: string
   mode?: EncryptMode
   sender?: Key
-  error?: Error
   loading: boolean
 }
 
@@ -59,6 +59,7 @@ const openFile = async () => {
 }
 
 const clear = (outOnly: boolean) => {
+  closeSnack()
   // TODO: Stream cancel?
   if (outOnly) {
     store.update((s) => {
@@ -66,7 +67,6 @@ const clear = (outOnly: boolean) => {
       s.fileOut = ''
       s.sender = undefined
       s.mode = undefined
-      s.error = undefined
     })
   } else {
     store.update((s) => {
@@ -76,35 +76,33 @@ const clear = (outOnly: boolean) => {
       s.fileOut = ''
       s.sender = undefined
       s.mode = undefined
-      s.error = undefined
       s.loading = false
     })
   }
 }
 
-const reloadSender = (kid?: string) => {
-  if (!kid) {
+const copyToClipboard = (value: string) => {
+  clipboard.writeText(value)
+  openSnack({message: 'Copied to Clipboard', duration: 2000})
+}
+
+const openFolder = (value: string) => {
+  shell.showItemInFolder(value)
+}
+
+const reloadSender = async (kid: string) => {
+  try {
+    const resp = await key({
+      key: kid,
+      search: false,
+      update: false,
+    })
     store.update((s) => {
-      s.sender = undefined
+      s.sender = resp.key
     })
-    return
+  } catch (err) {
+    openSnackError(err)
   }
-  const req: KeyRequest = {
-    key: kid,
-    search: false,
-    update: false,
-  }
-  key(req)
-    .then((resp: KeyResponse) => {
-      store.update((s) => {
-        s.sender = resp.key
-      })
-    })
-    .catch((err: Error) => {
-      store.update((s) => {
-        s.error = err
-      })
-    })
 }
 
 const decryptInput = async (input: string) => {
@@ -112,6 +110,7 @@ const decryptInput = async (input: string) => {
     clear(true)
     return
   }
+  closeSnack()
 
   console.log('Decrypting...')
   try {
@@ -123,15 +122,13 @@ const decryptInput = async (input: string) => {
     const decrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.sender = resp.sender
-      s.error = undefined
       s.output = decrypted
       s.fileOut = ''
       s.mode = resp.mode
     })
   } catch (err) {
-    store.update((s) => {
-      s.error = err
-    })
+    clear(true)
+    openSnackError(err)
   }
 }
 
@@ -157,7 +154,7 @@ const decryptFileIn = (fileIn: string, dir: string) => {
         })
       } else {
         store.update((s) => {
-          s.error = err
+          openSnackError(err)
           s.loading = false
         })
       }
@@ -167,7 +164,6 @@ const decryptFileIn = (fileIn: string, dir: string) => {
       store.update((s) => {
         s.fileOut = res?.out || ''
         s.sender = res?.sender
-        s.error = undefined
         s.output = ''
         s.mode = res?.mode
       })
@@ -194,14 +190,6 @@ const decryptFileTo = async (fileIn: string) => {
   }
 }
 
-const DecryptToButton = (props: {onClick: () => void; disabled: boolean}) => (
-  <Box style={{marginLeft: 10, marginTop: 10}}>
-    <Button color="primary" variant="outlined" disabled={props.disabled} onClick={props.onClick}>
-      Decrypt to
-    </Button>
-  </Box>
-)
-
 export default (_: {}) => {
   const inputRef = React.useRef<HTMLTextAreaElement>()
 
@@ -212,7 +200,7 @@ export default (_: {}) => {
     })
   }, [])
 
-  const {input, output, fileIn, fileOut, error, sender, mode, loading} = store.useState()
+  const {input, output, fileIn, fileOut, sender, mode, loading} = store.useState()
 
   React.useEffect(() => {
     if (fileIn == '') {
@@ -221,43 +209,64 @@ export default (_: {}) => {
   }, [input])
 
   const showDecryptFileButton = fileIn && !fileOut
+  const left = 10
 
   return (
-    <Box display="flex" flex={1} flexDirection="column" style={{overflow: 'hidden'}}>
-      <Box style={{position: 'relative', height: '40%'}}>
+    <Box display="flex" flex={1} flexDirection="column">
+      <Box style={{marginLeft: left, marginTop: contentTop, marginBottom: 4}}>
+        <Typography variant="h4">Decrypt</Typography>
+      </Box>
+      <Box display="flex" flexDirection="column" flex={0.75} style={{position: 'relative'}}>
         {fileIn && (
-          <Box style={{paddingTop: 8, paddingLeft: 8}}>
-            <Typography variant="body2" style={{display: 'inline'}}>
-              {fileIn}&nbsp;
-            </Typography>
-            <Link inline onClick={() => clear(false)}>
-              Clear
-            </Link>
+          <Box display="flex" flexDirection="column" style={{paddingTop: 8, paddingLeft: left}}>
+            <Box>
+              <Typography variant="body2" style={{display: 'inline'}}>
+                {fileIn}&nbsp;
+              </Typography>
+              <Link inline onClick={() => clear(false)} disabled={loading}>
+                Clear
+              </Link>
+            </Box>
+            {showDecryptFileButton && (
+              <Box marginTop={1}>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  onClick={() => decryptFileTo(fileIn)}
+                  disabled={loading}
+                >
+                  Decrypt to
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
         {!fileIn && (
           <Box style={{height: '100%'}}>
             <textarea
+              autoFocus
               ref={inputRef as React.RefObject<HTMLTextAreaElement>}
               value={input}
               onChange={onInputChange}
               spellCheck="false"
               style={{
-                height: 'calc(100% - 16px)',
-                width: 'calc(100% - 8px)',
-                overflow: 'auto',
-                border: 'none',
-                padding: 0,
                 ...mono,
+                height: 'calc(100% - 16px)',
+                width: 'calc(100% - ' + left + 'px)',
+                overflowY: 'auto',
+                border: 'none',
                 outline: 0,
                 resize: 'none',
+                paddingRight: 0,
                 paddingTop: 8,
-                paddingLeft: 8,
+                paddingLeft: left,
                 paddingBottom: 8,
+                backgroundColor: 'white',
               }}
             />
             {!input && (
-              <Box style={{position: 'absolute', top: 6, left: 8}}>
+              <Box style={{position: 'absolute', top: 6, left: left}}>
                 <Typography
                   style={{display: 'inline', color: '#a2a2a2'}}
                   onClick={() => inputRef.current?.focus()}
@@ -272,43 +281,52 @@ export default (_: {}) => {
             )}
           </Box>
         )}
-        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>
-          {!loading && <Divider />}
-          {loading && <LinearProgress />}
-        </Box>
+        <Box style={{position: 'absolute', bottom: 0, width: '100%'}}>{loading && <LinearProgress />}</Box>
       </Box>
-      <Box
-        style={{
-          height: '60%',
-          width: '100%',
-        }}
-      >
-        {error && (
-          <Box style={{paddingLeft: 10, paddingTop: 10}}>
-            <Typography variant="body2" style={{color: 'red', display: 'inline'}}>
-              {error.message}
-            </Typography>
+      <Box display="flex" flexDirection="column" flex={1}>
+        <SignerView signer={sender} mode={mode} unsigned={!sender && !!output} reload={reloadSender} />
+        <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
+          {output && (
+            <Box style={{position: 'absolute', right: 16, top: 4, zIndex: 10}}>
+              <IconButton
+                onClick={() => copyToClipboard(output)}
+                size="small"
+                style={{padding: 4, backgroundColor: 'white'}}
+              >
+                <CopyIcon />
+              </IconButton>
+            </Box>
+          )}
+          <Box
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              overflowY: 'auto',
+              paddingTop: 8,
+              paddingBottom: 8,
+              paddingLeft: 10,
+              // borderRadius: 10,
+              backgroundColor: column2Color,
+            }}
+          >
+            {output && (
+              <Typography style={{whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>{output}</Typography>
+            )}
+            {fileOut && (
+              <Box display="flex" flex={1}>
+                <Typography variant="body2" style={{display: 'inline'}}>
+                  {fileOut}&nbsp;
+                </Typography>
+                <Link inline onClick={() => openFolder(fileOut)}>
+                  Open Folder
+                </Link>
+              </Box>
+            )}
           </Box>
-        )}
-        {!error && showDecryptFileButton && (
-          <DecryptToButton onClick={() => decryptFileTo(fileIn)} disabled={loading} />
-        )}
-        {!error && !showDecryptFileButton && fileOut && (
-          <DecryptedFileView
-            fileOut={fileOut}
-            sender={sender}
-            mode={mode}
-            reloadKey={() => reloadSender(sender?.id)}
-          />
-        )}
-        {!error && !showDecryptFileButton && !fileOut && (
-          <DecryptedView
-            value={output}
-            sender={sender}
-            mode={mode}
-            reloadSender={() => reloadSender(sender?.id)}
-          />
-        )}
+        </Box>
       </Box>
     </Box>
   )

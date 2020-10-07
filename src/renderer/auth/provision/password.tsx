@@ -46,6 +46,9 @@ export default (props: Props) => {
         secret: password,
         type: AuthType.PASSWORD_AUTH,
       })
+      setPassword('')
+      setPasswordConfirm('')
+      setLoading(false)
       props.close('Password saved.')
     } catch (err) {
       setLoading(false)

@@ -29,6 +29,7 @@ import SecretContentView from './content'
 
 import {store, loadStore} from './store'
 import {openSnack, openSnackError} from '../snack'
+import {column1Color, column2Color} from '../theme'
 
 import {
   Secret,
@@ -138,7 +139,7 @@ export default (props: Props) => {
     [secrets]
   )
 
-  const newSecret = () => {
+  const openNew = () => {
     const editing: Secret = {
       id: '',
       name: '',
@@ -210,57 +211,66 @@ export default (props: Props) => {
   }
 
   const setSelected = (secret: Secret) => {
+    // TODO: Check if editing and confirm?
     store.update((s) => {
+      s.isNew = false
+      s.editing = undefined
       s.selected = secret
     })
   }
 
   return (
-    <Box display="flex" flexDirection="column" flex={1} style={{}}>
+    <Box display="flex" flexDirection="column" flex={1}>
       <Header />
       <Box display="flex" flexDirection="row" flex={1} style={{height: '100%'}}>
-        <Box style={{width: 250, position: 'relative'}}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            flex={1}
-            style={{paddingLeft: 8, paddingTop: 6, paddingBottom: 8, height: 34}}
-          >
+        <Box style={{width: 250, position: 'relative', paddingTop: 24, backgroundColor: column2Color}}>
+          <Box display="flex" flexDirection="row">
             <TextField
               placeholder="Filter"
               variant="outlined"
               value={input}
               onChange={onInput}
               inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-              style={{marginTop: 2, width: '100%', marginRight: 10}}
+              style={{marginLeft: 8, marginRight: 6, width: '100%', backgroundColor: 'white'}}
             />
-            <Button
-              color="primary"
-              variant="outlined"
-              size="small"
-              onClick={newSecret}
-              disabled={!!editing}
-              style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
-            >
-              <AddIcon />
-            </Button>
-            {syncEnabled && (
-              <Button
-                onClick={sync}
-                size="small"
-                variant="outlined"
-                style={{marginTop: 2, minWidth: 'auto', marginRight: 8}}
-                disabled={syncing}
-              >
-                <SyncIcon />
-              </Button>
-            )}
+            <Box display="flex" flexDirection="row" alignItems="center">
+              <Box>
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={openNew}
+                  disabled={!!editing}
+                  style={{marginRight: 6}}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              {syncEnabled && (
+                <Box>
+                  <IconButton
+                    onClick={sync}
+                    size="small"
+                    disabled={syncing || !!editing}
+                    style={{marginRight: 6}}
+                  >
+                    <SyncIcon />
+                  </IconButton>
+                </Box>
+              )}
+            </Box>
           </Box>
-          <Divider />
+
           <Box
             display="flex"
             flexDirection="row"
-            style={{position: 'absolute', width: 250, top: 49, left: 0, bottom: 0, overflow: 'auto'}}
+            style={{
+              position: 'absolute',
+              width: 250,
+              top: 69, // Nice
+              left: 0,
+              bottom: 0,
+              overflowY: 'auto',
+            }}
           >
             <Table size="small">
               {/* <TableHead>

@@ -125,7 +125,7 @@ class WormholeView extends React.Component<Props, State> {
             return
         }
 
-        if (res.message!.content!.data!.length! > 0) {
+        if ((res.message?.content?.data?.length || 0) > 0) {
           const text = new TextDecoder().decode(res.message!.content!.data!)
           this.addRow({id: res.message!.id!, text: text, type: WormholeMessageType.Received})
         }
@@ -179,7 +179,7 @@ class WormholeView extends React.Component<Props, State> {
   ack = (id: string) => {
     const nextRows = this.state.rows.map((r: WormholeMessage) => {
       if (r.id == id) {
-        r.pending = false
+        return {...r, pending: false}
       }
       return r
     })
@@ -324,7 +324,7 @@ class WormholeView extends React.Component<Props, State> {
       <Box display="flex" flexDirection="column" flex={1} style={{height: '100%', position: 'relative'}}>
         <Header loading={loading} />
         <Divider />
-        <Box display="flex" flexDirection="row">
+        <Box display="flex" flexDirection="row" style={{paddingTop: 28}}>
           <Box display="flex" flexDirection="column" flex={1}>
             <Box
               display="flex"
@@ -372,7 +372,7 @@ class WormholeView extends React.Component<Props, State> {
           style={{
             position: 'absolute',
             top: 107,
-            bottom: 0,
+            bottom: 40,
             left: 0,
             right: 0,
             overflowY: 'auto',
