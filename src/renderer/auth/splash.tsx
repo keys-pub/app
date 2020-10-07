@@ -7,7 +7,7 @@ import Header from '../header'
 
 export default (_: {}) => (
   <Box display="flex" flexGrow={1} flexDirection="column" alignItems="center" style={{height: '100%'}}>
-    <Header noLock noBack />
+    <Header noBack />
     <Logo top={100} />
   </Box>
 )

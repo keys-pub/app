@@ -311,7 +311,7 @@ export default (_: {}) => {
                         {!key.user && <Typography>-</Typography>}
                         <IDLabel
                           k={key}
-                          owner
+                          em
                           style={{
                             width: 210,
                             textOverflow: 'ellipsis',
