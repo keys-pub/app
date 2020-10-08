@@ -7,7 +7,7 @@ import AuthUnlockPasswordView from './password'
 import AuthUnlockFIDO2View from './fido2'
 import AuthForgotView from './forgot'
 
-import {store, unlocked} from '../../store'
+import {store, unlocked, loadStatus} from '../../store'
 import {authUnlock} from '../../rpc/keys'
 import {AuthType} from '../../rpc/keys.d'
 import {Action} from './actions'
@@ -18,6 +18,10 @@ export default (props: Props) => {
   const [step, setStep] = React.useState('password')
 
   const fido2Enabled = store.useState((s) => s.fido2Enabled)
+
+  React.useEffect(() => {
+    loadStatus()
+  }, [])
 
   let actions = [] as Action[]
 
