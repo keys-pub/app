@@ -71,10 +71,6 @@ export default (_: {}) => {
     snackOpen: s.snackOpen,
   }))
 
-  React.useEffect(() => {
-    loadStatus()
-  }, [])
-
   return (
     <ThemeProvider theme={theme}>
       <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}} onContextMenu={onContextMenu}>

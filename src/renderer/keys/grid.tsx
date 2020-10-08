@@ -246,30 +246,38 @@ export default (_: {}) => {
         <Box
           display="flex"
           flexDirection="row"
-          style={{paddingLeft: 8, paddingTop: 20, position: 'relative'}}
+          style={{paddingLeft: 8, paddingTop: 20, marginTop: 8, position: 'relative'}}
         >
-          <IconButton color="primary" onClick={() => setCreateOpen(true)} id="newKeyButton">
-            <Tooltip title="Generate Key" placement="top">
-              <AddIcon />
-            </Tooltip>
-          </IconButton>
-          <IconButton onClick={openImport}>
-            <Tooltip title="Import Key" placement="top">
-              <ImportIcon />
-            </Tooltip>
-          </IconButton>
-          <IconButton onClick={() => setSearchOpen(true)}>
-            <Tooltip title="Search Keys" placement="top">
-              <SearchIcon />
-            </Tooltip>
-          </IconButton>
-          {syncEnabled && (
-            <IconButton onClick={sync} disabled={syncing}>
-              <Tooltip title="Sync Vault" placement="top">
-                <SyncIcon />
+          <Box style={{marginTop: 4}}>
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => setCreateOpen(true)}
+              id="newKeyButton"
+              style={{marginRight: 12}}
+            >
+              <Tooltip title="Generate Key" placement="top">
+                <AddIcon />
               </Tooltip>
             </IconButton>
-          )}
+            <IconButton size="small" onClick={openImport} style={{marginRight: 12}}>
+              <Tooltip title="Import Key" placement="top">
+                <ImportIcon />
+              </Tooltip>
+            </IconButton>
+            <IconButton size="small" onClick={() => setSearchOpen(true)} style={{marginRight: 12}}>
+              <Tooltip title="Search Keys" placement="top">
+                <SearchIcon />
+              </Tooltip>
+            </IconButton>
+            {syncEnabled && (
+              <IconButton size="small" onClick={sync} disabled={syncing} style={{marginRight: 12}}>
+                <Tooltip title="Sync Vault" placement="top">
+                  <SyncIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+          </Box>
 
           <Box display="flex" flexDirection="row" flexGrow={1} />
           <TextField
@@ -278,7 +286,7 @@ export default (_: {}) => {
             value={input}
             onChange={onInputChange}
             inputProps={{style: {paddingTop: 8, paddingBottom: 8}}}
-            style={{marginTop: 8, marginBottom: 8, marginRight: 10, width: 300}}
+            style={{marginBottom: 8, marginRight: 10, width: 300}}
           />
 
           <SearchDialog open={searchOpen} close={() => setSearchOpen(false)} reload={reload} />

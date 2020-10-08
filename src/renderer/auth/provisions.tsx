@@ -33,7 +33,7 @@ import DeprovisionDialog from './provision/deprovision'
 import {authTypeDescription} from './helper'
 import {breakWords, contentTop} from '../theme'
 import {openSnack, openSnackError} from '../snack'
-import {store as appStore} from '../store'
+import {store as appStore, loadStatus} from '../store'
 
 type Props = {}
 
@@ -69,6 +69,7 @@ export default (props: Props) => {
   const fido2Enabled = appStore.useState((s) => s.fido2Enabled)
 
   React.useEffect(() => {
+    loadStatus()
     refresh(selected)
   }, [])
 
@@ -147,7 +148,7 @@ export default (props: Props) => {
   return (
     <Box display="flex" flexDirection="column" flex={1}>
       <Box display="flex" flexDirection="row" flex={1} style={{height: '100%', position: 'relative'}}>
-        <Box display="flex" flexDirection="column" style={{width: 204}}>
+        <Box display="flex" flexDirection="column" style={{width: 204, background: column2Color}}>
           <Box
             display="flex"
             flexDirection="row"
@@ -174,7 +175,6 @@ export default (props: Props) => {
                 width: col1,
                 overflowX: 'hidden',
                 overflowY: 'auto',
-                background: column2Color,
               }}
             >
               <Table size="small">
