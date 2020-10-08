@@ -114,7 +114,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
     return (
       <Box display="flex" flexDirection="column" flex={1}>
         <Box display="flex" flexDirection="row" flex={1} style={{height: '100%', position: 'relative'}}>
-          <Box display="flex" flexDirection="column" style={{width: 200}}>
+          <Box display="flex" flexDirection="column" style={{width: 200, background: column2Color}}>
             {this.renderHeader()}
             <Box display="flex" flexDirection="column" flex={1} style={{position: 'relative'}}>
               <Box
@@ -126,7 +126,6 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
                   bottom: 0,
                   overflowX: 'hidden',
                   overflowY: 'auto',
-                  backgroundColor: column2Color,
                 }}
               >
                 <Table size="small">
