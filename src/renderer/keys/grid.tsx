@@ -32,8 +32,8 @@ import KeyDialog from '../key'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys as listKeys, runtimeStatus, vaultUpdate} from '../rpc/keys'
-import {Key, KeyType, SortDirection, KeysRequest} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key, KeyType, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys.d'
 
 import {store, loadStore} from './store'
 import {openSnackError} from '../snack'
@@ -47,11 +47,11 @@ export default (_: {}) => {
     exportKey,
     importOpen,
     input,
-    keys,
     keyOpen,
     keyShow,
     removeOpen,
     removeKey,
+    results,
     searchOpen,
     selected,
     sortField,
@@ -177,7 +177,7 @@ export default (_: {}) => {
       s.syncing = true
     })
     try {
-      const resp = await vaultUpdate({})
+      const resp = await keys.VaultUpdate({})
       reload()
       store.update((s) => {
         s.syncing = false
@@ -197,10 +197,10 @@ export default (_: {}) => {
       if (!kid) return
 
       store.update((s) => {
-        s.selected = keys.find((k: Key) => k.id == kid)
+        s.selected = results.find((k: Key) => k.id == kid)
       })
 
-      const key = keys.find((k: Key) => kid == k.id)
+      const key = results.find((k: Key) => kid == k.id)
       if (!key) return
       const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
 
@@ -297,7 +297,7 @@ export default (_: {}) => {
         <Box style={{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0, overflowY: 'auto'}}>
           <Table size="small">
             <TableBody>
-              {keys.map((key, index) => {
+              {results.map((key: Key, index: number) => {
                 // const isPrivate = isKeyPrivate(key)
                 return (
                   <TableRow

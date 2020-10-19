@@ -32,7 +32,8 @@ import {store, loadStore} from './store'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import {contentTop, column2Color} from '../theme'
 
-import {configSet, configGet, keys, encrypt, encryptFile, EncryptFileEvent} from '../rpc/keys'
+import {keys} from '../rpc/client'
+import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
   Config,
@@ -42,7 +43,7 @@ import {
   EncryptResponse,
   EncryptFileInput,
   EncryptFileOutput,
-} from '../rpc/keys.d'
+} from '@keys-pub/tsclient/lib/keys.d'
 
 const openFile = async () => {
   clear(true)
@@ -118,35 +119,31 @@ const encryptFileIn = (
   store.update((s) => {
     s.loading = true
   })
-  const send = encryptFile((event: EncryptFileEvent) => {
-    console.log('Encrypt file:', event)
-    const {err, res, done} = event
-    if (err) {
-      if (err.code == grpc.status.CANCELLED) {
-        store.update((s) => {
-          s.loading = false
-        })
-      } else {
-        store.update((s) => {
-          s.loading = false
-        })
-        openSnackError(err)
-      }
-      return
-    }
-    if (res) {
-      store.update((s) => {
-        s.output = ''
-        s.fileOut = res.out || ''
-      })
-    }
-    if (done) {
+  const stream = keys.EncryptFile()
+  stream.on('data', (resp: EncryptFileOutput) => {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = resp?.out || ''
+    })
+  })
+  stream.on('error', (err: RPCError) => {
+    if (err.code == grpc.status.CANCELLED) {
       store.update((s) => {
         s.loading = false
       })
+    } else {
+      store.update((s) => {
+        s.loading = false
+      })
+      openSnackError(err)
     }
   })
-  send(req, false)
+  stream.on('end', () => {
+    store.update((s) => {
+      s.loading = false
+    })
+  })
+  stream.write(req)
 }
 
 const encryptInput = async (
@@ -176,7 +173,7 @@ const encryptInput = async (
       sender: sender?.id,
       options: {armored: true, noSenderRecipient, noSign},
     }
-    const resp = await encrypt(req)
+    const resp = await keys.Encrypt(req)
     const encrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.output = encrypted
@@ -224,7 +221,7 @@ const createReaction = (): (() => void) => {
           noSign: s.noSign,
         },
       }
-      const set = async () => await configSet({name: 'encrypt', config})
+      const set = async () => await keys.ConfigSet({name: 'encrypt', config})
       set()
     }
   )

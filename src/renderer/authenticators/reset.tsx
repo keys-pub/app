@@ -16,7 +16,7 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {reset} from '../rpc/fido2'
+import {fido2} from '../rpc/client'
 import {
   Device,
   DeviceInfo,
@@ -25,7 +25,7 @@ import {
   DeviceInfoResponse,
   ResetRequest,
   ResetResponse,
-} from '../rpc/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2.d'
 import {toHex} from '../helper'
 
 type Props = {
@@ -53,19 +53,18 @@ export default class ResetDialog extends React.Component<Props, State> {
     this.props.close(snack)
   }
 
-  reset = () => {
+  reset = async () => {
     this.setState({loading: true, error: undefined})
-    const req: ResetRequest = {
-      device: this.props.device.path,
+    try {
+      const resp = await fido2.Reset({
+        device: this.props.device.path,
+      })
+
+      this.setState({loading: false})
+      this.close('Device was reset')
+    } catch (err) {
+      this.setState({loading: false, error: err})
     }
-    reset(req)
-      .then((resp: ResetResponse) => {
-        this.setState({loading: false})
-        this.close('Device was reset')
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
   }
 
   renderContent() {

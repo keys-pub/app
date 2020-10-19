@@ -14,12 +14,12 @@ import {
 import {Link} from '../../components'
 import Dialog from '../../components/dialog'
 
-import {authProvision} from '../../rpc/keys'
-import {AuthType, Encoding} from '../../rpc/keys.d'
-import {devices as listDevices} from '../../rpc/fido2'
-import {Device} from '../../rpc/fido2.d'
 import SelectDevice from '../../authenticators/select'
 import {openSnack, openSnackError, closeSnack} from '../../snack'
+
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys.d'
+import {Device} from '@keys-pub/tsclient/lib/fido2.d'
+import {keys, fido2} from '../../rpc/client'
 
 type Props = {
   open: boolean
@@ -46,7 +46,7 @@ export default (props: Props) => {
     setLoading(true)
     try {
       openSnack({message: 'Creating the credential, you may need to interact with the device', alert: 'info'})
-      const gen = await authProvision({
+      const gen = await keys.AuthProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,
@@ -58,7 +58,7 @@ export default (props: Props) => {
         alert: 'info',
       })
 
-      const provision = await authProvision({
+      const provision = await keys.AuthProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,

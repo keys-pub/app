@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
-import {keys as listKeys, runtimeStatus, configGet} from '../rpc/keys'
-import {Key, KeysRequest, SortDirection} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key, KeysRequest, SortDirection} from '@keys-pub/tsclient/lib/keys.d'
 
 type State = {
   createOpen: boolean
@@ -10,11 +10,11 @@ type State = {
   importOpen: boolean
   input: string
   intro: boolean
-  keys: Key[]
   keyOpen: boolean
   keyShow?: Key
   removeOpen?: boolean
   removeKey?: Key
+  results: Key[]
   searchOpen: boolean
   selected?: Key
   sortField?: string
@@ -30,7 +30,7 @@ const initialState: State = {
   input: '',
   intro: true,
   keyOpen: false,
-  keys: [],
+  results: [],
   searchOpen: false,
   syncEnabled: false,
   syncing: false,
@@ -45,15 +45,15 @@ const list = async (query: string, intro: boolean, sortField?: string, sortDirec
     sortDirection: sortDirection,
     types: [],
   }
-  const resp = await listKeys(req)
-  const keys = resp.keys || []
+  const resp = await keys.Keys(req)
+  const results = resp.keys || []
   store.update((s) => {
-    s.keys = keys
+    s.results = results
     s.sortField = resp.sortField
     s.sortDirection = resp.sortDirection
   })
   // If we don't have keys and intro, then show create dialog
-  if (keys.length == 0 && intro) {
+  if (results.length == 0 && intro) {
     store.update((s) => {
       s.createOpen = true
       s.intro = false
@@ -62,7 +62,7 @@ const list = async (query: string, intro: boolean, sortField?: string, sortDirec
 }
 
 export const loadStore = async () => {
-  const resp = await runtimeStatus({})
+  const resp = await keys.RuntimeStatus({})
   store.update((s) => {
     s.syncEnabled = !!resp.sync
 

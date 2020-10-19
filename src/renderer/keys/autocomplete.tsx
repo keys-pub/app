@@ -12,8 +12,8 @@ import Autocomplete, {
 import {KeyLabel} from '../key/label'
 import matchSorter from 'match-sorter'
 
-import {keys} from '../rpc/keys'
-import {Key, SortDirection, KeyType, KeysRequest, KeysResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key, SortDirection, KeyType, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/keys.d'
 import {serviceColor} from '../theme'
 
 import SearchDialog from '../search/dialog'
@@ -53,29 +53,27 @@ export default class AutocompleteView extends React.Component<Props, State> {
     this.search('')
   }
 
-  search = (q: string) => {
+  search = async (q: string) => {
     this.setState({loading: true}) // , options: []
-    const req: KeysRequest = {
-      query: q,
-      types: this.props.keyTypes,
+    try {
+      const resp = await keys.Keys({
+        query: q,
+        types: this.props.keyTypes,
+      })
+      // Set default selected key.
+      if (this.state.defaultValue) {
+        const selected = resp.keys?.find((k: Key) => {
+          return this.state.defaultValue == k.id || this.state.defaultValue == k.user?.id
+        })
+        this.setState({defaultValue: '', selected: selected})
+      }
+
+      const results = this.createOptions(resp.keys || [])
+
+      this.setState({options: results, loading: false})
+    } catch (err) {
+      this.setState({loading: false, options: []})
     }
-    keys(req)
-      .then((resp: KeysResponse) => {
-        // Set default selected key.
-        if (this.state.defaultValue) {
-          const selected = resp.keys?.find((k: Key) => {
-            return this.state.defaultValue == k.id || this.state.defaultValue == k.user?.id
-          })
-          this.setState({defaultValue: '', selected: selected})
-        }
-
-        const keys = this.createOptions(resp.keys || [])
-
-        this.setState({options: keys, loading: false})
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false, options: []})
-      })
   }
 
   createOptions = (options: Key[]): Key[] => {

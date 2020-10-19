@@ -12,7 +12,8 @@ import {contentTop, column2Color} from '../theme'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import SignerView from '../verify/signer'
 
-import {decrypt, decryptFile, key, DecryptFileEvent} from '../rpc/keys'
+import {keys} from '../rpc/client'
+import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
   EncryptMode,
@@ -22,7 +23,7 @@ import {
   DecryptFileOutput,
   DecryptRequest,
   DecryptResponse,
-} from '../rpc/keys.d'
+} from '@keys-pub/tsclient/lib/keys.d'
 
 type State = {
   input: string
@@ -92,7 +93,7 @@ const openFolder = (value: string) => {
 
 const reloadSender = async (kid: string) => {
   try {
-    const resp = await key({
+    const resp = await keys.Key({
       key: kid,
       search: false,
       update: false,
@@ -118,7 +119,7 @@ const decryptInput = async (input: string) => {
     const req: DecryptRequest = {
       data: data,
     }
-    const resp = await decrypt(req)
+    const resp = await keys.Decrypt(req)
     const decrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.sender = resp.sender
@@ -145,36 +146,33 @@ const decryptFileIn = (fileIn: string, dir: string) => {
   store.update((s) => {
     s.loading = true
   })
-  const send = decryptFile((event: DecryptFileEvent) => {
-    const {err, res, done} = event
-    if (err) {
-      if (err.code == grpc.status.CANCELLED) {
-        store.update((s) => {
-          s.loading = false
-        })
-      } else {
-        store.update((s) => {
-          openSnackError(err)
-          s.loading = false
-        })
-      }
-      return
-    }
-    if (res) {
-      store.update((s) => {
-        s.fileOut = res?.out || ''
-        s.sender = res?.sender
-        s.output = ''
-        s.mode = res?.mode
-      })
-    }
-    if (done) {
+  const stream = keys.DecryptFile()
+  stream.on('data', (resp: DecryptFileOutput) => {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = resp?.out || ''
+      s.sender = resp?.sender
+      s.mode = resp?.mode
+    })
+  })
+  stream.on('error', (err: RPCError) => {
+    if (err.code == grpc.status.CANCELLED) {
       store.update((s) => {
         s.loading = false
       })
+    } else {
+      store.update((s) => {
+        s.loading = false
+      })
+      openSnackError(err)
     }
   })
-  send(req, false)
+  stream.on('end', () => {
+    store.update((s) => {
+      s.loading = false
+    })
+  })
+  stream.write(req)
 }
 
 const decryptFileTo = async (fileIn: string) => {

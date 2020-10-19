@@ -4,8 +4,8 @@ import {Box, Button, Typography} from '@material-ui/core'
 
 import Dialog from '../../components/dialog'
 
-import {authDeprovision} from '../../rpc/keys'
-import {AuthProvision} from '../../rpc/keys.d'
+import {keys} from '../../rpc/client'
+import {AuthProvision} from '@keys-pub/tsclient/lib/keys.d'
 import {authTypeDescription} from '../helper'
 import {dateString} from '../../helper'
 import {mono, breakWords} from '../../theme'
@@ -21,7 +21,7 @@ export default (props: Props) => {
   const {provision} = props
 
   const deprovision = async () => {
-    const resp = await authDeprovision({id: provision?.id})
+    const resp = await keys.AuthDeprovision({id: provision?.id})
     props.close(true)
   }
 

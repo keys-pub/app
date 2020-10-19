@@ -16,8 +16,8 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {vaultSync} from '../rpc/keys'
-import {VaultSyncRequest, VaultSyncResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {VaultSyncRequest, VaultSyncResponse} from '@keys-pub/tsclient/lib/keys.d'
 import {toHex} from '../helper'
 
 type Props = {
@@ -44,17 +44,15 @@ export default class EnableDialog extends React.Component<Props, State> {
     this.props.close(snack)
   }
 
-  enable = () => {
+  enable = async () => {
     this.setState({loading: true, error: undefined})
-    const req: VaultSyncRequest = {}
-    vaultSync(req)
-      .then((resp: VaultSyncResponse) => {
-        this.setState({loading: false})
-        this.close('Sync enabled')
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
+    try {
+      const resp = await keys.VaultSync({})
+      this.setState({loading: false})
+      this.close('Sync enabled')
+    } catch (err) {
+      this.setState({loading: false, error: err})
+    }
   }
 
   render() {

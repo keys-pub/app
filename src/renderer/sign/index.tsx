@@ -11,8 +11,16 @@ import * as path from 'path'
 
 import SignKeySelectView from '../keys/select'
 
-import {keys, sign, configGet, configSet, signFile, SignFileEvent} from '../rpc/keys'
-import {Key, Config, SignRequest, SignResponse, SignFileInput, SignFileOutput} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {RPCError} from '@keys-pub/tsclient'
+import {
+  Key,
+  Config,
+  SignRequest,
+  SignResponse,
+  SignFileInput,
+  SignFileOutput,
+} from '@keys-pub/tsclient/lib/keys.d'
 import {store, loadStore} from './store'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import {contentTop, column2Color} from '../theme'
@@ -71,7 +79,7 @@ const signInput = async (input: string, signer?: Key) => {
   console.log('Signing...')
   try {
     const data = new TextEncoder().encode(input)
-    const resp = await sign({
+    const resp = await keys.Sign({
       data: data,
       armored: true,
       signer: signer?.id,
@@ -106,34 +114,31 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
   store.update((s) => {
     s.loading = true
   })
-  const send = signFile((event: SignFileEvent) => {
-    const {err, res, done} = event
-    if (err) {
-      if (err.code == grpc.status.CANCELLED) {
-        store.update((s) => {
-          s.loading = false
-        })
-      } else {
-        store.update((s) => {
-          s.loading = false
-        })
-        openSnackError(err)
-      }
-      return
-    }
-    if (res) {
-      store.update((s) => {
-        s.output = ''
-        s.fileOut = res?.out || ''
-      })
-    }
-    if (done) {
+  const stream = keys.SignFile()
+  stream.on('data', (resp: SignFileOutput) => {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = resp?.out || ''
+    })
+  })
+  stream.on('error', (err: RPCError) => {
+    if (err.code == grpc.status.CANCELLED) {
       store.update((s) => {
         s.loading = false
       })
+    } else {
+      store.update((s) => {
+        s.loading = false
+      })
+      openSnackError(err)
     }
   })
-  send(req, false)
+  stream.on('end', () => {
+    store.update((s) => {
+      s.loading = false
+    })
+  })
+  stream.write(req)
 }
 
 const signFileTo = async (fileIn: string, signer?: Key) => {
@@ -191,7 +196,7 @@ export default (props: Props) => {
             signer: s.signer?.id,
           },
         }
-        const set = async () => await configSet({name: 'sign', config})
+        const set = async () => await keys.ConfigSet({name: 'sign', config})
         set()
       }
     )

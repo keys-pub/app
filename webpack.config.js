@@ -170,14 +170,6 @@ function createMainConfig(isDev) {
             from: 'icon.png',
             to: 'icon.png',
           },
-          {
-            from: 'main/rpc/keys.proto',
-            to: 'keys.proto',
-          },
-          {
-            from: 'main/rpc/fido2.proto',
-            to: 'fido2.proto',
-          },
         ],
       }),
     ],

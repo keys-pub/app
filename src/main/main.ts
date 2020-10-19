@@ -28,7 +28,6 @@ import {MenuActionType} from './menu'
 import {keysStart, keysStop} from './service'
 import {update, UpdateResult} from './updater'
 
-import {rpcRegister} from './rpc'
 import {reloadApp} from './app'
 
 let mainWindow: BrowserWindow | null = null
@@ -131,16 +130,6 @@ app.on('ready', async () => {
   mainWindow.on('move', () => {
     // TODO: This shouldn't be necessary
     ws.saveState()
-  })
-
-  mainWindow.on('responsive', () => {
-    if (!mainWindow) return
-    mainWindow.webContents.send('responsive')
-  })
-
-  mainWindow.on('unresponsive', () => {
-    if (!mainWindow) return
-    mainWindow.webContents.send('unresponsive')
   })
 
   const menuBuilder = new MenuBuilder(mainWindow, menuAction)
@@ -270,7 +259,6 @@ ipcMain.on('keys-start', (event, arg) => {
   keysStart()
     .then(() => {
       console.log('Start...')
-      rpcRegister()
       event.sender.send('keys-started')
     })
     .catch((err: Error) => {

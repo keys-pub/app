@@ -17,7 +17,7 @@ import {
 import Snack, {SnackProps} from '../components/snack'
 import SearchView from './view'
 
-import {Key} from '../rpc/keys.d'
+import {Key} from '@keys-pub/tsclient/lib/keys.d'
 
 import KeyDialog from '../key'
 

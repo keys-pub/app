@@ -21,7 +21,9 @@ const CustomTooltip = (props: Props) => {
   if (!props.enterDelay) {
     props = {...props, enterDelay: 800}
   }
-  if (props.dark) {
+  const dark = props.dark
+  props.dark = undefined
+  if (dark) {
     return <Tooltip {...props}>{props.children}</Tooltip>
   }
   return <LightTooltip {...props}>{props.children}</LightTooltip>

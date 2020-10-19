@@ -17,10 +17,9 @@ import {RefreshIcon} from '../icons'
 import {Link} from '../components'
 import Dialog from '../components/dialog'
 
-import {authProvision} from '../rpc/keys'
-import {AuthType, Encoding} from '../rpc/keys.d'
-import {devices as listDevices} from '../rpc/fido2'
-import {Device} from '../rpc/fido2.d'
+import {keys, fido2} from '../rpc/client'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys.d'
+import {Device} from '@keys-pub/tsclient/lib/fido2.d'
 import {openSnackError} from '../snack'
 
 type Props = {
@@ -33,7 +32,7 @@ export default (props: Props) => {
 
   const onFIDO2Devices = async () => {
     try {
-      const resp = await listDevices({})
+      const resp = await fido2.Devices({})
       const devices = resp.devices || []
       setDevices(devices)
       if (devices.length == 0) {

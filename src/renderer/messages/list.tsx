@@ -4,8 +4,8 @@ import {Box, CircularProgress} from '@material-ui/core'
 
 import MessageView from './message'
 
-import {messages} from '../rpc/keys'
-import {Message, MessagesRequest, MessagesResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Message, MessagesRequest, MessagesResponse} from '@keys-pub/tsclient/lib/keys.d'
 import {MessageRow} from './types'
 
 type Props = {
@@ -124,7 +124,7 @@ export default class MessagesListView extends React.Component<Props, State> {
     }
     console.log('Load rows, RPC messages:', req)
     // TODO: Catch error
-    messages(req).then((resp: MessagesResponse) => {
+    keys.Messages(req).then((resp: MessagesResponse) => {
       if (this.listRef === null) {
         // console.error('No list ref')
         return

@@ -21,8 +21,8 @@ import ServiceSelect from '../user/service'
 
 import {shell} from 'electron'
 
-import {keyGenerate} from '../rpc/keys'
-import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '@keys-pub/tsclient/lib/keys.d'
 
 type Props = {
   open: boolean
@@ -70,18 +70,17 @@ export default class KeyCreateDialog extends React.Component<Props> {
   keyGenerate = () => {
     this.setState({loading: true})
     // Make generate take a second
-    setTimeout(() => {
+    setTimeout(async () => {
       const req: KeyGenerateRequest = {
         type: this.state.type,
       }
-      keyGenerate(req)
-        .then((resp: KeyGenerateResponse) => {
-          this.props.onChange()
-          this.setState({kid: resp.kid, step: 'CREATED', loading: false})
-        })
-        .catch((err: Error) => {
-          this.setState({loading: false})
-        })
+      try {
+        const resp = await keys.KeyGenerate(req)
+        this.props.onChange()
+        this.setState({kid: resp.kid, step: 'CREATED', loading: false})
+      } catch (err) {
+        this.setState({loading: false})
+      }
     }, 500)
   }
 

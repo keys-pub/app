@@ -20,10 +20,10 @@ import {KeyLabel} from '../key/label'
 import {clipboard} from 'electron'
 
 import {DialogTitle} from '../components'
-import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '../rpc/keys.d'
+import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys.d'
 import Snack, {SnackProps} from '../components/snack'
 
-import {keyExport} from '../rpc/keys'
+import {keys} from '../rpc/client'
 
 type Props = {
   k: Key
@@ -71,7 +71,7 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         public: false,
         type: ExportType.DEFAULT_EXPORT_TYPE,
       }
-      const resp = await keyExport(req)
+      const resp = await keys.KeyExport(req)
       const out = new TextDecoder().decode(resp.export)
       this.setState({password: '', passwordConfirm: '', export: out})
     } catch (err) {

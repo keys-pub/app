@@ -7,8 +7,8 @@ import Nav from './nav'
 
 import {Box} from '@material-ui/core'
 
-import {configSet} from './rpc/keys'
-import {Config} from './rpc/keys.d'
+import {keys} from './rpc/client'
+import {Config} from '@keys-pub/tsclient/lib/keys.d'
 
 export default (_: {}) => {
   React.useEffect(() => {
@@ -26,7 +26,7 @@ export default (_: {}) => {
             navMinimized: s.navMinimized,
           },
         }
-        const set = async () => await configSet({name: 'app', config})
+        const set = async () => await keys.ConfigSet({name: 'app', config})
         set()
       }
     )

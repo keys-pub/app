@@ -15,8 +15,8 @@ import Header from '../header'
 import Logo from '../logo'
 import {mono} from '../theme'
 
-import {authRecover} from '../rpc/keys'
-import {AuthType} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {AuthType} from '@keys-pub/tsclient/lib/keys.d'
 
 import {store, unlocked} from '../store'
 import {openSnack, openSnackError, closeSnack} from '../snack'
@@ -44,7 +44,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const resp = await authRecover({
+      const resp = await keys.AuthRecover({
         paperKey,
         newPassword,
       })

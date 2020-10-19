@@ -4,8 +4,8 @@ import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
 import AuthSplash from './splash'
 
-import {runtimeStatus} from '../rpc/keys'
-import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '@keys-pub/tsclient/lib/keys.d'
 import {store, Error} from '../store'
 
 export default (props: {}) => {
@@ -13,7 +13,7 @@ export default (props: {}) => {
 
   const refresh = async () => {
     try {
-      const resp = await runtimeStatus({})
+      const resp = await keys.RuntimeStatus({})
       setStatus(resp.authStatus!)
     } catch (err) {
       store.update((s) => {

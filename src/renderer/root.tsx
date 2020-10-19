@@ -22,8 +22,8 @@ import UpdateSplash from './update/splash'
 import {updateCheck} from './update'
 import * as grpc from '@grpc/grpc-js'
 
-import {configSet, setErrHandler, runtimeStatus} from './rpc/keys'
-import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from './rpc/keys.d'
+import {keys} from './rpc/client'
+import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/keys.d'
 
 import './app.css'
 
@@ -97,22 +97,23 @@ ipcRenderer.on('keys-started', (event, err) => {
     })
   }
 
-  setErrHandler((err: Error) => {
-    switch (err.code) {
-      case grpc.status.PERMISSION_DENIED:
-      case grpc.status.UNAUTHENTICATED:
-        store.update((s) => {
-          s.unlocked = false
-        })
-        break
-      case grpc.status.UNAVAILABLE:
-        store.update((s) => {
-          s.unlocked = false
-          s.error = err
-        })
-        break
-    }
-  })
+  // TODO: Set error handler
+  // setErrHandler((err: Error) => {
+  //   switch (err.code) {
+  //     case grpc.status.PERMISSION_DENIED:
+  //     case grpc.status.UNAUTHENTICATED:
+  //       store.update((s) => {
+  //         s.unlocked = false
+  //       })
+  //       break
+  //     case grpc.status.UNAVAILABLE:
+  //       store.update((s) => {
+  //         s.unlocked = false
+  //         s.error = err
+  //       })
+  //       break
+  //   }
+  // })
 
   store.update((s) => {
     s.ready = true
@@ -140,5 +141,5 @@ ipcRenderer.on('focus', (event, message) => {
 // ipcRenderer.on('responsive', (event, message) => {})
 
 const ping = async () => {
-  await runtimeStatus({})
+  await keys.RuntimeStatus({})
 }

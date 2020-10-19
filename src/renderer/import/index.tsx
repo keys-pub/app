@@ -16,8 +16,8 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {KeyImportRequest, KeyImportResponse} from '../rpc/keys.d'
-import {keyImport} from '../rpc/keys'
+import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {keys} from '../rpc/client'
 
 type Props = {
   open: boolean
@@ -52,17 +52,15 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   importKey = async () => {
     this.setState({loading: true, error: undefined})
     const input = new TextEncoder().encode(this.state.in)
-    const req: KeyImportRequest = {
-      in: input,
-      password: this.state.password,
+    try {
+      const resp = await keys.KeyImport({
+        in: input,
+        password: this.state.password,
+      })
+      this.setState({loading: false, imported: resp.kid || ''})
+    } catch (err) {
+      this.setState({loading: false, error: err})
     }
-    keyImport(req)
-      .then((resp: KeyImportResponse) => {
-        this.setState({loading: false, imported: resp.kid || ''})
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {

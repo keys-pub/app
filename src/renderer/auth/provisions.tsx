@@ -21,8 +21,8 @@ import {
 import {AddIcon} from '../icons'
 import {column2Color} from '../theme'
 
-import {authProvisions} from '../rpc/keys'
-import {AuthProvision, AuthType} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {AuthProvision, AuthType} from '@keys-pub/tsclient/lib/keys.d'
 import {Store} from 'pullstate'
 import {dateString} from '../helper'
 import ProvisionPassword from './provision/password'
@@ -50,7 +50,7 @@ export const store = new Store(initialState)
 
 const refresh = async (selected?: AuthProvision) => {
   try {
-    const resp = await authProvisions({})
+    const resp = await keys.AuthProvisions({})
     const provisions = resp.provisions || []
     let selectedProvision = provisions.find((p: AuthProvision) => p.id == selected?.id)
 
