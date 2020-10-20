@@ -1,5 +1,6 @@
 import {store} from './store'
 import {SnackProps} from './components/snack'
+import {Error} from './store'
 
 export const openSnack = (snack: SnackProps) => {
   store.update((s) => {
@@ -15,5 +16,10 @@ export const closeSnack = () => {
 }
 
 export const openSnackError = (err: Error) => {
-  openSnack({message: err.message, alert: 'error', duration: 6000})
+  let message = err.message
+  if (err.details) {
+    message = err.details
+  }
+
+  openSnack({message: message, alert: 'error', duration: 8000})
 }
