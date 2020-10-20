@@ -7,7 +7,7 @@ import AuthUnlockPasswordView from './password'
 import AuthUnlockFIDO2View from './fido2'
 import AuthForgotView from './forgot'
 
-import {store, unlocked, loadStatus} from '../../store'
+import {store, loadStatus} from '../../store'
 import {AuthType} from '@keys-pub/tsclient/lib/keys'
 import {Action} from './actions'
 
