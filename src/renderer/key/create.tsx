@@ -16,7 +16,7 @@ import {
 
 import {DialogTitle, Link} from '../components'
 
-import UserSignDialog from '../user/dialog'
+import UserSignDialog from '../user/sign'
 import ServiceSelect from '../user/service'
 
 import {shell} from 'electron'

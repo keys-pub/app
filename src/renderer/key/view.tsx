@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Button, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
 import KeyContentView from './content'
-import UserSignDialog from '../user/dialog'
+import UserSignDialog from '../user/sign'
 import UserRevokeDialog from '../user/revoke'
 
 import {Key} from '@keys-pub/tsclient/lib/keys'

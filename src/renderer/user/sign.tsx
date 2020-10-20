@@ -17,11 +17,9 @@ import {breakWords} from '../theme'
 import {DialogTitle} from '../components/dialog'
 import {mono} from '../theme'
 import Snack, {SnackProps} from '../components/snack'
-import {Error} from '../store'
-import ErrorView from './error'
+import {openSnack, openSnackError, closeSnack} from '../snack'
 
 import {keys} from '../rpc/client'
-import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   kid: string
@@ -32,9 +30,6 @@ type Props = {
 
 type State = {
   name: string
-  error?: Error
-  errorOpen: boolean
-  errorUsername?: Error
   loading: boolean
   signedMessage: string
   snack?: SnackProps
@@ -45,7 +40,6 @@ type State = {
 
 export default class UserSignDialog extends React.Component<Props, State> {
   state: State = {
-    errorOpen: false,
     loading: false,
     name: '',
     signedMessage: '',
@@ -57,9 +51,6 @@ export default class UserSignDialog extends React.Component<Props, State> {
   clear = () => {
     this.setState({
       name: '',
-      error: undefined,
-      errorOpen: false,
-      errorUsername: undefined,
       signedMessage: '',
       loading: false,
       url: '',
@@ -73,13 +64,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
   }
 
   onNameChange = (e: React.SyntheticEvent<EventTarget>) => {
+    closeSnack()
     let target = e.target as HTMLInputElement
-    this.setState({name: target ? target.value : '', error: undefined})
+    this.setState({name: target ? target.value : ''})
   }
 
   onURLChange = (e: React.SyntheticEvent<EventTarget>) => {
+    closeSnack()
     let target = e.target as HTMLInputElement
-    this.setState({url: target ? target.value : '', error: undefined})
+    this.setState({url: target ? target.value : ''})
   }
 
   copyToClipboard = () => {
@@ -89,13 +82,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   userSign = async () => {
     if (!this.state.name) {
-      this.setState({
-        errorUsername: {message: 'Oops, name is empty'},
-      })
+      openSnackError(new Error('Oops, name is empty'))
       return
     }
-
-    this.setState({loading: true, error: undefined, errorOpen: false, errorUsername: undefined})
+    closeSnack()
+    this.setState({loading: true})
     try {
       const resp = await keys.UserSign({
         kid: this.props.kid,
@@ -114,7 +105,8 @@ export default class UserSignDialog extends React.Component<Props, State> {
         step: 'sign',
       })
     } catch (err) {
-      this.setState({loading: false, error: err, errorOpen: true})
+      openSnackError(err)
+      this.setState({loading: false})
     }
   }
 
@@ -132,8 +124,8 @@ export default class UserSignDialog extends React.Component<Props, State> {
   }
 
   userAdd = async () => {
-    this.setState({loading: true, error: undefined})
-
+    closeSnack()
+    this.setState({loading: true})
     try {
       const resp = await keys.UserAdd({
         kid: this.props.kid,
@@ -145,13 +137,15 @@ export default class UserSignDialog extends React.Component<Props, State> {
       this.setState({loading: false})
       this.close(true)
     } catch (err) {
-      this.setState({loading: false, error: err, errorOpen: true})
+      openSnackError(err)
+      this.setState({loading: false})
     }
   }
 
   back = () => {
+    closeSnack()
     if (this.state.step == 'sign') {
-      this.setState({step: 'name', error: undefined})
+      this.setState({step: 'name'})
     } else {
       this.close(false)
     }
@@ -166,30 +160,25 @@ export default class UserSignDialog extends React.Component<Props, State> {
       "In the next step, we'll create a signed message using this key that you can post to your account."
     switch (service) {
       case 'github':
-        placeholder = 'username'
         question = "What's your Github username?"
         next =
           "In the next step, we'll create a signed message using this key that you can post as a gist on your Github account."
         break
       case 'twitter':
-        placeholder = '@username'
         question = "What's your Twitter handle?"
         next = "In the next step, we'll create a signed message using this key that you can post as a tweet."
         break
       case 'reddit':
-        placeholder = 'username'
         question = "What's your Reddit username?"
         next =
           "In the next step, we'll create a signed message using this key that you can post on r/keyspubmsgs."
         break
       case 'https':
-        placeholder = ''
         question = "What's the domain name?"
         next =
           "In the next step, we'll create a signed message that you can put on your domain as /keyspub.txt."
         break
       case 'echo':
-        placeholder = ''
         question = "What's your test name?"
         next = "In the next step, we'll save it."
         break
@@ -200,17 +189,16 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <Typography variant="subtitle1" style={{paddingBottom: 10}}>
           {question}
         </Typography>
-        <FormControl error={!!this.state.errorUsername}>
+        <FormControl>
           <TextField
             autoFocus
             placeholder={placeholder}
             onChange={this.onNameChange}
             value={this.state.name}
-            style={{minWidth: 300}}
+            style={{minWidth: 300, paddingBottom: 10}}
             id="userNameTextField"
             inputProps={{spellCheck: 'false'}}
           />
-          <FormHelperText>{this.state.errorUsername?.message || ' '}</FormHelperText>
         </FormControl>
         <Typography>{next}</Typography>
       </Box>
@@ -399,11 +387,6 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Box>
           )}
         </DialogActions>
-        <ErrorView
-          open={this.state.errorOpen}
-          error={this.state.error}
-          close={() => this.setState({errorOpen: false})}
-        />
         <Snack
           open={this.state.snackOpen}
           {...this.state.snack}
