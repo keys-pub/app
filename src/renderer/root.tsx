@@ -124,11 +124,10 @@ const ping = async () => {
   await keys.RuntimeStatus({})
 }
 
-window.addEventListener('error', (event) => {
-  event.preventDefault()
-  console.log('Unhandled error', event)
-  errored(event.error || event)
-})
+// window.addEventListener('error', (event) => {
+//   event.preventDefault()
+//   errored(event.error || event)
+// })
 
 window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault()
