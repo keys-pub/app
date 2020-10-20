@@ -21,12 +21,7 @@ import {Error} from '../store'
 import ErrorView from './error'
 
 import {keys} from '../rpc/client'
-import {
-  UserAddRequest,
-  UserAddResponse,
-  UserSignRequest,
-  UserSignResponse,
-} from '@keys-pub/tsclient/lib/keys.d'
+import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   kid: string

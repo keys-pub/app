@@ -17,8 +17,8 @@ import Dialog from '../../components/dialog'
 import SelectDevice from '../../authenticators/select'
 import {openSnack, openSnackError, closeSnack} from '../../snack'
 
-import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys.d'
-import {Device} from '@keys-pub/tsclient/lib/fido2.d'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
+import {Device} from '@keys-pub/tsclient/lib/fido2'
 import {keys, fido2} from '../../rpc/client'
 
 type Props = {

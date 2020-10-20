@@ -5,7 +5,7 @@ import {Box, Button, Divider, Tabs, Tab, TextField, Typography} from '@material-
 import Info from './info'
 import Credentials from './credentials'
 
-import {Device} from '@keys-pub/tsclient/lib/fido2.d'
+import {Device} from '@keys-pub/tsclient/lib/fido2'
 
 type Props = {
   device: Device

@@ -22,7 +22,7 @@ import {AddIcon} from '../icons'
 import {column2Color} from '../theme'
 
 import {keys} from '../rpc/client'
-import {AuthProvision, AuthType} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthProvision, AuthType} from '@keys-pub/tsclient/lib/keys'
 import {Store} from 'pullstate'
 import {dateString} from '../helper'
 import ProvisionPassword from './provision/password'

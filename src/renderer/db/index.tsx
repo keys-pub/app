@@ -26,7 +26,7 @@ import {
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   db: string

@@ -5,8 +5,8 @@ import AuthUnlockView from './unlock'
 import AuthSplash from './splash'
 
 import {keys} from '../rpc/client'
-import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '@keys-pub/tsclient/lib/keys.d'
-import {store, Error} from '../store'
+import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '@keys-pub/tsclient/lib/keys'
+import {errored} from '../store'
 
 export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
@@ -16,9 +16,7 @@ export default (props: {}) => {
       const resp = await keys.RuntimeStatus({})
       setStatus(resp.authStatus!)
     } catch (err) {
-      store.update((s) => {
-        s.error = err as Error
-      })
+      errored(err)
     }
   }
 

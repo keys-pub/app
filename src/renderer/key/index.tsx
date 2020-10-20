@@ -8,7 +8,7 @@ import {DialogTitle} from '../components'
 import KeyView from './view'
 
 import {keys} from '../rpc/client'
-import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open: boolean

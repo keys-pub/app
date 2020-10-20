@@ -16,7 +16,7 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {Device, SetPINRequest, SetPINResponse} from '@keys-pub/tsclient/lib/fido2.d'
+import {Device, SetPINRequest, SetPINResponse} from '@keys-pub/tsclient/lib/fido2'
 import {fido2} from '../rpc/client'
 
 type Props = {

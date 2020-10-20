@@ -22,7 +22,7 @@ import ServiceSelect from '../user/service'
 import {shell} from 'electron'
 
 import {keys} from '../rpc/client'
-import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '@keys-pub/tsclient/lib/keys.d'
+import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open: boolean

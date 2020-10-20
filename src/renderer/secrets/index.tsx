@@ -41,7 +41,7 @@ import {
   RuntimeStatusResponse,
   VaultUpdateRequest,
   VaultUpdateResponse,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 import {keys} from '../rpc/client'
 

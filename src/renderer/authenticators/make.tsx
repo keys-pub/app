@@ -22,7 +22,7 @@ import {DialogTitle} from '../components'
 import {deepCopy, fromHex} from '../helper'
 
 import {fido2} from '../rpc/client'
-import {Device, MakeCredentialRequest, MakeCredentialResponse} from '@keys-pub/tsclient/lib/fido2.d'
+import {Device, MakeCredentialRequest, MakeCredentialResponse} from '@keys-pub/tsclient/lib/fido2'
 
 type Props = {
   device: Device

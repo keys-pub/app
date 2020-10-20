@@ -1,6 +1,10 @@
+import * as getenv from 'getenv'
+
 import {binPath} from './paths'
 import {execProc, spawnProc} from './run'
-import {getAppName, getPort, defaultAppName, defaultPort} from './env'
+
+const defaultAppName = 'Keys'
+const defaultPort = 22405
 
 const keysPath = (): string => {
   let path = ''
@@ -12,6 +16,14 @@ const keysPath = (): string => {
   }
   console.log('Keys path:', path)
   return path
+}
+
+export const getAppName = (): string => {
+  return getenv.string('KEYS_APP', defaultAppName)
+}
+
+const getPort = (): number => {
+  return getenv.int('KEYS_PORT', 22405)
 }
 
 export const keysStart = (): Promise<any> => {

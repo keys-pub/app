@@ -7,11 +7,10 @@ import Logo from '../../logo'
 import {Link} from '../../components'
 
 import {keys} from '../../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys.d'
-import {Device} from '@keys-pub/tsclient/lib/fido2.d'
+import {AuthType} from '@keys-pub/tsclient/lib/keys'
 import SelectDevice from '../../authenticators/select'
 
-import {store, unlocked} from '../../store'
+import {store, unlock} from '../../store'
 import {openSnack, openSnackError, closeSnack} from '../../snack'
 import ActionsView, {Action} from './actions'
 
@@ -42,7 +41,7 @@ export default (props: Props) => {
         client: 'app',
       })
       closeSnack()
-      await unlocked(resp.authToken)
+      await unlock(resp.authToken)
     } catch (err) {
       openSnack({message: err.message, alert: 'error', duration: 6000})
       setLoading(false)

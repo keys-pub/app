@@ -11,7 +11,7 @@ import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 
 import {keys} from '../rpc/client'
-import {Key, KeysRequest, KeysResponse, SortDirection} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeysRequest, KeysResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
 import {openSnackError} from '../snack'
 
 type Props = {

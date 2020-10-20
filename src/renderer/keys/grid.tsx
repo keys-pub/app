@@ -33,7 +33,7 @@ import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
 import {keys} from '../rpc/client'
-import {Key, KeyType, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyType, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys'
 
 import {store, loadStore} from './store'
 import {openSnackError} from '../snack'

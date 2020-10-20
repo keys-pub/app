@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 
 import {breakWords} from '../theme'
-import {Statement} from '@keys-pub/tsclient/lib/keys.d'
+import {Statement} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   statements: Array<Statement>

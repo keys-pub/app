@@ -7,12 +7,15 @@ import {loadStore as signLoadStore} from './sign/store'
 
 import {keys, auth} from './rpc/client'
 import {SnackProps} from './components/snack'
+import * as grpc from '@grpc/grpc-js'
+import {ipcRenderer} from 'electron'
+import {openSnackError} from './snack'
 
 export interface Error {
+  name: string
   message: string
   details?: string
   code?: number
-  name?: string
 }
 
 export type State = {
@@ -70,7 +73,7 @@ export const loadStore = async () => {
   signLoadStore()
 }
 
-export const unlocked = async (authToken?: string) => {
+export const unlock = async (authToken?: string) => {
   if (!authToken) {
     throw new Error('no auth token')
   }
@@ -78,6 +81,31 @@ export const unlocked = async (authToken?: string) => {
   await loadStore()
   store.update((s) => {
     s.unlocked = true
+  })
+}
+
+export const lock = () => {
+  auth.token = ''
+  store.update((s) => {
+    s.unlocked = false
+  })
+}
+
+export const errored = (err: Error) => {
+  // TODO: Special view for grpc unavailable
+  console.error(err)
+
+  switch (err.code) {
+    case grpc.status.PERMISSION_DENIED:
+    case grpc.status.UNAUTHENTICATED:
+      console.log('Locking...')
+      lock()
+      openSnackError(err as Error)
+      return
+  }
+
+  store.update((s) => {
+    s.error = err
   })
 }
 

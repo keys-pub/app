@@ -24,7 +24,7 @@ import DeviceContentView from './content'
 
 import * as grpc from '@grpc/grpc-js'
 import {fido2} from '../rpc/client'
-import {Device, DevicesRequest, DevicesResponse} from '@keys-pub/tsclient/lib/fido2.d'
+import {Device, DevicesRequest, DevicesResponse} from '@keys-pub/tsclient/lib/fido2'
 import {Error} from '../store'
 import {contentTop, column2Color} from '../theme'
 

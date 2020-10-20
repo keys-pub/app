@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
 import {keys} from '../rpc/client'
-import {Key, KeysRequest, SortDirection} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeysRequest, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   createOpen: boolean

@@ -20,7 +20,7 @@ import {
   SignResponse,
   SignFileInput,
   SignFileOutput,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 import {store, loadStore} from './store'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import {contentTop, column2Color} from '../theme'

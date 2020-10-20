@@ -28,7 +28,7 @@ import {
   CredentialsRequest,
   CredentialsResponse,
   Option,
-} from '@keys-pub/tsclient/lib/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
 import CredentialsList from './credentials-list'

@@ -21,7 +21,7 @@ import UserLabel from '../user/label'
 
 import Snack, {SnackProps} from '../components/snack'
 
-import {Key, SearchRequest, SearchResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, SearchRequest, SearchResponse} from '@keys-pub/tsclient/lib/keys'
 import {keys} from '../rpc/client'
 
 import {debounce, throttle} from 'lodash'

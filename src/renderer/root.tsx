@@ -4,7 +4,7 @@ import {ThemeProvider} from '@material-ui/styles'
 import {theme} from './theme'
 
 import Routes from './routes'
-import {store, loadStore, loadStatus, setLocation, Error} from './store'
+import {store, setLocation, errored} from './store'
 import {closeSnack} from './snack'
 import {ipcRenderer, remote} from 'electron'
 import Snack, {SnackProps} from './components/snack'
@@ -20,10 +20,9 @@ import UpdateAlert from './update/alert'
 import UpdateSplash from './update/splash'
 
 import {updateCheck} from './update'
-import * as grpc from '@grpc/grpc-js'
 
 import {keys} from './rpc/client'
-import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/keys'
 
 import './app.css'
 
@@ -92,28 +91,9 @@ ipcRenderer.on('log', (event, text) => {
 ipcRenderer.removeAllListeners('keys-started')
 ipcRenderer.on('keys-started', (event, err) => {
   if (err) {
-    store.update((s) => {
-      s.error = err
-    })
+    errored(err)
+    return
   }
-
-  // TODO: Set error handler
-  // setErrHandler((err: Error) => {
-  //   switch (err.code) {
-  //     case grpc.status.PERMISSION_DENIED:
-  //     case grpc.status.UNAUTHENTICATED:
-  //       store.update((s) => {
-  //         s.unlocked = false
-  //       })
-  //       break
-  //     case grpc.status.UNAVAILABLE:
-  //       store.update((s) => {
-  //         s.unlocked = false
-  //         s.error = err
-  //       })
-  //       break
-  //   }
-  // })
 
   store.update((s) => {
     s.ready = true
@@ -143,3 +123,15 @@ ipcRenderer.on('focus', (event, message) => {
 const ping = async () => {
   await keys.RuntimeStatus({})
 }
+
+window.addEventListener('error', (event) => {
+  event.preventDefault()
+  console.log('Unhandled error', event)
+  errored(event.error || event)
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  event.preventDefault()
+  console.log('Unhandled rejection', event)
+  errored(event.reason)
+})

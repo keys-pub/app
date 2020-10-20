@@ -18,7 +18,7 @@ import {DialogTitle, Link} from '../components'
 import {shell} from 'electron'
 
 import {keys} from '../rpc/client'
-import {VaultUnsyncRequest, VaultUnsyncResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {VaultUnsyncRequest, VaultUnsyncResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open: boolean

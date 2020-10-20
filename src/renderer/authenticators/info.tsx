@@ -20,7 +20,7 @@ import {
   RelyingParty,
   RelyingPartiesRequest,
   RelyingPartiesResponse,
-} from '@keys-pub/tsclient/lib/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
 import RelyingParties from './rps'

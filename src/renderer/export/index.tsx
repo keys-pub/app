@@ -20,7 +20,7 @@ import {KeyLabel} from '../key/label'
 import {clipboard} from 'electron'
 
 import {DialogTitle} from '../components'
-import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys'
 import Snack, {SnackProps} from '../components/snack'
 
 import {keys} from '../rpc/client'

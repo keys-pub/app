@@ -1,4 +1,4 @@
-import {Message} from '@keys-pub/tsclient/lib/keys.d'
+import {Message} from '@keys-pub/tsclient/lib/keys'
 
 export type MessageRow = {
   message: Message

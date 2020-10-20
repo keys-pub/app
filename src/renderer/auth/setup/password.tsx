@@ -10,10 +10,10 @@ import {
   AuthUnlockRequest,
   AuthUnlockResponse,
   AuthType,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 import {ipcRenderer} from 'electron'
 
-import {setLocation, store, unlocked} from '../../store'
+import {setLocation, store, unlock} from '../../store'
 
 type Props = {}
 
@@ -58,7 +58,7 @@ export default (props: Props) => {
         type: AuthType.PASSWORD_AUTH,
         client: 'app',
       })
-      await unlocked(resp.authToken)
+      await unlock(resp.authToken)
       // setLoading(false)
     } catch (err) {
       setLoading(false)

@@ -1,7 +1,7 @@
 import emoji from 'node-emoji'
 
 import {keys} from './rpc/client'
-import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import * as Long from 'long'
 

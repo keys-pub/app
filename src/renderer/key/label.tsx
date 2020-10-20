@@ -6,7 +6,7 @@ import {Link} from '../components'
 
 import UserLabel from '../user/label'
 
-import {Key, KeyType, User} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyType, User} from '@keys-pub/tsclient/lib/keys'
 
 type IDLabelProps = {
   k: Key

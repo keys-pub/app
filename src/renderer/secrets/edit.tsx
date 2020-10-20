@@ -23,6 +23,7 @@ import {deepCopy} from '../helper'
 import {mono} from '../theme'
 
 import PasswordOptions from './pw'
+import {openSnackError} from '../snack'
 
 import {keys} from '../rpc/client'
 import {
@@ -33,7 +34,7 @@ import {
   RandPasswordRequest,
   RandPasswordResponse,
   Encoding,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   secret: Secret
@@ -92,11 +93,14 @@ export default class SecretEditView extends React.Component<Props, State> {
   generatePassword = async () => {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
-    const resp = await keys.RandPassword({length: 16})
-    const secret = deepCopy(this.state.secret)
-    secret.password = resp.password
-    this.setState({secret})
-    // TODO: Catch error
+    try {
+      const resp = await keys.RandPassword({length: 16})
+      const secret = deepCopy(this.state.secret)
+      secret.password = resp.password
+      this.setState({secret})
+    } catch (err) {
+      openSnackError(err)
+    }
   }
 
   renderEditActions() {

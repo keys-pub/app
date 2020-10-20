@@ -18,8 +18,8 @@ import {Link} from '../components'
 import Dialog from '../components/dialog'
 
 import {keys, fido2} from '../rpc/client'
-import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys.d'
-import {Device} from '@keys-pub/tsclient/lib/fido2.d'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
+import {Device} from '@keys-pub/tsclient/lib/fido2'
 import {openSnackError} from '../snack'
 
 type Props = {

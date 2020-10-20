@@ -34,7 +34,7 @@ import {
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 import {ClientDuplexStream, RPCError} from '@keys-pub/tsclient'
 
 import {WormholeMessage, WormholeMessageType} from './types'

@@ -16,9 +16,9 @@ import Logo from '../logo'
 import {mono} from '../theme'
 
 import {keys} from '../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthType} from '@keys-pub/tsclient/lib/keys'
 
-import {store, unlocked} from '../store'
+import {store, unlock} from '../store'
 import {openSnack, openSnackError, closeSnack} from '../snack'
 
 type Props = {
@@ -48,7 +48,7 @@ export default (props: Props) => {
         paperKey,
         newPassword,
       })
-      await unlocked(resp.authToken)
+      await unlock(resp.authToken)
       setLoading(false)
     } catch (err) {
       setLoading(false)

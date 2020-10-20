@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
 import {keys} from '../rpc/client'
-import {Secret, SortDirection, SecretsRequest} from '@keys-pub/tsclient/lib/keys.d'
+import {Secret, SortDirection, SecretsRequest} from '@keys-pub/tsclient/lib/keys'
 
 export type State = {
   editing?: Secret

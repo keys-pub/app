@@ -25,7 +25,7 @@ import {
   DeviceInfoResponse,
   ResetRequest,
   ResetResponse,
-} from '@keys-pub/tsclient/lib/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
 type Props = {

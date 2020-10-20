@@ -5,7 +5,7 @@ import {Link} from '../../components'
 import Dialog from '../../components/dialog'
 
 import {keys} from '../../rpc/client'
-import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
 import {openSnackError, closeSnack} from '../../snack'
 
 type Props = {

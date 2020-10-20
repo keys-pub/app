@@ -8,7 +8,7 @@ import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
-import {Key, KeyType, User, UserStatus} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyType, User, UserStatus} from '@keys-pub/tsclient/lib/keys'
 import ServiceSelect from '../user/service'
 import {Link} from '../components'
 import UserLabel from '../user/label'

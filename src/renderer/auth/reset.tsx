@@ -17,7 +17,7 @@ import {mono} from '../theme'
 import {ipcRenderer} from 'electron'
 
 import {keys} from '../rpc/client'
-import {Encoding} from '@keys-pub/tsclient/lib/keys.d'
+import {Encoding} from '@keys-pub/tsclient/lib/keys'
 import {openSnackError, closeSnack} from '../snack'
 
 type Props = {

@@ -5,7 +5,7 @@ import Dialog from '../components/dialog'
 import {openSnackError} from '../snack'
 
 import {keys} from '../rpc/client'
-import {StatementRevokeRequest, StatementRevokeResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {StatementRevokeRequest, StatementRevokeResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   kid: string

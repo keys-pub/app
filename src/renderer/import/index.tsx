@@ -16,7 +16,7 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys'
 import {keys} from '../rpc/client'
 
 type Props = {

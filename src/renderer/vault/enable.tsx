@@ -17,7 +17,7 @@ import {
 import {DialogTitle} from '../components'
 
 import {keys} from '../rpc/client'
-import {VaultSyncRequest, VaultSyncResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {VaultSyncRequest, VaultSyncResponse} from '@keys-pub/tsclient/lib/keys'
 import {toHex} from '../helper'
 
 type Props = {

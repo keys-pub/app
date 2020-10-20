@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
 import {keys} from '../rpc/client'
-import {Key} from '@keys-pub/tsclient/lib/keys.d'
+import {Key} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   fileIn: string

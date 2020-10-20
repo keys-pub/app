@@ -8,7 +8,7 @@ import Nav from './nav'
 import {Box} from '@material-ui/core'
 
 import {keys} from './rpc/client'
-import {Config} from '@keys-pub/tsclient/lib/keys.d'
+import {Config} from '@keys-pub/tsclient/lib/keys'
 
 export default (_: {}) => {
   React.useEffect(() => {

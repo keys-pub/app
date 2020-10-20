@@ -23,7 +23,7 @@ import {
   VaultSyncResponse,
   VaultStatusRequest,
   VaultStatusResponse,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   phrase: string

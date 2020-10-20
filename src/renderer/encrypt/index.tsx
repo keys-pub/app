@@ -43,7 +43,7 @@ import {
   EncryptResponse,
   EncryptFileInput,
   EncryptFileOutput,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 const openFile = async () => {
   clear(true)

@@ -7,9 +7,9 @@ import Logo from '../../logo'
 import {Link} from '../../components'
 
 import {keys} from '../../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthType} from '@keys-pub/tsclient/lib/keys'
 
-import {store, unlocked} from '../../store'
+import {store, unlock} from '../../store'
 import {openSnackError, closeSnack} from '../../snack'
 import ActionsView, {Action} from './actions'
 
@@ -52,7 +52,7 @@ export default (props: Props) => {
         client: 'app',
       })
       clearTimeout(timeout)
-      await unlocked(resp.authToken)
+      await unlock(resp.authToken)
       // setLoading(false)
       // setProgress(false)
     } catch (err) {

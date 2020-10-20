@@ -23,7 +23,7 @@ import {
   DecryptFileOutput,
   DecryptRequest,
   DecryptResponse,
-} from '@keys-pub/tsclient/lib/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   input: string

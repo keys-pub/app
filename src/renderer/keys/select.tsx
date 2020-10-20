@@ -5,7 +5,8 @@ import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} fro
 import {KeyLabel} from '../key/label'
 
 import {keys} from '../rpc/client'
-import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '@keys-pub/tsclient/lib/keys.d'
+import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {openSnack, openSnackError, closeSnack} from '../snack'
 
 export type Props = {
   value?: Key
@@ -33,13 +34,16 @@ export default (props: Props) => {
   }
 
   const listKeys = async () => {
-    const req: KeysRequest = {
-      query: '',
-      types: [KeyType.EDX25519],
+    try {
+      const req: KeysRequest = {
+        query: '',
+        types: [KeyType.EDX25519],
+      }
+      const resp = await keys.Keys(req)
+      setOptions(resp.keys || [])
+    } catch (err) {
+      openSnackError(err)
     }
-    const resp = await keys.Keys(req)
-    setOptions(resp.keys || [])
-    // TODO: Catch error
   }
 
   React.useEffect(() => {

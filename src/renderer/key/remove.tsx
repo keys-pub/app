@@ -7,7 +7,7 @@ import {KeyLabel} from './label'
 import {openSnack, openSnackError} from '../snack'
 
 import {keys} from '../rpc/client'
-import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open?: boolean

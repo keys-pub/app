@@ -5,7 +5,7 @@ import {Box, Button, Typography} from '@material-ui/core'
 import Dialog from '../../components/dialog'
 
 import {keys} from '../../rpc/client'
-import {AuthProvision} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthProvision} from '@keys-pub/tsclient/lib/keys'
 import {authTypeDescription} from '../helper'
 import {dateString} from '../../helper'
 import {mono, breakWords} from '../../theme'

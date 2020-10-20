@@ -18,10 +18,10 @@ import {
   RelyingParty,
   RelyingPartiesRequest,
   RelyingPartiesResponse,
-} from '@keys-pub/tsclient/lib/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
-import {SortDirection} from '@keys-pub/tsclient/lib/keys.d'
+import {SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import {directionString, flipDirection} from '../helper'
 

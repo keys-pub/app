@@ -1,5 +1,5 @@
 import {keys} from '../rpc/client'
-import {Key} from '@keys-pub/tsclient/lib/keys.d'
+import {Key} from '@keys-pub/tsclient/lib/keys'
 import {Store} from 'pullstate'
 
 type State = {

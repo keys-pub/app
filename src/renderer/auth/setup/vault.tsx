@@ -16,7 +16,7 @@ import Logo from '../../logo'
 import {mono} from '../../theme'
 
 import {keys} from '../../rpc/client'
-import {AuthVaultRequest, AuthVaultResponse} from '@keys-pub/tsclient/lib/keys.d'
+import {AuthVaultRequest, AuthVaultResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   back: () => void
