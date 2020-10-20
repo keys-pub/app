@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
-import {configGet, keys} from '../rpc/keys'
-import {Key} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   fileIn: string
@@ -29,10 +29,10 @@ const initialState: State = {
 export const store = new Store(initialState)
 
 export const loadStore = async () => {
-  const configResp = await configGet({name: 'encrypt'})
+  const configResp = await keys.ConfigGet({name: 'encrypt'})
   const config = configResp?.config?.encrypt
 
-  const keysResp = await keys({})
+  const keysResp = await keys.Keys({})
   const recipients = (config?.recipients || [])
     .map((kid: string) => keysResp.keys?.find((k: Key) => k.id == kid))
     .filter((k?: Key) => k) as Key[]

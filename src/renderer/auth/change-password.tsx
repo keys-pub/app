@@ -4,7 +4,7 @@ import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography
 import {Link} from '../components'
 import Dialog from '../components/dialog'
 
-import {authPasswordChange} from '../rpc/keys'
+import {keys} from '../rpc/client'
 import {openSnack, openSnackError, closeSnack} from '../snack'
 
 type Props = {
@@ -54,7 +54,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      await authPasswordChange({
+      await keys.AuthPasswordChange({
         old: oldPassword,
         new: password,
       })

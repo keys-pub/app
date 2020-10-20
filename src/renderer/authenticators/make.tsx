@@ -21,8 +21,8 @@ import Alert from '@material-ui/lab/Alert'
 import {DialogTitle} from '../components'
 import {deepCopy, fromHex} from '../helper'
 
-import {makeCredential, credentials} from '../rpc/fido2'
-import {Device, MakeCredentialRequest, MakeCredentialResponse} from '../rpc/fido2.d'
+import {fido2} from '../rpc/client'
+import {Device, MakeCredentialRequest, MakeCredentialResponse} from '@keys-pub/tsclient/lib/fido2'
 
 type Props = {
   device: Device
@@ -50,35 +50,36 @@ export default class MakeCredentialView extends React.Component<Props, State> {
     loading: false,
   }
 
-  save = () => {
+  save = async () => {
     if (!this.state.credential) return
 
     this.setState({loading: true, error: undefined})
-    const req: MakeCredentialRequest = {
-      device: this.props.device.path,
-      clientDataHash: fromHex(this.state.credential.clientDataHash),
-      rp: {
-        id: this.state.credential.rpID,
-        name: this.state.credential.rpName,
-      },
-      user: {
-        id: fromHex(this.state.credential.userID),
-        name: this.state.credential.userName,
-        displayName: '',
-        icon: '',
-      },
-      type: this.state.credential.type,
-      pin: '',
-      extensions: [],
-      rk: '',
-      uv: '',
+    try {
+      const req: MakeCredentialRequest = {
+        device: this.props.device.path,
+        clientDataHash: fromHex(this.state.credential.clientDataHash),
+        rp: {
+          id: this.state.credential.rpID,
+          name: this.state.credential.rpName,
+        },
+        user: {
+          id: fromHex(this.state.credential.userID),
+          name: this.state.credential.userName,
+          displayName: '',
+          icon: '',
+        },
+        type: this.state.credential.type,
+        pin: '',
+        extensions: [],
+        rk: '',
+        uv: '',
+      }
+      const resp = await fido2.MakeCredential(req)
+      this.setState({loading: false})
+      this.props.onChange()
+    } catch (err) {
+      this.setState({loading: false, error: err})
     }
-    makeCredential(req)
-      .then((resp: MakeCredentialResponse) => {
-        this.setState({loading: false})
-        this.props.onChange()
-      })
-      .catch((err: Error) => this.setState({loading: false, error: err}))
   }
 
   onChange = (e: React.ChangeEvent<{value: unknown}>, fieldName: string) => {

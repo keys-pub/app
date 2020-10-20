@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
-import {secrets as listSecrets, runtimeStatus, configGet} from '../rpc/keys'
-import {Secret, SortDirection, SecretsRequest} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Secret, SortDirection, SecretsRequest} from '@keys-pub/tsclient/lib/keys'
 
 export type State = {
   editing?: Secret
@@ -31,7 +31,7 @@ const list = async (query: string, sortField?: string, sortDirection?: SortDirec
     sortField: sortField,
     sortDirection: sortDirection,
   }
-  const resp = await listSecrets(req)
+  const resp = await keys.Secrets(req)
   const secrets = resp.secrets || []
   store.update((s) => {
     if (!s.selected && secrets.length > 0) {
@@ -44,7 +44,7 @@ const list = async (query: string, sortField?: string, sortDirection?: SortDirec
 }
 
 export const loadStore = async () => {
-  const resp = await runtimeStatus({})
+  const resp = await keys.RuntimeStatus({})
   store.update((s) => {
     s.syncEnabled = !!resp.sync
 

@@ -4,7 +4,7 @@ import * as React from 'react'
 import {Avatar, Box, Button, Divider, Typography} from '@material-ui/core'
 
 import {mono} from '../theme'
-import {Message, User} from '../rpc/keys.d'
+import {Message, User} from '@keys-pub/tsclient/lib/keys'
 import {MessageRow} from './types'
 
 type Props = {

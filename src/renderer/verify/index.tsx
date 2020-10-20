@@ -12,7 +12,8 @@ import {column2Color, contentTop} from '../theme'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import SignerView from '../verify/signer'
 
-import {verify, verifyFile, key, VerifyFileEvent} from '../rpc/keys'
+import {keys} from '../rpc/client'
+import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
   EncryptMode,
@@ -22,7 +23,7 @@ import {
   VerifyFileOutput,
   VerifyRequest,
   VerifyResponse,
-} from '../rpc/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type State = {
   input: string
@@ -89,7 +90,7 @@ const openFolder = (value: string) => {
 
 const reloadSender = async (kid: string) => {
   try {
-    const resp = await key({
+    const resp = await keys.Key({
       key: kid,
       search: false,
       update: false,
@@ -115,7 +116,7 @@ const verifyInput = async (input: string) => {
     const req: VerifyRequest = {
       data: data,
     }
-    const resp = await verify(req)
+    const resp = await keys.Verify(req)
     const verifyed = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.signer = resp.signer
@@ -141,35 +142,32 @@ const verifyFileIn = (fileIn: string, dir: string) => {
   store.update((s) => {
     s.loading = true
   })
-  const send = verifyFile((event: VerifyFileEvent) => {
-    const {err, res, done} = event
-    if (err) {
-      if (err.code == grpc.status.CANCELLED) {
-        store.update((s) => {
-          s.loading = false
-        })
-      } else {
-        store.update((s) => {
-          openSnackError(err)
-          s.loading = false
-        })
-      }
-      return
-    }
-    if (res) {
-      store.update((s) => {
-        s.fileOut = res?.out || ''
-        s.signer = res?.signer
-        s.output = ''
-      })
-    }
-    if (done) {
+  const stream = keys.VerifyFile()
+  stream.on('data', (resp: VerifyFileOutput) => {
+    store.update((s) => {
+      s.output = ''
+      s.fileOut = resp?.out || ''
+      s.signer = resp?.signer
+    })
+  })
+  stream.on('error', (err: RPCError) => {
+    if (err.code == grpc.status.CANCELLED) {
       store.update((s) => {
         s.loading = false
       })
+    } else {
+      store.update((s) => {
+        s.loading = false
+      })
+      openSnackError(err)
     }
   })
-  send(req, false)
+  stream.on('end', () => {
+    store.update((s) => {
+      s.loading = false
+    })
+  })
+  stream.write(req)
 }
 
 const verifyFileTo = async (fileIn: string) => {

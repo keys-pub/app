@@ -5,16 +5,17 @@ import {loadStore as secretsLoadStore} from './secrets/store'
 import {loadStore as encryptLoadStore} from './encrypt/store'
 import {loadStore as signLoadStore} from './sign/store'
 
-import {ipcRenderer} from 'electron'
-import {configGet, runtimeStatus} from './rpc/keys'
-import {Key} from './rpc/keys.d'
+import {keys, auth} from './rpc/client'
 import {SnackProps} from './components/snack'
+import * as grpc from '@grpc/grpc-js'
+import {ipcRenderer} from 'electron'
+import {openSnackError} from './snack'
 
 export interface Error {
+  name: string
   message: string
   details?: string
   code?: number
-  name?: string
 }
 
 export type State = {
@@ -47,14 +48,14 @@ export const store = new Store<State>({
 })
 
 export const loadStatus = async () => {
-  const status = await runtimeStatus({})
+  const status = await keys.RuntimeStatus({})
   store.update((s) => {
     s.fido2Enabled = !!status.fido2
   })
 }
 
 export const loadStore = async () => {
-  const configResp = await configGet({name: 'app'})
+  const configResp = await keys.ConfigGet({name: 'app'})
   const config = configResp?.config?.app
   // console.log('Config:', config)
   const location = config?.location || '/keys'
@@ -72,14 +73,39 @@ export const loadStore = async () => {
   signLoadStore()
 }
 
-export const unlocked = async (authToken?: string) => {
+export const unlock = async (authToken?: string) => {
   if (!authToken) {
     throw new Error('no auth token')
   }
-  ipcRenderer.send('authToken', {authToken})
+  auth.token = authToken
   await loadStore()
   store.update((s) => {
     s.unlocked = true
+  })
+}
+
+export const lock = () => {
+  auth.token = ''
+  store.update((s) => {
+    s.unlocked = false
+  })
+}
+
+export const errored = (err: Error) => {
+  // TODO: Special view for grpc unavailable
+  console.error(err)
+
+  switch (err.code) {
+    case grpc.status.PERMISSION_DENIED:
+    case grpc.status.UNAUTHENTICATED:
+      console.log('Locking...')
+      lock()
+      openSnackError(err as Error)
+      return
+  }
+
+  store.update((s) => {
+    s.error = err
   })
 }
 

@@ -6,12 +6,11 @@ import Header from '../../header'
 import Logo from '../../logo'
 import {Link} from '../../components'
 
-import {authUnlock} from '../../rpc/keys'
-import {AuthType} from '../../rpc/keys.d'
+import {keys} from '../../rpc/client'
+import {AuthType} from '@keys-pub/tsclient/lib/keys'
 import SelectDevice from '../../authenticators/select'
-import {Device} from '../../rpc/fido2.d'
 
-import {store, unlocked} from '../../store'
+import {store, unlock} from '../../store'
 import {openSnack, openSnackError, closeSnack} from '../../snack'
 import ActionsView, {Action} from './actions'
 
@@ -36,13 +35,13 @@ export default (props: Props) => {
 
     try {
       openSnack({message: 'You may need to interact with the device', alert: 'info'})
-      const resp = await authUnlock({
+      const resp = await keys.AuthUnlock({
         secret: input,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         client: 'app',
       })
       closeSnack()
-      await unlocked(resp.authToken)
+      await unlock(resp.authToken)
     } catch (err) {
       openSnack({message: err.message, alert: 'error', duration: 6000})
       setLoading(false)

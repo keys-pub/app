@@ -33,8 +33,8 @@ import KeyView from '../key/view'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys as listKeys, runtimeStatus, vaultUpdate} from '../rpc/keys'
-import {Key, KeyType, SortDirection, KeysRequest} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key, KeyType, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys'
 
 import {store, loadStore} from './store'
 import {openSnack, openSnackError} from '../snack'
@@ -47,9 +47,9 @@ export default (_: {}) => {
     importOpen,
     input,
     intro,
-    keys,
     removeOpen,
     removeKey,
+    results,
     searchOpen,
     selected,
     sortField,
@@ -140,7 +140,7 @@ export default (_: {}) => {
   const closeImport = (imported: string) => {
     store.update((s) => {
       s.importOpen = false
-      s.selected = keys.find((k: Key) => imported == k.id)
+      s.selected = results.find((k: Key) => imported == k.id)
     })
     if (imported) {
       reload()
@@ -172,7 +172,7 @@ export default (_: {}) => {
       s.syncing = true
     })
     try {
-      const resp = await vaultUpdate({})
+      const resp = await keys.VaultUpdate({})
       reload()
       store.update((s) => {
         s.syncing = false
@@ -190,7 +190,7 @@ export default (_: {}) => {
       event.preventDefault()
       const kid = event.currentTarget?.id
       if (!kid) return
-      const key = keys.find((k: Key) => kid == k.id)
+      const key = results.find((k: Key) => kid == k.id)
 
       store.update((s) => {
         s.selected = key
@@ -293,7 +293,7 @@ export default (_: {}) => {
         >
           <Table size="small">
             <TableBody>
-              {keys.map((key, index) => {
+              {results.map((key: Key, index: number) => {
                 return (
                   <TableRow
                     hover

@@ -16,8 +16,8 @@ import {
 
 import {DialogTitle} from '../components'
 
-import {Device, SetPINRequest, SetPINResponse} from '../rpc/fido2.d'
-import {setPIN} from '../rpc/fido2'
+import {Device, SetPINRequest, SetPINResponse} from '@keys-pub/tsclient/lib/fido2'
+import {fido2} from '../rpc/client'
 
 type Props = {
   device: Device
@@ -58,19 +58,17 @@ export default class SetPinDialog extends React.Component<Props, State> {
     }
 
     this.setState({loading: true, error: undefined})
-    const req: SetPINRequest = {
-      device: this.props.device.path,
-      oldPin: this.state.oldPin,
-      pin: this.state.pin,
+    try {
+      const resp = await fido2.SetPIN({
+        device: this.props.device.path,
+        oldPin: this.state.oldPin,
+        pin: this.state.pin,
+      })
+      this.setState({loading: false})
+      this.close('PIN successfully set')
+    } catch (err) {
+      this.setState({loading: false, error: err})
     }
-    setPIN(req)
-      .then((resp: SetPINResponse) => {
-        this.setState({loading: false})
-        this.close('PIN successfully set')
-      })
-      .catch((err: Error) => {
-        this.setState({loading: false, error: err})
-      })
   }
 
   onPinChange = (e: React.SyntheticEvent<EventTarget>) => {

@@ -1,7 +1,6 @@
 import {app} from 'electron'
 import * as path from 'path'
 import * as os from 'os'
-import {getAppName} from './env'
 
 export const appResourcePath = (): string => {
   let resourcesPath = app.getAppPath()
@@ -17,36 +16,6 @@ export const platform = (): NodeJS.Platform => {
     platform = process.env.KEYS_PLATFORM as NodeJS.Platform
   }
   return platform
-}
-
-export const appSupportPath = (): string => {
-  const appName = getAppName()
-  let supportDir
-  switch (platform()) {
-    case 'linux':
-      if (process.env.XDG_DATA_HOME) {
-        supportDir = process.env.XDG_DATA_HOME
-      } else {
-        const homeDir = os.homedir()
-        supportDir = path.join(homeDir, '.local', 'share')
-      }
-      break
-    case 'win32':
-      if (process.env.LOCALAPPDATA) {
-        supportDir = process.env.LOCALAPPDATA
-      } else {
-        const homeDir = os.homedir()
-        supportDir = path.join(homeDir, 'AppData', 'Roaming')
-      }
-      break
-    default:
-      supportDir = app.getPath('appData')
-      break
-  }
-
-  const p = path.join(supportDir, appName)
-  console.log('App support path:', p)
-  return p
 }
 
 export const updateApplyPath = (): string => {

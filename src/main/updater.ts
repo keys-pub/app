@@ -1,7 +1,8 @@
 import {binPath} from './paths'
 import {execProc, ExecOut} from './run'
 import {app} from 'electron'
-import {updateApplyPath, appSupportPath} from './paths'
+import {updateApplyPath} from './paths'
+import {appDir} from '@keys-pub/tsclient'
 import * as fs from 'fs'
 import * as filepath from 'path'
 import {platform} from './paths'
@@ -87,7 +88,7 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
 
       if (platform() == 'win32') {
         // Copy updater to support path, so we can update over the installed version.
-        const updaterDest = filepath.join(appSupportPath(), 'updater.exe')
+        const updaterDest = filepath.join(appDir(), 'updater.exe')
         if (fs.existsSync(updaterDest)) {
           fs.unlinkSync(updaterDest)
         }

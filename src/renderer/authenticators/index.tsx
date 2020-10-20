@@ -22,8 +22,9 @@ import {RefreshIcon} from '../icons'
 
 import DeviceContentView from './content'
 
-import {devices as listDevices} from '../rpc/fido2'
-import {Device, DevicesRequest, DevicesResponse} from '../rpc/fido2.d'
+import * as grpc from '@grpc/grpc-js'
+import {fido2} from '../rpc/client'
+import {Device, DevicesRequest, DevicesResponse} from '@keys-pub/tsclient/lib/fido2'
 import {Error} from '../store'
 import {contentTop, column2Color} from '../theme'
 
@@ -61,7 +62,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   list = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await listDevices({})
+      const resp = await fido2.Devices({})
       let selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
       const devices = resp.devices || []
       if (devices.length > 0 && !selected) {
@@ -73,8 +74,11 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
         loading: false,
       })
     } catch (err) {
-      if (err.code == 12) {
-        err = {code: 12, message: "Sorry, this feature isn't currently available on your platform."}
+      if (err.code == grpc.status.UNIMPLEMENTED) {
+        err = {
+          code: grpc.status.UNIMPLEMENTED,
+          message: "Sorry, this feature isn't currently available on your platform.",
+        }
       }
       this.setState({devices: [], loading: false, error: err})
     }

@@ -15,8 +15,8 @@ import Header from '../../header'
 import Logo from '../../logo'
 import {mono} from '../../theme'
 
-import {authVault} from '../../rpc/keys'
-import {AuthVaultRequest, AuthVaultResponse} from '../../rpc/keys.d'
+import {keys} from '../../rpc/client'
+import {AuthVaultRequest, AuthVaultResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   back: () => void
@@ -104,17 +104,15 @@ export default class AuthVaultView extends React.Component<Props, State> {
   }
 
   authVault = async () => {
-    const req: AuthVaultRequest = {
-      phrase: this.state.phrase,
-    }
     this.setState({loading: true, error: undefined})
-    authVault(req)
-      .then((resp: AuthVaultResponse) => {
-        this.props.setup()
-        this.setState({loading: false})
+    try {
+      const resp = await keys.AuthVault({
+        phrase: this.state.phrase,
       })
-      .catch((err: Error) => {
-        this.setState({error: err, loading: false})
-      })
+      this.props.setup()
+      this.setState({loading: false})
+    } catch (err) {
+      this.setState({error: err, loading: false})
+    }
   }
 }

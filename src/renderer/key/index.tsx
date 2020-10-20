@@ -7,8 +7,8 @@ import {breakWords} from '../theme'
 import {DialogTitle} from '../components'
 import KeyView from './view'
 
-import {key, pull} from '../rpc/keys'
-import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key, KeyRequest, KeyResponse, PullRequest, PullResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open: boolean
@@ -49,33 +49,31 @@ export default class KeyDialog extends React.Component<Props, State> {
     }
   }
 
-  loadKey = (update: boolean, reload: boolean) => {
+  loadKey = async (update: boolean, reload: boolean) => {
     if (!this.props.kid) {
       this.setState({key: undefined})
       return
     }
 
     this.setState({loading: true, error: undefined})
-    const req: KeyRequest = {
-      key: this.props.kid,
-      search: !!this.props.search,
-      update: update,
+    try {
+      const resp = await keys.Key({
+        key: this.props.kid,
+        search: !!this.props.search,
+        update: update,
+      })
+      this.setState({loading: false})
+      if (resp.key) {
+        this.setState({key: resp.key, loading: false})
+      } else {
+        this.setState({error: new Error('Key not found'), loading: false})
+      }
+      if (reload && this.props.reload) {
+        this.props.reload()
+      }
+    } catch (err) {
+      this.setState({error: err, loading: false})
     }
-    key(req)
-      .then((resp: KeyResponse) => {
-        this.setState({loading: false})
-        if (resp.key) {
-          this.setState({key: resp.key, loading: false})
-        } else {
-          this.setState({error: new Error('Key not found'), loading: false})
-        }
-        if (reload && this.props.reload) {
-          this.props.reload()
-        }
-      })
-      .catch((err: Error) => {
-        this.setState({error: err, loading: false})
-      })
   }
 
   refresh = (update: boolean) => {
@@ -91,7 +89,7 @@ export default class KeyDialog extends React.Component<Props, State> {
       key: this.props.kid,
     }
     try {
-      const resp = await pull(req)
+      const resp = await keys.Pull(req)
       this.setState({loading: false})
       this.close('Imported key')
       if (this.props.reload) {

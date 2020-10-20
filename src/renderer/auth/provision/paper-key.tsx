@@ -4,8 +4,8 @@ import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography
 import {Link} from '../../components'
 import Dialog from '../../components/dialog'
 
-import {authProvision, rand} from '../../rpc/keys'
-import {AuthType, Encoding} from '../../rpc/keys.d'
+import {keys} from '../../rpc/client'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
 import {openSnackError, closeSnack} from '../../snack'
 
 type Props = {
@@ -20,7 +20,7 @@ export default (props: Props) => {
   React.useEffect(() => {
     const init = async () => {
       try {
-        const resp = await rand({numBytes: 32, encoding: Encoding.BIP39})
+        const resp = await keys.Rand({numBytes: 32, encoding: Encoding.BIP39})
         setPaperKey(resp.data || '')
       } catch (err) {
         openSnackError(err)
@@ -33,7 +33,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const resp = await authProvision({
+      const resp = await keys.AuthProvision({
         secret: paperKey,
         type: AuthType.PAPER_KEY_AUTH,
       })

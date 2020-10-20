@@ -13,7 +13,7 @@ import {
 
 import {pluralize} from '../helper'
 
-import {credentials, deviceInfo, relyingParties, retryCount} from '../rpc/fido2'
+import {fido2} from '../rpc/client'
 import {
   Device,
   DeviceInfo,
@@ -28,7 +28,7 @@ import {
   CredentialsRequest,
   CredentialsResponse,
   Option,
-} from '../rpc/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
 import CredentialsList from './credentials-list'
@@ -82,83 +82,77 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
     this.setState({pinInput: '', pin: '', error: undefined, credentials: [], step: ''})
   }
 
-  info = () => {
+  info = async () => {
     if (!this.props.device) {
       return
     }
 
     this.setState({loading: true, error: undefined})
-    const req: DeviceInfoRequest = {
-      device: this.props.device.path,
-    }
-    deviceInfo(req)
-      .then((resp: DeviceInfoResponse) => {
-        let clientPin = ''
-        const optClientPin = resp.info?.options?.find((opt: Option) => opt.name == 'clientPin')
-        if (optClientPin) {
-          clientPin = optClientPin.value || ''
-        }
-        let credMgmt = ''
-        const optCredMgmt = resp.info?.options?.find((opt: Option) => opt.name == 'credMgmt')
-        if (optCredMgmt) {
-          credMgmt = optCredMgmt.value || ''
-        }
+    try {
+      const resp = await fido2.DeviceInfo({
+        device: this.props.device.path,
+      })
+      let clientPin = ''
+      const optClientPin = resp.info?.options?.find((opt: Option) => opt.name == 'clientPin')
+      if (optClientPin) {
+        clientPin = optClientPin.value || ''
+      }
+      let credMgmt = ''
+      const optCredMgmt = resp.info?.options?.find((opt: Option) => opt.name == 'credMgmt')
+      if (optCredMgmt) {
+        credMgmt = optCredMgmt.value || ''
+      }
 
-        this.setState({
-          loading: false,
-          clientPin,
-          credMgmt,
-          step: 'pin',
-        })
+      this.setState({
+        loading: false,
+        clientPin,
+        credMgmt,
+        step: 'pin',
       })
-      .catch((err: Error) => {
-        this.setState({error: err, step: '', loading: false})
-      })
+    } catch (err) {
+      this.setState({error: err, step: '', loading: false})
+    }
   }
 
-  credentials = () => {
+  credentials = async () => {
     if (!this.props.device) {
       return
     }
 
     this.setState({loading: true})
-    const req: CredentialsRequest = {
-      device: this.props.device.path,
-      pin: this.state.pin,
-      rpId: '',
+    try {
+      const resp = await fido2.Credentials({
+        device: this.props.device.path,
+        pin: this.state.pin,
+        rpId: '',
+      })
+      this.setState({
+        step: 'credentials',
+        credentials: resp.credentials || [],
+        loading: false,
+      })
+    } catch (err) {
+      this.setState({error: err, pin: '', step: 'pin', retryCount: -1, loading: false})
+      if (err.code == 3) {
+        // Invalid pin
+        this.pinRetryCount()
+      }
+      return
     }
-    credentials(req)
-      .then((resp: CredentialsResponse) => {
-        this.setState({
-          step: 'credentials',
-          credentials: resp.credentials || [],
-          loading: false,
-        })
-      })
-      .catch((err: Error) => {
-        this.setState({error: err, pin: '', step: 'pin', retryCount: -1, loading: false})
-        if (err.code == 3) {
-          // Invalid pin
-          this.pinRetryCount()
-        }
-        return
-      })
   }
 
-  pinRetryCount = () => {
-    const req: RetryCountRequest = {
-      device: this.props.device.path,
+  pinRetryCount = async () => {
+    try {
+      const resp = await fido2.RetryCount({
+        device: this.props.device.path,
+      })
+      this.setState({
+        retryCount: resp.count || 0,
+        loading: false,
+      })
+    } catch (err) {
+      this.setState({error: err, pin: '', step: 'pin', loading: false})
     }
-    retryCount(req)
-      .then((resp: RetryCountResponse) => {
-        this.setState({
-          retryCount: resp.count || 0,
-          loading: false,
-        })
-      })
-      .catch((err: Error) => {
-        this.setState({error: err, pin: '', step: 'pin', loading: false})
-      })
   }
 
   //   rps = () => {

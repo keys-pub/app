@@ -8,8 +8,7 @@ import AuthUnlockFIDO2View from './fido2'
 import AuthForgotView from './forgot'
 
 import {store, unlocked, loadStatus} from '../../store'
-import {authUnlock} from '../../rpc/keys'
-import {AuthType} from '../../rpc/keys.d'
+import {AuthType} from '@keys-pub/tsclient/lib/keys'
 import {Action} from './actions'
 
 type Props = {}

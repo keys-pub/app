@@ -29,8 +29,7 @@ import {
 import Tooltip from './components/tooltip'
 
 import {setLocation, store} from './store'
-import {authLock} from './rpc/keys'
-import {ipcRenderer} from 'electron'
+import {keys, auth} from './rpc/client'
 
 type NavRoute = {
   label: string
@@ -45,11 +44,11 @@ const backgroundColorSelected = '#1a1a1a'
 // TODO: Nav hover
 
 const lock = async () => {
-  ipcRenderer.send('authToken', {authToken: ''})
+  auth.token = ''
   store.update((s) => {
     s.unlocked = false
   })
-  await authLock({})
+  await keys.AuthLock({})
 }
 
 export default (props: {}) => {

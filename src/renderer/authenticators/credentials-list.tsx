@@ -13,11 +13,11 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Device, Credential} from '../rpc/fido2.d'
+import {Device, Credential} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 import {breakWords} from '../theme'
 
-import {SortDirection} from '../rpc/keys.d'
+import {SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import {directionString, flipDirection} from '../helper'
 

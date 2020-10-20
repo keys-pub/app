@@ -9,7 +9,7 @@ import SetPinDialog from './setpin'
 import ResetDialog from './reset'
 import {breakWords, mono} from '../theme'
 
-import {deviceInfo, deviceType, relyingParties} from '../rpc/fido2'
+import {fido2} from '../rpc/client'
 import {
   Device,
   DeviceType,
@@ -20,7 +20,7 @@ import {
   RelyingParty,
   RelyingPartiesRequest,
   RelyingPartiesResponse,
-} from '../rpc/fido2.d'
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
 import RelyingParties from './rps'
@@ -69,10 +69,10 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 
     this.setState({info: undefined, loading: true, error: undefined, unsupported: false})
     try {
-      const devt = await deviceType({
+      const devt = await fido2.DeviceType({
         device: this.props.device.path,
       })
-      if (devt.type != DeviceType.FIDO2) {
+      if (devt.type != DeviceType.FIDO2_DEVICE) {
         this.setState({
           loading: false,
           unsupported: true,
@@ -80,7 +80,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         return
       }
 
-      const dev = await deviceInfo({
+      const dev = await fido2.DeviceInfo({
         device: this.props.device.path,
       })
       let clientPin = ''

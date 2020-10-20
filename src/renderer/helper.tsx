@@ -1,7 +1,7 @@
 import emoji from 'node-emoji'
 
-import {rand} from './rpc/keys'
-import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from './rpc/keys.d'
+import {keys} from './rpc/client'
+import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import * as Long from 'long'
 
@@ -51,14 +51,9 @@ export const dateString = (ms?: any): string => {
   return d.toLocaleDateString('en-US', dateOptions)
 }
 
-export const generateID = (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    rand({numBytes: 32, encoding: Encoding.BASE62})
-      .then((resp: RandResponse) => {
-        resolve(resp.data)
-      })
-      .catch((err: Error) => reject(err))
-  })
+export const generateID = async (): Promise<string> => {
+  const resp = await keys.Rand({numBytes: 32, encoding: Encoding.BASE62})
+  return resp.data || ''
 }
 
 export const directionString = (d?: SortDirection): 'asc' | 'desc' => {

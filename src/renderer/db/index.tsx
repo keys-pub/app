@@ -18,7 +18,7 @@ import {
 import Header from '../header'
 
 import {dateString} from '../helper'
-import {collections, documents} from '../rpc/keys'
+import {keys} from '../rpc/client'
 import {
   Collection,
   Document,
@@ -26,7 +26,7 @@ import {
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-} from '../rpc/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   db: string
@@ -43,20 +43,20 @@ export default class DBView extends React.Component<Props, State> {
     documents: [],
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
     const req: CollectionsRequest = {
       db: this.props.db,
       parent: '',
     }
-    collections(req).then((resp: CollectionsResponse) => {
-      this.setState({
-        collections: resp.collections || [],
-        documents: [],
-      })
+    const resp = await keys.Collections(req)
+
+    this.setState({
+      collections: resp.collections || [],
+      documents: [],
     })
   }
 
-  selectCollection = (col: Collection) => {
+  selectCollection = async (col: Collection) => {
     this.setState({
       documents: [],
     })
@@ -64,10 +64,9 @@ export default class DBView extends React.Component<Props, State> {
       prefix: col.path + '/',
       db: this.props.db,
     }
-    documents(req).then((resp: DocumentsResponse) => {
-      this.setState({
-        documents: resp.documents || [],
-      })
+    const resp = await keys.Documents(req)
+    this.setState({
+      documents: resp.documents || [],
     })
   }
 

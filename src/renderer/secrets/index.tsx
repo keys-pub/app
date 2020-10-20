@@ -41,9 +41,9 @@ import {
   RuntimeStatusResponse,
   VaultUpdateRequest,
   VaultUpdateResponse,
-} from '../rpc/keys.d'
+} from '@keys-pub/tsclient/lib/keys'
 
-import {secrets as listSecrets, runtimeStatus, vaultUpdate} from '../rpc/keys'
+import {keys} from '../rpc/client'
 
 type Props = {}
 
@@ -175,8 +175,7 @@ export default (props: Props) => {
       s.syncing = true
     })
     try {
-      const req: VaultUpdateRequest = {}
-      const resp = await vaultUpdate(req)
+      const resp = await keys.VaultUpdate({})
       store.update((s) => {
         s.syncing = false
       })

@@ -23,8 +23,9 @@ import {deepCopy} from '../helper'
 import {mono} from '../theme'
 
 import PasswordOptions from './pw'
+import {openSnackError} from '../snack'
 
-import {randPassword} from '../rpc/keys'
+import {keys} from '../rpc/client'
 import {
   Secret,
   SecretSaveRequest,
@@ -33,8 +34,7 @@ import {
   RandPasswordRequest,
   RandPasswordResponse,
   Encoding,
-} from '../rpc/keys.d'
-import {secretSave} from '../rpc/keys'
+} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   secret: Secret
@@ -74,7 +74,7 @@ export default class SecretEditView extends React.Component<Props, State> {
       const req: SecretSaveRequest = {
         secret: this.state.secret,
       }
-      const resp = await secretSave(req)
+      const resp = await keys.SecretSave(req)
       this.setState({loading: false, secret: resp.secret!})
       this.props.onChange(resp.secret!)
     } catch (err) {
@@ -90,15 +90,17 @@ export default class SecretEditView extends React.Component<Props, State> {
     this.setState(state)
   }
 
-  generatePassword = () => {
+  generatePassword = async () => {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
-    randPassword({length: 14}).then((resp: RandPasswordResponse) => {
+    try {
+      const resp = await keys.RandPassword({length: 16})
       const secret = deepCopy(this.state.secret)
       secret.password = resp.password
       this.setState({secret})
-    })
-    // TODO: Catch error
+    } catch (err) {
+      openSnackError(err)
+    }
   }
 
   renderEditActions() {

@@ -13,11 +13,15 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {deviceInfo, relyingParties} from '../rpc/fido2'
-import {Device, RelyingParty, RelyingPartiesRequest, RelyingPartiesResponse} from '../rpc/fido2.d'
+import {
+  Device,
+  RelyingParty,
+  RelyingPartiesRequest,
+  RelyingPartiesResponse,
+} from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
-import {SortDirection} from '../rpc/keys.d'
+import {SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import {directionString, flipDirection} from '../helper'
 

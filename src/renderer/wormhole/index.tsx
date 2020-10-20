@@ -26,8 +26,16 @@ import {
   errorStatus,
 } from './status'
 
-import {wormhole, rand, WormholeEvent} from '../rpc/keys'
-import {KeyType, ContentType, MessageType, WormholeStatus, WormholeInput, WormholeOutput} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {
+  KeyType,
+  ContentType,
+  MessageType,
+  WormholeStatus,
+  WormholeInput,
+  WormholeOutput,
+} from '@keys-pub/tsclient/lib/keys'
+import {ClientDuplexStream, RPCError} from '@keys-pub/tsclient'
 
 import {WormholeMessage, WormholeMessageType} from './types'
 
@@ -65,7 +73,7 @@ class WormholeView extends React.Component<Props, State> {
     rows: this.props.messages,
   }
   private listRef: React.RefObject<HTMLDivElement> = React.createRef()
-  private wormhole?: (req?: WormholeInput, end?: boolean) => void
+  private wormhole?: ClientDuplexStream<WormholeInput, WormholeOutput>
 
   componentDidMount() {
     if (this.state.rows.length == 0) {
@@ -95,45 +103,44 @@ class WormholeView extends React.Component<Props, State> {
     this.addRow(connectingStatus(this.props.recipient))
 
     this.setState({loading: true, connected: false})
-    this.wormhole = wormhole((event: WormholeEvent) => {
-      const {err, res, done} = event
-      if (err) {
+    this.wormhole = keys.Wormhole()
+    this.wormhole.on('error', (err: RPCError) => {
+      this.setState({loading: false, connected: false})
+      if (err.code == grpc.status.CANCELLED || err.message == 'closed') {
+        // Closed
+        this.addRow(disconnectedStatus())
+      } else {
+        this.addRow(errorStatus(err.message))
+      }
+      return
+    })
+    this.wormhole.on('data', (res: WormholeOutput) => {
+      if (this.state.loading && res.status == WormholeStatus.WORMHOLE_CONNECTED) {
+        this.setState({loading: false, connected: true})
+        this.addRow(connectedStatus())
+      }
+
+      if (res.status == WormholeStatus.WORMHOLE_CLOSED) {
         this.setState({loading: false, connected: false})
-        if (err.code == grpc.status.CANCELLED || err.message == 'closed') {
-          // Closed
-          this.addRow(disconnectedStatus())
-        } else {
-          this.addRow(errorStatus(err.message))
-        }
+        this.addRow(disconnectedStatus())
         return
       }
-      if (res) {
-        if (this.state.loading && res.status == WormholeStatus.WORMHOLE_CONNECTED) {
-          this.setState({loading: false, connected: true})
-          this.addRow(connectedStatus())
-        }
 
-        if (res.status == WormholeStatus.WORMHOLE_CLOSED) {
-          this.setState({loading: false, connected: false})
-          this.addRow(disconnectedStatus())
+      switch (res.message?.type) {
+        case MessageType.MESSAGE_ACK:
+          this.ack(res.message.id!)
           return
-        }
-
-        switch (res.message?.type) {
-          case MessageType.MESSAGE_ACK:
-            this.ack(res.message.id!)
-            return
-        }
-
-        if ((res.message?.content?.data?.length || 0) > 0) {
-          const text = new TextDecoder().decode(res.message!.content!.data!)
-          this.addRow({id: res.message!.id!, text: text, type: WormholeMessageType.Received})
-        }
       }
-      if (done) {
-        this.setState({loading: false})
+
+      if ((res.message?.content?.data?.length || 0) > 0) {
+        const text = new TextDecoder().decode(res.message!.content!.data!)
+        this.addRow({id: res.message!.id!, text: text, type: WormholeMessageType.Received})
       }
     })
+    this.wormhole.on('end', () => {
+      this.setState({loading: false})
+    })
+
     const req: WormholeInput = {
       sender: this.props.sender,
       recipient: this.props.recipient,
@@ -143,7 +150,7 @@ class WormholeView extends React.Component<Props, State> {
       type: ContentType.UTF8_CONTENT,
     }
     console.log('Wormhole request:', req)
-    this.wormhole(req, false)
+    this.wormhole.write(req)
   }
 
   send = (id: string, text: string) => {
@@ -163,14 +170,14 @@ class WormholeView extends React.Component<Props, State> {
       invite: '',
     }
     // TODO: Check if wormhole closed
-    this.wormhole(req, false)
+    this.wormhole.write(req)
   }
 
   close = () => {
     // TODO: Check if wormhole already closed
     if (this.wormhole) {
       this.addRowUnlessLast(disconnectedStatus())
-      this.wormhole(undefined, true)
+      this.wormhole.cancel()
       this.wormhole = undefined
     }
     this.setState({loading: false, connected: false})

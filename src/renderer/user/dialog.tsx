@@ -20,8 +20,8 @@ import Snack, {SnackProps} from '../components/snack'
 import {Error} from '../store'
 import ErrorView from './error'
 
-import {userAdd, userSign} from '../rpc/keys'
-import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {UserAddRequest, UserAddResponse, UserSignRequest, UserSignResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   kid: string
@@ -97,7 +97,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
     this.setState({loading: true, error: undefined, errorOpen: false, errorUsername: undefined})
     try {
-      const resp = await userSign({
+      const resp = await keys.UserSign({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,
@@ -135,7 +135,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     this.setState({loading: true, error: undefined})
 
     try {
-      const resp = await userAdd({
+      const resp = await keys.UserAdd({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,

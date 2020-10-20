@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, Typography} from '@material-ui/core'
 
-import {User} from '../rpc/keys.d'
+import {User} from '@keys-pub/tsclient/lib/keys'
 
 type ButtonProps = {
   user: User

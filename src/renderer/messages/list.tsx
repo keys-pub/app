@@ -4,9 +4,10 @@ import {Box, CircularProgress} from '@material-ui/core'
 
 import MessageView from './message'
 
-import {messages} from '../rpc/keys'
-import {Message, MessagesRequest, MessagesResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Message, MessagesRequest, MessagesResponse} from '@keys-pub/tsclient/lib/keys'
 import {MessageRow} from './types'
+import {openSnackError} from '../snack'
 
 type Props = {
   kid: string
@@ -113,7 +114,7 @@ export default class MessagesListView extends React.Component<Props, State> {
     this.loadRows(start)
   }
 
-  loadRows = (index: number) => {
+  loadRows = async (index: number) => {
     if (!this.props.kid) {
       console.error('No inbox address')
       return
@@ -123,8 +124,8 @@ export default class MessagesListView extends React.Component<Props, State> {
       recipient: '',
     }
     console.log('Load rows, RPC messages:', req)
-    // TODO: Catch error
-    messages(req).then((resp: MessagesResponse) => {
+    try {
+      const resp = await keys.Messages(req)
       if (this.listRef === null) {
         // console.error('No list ref')
         return
@@ -172,7 +173,9 @@ export default class MessagesListView extends React.Component<Props, State> {
       } else {
         this.listRef.scrollTop(sp.scrollTop)
       }
-    })
+    } catch (err) {
+      openSnackError(err)
+    }
   }
 
   onScroll = (e: any) => {

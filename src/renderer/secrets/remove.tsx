@@ -4,8 +4,9 @@ import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from '@ma
 
 import {DialogTitle} from '../components'
 
-import {secretRemove} from '../rpc/keys'
-import {Secret, SecretRemoveRequest, SecretRemoveResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Secret, SecretRemoveRequest, SecretRemoveResponse} from '@keys-pub/tsclient/lib/keys'
+import {openSnackError} from '../snack'
 
 type Props = {
   open: boolean
@@ -16,13 +17,15 @@ type Props = {
 type State = {}
 
 export default class SecretRemoveDialog extends React.Component<Props, State> {
-  remove = () => {
+  remove = async () => {
     if (!this.props.secret) return
-    const req: SecretRemoveRequest = {id: this.props.secret.id}
-    secretRemove(req).then((resp: SecretRemoveResponse) => {
+    try {
+      const req: SecretRemoveRequest = {id: this.props.secret.id}
+      const resp = await keys.SecretRemove(req)
       this.props.close(true)
-    })
-    // TODO: Catch error
+    } catch (err) {
+      openSnackError(err)
+    }
   }
 
   render() {

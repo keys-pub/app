@@ -4,8 +4,8 @@ import {Box, Button, DialogContentText, Divider, LinearProgress, Typography} fro
 import Dialog from '../components/dialog'
 import {openSnackError} from '../snack'
 
-import {statementRevoke} from '../rpc/keys'
-import {StatementRevokeRequest, StatementRevokeResponse} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {StatementRevokeRequest, StatementRevokeResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   kid: string
@@ -25,7 +25,7 @@ export default (props: Props) => {
       local: false,
     }
     try {
-      const resp = await statementRevoke(req)
+      const resp = await keys.StatementRevoke(req)
       props.close(true)
       setLoading(false)
     } catch (err) {

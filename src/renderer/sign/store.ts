@@ -1,5 +1,5 @@
-import {keys, configGet} from '../rpc/keys'
-import {Key} from '../rpc/keys.d'
+import {keys} from '../rpc/client'
+import {Key} from '@keys-pub/tsclient/lib/keys'
 import {Store} from 'pullstate'
 
 type State = {
@@ -20,10 +20,10 @@ export const store = new Store<State>({
 })
 
 export const loadStore = async () => {
-  const configResp = await configGet({name: 'sign'})
+  const configResp = await keys.ConfigGet({name: 'sign'})
   const config = configResp?.config?.sign
 
-  const keysResp = await keys({query: config?.signer})
+  const keysResp = await keys.Keys({query: config?.signer})
   const signer = keysResp.keys?.find((k: Key) => k.id == config?.signer)
 
   store.update((s) => {
