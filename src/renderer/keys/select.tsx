@@ -5,7 +5,8 @@ import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} fro
 import {KeyLabel} from '../key/label'
 
 import {keys} from '../rpc/client'
-import {KeysRequest, KeysResponse, Key, KeyType, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
+import {KeysRequest, KeysResponse, Key, SortDirection} from '@keys-pub/tsclient/lib/keys'
 import {openSnack, openSnackError, closeSnack} from '../snack'
 
 export type Props = {
@@ -37,7 +38,7 @@ export default (props: Props) => {
     try {
       const req: KeysRequest = {
         query: '',
-        types: [KeyType.EDX25519],
+        types: [EDX25519],
       }
       const resp = await keys.Keys(req)
       setOptions(resp.keys || [])

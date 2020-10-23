@@ -27,8 +27,8 @@ import {
 } from './status'
 
 import {keys} from '../rpc/client'
+import {EDX25519, EDX25519Public} from '../rpc/keys'
 import {
-  KeyType,
   ContentType,
   MessageType,
   WormholeStatus,
@@ -346,7 +346,7 @@ class WormholeView extends React.Component<Props, State> {
                 identity={this.props.recipient}
                 disabled={this.state.loading || this.state.connected}
                 onChange={this.props.setRecipient}
-                keyTypes={[KeyType.EDX25519_PUBLIC, KeyType.EDX25519]}
+                keyTypes={[EDX25519, EDX25519Public]}
                 style={{width: '100%'}}
                 addOptions={true}
               />
@@ -366,7 +366,7 @@ class WormholeView extends React.Component<Props, State> {
                 identity={this.props.sender}
                 disabled={this.state.loading || this.state.connected}
                 onChange={this.props.setSender}
-                keyTypes={[KeyType.EDX25519]}
+                keyTypes={[EDX25519]}
                 style={{width: '100%'}}
               />
             </Box>

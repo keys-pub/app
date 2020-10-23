@@ -8,7 +8,8 @@ import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
-import {Key, KeyType, User, UserStatus} from '@keys-pub/tsclient/lib/keys'
+import {Key, UserStatus} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
 import ServiceSelect from '../user/service'
 import {Link} from '../components'
 import UserLabel from '../user/label'
@@ -31,8 +32,8 @@ type UserRowProps = {
 const UserRow = (props: UserRowProps) => {
   const key = props.k
   const user = key.user
-  const signable = key.type == KeyType.EDX25519
-  const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+  const signable = key.type == EDX25519
+  const isPrivate = key.type == X25519 || key.type == EDX25519
 
   const [service, setService] = React.useState('github')
 

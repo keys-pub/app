@@ -131,6 +131,6 @@ const ping = async () => {
 
 window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault()
-  console.log('Unhandled rejection', event)
+  // console.log('Unhandled rejection', event)
   errored(event.reason)
 })

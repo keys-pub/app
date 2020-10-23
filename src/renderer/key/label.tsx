@@ -2,11 +2,10 @@ import * as React from 'react'
 import {CSSProperties} from 'react'
 import {Box, Typography} from '@material-ui/core'
 
-import {Link} from '../components'
-
 import UserLabel from '../user/label'
 
-import {Key, KeyType, User} from '@keys-pub/tsclient/lib/keys'
+import {Key, User} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
 
 type IDLabelProps = {
   k: Key
@@ -15,7 +14,7 @@ type IDLabelProps = {
 }
 
 export const isKeyPrivate = (key: Key): boolean => {
-  return key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+  return key.type == X25519 || key.type == EDX25519
 }
 
 export const IDLabel = (props: IDLabelProps) => {

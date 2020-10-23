@@ -34,7 +34,8 @@ import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
 import {keys} from '../rpc/client'
-import {Key, KeyType, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
+import {Key, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys'
 
 import {store, loadStore} from './store'
 import {openSnack, openSnackError} from '../snack'
@@ -197,7 +198,7 @@ export default (_: {}) => {
       })
 
       if (!key) return
-      const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+      const isPrivate = key.type == X25519 || key.type == EDX25519
 
       let labels = []
       if (isPrivate) {

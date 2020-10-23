@@ -1,19 +1,20 @@
 import emoji from 'node-emoji'
 
 import {keys} from './rpc/client'
-import {Key, KeyType, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from './rpc/keys'
+import {Key, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import * as Long from 'long'
 
 export const keyTypeLabel = (key: Key): string => {
   switch (key.type) {
-    case KeyType.X25519:
+    case X25519:
       return 'Curve25519 Private Key'
-    case KeyType.X25519_PUBLIC:
+    case 'x25519-public':
       return 'Curve25519 Public Key'
-    case KeyType.EDX25519:
+    case EDX25519:
       return 'EdX25519 Private Key'
-    case KeyType.EDX25519_PUBLIC:
+    case 'ed25519-public':
       return 'EdX25519 Public Key'
     default:
       return ''

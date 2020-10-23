@@ -22,7 +22,8 @@ import ServiceSelect from '../user/service'
 import {shell} from 'electron'
 
 import {keys} from '../rpc/client'
-import {KeyGenerateRequest, KeyGenerateResponse, KeyType} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
+import {KeyGenerateRequest, KeyGenerateResponse} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open: boolean
@@ -43,7 +44,7 @@ type State = {
 
 export default class KeyCreateDialog extends React.Component<Props> {
   state = {
-    type: KeyType.EDX25519,
+    type: EDX25519,
     loading: false,
     service: 'github',
     kid: '',
@@ -51,7 +52,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
   }
 
   reset = () => {
-    this.setState({step: 'KEYGEN', type: KeyType.EDX25519, service: 'github', kid: ''})
+    this.setState({step: 'KEYGEN', type: EDX25519, service: 'github', kid: ''})
   }
 
   close = () => {
@@ -100,10 +101,10 @@ export default class KeyCreateDialog extends React.Component<Props> {
   renderKeygen(open: boolean) {
     let keyDesc = ''
     switch (this.state.type) {
-      case KeyType.EDX25519:
+      case EDX25519:
         keyDesc = `An EdX25519 key is the default key capable of signing (Ed25519) and encryption (X25519).`
         break
-      case KeyType.X25519:
+      case X25519:
         keyDesc = 'An X25519 key only provides public key authenticated encryption.'
         break
     }
@@ -126,12 +127,12 @@ export default class KeyCreateDialog extends React.Component<Props> {
           <Box>
             <FormControl variant="outlined">
               <Select value={this.state.type} onChange={this.setType}>
-                <MenuItem value={KeyType.EDX25519}>
+                <MenuItem value={EDX25519}>
                   <Typography style={{width: 400}}>
                     Signing/Encryption (EdX25519)<span style={{color: '#999999'}}>&nbsp;(recommended)</span>
                   </Typography>
                 </MenuItem>
-                <MenuItem value={KeyType.X25519}>
+                <MenuItem value={X25519}>
                   <Typography style={{width: 400}}>Encryption (X25519)</Typography>
                 </MenuItem>
               </Select>
@@ -163,7 +164,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
     let next = ''
     let closeLabel = ''
     switch (this.state.type) {
-      case KeyType.EDX25519:
+      case EDX25519:
         buttonId = 'keyCreatedNextButton'
         buttonLabel = 'Next'
         buttonAction = () => this.setState({step: 'USER'})
@@ -171,7 +172,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
           'In the next step we will ask if you want to publish your key or link it with your account on Github, Twitter, Reddit or a domain.'
         closeLabel = 'Later'
         break
-      case KeyType.X25519:
+      case X25519:
         closeLabel = 'Close'
     }
 
@@ -269,15 +270,4 @@ export default class KeyCreateDialog extends React.Component<Props> {
     }
     return null
   }
-}
-
-const keyTypeFromString = (s: string, dflt: KeyType): KeyType => {
-  if (!s) return dflt
-  switch (s) {
-    case KeyType.EDX25519:
-      return KeyType.EDX25519
-    case KeyType.X25519:
-      return KeyType.X25519
-  }
-  return KeyType.UNKNOWN_KEY_TYPE
 }

@@ -7,7 +7,8 @@ import {KeyLabel} from './label'
 import {openSnack, openSnackError} from '../snack'
 
 import {keys} from '../rpc/client'
-import {Key, KeyType, KeyRemoveRequest, KeyRemoveResponse} from '@keys-pub/tsclient/lib/keys'
+import {EDX25519, X25519} from '../rpc/keys'
+import {Key} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   open?: boolean
@@ -27,7 +28,7 @@ export default (props: Props) => {
 
   const key = props.k
   const open = props.open
-  const isPrivate = key.type == KeyType.X25519 || key.type == KeyType.EDX25519
+  const isPrivate = key.type == X25519 || key.type == EDX25519
 
   return (
     <Dialog

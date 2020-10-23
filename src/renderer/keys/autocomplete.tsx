@@ -13,7 +13,7 @@ import {KeyLabel} from '../key/label'
 import matchSorter from 'match-sorter'
 
 import {keys} from '../rpc/client'
-import {Key, SortDirection, KeyType, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/keys'
+import {Key, SortDirection, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/keys'
 import {serviceColor} from '../theme'
 
 import SearchDialog from '../search/dialog'
@@ -24,7 +24,7 @@ export type Props = {
   disabled?: boolean
   onChange?: (value?: string) => void
   placeholder?: string
-  keyTypes?: KeyType[]
+  keyTypes?: string[]
   style?: CSSProperties
   addOptions?: boolean
 }
