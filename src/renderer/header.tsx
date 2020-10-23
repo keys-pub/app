@@ -67,10 +67,18 @@ export default (props: Props) => {
           {showSystemButtons && (
             <Box display="flex" flexDirection="row" style={{zIndex: 10}}>
               <Box>
-                <IconButton size="small" onClick={minimize} style={{zIndex: 10}}>
+                <IconButton
+                  size="small"
+                  onClick={minimize}
+                  style={{zIndex: 10, marginRight: 10, marginTop: 1}}
+                >
                   <MinimizeIcon fontSize="small" style={{color: '#666'}} />
                 </IconButton>
-                <IconButton size="small" onClick={maximize} style={{zIndex: 10}}>
+                <IconButton
+                  size="small"
+                  onClick={maximize}
+                  style={{zIndex: 10, marginRight: 10, marginTop: 1}}
+                >
                   {!maximized && <MaximizeIcon fontSize="small" style={{color: '#666'}} />}
                   {maximized && <UnmaximizeIcon fontSize="small" style={{color: '#666'}} />}
                 </IconButton>
@@ -78,7 +86,7 @@ export default (props: Props) => {
                   size="small"
                   color="secondary"
                   onClick={close}
-                  style={{marginRight: 4, zIndex: 10}}
+                  style={{marginRight: 4, marginTop: 1, zIndex: 10}}
                 >
                   <CloseIcon fontSize="small" style={{color: '#666'}} />
                 </IconButton>
