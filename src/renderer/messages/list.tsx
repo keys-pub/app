@@ -120,8 +120,8 @@ export default class MessagesListView extends React.Component<Props, State> {
       return
     }
     const req: MessagesRequest = {
-      sender: '',
-      recipient: '',
+      member: '',
+      channel: '',
     }
     console.log('Load rows, RPC messages:', req)
     try {

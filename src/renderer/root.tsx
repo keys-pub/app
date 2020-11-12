@@ -101,28 +101,30 @@ ipcRenderer.on('keys-started', (event, err) => {
 
   // Update check
   updateCheck()
+
+  const ping = async () => {
+    await keys.RuntimeStatus({})
+  }
+
+  const online = () => {
+    console.log('Online')
+    ping()
+  }
+  window.addEventListener('online', online)
+  // window.addEventListener('offline', offlineFn)
+
+  ipcRenderer.removeAllListeners('focus')
+  ipcRenderer.on('focus', (event, message) => {
+    ping()
+  })
 })
+
+// Start keysd
 ipcRenderer.send('keys-start')
-
-const online = () => {
-  console.log('Online')
-  ping()
-}
-window.addEventListener('online', online)
-// window.addEventListener('offline', offlineFn)
-
-ipcRenderer.removeAllListeners('focus')
-ipcRenderer.on('focus', (event, message) => {
-  ping()
-})
 
 // ipcRenderer.on('unresponsive', (event, message) => {})
 
 // ipcRenderer.on('responsive', (event, message) => {})
-
-const ping = async () => {
-  await keys.RuntimeStatus({})
-}
 
 // window.addEventListener('error', (event) => {
 //   event.preventDefault()

@@ -12,12 +12,8 @@ export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
 
   const refresh = async () => {
-    try {
-      const resp = await keys.RuntimeStatus({})
-      setStatus(resp.authStatus!)
-    } catch (err) {
-      errored(err)
-    }
+    const resp = await keys.RuntimeStatus({})
+    setStatus(resp.authStatus!)
   }
 
   React.useEffect(() => {

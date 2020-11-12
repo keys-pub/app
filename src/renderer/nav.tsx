@@ -29,7 +29,7 @@ import {
 import Tooltip from './components/tooltip'
 
 import {setLocation, store} from './store'
-import {keys, auth} from './rpc/client'
+import {keys, creds} from './rpc/client'
 
 type NavRoute = {
   label: string
@@ -44,7 +44,7 @@ const backgroundColorSelected = '#1a1a1a'
 // TODO: Nav hover
 
 const lock = async () => {
-  auth.token = ''
+  creds.token = ''
   store.update((s) => {
     s.unlocked = false
   })

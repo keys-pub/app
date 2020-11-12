@@ -5,7 +5,7 @@ import {loadStore as secretsLoadStore} from './secrets/store'
 import {loadStore as encryptLoadStore} from './encrypt/store'
 import {loadStore as signLoadStore} from './sign/store'
 
-import {keys, auth} from './rpc/client'
+import {keys, creds} from './rpc/client'
 import {SnackProps} from './components/snack'
 import * as grpc from '@grpc/grpc-js'
 import {ipcRenderer} from 'electron'
@@ -77,7 +77,7 @@ export const unlock = async (authToken?: string) => {
   if (!authToken) {
     throw new Error('no auth token')
   }
-  auth.token = authToken
+  creds.token = authToken
   await loadStore()
   store.update((s) => {
     s.unlocked = true
@@ -85,7 +85,7 @@ export const unlock = async (authToken?: string) => {
 }
 
 export const lock = () => {
-  auth.token = ''
+  creds.token = ''
   store.update((s) => {
     s.unlocked = false
   })

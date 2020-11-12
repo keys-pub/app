@@ -70,8 +70,8 @@ export default class MessageView extends React.Component<Props, State> {
       }
     }
 
-    const timeDisplay = row.message.timeDisplay
-    const dateDisplay = row.message.dateDisplay
+    const timeDisplay = '' // row.message.timeDisplay
+    const dateDisplay = '' // row.message.dateDisplay
     const avatarSize = 6
     const left = 8
 

@@ -30,10 +30,10 @@ import {keys} from '../rpc/client'
 import {EDX25519, EDX25519Public} from '../rpc/keys'
 import {
   ContentType,
-  MessageType,
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
+  WormholeMessageType as WormholePingType,
 } from '@keys-pub/tsclient/lib/keys'
 import {ClientDuplexStream, RPCError} from '@keys-pub/tsclient'
 
@@ -127,7 +127,7 @@ class WormholeView extends React.Component<Props, State> {
       }
 
       switch (res.message?.type) {
-        case MessageType.MESSAGE_ACK:
+        case WormholePingType.WORMHOLE_MESSAGE_ACK:
           this.ack(res.message.id!)
           return
       }

@@ -1,11 +1,10 @@
 import {
-  Auth,
-  credentials,
-  createKeysClient,
-  createFIDO2Client,
+  certPath,
+  Credentials,
+  keysService,
+  fido2Service,
   KeysService,
   FIDO2Service,
-  certPath,
   RPCError,
 } from '@keys-pub/tsclient'
 
@@ -15,9 +14,9 @@ import {lock, errored} from '../store'
 
 const port = getenv.int('KEYS_PORT', 22405)
 
-export const auth: Auth = new Auth()
+export const creds: Credentials = new Credentials(certPath())
 
-export const keys: KeysService = createKeysClient('localhost:' + port, credentials(certPath(), auth))
+export const keys = keysService('localhost:' + port, creds)
 keys.on('unauthenticated', (e: RPCError) => {
   lock()
 })
@@ -25,7 +24,7 @@ keys.on('unavailable', (e: RPCError) => {
   errored(e)
 })
 
-export const fido2: FIDO2Service = createFIDO2Client('localhost:' + port, credentials(certPath(), auth))
+export const fido2: FIDO2Service = fido2Service('localhost:' + port, creds)
 fido2.on('unauthenticated', (e: RPCError) => {
   lock()
 })

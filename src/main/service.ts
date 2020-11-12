@@ -26,10 +26,10 @@ const getPort = (): number => {
   return getenv.int('KEYS_PORT', 22405)
 }
 
-export const keysStart = (): Promise<any> => {
+export const keysStart = (): Promise<{}> => {
   const path = keysPath()
   if (!path) {
-    return Promise.resolve()
+    return Promise.resolve({})
   }
   const appName = getAppName()
   const port = getPort()
