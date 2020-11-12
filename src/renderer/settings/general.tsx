@@ -16,7 +16,7 @@ import {
 import {Link} from '../components'
 import {ipcRenderer} from 'electron'
 
-import {store, setLocation} from '../store'
+import {creds} from '../rpc/client'
 import {openSnack} from '../snack'
 import ChangePasswordDialog from '../auth/change-password'
 import {contentTop} from '../theme'
@@ -95,6 +95,19 @@ export default (props: {}) => {
               </Box>
             </TableCell>
           </TableRow>
+
+          {process.env.NODE_ENV === 'development' && (
+            <TableRow>
+              <TableCell style={cellStyles}>
+                <Typography align="right">Token</Typography>
+              </TableCell>
+              <TableCell style={cellStyles}>
+                <Box display="flex" flexDirection="column">
+                  <Typography variant="body2">{creds.token}</Typography>
+                </Box>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
       {changePasswordOpen && (
