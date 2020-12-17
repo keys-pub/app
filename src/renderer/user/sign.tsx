@@ -18,6 +18,8 @@ import {DialogTitle} from '../components/dialog'
 import {mono} from '../theme'
 import Snack, {SnackProps} from '../components/snack'
 import {openSnack, openSnackError, closeSnack} from '../snack'
+import {status} from '@grpc/grpc-js'
+import {ErrorConflict} from './error'
 
 import {keys} from '../rpc/client'
 
@@ -32,10 +34,10 @@ type State = {
   name: string
   loading: boolean
   signedMessage: string
-  snack?: SnackProps
-  snackOpen: boolean
   step: string
   url: string
+  errorConflictOpen: boolean
+  errorConflict?: Error
 }
 
 export default class UserSignDialog extends React.Component<Props, State> {
@@ -43,9 +45,9 @@ export default class UserSignDialog extends React.Component<Props, State> {
     loading: false,
     name: '',
     signedMessage: '',
-    snackOpen: false,
     step: 'name',
     url: '',
+    errorConflictOpen: false,
   }
 
   clear = () => {
@@ -77,7 +79,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.signedMessage)
-    this.setState({snack: {message: 'Copied to Clipboard', duration: 2000}, snackOpen: true})
+    openSnack({message: 'Copied to Clipboard', duration: 2000})
   }
 
   userSign = async () => {
@@ -137,7 +139,11 @@ export default class UserSignDialog extends React.Component<Props, State> {
       this.setState({loading: false})
       this.close(true)
     } catch (err) {
-      openSnackError(err)
+      if (err.code == status.ALREADY_EXISTS) {
+        this.setState({errorConflict: err, errorConflictOpen: true})
+      } else {
+        openSnackError(err)
+      }
       this.setState({loading: false})
     }
   }
@@ -387,10 +393,10 @@ export default class UserSignDialog extends React.Component<Props, State> {
             </Box>
           )}
         </DialogActions>
-        <Snack
-          open={this.state.snackOpen}
-          {...this.state.snack}
-          onClose={() => this.setState({snackOpen: false})}
+        <ErrorConflict
+          error={this.state.errorConflict}
+          open={this.state.errorConflictOpen}
+          close={() => this.setState({errorConflictOpen: false})}
         />
       </Dialog>
     )

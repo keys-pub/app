@@ -12,34 +12,7 @@ type Props = {
   close: () => void
 }
 
-export default (props: Props) => {
-  switch (props.error?.code) {
-    case status.ALREADY_EXISTS:
-      return <ErrorConflict {...props} />
-    default:
-      return <ErrorSnack {...props} />
-  }
-}
-
-const ErrorSnack = (props: Props) => {
-  const snack = {message: props.error?.message, alert: 'error', duration: 8000}
-  return <Snack open={props.open} {...snack} onClose={() => props.close()} />
-}
-
-// const ErrorDefault = (props: Props) => {
-//   return (
-//     <Dialog
-//       open={props.open}
-//       close={{label: 'Close', action: () => props.close(false)}}
-//       title="Error"
-//     >
-//       <Typography>Oops, there was an error.</Typography>
-//       <Typography>{props.error?.message}</Typography>
-//     </Dialog>
-//   )
-// }
-
-const ErrorConflict = (props: Props) => {
+export const ErrorConflict = (props: Props) => {
   return (
     <Dialog
       open={props.open}
