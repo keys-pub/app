@@ -115,7 +115,7 @@ export default class KeyDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.close('')}>
           Key
         </DialogTitle>
-        <DialogContent dividers style={{minHeight: 161, overflowX: 'hidden'}}>
+        <DialogContent style={{minHeight: 161, overflowX: 'hidden'}}>
           {/*TODO: Better error display*/}
           {this.state.error && (
             <Typography variant="body2" style={{...breakWords, color: 'red', paddingBottom: 20}}>

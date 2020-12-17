@@ -39,7 +39,7 @@ export default class SecretRemoveDialog extends React.Component<Props, State> {
         // keepMounted
       >
         <DialogTitle onClose={() => this.props.close(false)}>Delete Secret</DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Box style={{paddingBottom: 10}}>
             <Typography style={{paddingBottom: 10}}>Do you want to delete this secret?</Typography>
             <Typography variant="body2">{this.props.secret?.name}</Typography>

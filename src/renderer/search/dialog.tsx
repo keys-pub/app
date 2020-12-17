@@ -62,7 +62,6 @@ export default class SearchDialog extends React.Component<Props, State> {
         // keepMounted
       >
         <DialogContent
-          dividers
           style={{
             paddingTop: 0,
             paddingLeft: 0,

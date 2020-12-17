@@ -365,7 +365,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.close(false)}>
           {title}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           {this.state.step == 'name' && this.renderName()}
           {this.state.step == 'sign' && this.renderSign()}
         </DialogContent>

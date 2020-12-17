@@ -18,6 +18,7 @@ import {DialogTitle} from '../components/dialog'
 
 import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys'
 import {keys} from '../rpc/client'
+import {openSnackError} from '../snack'
 
 type Props = {
   open: boolean
@@ -25,7 +26,6 @@ type Props = {
 }
 
 type State = {
-  error?: Error
   in: string
   loading: boolean
   password: string
@@ -41,7 +41,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   }
 
   reset = () => {
-    this.setState({error: undefined, in: '', loading: false, password: '', imported: ''})
+    this.setState({in: '', loading: false, password: '', imported: ''})
   }
 
   close = () => {
@@ -50,7 +50,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   }
 
   importKey = async () => {
-    this.setState({loading: true, error: undefined})
+    this.setState({loading: true})
     const input = new TextEncoder().encode(this.state.in)
     try {
       const resp = await keys.keyImport({
@@ -59,48 +59,46 @@ export default class KeyImportDialog extends React.Component<Props, State> {
       })
       this.setState({loading: false, imported: resp.kid || ''})
     } catch (err) {
-      this.setState({loading: false, error: err})
+      this.setState({loading: false})
+      openSnackError(err)
     }
   }
 
   onInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({in: target.value, error: undefined})
+    this.setState({in: target.value})
   }
 
   onPasswordInputChange = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({password: target.value, error: undefined})
+    this.setState({password: target.value})
   }
 
   renderImport() {
     return (
       <Box display="flex" flexDirection="column">
         <Typography style={{paddingBottom: 16}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
-        <FormControl error={!!this.state.error} style={{marginBottom: 10}}>
-          <TextField
-            multiline
-            autoFocus
-            label="Key"
-            rows={8}
-            variant="outlined"
-            onChange={this.onInputChange}
-            value={this.state.in}
-            inputProps={{
-              spellCheck: false,
-            }}
-          />
-        </FormControl>
-        <FormControl error={!!this.state.error} style={{marginBottom: -10}}>
-          <TextField
-            placeholder="Password (optional)"
-            variant="outlined"
-            type="password"
-            onChange={this.onPasswordInputChange}
-            value={this.state.password}
-          />
-          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
-        </FormControl>
+        <TextField
+          multiline
+          autoFocus
+          label="Key"
+          rows={8}
+          variant="outlined"
+          onChange={this.onInputChange}
+          value={this.state.in}
+          fullWidth
+          inputProps={{
+            spellCheck: false,
+          }}
+        />
+        <Box style={{marginBottom: 10}} />
+        <TextField
+          placeholder="Password (optional)"
+          variant="outlined"
+          type="password"
+          onChange={this.onPasswordInputChange}
+          value={this.state.password}
+        />
       </Box>
     )
   }
@@ -130,7 +128,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           Import Key
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           {!this.state.imported && this.renderImport()}
           {this.state.imported && this.renderImported()}
         </DialogContent>

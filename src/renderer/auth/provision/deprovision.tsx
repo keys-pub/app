@@ -35,10 +35,7 @@ export default (props: Props) => {
       <Box>
         <Typography style={{paddingBottom: 10}}>
           Do you want to remove the {authTypeDescription(provision.type)} created on{' '}
-          <Box display="inline" style={mono}>
-            {dateString(provision.createdAt)}
-          </Box>
-          ?
+          <Box display="inline">{dateString(provision.createdAt)}</Box>?
         </Typography>
       </Box>
     </Dialog>

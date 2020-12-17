@@ -116,26 +116,15 @@ export default class SearchView extends React.Component<Props, State> {
             }}
           />
         </Box>
-        <Divider />
         <Box style={{overflowY: 'auto', height: '100%'}}>
           <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography>User</Typography>
-                </TableCell>
-                <TableCell style={{width: 500}}>
-                  <Typography>Key</Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
             <TableBody>
               {this.state.keys.map((k: Key, index: number): any => (
                 <TableRow hover onClick={(event) => this.select(k)} key={k.id} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">
                     {k.user && <UserLabel user={k.user} />}
                   </TableCell>
-                  <TableCell style={{verticalAlign: 'top'}}>
+                  <TableCell style={{verticalAlign: 'top', width: 500}}>
                     <IDLabel k={k} />
                   </TableCell>
                 </TableRow>

@@ -37,7 +37,7 @@ import {EDX25519, X25519} from '../rpc/keys'
 import {Key, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import {store, loadStore} from './store'
-import {openSnackError} from '../snack'
+import {openSnack, openSnackError} from '../snack'
 import {column2Color} from '../theme'
 import Tooltip from '../components/tooltip'
 
@@ -197,12 +197,9 @@ export default (_: {}) => {
       const kid = event.currentTarget?.id
       if (!kid) return
 
-      store.update((s) => {
-        s.selected = results.find((k: Key) => k.id == kid)
-      })
-
       const key = results.find((k: Key) => kid == k.id)
       if (!key) return
+
       const isPrivate = key.isPrivate
 
       let labels = []
@@ -213,6 +210,11 @@ export default (_: {}) => {
       }
       // TODO: Update
 
+      store.update((s) => {
+        s.selected = key
+      })
+
+      ipcRenderer.removeAllListeners('context-menu')
       ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
         switch (arg.label) {
           case 'Export':
@@ -221,6 +223,7 @@ export default (_: {}) => {
           case 'Copy':
             if (key.id) {
               clipboard.writeText(key.id)
+              openSnack({message: 'Copied key.', duration: 4000})
             }
             break
           case 'Delete':
@@ -231,12 +234,11 @@ export default (_: {}) => {
           store.update((s) => {
             s.selected = undefined
           })
-          ipcRenderer.removeAllListeners('context-menu')
         }
       })
       ipcRenderer.send('context-menu', {labels, x: event.clientX, y: event.clientY})
     },
-    [keys]
+    [results]
   )
 
   return (

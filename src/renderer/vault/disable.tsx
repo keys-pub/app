@@ -70,7 +70,7 @@ export default class DisableDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           Delete Vault Sync
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Box display="flex" flexDirection="column">
             <Typography>
               <span style={{fontWeight: 600}}>

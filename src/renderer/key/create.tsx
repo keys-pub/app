@@ -124,7 +124,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         <DialogTitle loading={this.state.loading} onClose={this.close}>
           Generate Key
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Box>
             <FormControl variant="outlined">
               <Select value={this.state.type} onChange={this.setType}>
@@ -189,7 +189,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
       >
         {/* TODO: This title? */}
         <DialogTitle onClose={this.close}>Key Created</DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Box>
             <Typography style={{paddingBottom: 10}}>We created and saved the key:</Typography>
             <Typography variant="body2" style={{paddingBottom: 10, paddingLeft: 10}}>
@@ -228,7 +228,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         keepMounted
       >
         <DialogTitle onClose={this.close}>Publish Key</DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Box>
             <Typography>
               Do you want to link this key with a user account (Github, Twitter, Reddit, etc) and publish your

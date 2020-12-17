@@ -80,7 +80,7 @@ export default class GetPinDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={this.cancel}>
           PIN
         </DialogTitle>
-        <DialogContent dividers>{this.renderPinChange()}</DialogContent>
+        <DialogContent>{this.renderPinChange()}</DialogContent>
         <DialogActions>
           <Button onClick={this.cancel}>Cancel</Button>
           <Button color="primary" onClick={this.select}>

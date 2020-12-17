@@ -98,7 +98,7 @@ export default class ResetDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           Reset
         </DialogTitle>
-        <DialogContent dividers>{this.renderContent()}</DialogContent>
+        <DialogContent>{this.renderContent()}</DialogContent>
         <DialogActions>
           <Button onClick={() => this.close('')} disabled={this.state.loading}>
             Close

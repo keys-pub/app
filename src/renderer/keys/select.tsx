@@ -41,7 +41,8 @@ export default (props: Props) => {
         types: [EDX25519],
       }
       const resp = await keys.keys(req)
-      setOptions(resp.keys || [])
+      const ks = resp.keys?.filter((k: Key) => k.isPrivate) || []
+      setOptions(ks)
     } catch (err) {
       openSnackError(err)
     }

@@ -191,10 +191,8 @@ ipcMain.on('context-menu', (event, props: ContextMenuProps) => {
   var contextMenu = Menu.buildFromTemplate(template)
   contextMenu.popup({window: window})
   contextMenu.on('menu-will-close', (e: Event) => {
-    setTimeout(() => {
-      const out: ContextMenuSelected = {close: true}
-      event.sender.send('context-menu', out)
-    }, 10)
+    const out: ContextMenuSelected = {close: true}
+    event.sender.send('context-menu', out)
   })
 })
 

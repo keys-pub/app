@@ -165,7 +165,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
         <DialogTitle loading={this.state.loading} onClose={() => this.props.close('')}>
           {this.props.create ? 'Create a PIN' : 'Change PIN'}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           {this.props.create && this.renderCreate()}
           {!this.props.create && this.renderChange()}
         </DialogContent>

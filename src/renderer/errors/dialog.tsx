@@ -45,7 +45,7 @@ export default (props: Props) => {
       }}
     >
       <DialogTitle>Error</DialogTitle>
-      <DialogContent dividers style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
+      <DialogContent style={{padding: 0, height: '100%', backgroundColor: 'black'}}>
         {props.error && <ErrorView error={props.error} />}
       </DialogContent>
       <DialogActions>

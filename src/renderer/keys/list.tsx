@@ -208,6 +208,7 @@ export default (_: {}) => {
       }
       // TODO: Update
 
+      ipcRenderer.removeAllListeners('context-menu')
       ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
         switch (arg.label) {
           case 'Export':
@@ -223,12 +224,11 @@ export default (_: {}) => {
             break
         }
         if (arg.close) {
-          ipcRenderer.removeAllListeners('context-menu')
         }
       })
       ipcRenderer.send('context-menu', {labels, x: event.clientX, y: event.clientY})
     },
-    [keys]
+    [results]
   )
 
   const buttonWidth = 80

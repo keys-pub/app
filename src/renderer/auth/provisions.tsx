@@ -123,6 +123,7 @@ export default (props: Props) => {
         s.selected = provision
       })
 
+      ipcRenderer.removeAllListeners('context-menu')
       ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
         switch (arg.label) {
           case 'Deprovision':
@@ -130,7 +131,6 @@ export default (props: Props) => {
             break
         }
         if (arg.close) {
-          ipcRenderer.removeAllListeners('context-menu')
         }
       })
       ipcRenderer.send('context-menu', {
