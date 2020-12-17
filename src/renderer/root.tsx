@@ -55,16 +55,16 @@ const Root = (_: {}) => {
 }
 
 export default (_: {}) => {
-  const onContextMenu = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const labels = [] as string[]
-    ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
-      if (arg.close) {
-        ipcRenderer.removeAllListeners('context-menu')
-      }
-    })
-    ipcRenderer.send('context-menu', {labels: [], x: event.clientX, y: event.clientY})
-  }, [])
+  // const onContextMenu = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+  //   event.preventDefault()
+  //   const labels = [] as string[]
+  //   ipcRenderer.on('context-menu', (e, arg: {label?: string; close?: boolean}) => {
+  //     if (arg.close) {
+  //       ipcRenderer.removeAllListeners('context-menu')
+  //     }
+  //   })
+  //   ipcRenderer.send('context-menu', {labels: [], x: event.clientX, y: event.clientY})
+  // }, [])
 
   const {snack, snackOpen} = store.useState((s) => ({
     snack: s.snack,
@@ -73,7 +73,7 @@ export default (_: {}) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}} onContextMenu={onContextMenu}>
+      <Box display="flex" flex={1} flexDirection="row" style={{height: '100%'}}>
         <Root />
         <Errors />
         <UpdateAlert />
