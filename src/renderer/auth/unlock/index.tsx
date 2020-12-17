@@ -11,7 +11,9 @@ import {store, loadStatus} from '../../store'
 import {AuthType} from '@keys-pub/tsclient/lib/keys'
 import {Action} from './actions'
 
-type Props = {}
+type Props = {
+  refresh: () => void
+}
 
 export default (props: Props) => {
   const [step, setStep] = React.useState('password')
@@ -36,9 +38,14 @@ export default (props: Props) => {
       break
   }
 
+  const closeForgot = async () => {
+    setStep('password')
+    await props.refresh()
+  }
+
   return (
     <Box display="flex" flex={1} flexDirection="column">
-      {step == 'forgot' && <AuthForgotView close={() => setStep('password')} />}
+      {step == 'forgot' && <AuthForgotView close={closeForgot} />}
       {step == 'password' && <AuthUnlockPasswordView actions={actions} />}
       {step == 'fido2' && <AuthUnlockFIDO2View actions={actions} />}
     </Box>
