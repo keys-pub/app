@@ -21,9 +21,9 @@ import {clipboard} from 'electron'
 
 import {DialogTitle} from '../components/dialog'
 import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys'
-import Snack, {SnackProps} from '../components/snack'
 
 import {keys} from '../rpc/client'
+import {openSnack, closeSnack, openSnackError} from '../snack'
 
 type Props = {
   k: Key
@@ -35,9 +35,6 @@ type State = {
   export: string
   password: string
   passwordConfirm: string
-  error?: Error
-  snackOpen: boolean
-  snack?: SnackProps
 }
 
 export default class KeyExportDialog extends React.Component<Props, State> {
@@ -45,16 +42,13 @@ export default class KeyExportDialog extends React.Component<Props, State> {
     export: '',
     password: '',
     passwordConfirm: '',
-    snackOpen: false,
   }
 
   export = async () => {
     const password = this.state.password
     const confirm = this.state.passwordConfirm
     if (password != confirm) {
-      this.setState({
-        error: new Error("Passwords don't match"),
-      })
+      openSnackError(new Error("Passwords don't match"))
       return
     }
     let noPassword = false
@@ -62,7 +56,6 @@ export default class KeyExportDialog extends React.Component<Props, State> {
       noPassword = true
     }
 
-    this.setState({error: undefined})
     try {
       const req: KeyExportRequest = {
         kid: this.props.k.id,
@@ -75,12 +68,13 @@ export default class KeyExportDialog extends React.Component<Props, State> {
       const out = new TextDecoder().decode(resp.export)
       this.setState({password: '', passwordConfirm: '', export: out})
     } catch (err) {
-      this.setState({error: err})
+      openSnackError(err)
     }
   }
 
   reset = () => {
-    this.setState({password: '', passwordConfirm: '', error: undefined, export: ''})
+    closeSnack()
+    this.setState({password: '', passwordConfirm: '', export: ''})
   }
 
   close = () => {
@@ -90,20 +84,17 @@ export default class KeyExportDialog extends React.Component<Props, State> {
 
   onInputChangePassword = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({password: target ? target.value : '', error: undefined})
+    this.setState({password: target ? target.value : ''})
   }
 
   onInputChangeConfirm = (e: React.SyntheticEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
-    this.setState({passwordConfirm: target ? target.value : '', error: undefined})
+    this.setState({passwordConfirm: target ? target.value : ''})
   }
 
   copyToClipboard = () => {
     clipboard.writeText(this.state.export)
-    this.setState({
-      snack: {message: 'Copied to Clipboard', duration: 2000},
-      snackOpen: true,
-    })
+    openSnack({message: 'Copied to Clipboard', duration: 2000})
   }
 
   renderExport() {
@@ -112,26 +103,23 @@ export default class KeyExportDialog extends React.Component<Props, State> {
         <Box style={{paddingBottom: 20}}>
           <KeyLabel k={this.props.k} full />
         </Box>
-        <FormControl error={!!this.state.error}>
-          <TextField
-            autoFocus
-            label="Password"
-            placeholder="Password"
-            variant="outlined"
-            type="password"
-            onChange={this.onInputChangePassword}
-            value={this.state.password}
-          />
-          <Box padding={1} />
-          <TextField
-            label="Confirm Password"
-            variant="outlined"
-            type="password"
-            onChange={this.onInputChangeConfirm}
-            value={this.state.passwordConfirm}
-          />
-          <FormHelperText>{this.state.error?.message || ' '}</FormHelperText>
-        </FormControl>
+        <TextField
+          autoFocus
+          label="Password"
+          placeholder="Password"
+          variant="outlined"
+          type="password"
+          onChange={this.onInputChangePassword}
+          value={this.state.password}
+        />
+        <Box padding={1} />
+        <TextField
+          label="Confirm Password"
+          variant="outlined"
+          type="password"
+          onChange={this.onInputChangeConfirm}
+          value={this.state.passwordConfirm}
+        />
       </Box>
     )
   }
@@ -195,11 +183,6 @@ export default class KeyExportDialog extends React.Component<Props, State> {
             </Button>
           )}
         </DialogActions>
-        <Snack
-          open={this.state.snackOpen}
-          {...this.state.snack}
-          onClose={() => this.setState({snackOpen: false})}
-        />
       </Dialog>
     )
   }
