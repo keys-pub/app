@@ -89,7 +89,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
 
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await fido2.DeviceInfo({
+      const resp = await fido2.deviceInfo({
         device: this.props.device.path,
       })
       let clientPin = ''
@@ -121,7 +121,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
 
     this.setState({loading: true})
     try {
-      const resp = await fido2.Credentials({
+      const resp = await fido2.credentials({
         device: this.props.device.path,
         pin: this.state.pin,
         rpId: '',
@@ -143,7 +143,7 @@ export default class DeviceCredentialsView extends React.Component<Props, State>
 
   pinRetryCount = async () => {
     try {
-      const resp = await fido2.RetryCount({
+      const resp = await fido2.retryCount({
         device: this.props.device.path,
       })
       this.setState({

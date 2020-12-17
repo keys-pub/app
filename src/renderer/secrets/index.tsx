@@ -175,7 +175,7 @@ export default (props: Props) => {
       s.syncing = true
     })
     try {
-      const resp = await keys.VaultUpdate({})
+      const resp = await keys.vaultUpdate({})
       store.update((s) => {
         s.syncing = false
       })

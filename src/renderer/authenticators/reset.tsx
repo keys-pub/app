@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 
 import {fido2} from '../rpc/client'
 import {
@@ -56,7 +56,7 @@ export default class ResetDialog extends React.Component<Props, State> {
   reset = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await fido2.Reset({
+      const resp = await fido2.reset({
         device: this.props.device.path,
       })
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Snackbar, Typography} from '@material-ui/core'
 
-import {Link} from '../components'
+import Link from '../components/link'
 
 import Alert from '@material-ui/lab/Alert'
 import {platform} from '../env'

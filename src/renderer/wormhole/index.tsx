@@ -5,7 +5,7 @@ import {Button, Divider, Input, LinearProgress, Typography, Box} from '@material
 
 import Alert, {Color as AlertColor} from '@material-ui/lab/Alert'
 
-import {Link} from '../components'
+import Link from '../components/link'
 import Autocomplete from '../keys/autocomplete'
 
 import * as grpc from '@grpc/grpc-js'
@@ -29,11 +29,10 @@ import {
 import {keys} from '../rpc/client'
 import {EDX25519, EDX25519Public} from '../rpc/keys'
 import {
-  ContentType,
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
-  WormholeMessageType as WormholePingType,
+  WormholeMessageStatus,
 } from '@keys-pub/tsclient/lib/keys'
 import {ClientDuplexStream, RPCError} from '@keys-pub/tsclient'
 
@@ -103,7 +102,7 @@ class WormholeView extends React.Component<Props, State> {
     this.addRow(connectingStatus(this.props.recipient))
 
     this.setState({loading: true, connected: false})
-    this.wormhole = keys.Wormhole()
+    this.wormhole = keys.wormhole()
     this.wormhole.on('error', (err: RPCError) => {
       this.setState({loading: false, connected: false})
       if (err.code == grpc.status.CANCELLED || err.message == 'closed') {
@@ -126,15 +125,14 @@ class WormholeView extends React.Component<Props, State> {
         return
       }
 
-      switch (res.message?.type) {
-        case WormholePingType.WORMHOLE_MESSAGE_ACK:
+      switch (res.message?.status) {
+        case WormholeMessageStatus.WORMHOLE_MESSAGE_ACK:
           this.ack(res.message.id!)
           return
       }
 
-      if ((res.message?.content?.data?.length || 0) > 0) {
-        const text = new TextDecoder().decode(res.message!.content!.data!)
-        this.addRow({id: res.message!.id!, text: text, type: WormholeMessageType.Received})
+      if ((res.message?.text?.length || 0) > 0) {
+        this.addRow({id: res.message!.id!, text: res.message!.text!, type: WormholeMessageType.Received})
       }
     })
     this.wormhole.on('end', () => {
@@ -146,8 +144,7 @@ class WormholeView extends React.Component<Props, State> {
       recipient: this.props.recipient,
       invite: '',
       id: '',
-      data: new Uint8Array(),
-      type: ContentType.UTF8_CONTENT,
+      text: '',
     }
     console.log('Wormhole request:', req)
     this.wormhole.write(req)
@@ -160,11 +157,9 @@ class WormholeView extends React.Component<Props, State> {
     if (!this.wormhole) {
       return
     }
-    const data = new TextEncoder().encode(text)
     const req: WormholeInput = {
       id: id,
-      data: data,
-      type: ContentType.UTF8_CONTENT,
+      text: text,
       sender: this.props.sender,
       recipient: this.props.recipient,
       invite: '',

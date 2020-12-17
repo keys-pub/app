@@ -25,7 +25,7 @@ export default (props: Props) => {
       local: false,
     }
     try {
-      const resp = await keys.StatementRevoke(req)
+      const resp = await keys.statementRevoke(req)
       props.close(true)
       setLoading(false)
     } catch (err) {

@@ -1,6 +1,7 @@
 import {keys} from '../rpc/client'
 import {Key} from '@keys-pub/tsclient/lib/keys'
 import {Store} from 'pullstate'
+import {openSnackError} from '../snack'
 
 type State = {
   input: string
@@ -20,13 +21,17 @@ export const store = new Store<State>({
 })
 
 export const loadStore = async () => {
-  const configResp = await keys.ConfigGet({name: 'sign'})
-  const config = configResp?.config?.sign
+  try {
+    const configResp = await keys.configGet({name: 'sign'})
+    const config = configResp?.config?.sign
 
-  const keysResp = await keys.Keys({query: config?.signer})
-  const signer = keysResp.keys?.find((k: Key) => k.id == config?.signer)
+    const keysResp = await keys.keys({query: config?.signer})
+    const signer = keysResp.keys?.find((k: Key) => k.id == config?.signer)
 
-  store.update((s) => {
-    s.signer = signer
-  })
+    store.update((s) => {
+      s.signer = signer
+    })
+  } catch (err) {
+    openSnackError(err)
+  }
 }

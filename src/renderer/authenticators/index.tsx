@@ -62,7 +62,7 @@ export default class AuthenticatorsView extends React.Component<Props, State> {
   list = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await fido2.Devices({})
+      const resp = await fido2.devices({})
       let selected = resp.devices?.find((d: Device) => d.path == this.state.selected?.path)
       const devices = resp.devices || []
       if (devices.length > 0 && !selected) {

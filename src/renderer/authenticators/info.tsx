@@ -69,7 +69,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
 
     this.setState({info: undefined, loading: true, error: undefined, unsupported: false})
     try {
-      const devt = await fido2.DeviceType({
+      const devt = await fido2.deviceType({
         device: this.props.device.path,
       })
       if (devt.type != DeviceType.FIDO2_DEVICE) {
@@ -80,7 +80,7 @@ export default class DeviceInfoView extends React.Component<Props, State> {
         return
       }
 
-      const dev = await fido2.DeviceInfo({
+      const dev = await fido2.deviceInfo({
         device: this.props.device.path,
       })
       let clientPin = ''

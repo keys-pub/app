@@ -20,6 +20,5 @@ export const openSnackError = (err: Error) => {
   if (err.details) {
     message = err.details
   }
-
   openSnack({message: message, alert: 'error', duration: 8000})
 }

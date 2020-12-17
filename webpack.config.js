@@ -3,6 +3,7 @@ const HtmlPlugin = require('html-webpack-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const DefinePlugin = require('webpack').DefinePlugin
 const CopyPlugin = require('copy-webpack-plugin')
+const NoEmitOnErrorsPlugin = require('webpack').NoEmitOnErrorsPlugin
 
 const DEVELOPMENT = 'development'
 const PRODUCTION = 'production'
@@ -104,6 +105,7 @@ function createRenderConfig(isDev) {
         template: 'index.html',
         cache: true,
       }),
+      new NoEmitOnErrorsPlugin(),
     ],
 
     devServer: isDev

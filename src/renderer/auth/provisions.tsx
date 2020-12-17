@@ -50,7 +50,7 @@ export const store = new Store(initialState)
 
 const refresh = async (selected?: AuthProvision) => {
   try {
-    const resp = await keys.AuthProvisions({})
+    const resp = await keys.authProvisions({})
     const provisions = resp.provisions || []
     let selectedProvision = provisions.find((p: AuthProvision) => p.id == selected?.id)
 
@@ -87,7 +87,6 @@ export default (props: Props) => {
   const [deprovisionOpen, setDeprovisionOpen] = React.useState(false)
 
   const onAddOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('open')
     setAnchorEl(event.currentTarget)
   }
 

@@ -11,7 +11,6 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
-import {Link} from '../../components'
 import Dialog from '../../components/dialog'
 
 import SelectDevice from '../../authenticators/select'
@@ -46,7 +45,7 @@ export default (props: Props) => {
     setLoading(true)
     try {
       openSnack({message: 'Creating the credential, you may need to interact with the device', alert: 'info'})
-      const gen = await keys.AuthProvision({
+      const gen = await keys.authProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,
@@ -58,7 +57,7 @@ export default (props: Props) => {
         alert: 'info',
       })
 
-      const provision = await keys.AuthProvision({
+      const provision = await keys.authProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,

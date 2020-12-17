@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box} from '@material-ui/core'
-import {Link} from '../../components'
+import Link from '../../components/link'
 
 import AuthUnlockPasswordView from './password'
 import AuthUnlockFIDO2View from './fido2'

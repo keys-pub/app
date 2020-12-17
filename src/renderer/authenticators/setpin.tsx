@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 
 import {Device, SetPINRequest, SetPINResponse} from '@keys-pub/tsclient/lib/fido2'
 import {fido2} from '../rpc/client'
@@ -59,7 +59,7 @@ export default class SetPinDialog extends React.Component<Props, State> {
 
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await fido2.SetPIN({
+      const resp = await fido2.setPIN({
         device: this.props.device.path,
         oldPin: this.state.oldPin,
         pin: this.state.pin,

@@ -1,17 +1,6 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@material-ui/core'
+import {Box, List, ListItem, ListItemIcon} from '@material-ui/core'
 
 import Header from '../header'
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
-import {Link} from '../../components'
+import Link from '../../components/link'
 import Dialog from '../../components/dialog'
 
 import {keys} from '../../rpc/client'
@@ -42,7 +42,7 @@ export default (props: Props) => {
 
     setLoading(true)
     try {
-      const resp = await keys.AuthProvision({
+      const resp = await keys.authProvision({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
       })

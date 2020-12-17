@@ -173,7 +173,7 @@ export default (_: {}) => {
       s.syncing = true
     })
     try {
-      const resp = await keys.VaultUpdate({})
+      const resp = await keys.vaultUpdate({})
       reload()
       store.update((s) => {
         s.syncing = false
@@ -198,7 +198,7 @@ export default (_: {}) => {
       })
 
       if (!key) return
-      const isPrivate = key.type == X25519 || key.type == EDX25519
+      const isPrivate = key.isPrivate
 
       let labels = []
       if (isPrivate) {

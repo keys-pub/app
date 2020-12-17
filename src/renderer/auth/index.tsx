@@ -12,7 +12,7 @@ export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
 
   const refresh = async () => {
-    const resp = await keys.RuntimeStatus({})
+    const resp = await keys.runtimeStatus({})
     setStatus(resp.authStatus!)
   }
 

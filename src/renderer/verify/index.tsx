@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Divider, Button, Box, IconButton, Input, LinearProgress, Typography} from '@material-ui/core'
 
 import {AddRecipientIcon, SignIcon, CopyIcon} from '../icons'
-import {Link} from '../components'
+import Link from '../components/link'
 import {mono} from '../theme'
 import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
@@ -90,7 +90,7 @@ const openFolder = (value: string) => {
 
 const reloadSender = async (kid: string) => {
   try {
-    const resp = await keys.Key({
+    const resp = await keys.key({
       key: kid,
       search: false,
       update: false,
@@ -116,7 +116,7 @@ const verifyInput = async (input: string) => {
     const req: VerifyRequest = {
       data: data,
     }
-    const resp = await keys.Verify(req)
+    const resp = await keys.verify(req)
     const verifyed = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.signer = resp.signer
@@ -142,7 +142,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.VerifyFile()
+  const stream = keys.verifyFile()
   stream.on('data', (resp: VerifyFileOutput) => {
     store.update((s) => {
       s.output = ''

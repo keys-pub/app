@@ -7,6 +7,7 @@ import SecretsView from './secrets'
 import WormholeView from './wormhole'
 
 import SettingsView from './settings'
+import ChannelsView from './channels'
 
 import KeysView from './keys'
 import ToolsView from './tools'
@@ -21,12 +22,12 @@ export type RouteInfo = {
 export const routes: Array<RouteInfo> = [
   {location: '/keys', component: () => <KeysView />},
   {location: '/secrets', component: () => <SecretsView />},
-
-  {location: '/wormhole', component: () => <WormholeView />},
-
   {location: '/tools', component: () => <ToolsView />},
-
+  {location: '/channels', component: () => <ChannelsView />},
   {location: '/settings', component: () => <SettingsView />},
+
+  // Experimental
+  {location: '/wormhole', component: () => <WormholeView />},
 ]
 
 type Props = {}

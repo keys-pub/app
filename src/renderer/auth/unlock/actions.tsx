@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
-import {Link} from '../../components'
+import Link from '../../components/link'
 
 export type Action = {
   label: string

@@ -41,8 +41,8 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const status = await keys.RuntimeStatus({})
-      const resp = await keys.AuthReset({appName: status.appName})
+      const status = await keys.runtimeStatus({})
+      const resp = await keys.authReset({appName: status.appName})
       setLoading(false)
       props.close()
     } catch (err) {

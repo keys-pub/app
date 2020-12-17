@@ -14,7 +14,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle, Link} from '../components'
+import Link from '../components/link'
+import {DialogTitle} from '../components/dialog'
 import {shell} from 'electron'
 
 import {keys} from '../rpc/client'
@@ -47,7 +48,7 @@ export default class DisableDialog extends React.Component<Props, State> {
   vaultDelete = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await keys.VaultUnsync({})
+      const resp = await keys.vaultUnsync({})
       this.setState({loading: false})
       this.close('')
     } catch (err) {

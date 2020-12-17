@@ -18,7 +18,7 @@ import {
 
 import Alert from '@material-ui/lab/Alert'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 import {deepCopy, fromHex} from '../helper'
 
 import {fido2} from '../rpc/client'
@@ -74,7 +74,7 @@ export default class MakeCredentialView extends React.Component<Props, State> {
         rk: '',
         uv: '',
       }
-      const resp = await fido2.MakeCredential(req)
+      const resp = await fido2.makeCredential(req)
       this.setState({loading: false})
       this.props.onChange()
     } catch (err) {

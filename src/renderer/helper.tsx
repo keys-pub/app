@@ -2,6 +2,7 @@ import emoji from 'node-emoji'
 
 import {keys} from './rpc/client'
 import {EDX25519, X25519} from './rpc/keys'
+import dayjs from 'dayjs'
 import {Key, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
 
 import * as Long from 'long'
@@ -31,29 +32,39 @@ var dateOptions = {
   timeZoneName: undefined, // 'short',
 }
 
-export const date = (ms?: any): Date | null => {
+export const date = (ms?: any): Date | undefined => {
   // ms can be a number or Long
-  if (!ms) return null
+  if (!ms) return undefined
   const l = ms.low != undefined ? Long.fromBits(ms.low, ms.high, ms.unsigned) : ms
   const s = l.toString()
   const n = parseInt(s)
   if (n === 0) {
-    return null
+    return undefined
   }
   return new Date(n)
 }
 
 export const dateString = (ms?: any): string => {
   const d = date(ms)
-  if (d == null) {
+  if (!d) {
     return ''
   }
   // return d.toJSON()
   return d.toLocaleDateString('en-US', dateOptions)
 }
 
+export const timeString = (ms?: any): string => {
+  const d = date(ms)
+  if (!d) {
+    return ''
+  }
+  // return d.toJSON()
+  //return d.toLocaleDateString('en-US', dateOptions)
+  return dayjs(d).format('h:mma')
+}
+
 export const generateID = async (): Promise<string> => {
-  const resp = await keys.Rand({numBytes: 32, encoding: Encoding.BASE62})
+  const resp = await keys.rand({numBytes: 32, encoding: Encoding.BASE62})
   return resp.data || ''
 }
 

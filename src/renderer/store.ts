@@ -48,14 +48,14 @@ export const store = new Store<State>({
 })
 
 export const loadStatus = async () => {
-  const status = await keys.RuntimeStatus({})
+  const status = await keys.runtimeStatus({})
   store.update((s) => {
     s.fido2Enabled = !!status.fido2
   })
 }
 
 export const loadStore = async () => {
-  const configResp = await keys.ConfigGet({name: 'app'})
+  const configResp = await keys.configGet({name: 'app'})
   const config = configResp?.config?.app
   // console.log('Config:', config)
   const location = config?.location || '/keys'
@@ -133,4 +133,13 @@ export const goBack = () => {
       s.history = [...next]
     }
   })
+}
+
+export const once = <A extends any[], R, T>(
+  fn: (this: T, ...arg: A) => R
+): ((this: T, ...arg: A) => R | undefined) => {
+  let done = false
+  return function (this: T, ...args: A) {
+    return done ? void 0 : ((done = true), fn.apply(this, args))
+  }
 }

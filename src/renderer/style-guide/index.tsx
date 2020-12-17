@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Link} from '../components'
+import Link from '../components/link'
 import Header from '../header'
 import Snack, {SnackProps} from '../components/snack'
 import Tooltip from '../components/tooltip'

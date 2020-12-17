@@ -19,7 +19,7 @@ type Props = {
 export default (props: Props) => {
   const removeKey = async () => {
     try {
-      const resp = await keys.KeyRemove({kid: props.k.id})
+      const resp = await keys.keyRemove({kid: props.k.id})
       props.close(true)
     } catch (err) {
       openSnackError(err)
@@ -28,7 +28,7 @@ export default (props: Props) => {
 
   const key = props.k
   const open = props.open
-  const isPrivate = key.type == X25519 || key.type == EDX25519
+  const isPrivate = key.isPrivate
 
   return (
     <Dialog

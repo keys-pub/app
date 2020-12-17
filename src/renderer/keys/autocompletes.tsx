@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Box, TextField, TextFieldProps, Typography} from '@material-ui/core'
+import {Box, InputProps, Popper, PopperProps, TextField, TextFieldProps, Typography} from '@material-ui/core'
 
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
@@ -22,6 +22,7 @@ type Props = {
   searchOption?: boolean
   importOption?: boolean
   id?: string
+  variant?: 'outlined' | undefined
 }
 
 const createOptions = (options: Key[], searchOption: boolean, importOption: boolean): Key[] => {
@@ -61,6 +62,20 @@ const getOptionLabel = (option: Key): string => {
   return ((<KeyLabel k={option} />) as unknown) as string
 }
 
+const AutoPopper = (props: PopperProps) => {
+  return (
+    <Popper
+      {...props}
+      placement="bottom-start"
+      modifiers={{
+        flip: {
+          enabled: false,
+        },
+      }}
+    />
+  )
+}
+
 export default (props: Props) => {
   const filterOptions = (options: Key[], {inputValue}: {inputValue: string}) => {
     const filter = matchSorter(options, inputValue, {
@@ -88,7 +103,7 @@ export default (props: Props) => {
   const search = async () => {
     try {
       // Filtering happens with matchSorter.
-      const resp = await keys.Keys({})
+      const resp = await keys.keys({})
       const results = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
       setOptions(results || [])
     } catch (err) {
@@ -117,6 +132,14 @@ export default (props: Props) => {
     props.onChange(keys)
   }
 
+  let textFieldProps: TextFieldProps = {
+    variant: props.variant == 'outlined' ? 'outlined' : undefined,
+  }
+
+  const inputProps: InputProps = {
+    disableUnderline: true,
+  }
+
   return (
     <Box style={{width: '100%'}}>
       <Autocomplete
@@ -136,9 +159,11 @@ export default (props: Props) => {
         ChipProps={{variant: 'outlined', size: 'small', style: {marginLeft: 0, marginRight: 5}}} //  icon: <FaceIcon />,
         renderOption={renderOption}
         popupIcon={null}
+        PopperComponent={AutoPopper}
         renderInput={(params) => (
           <TextField
             {...params}
+            {...textFieldProps}
             placeholder={props.placeholder}
             fullWidth
             inputProps={{
@@ -147,8 +172,8 @@ export default (props: Props) => {
             }}
             InputProps={{
               ...params.InputProps,
+              ...inputProps,
               style: {minHeight: 31},
-              disableUnderline: true,
               // endAdornment: (
               //   <React.Fragment>
               //     {loading ? <CircularProgress color="inherit" size={20} /> : null}

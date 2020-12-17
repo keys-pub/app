@@ -75,7 +75,7 @@ const Dialog = (props: Props) => {
           {props.title}
         </DialogTitle>
       )}
-      <DialogContent dividers>{props.children}</DialogContent>
+      <DialogContent>{props.children}</DialogContent>
       <DialogActions>
         {props.close && (
           <Button onClick={props.close.action} color={props.close.color} key="close">

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CSSProperties} from 'react'
 
 import {Box, Typography} from '@material-ui/core'
 
@@ -8,6 +9,7 @@ import {User, UserStatus} from '@keys-pub/tsclient/lib/keys'
 
 type Props = {
   user: User
+  style?: CSSProperties
 }
 
 export default (props: Props) => {
@@ -45,6 +47,7 @@ export default (props: Props) => {
       style={{
         color: textColor,
         zoom: '96%',
+        ...props.style,
       }}
     >
       <span style={{wordWrap: 'break-word', wordBreak: 'break-all'}}>{name}</span>

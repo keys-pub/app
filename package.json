@@ -163,6 +163,7 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.39",
     "@material-ui/styles": "^4.3.0",
+    "dayjs": "^1.9.6",
     "electron-store": "^6.0.0",
     "electron-window-state": "^5.0.3",
     "getenv": "^1.0.0",
@@ -174,6 +175,7 @@
     "query-string": "^6.8.3",
     "react": "^16.8.0",
     "react-dom": "^16.5.1",
+    "ts-log": "^2.2.3",
     "typeface-open-sans": "^1.1.13",
     "typeface-roboto-mono": "^1.1.13"
   },

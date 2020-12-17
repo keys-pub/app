@@ -21,7 +21,7 @@ import {
 
 import {AddRecipientIcon, SignIcon, CopyIcon} from '../icons'
 
-import {Link} from '../components'
+import Link from '../components/link'
 
 import AutocompletesView from '../keys/autocompletes'
 import SignKeySelectView from '../keys/select'
@@ -119,7 +119,7 @@ const encryptFileIn = (
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.EncryptFile()
+  const stream = keys.encryptFile()
   stream.on('data', (resp: EncryptFileOutput) => {
     store.update((s) => {
       s.output = ''
@@ -173,7 +173,7 @@ const encryptInput = async (
       sender: sender?.id,
       options: {armored: true, noSenderRecipient, noSign},
     }
-    const resp = await keys.Encrypt(req)
+    const resp = await keys.encrypt(req)
     const encrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.output = encrypted
@@ -221,7 +221,7 @@ const createReaction = (): (() => void) => {
           noSign: s.noSign,
         },
       }
-      const set = async () => await keys.ConfigSet({name: 'encrypt', config})
+      const set = async () => await keys.configSet({name: 'encrypt', config})
       set()
     }
   )
@@ -281,7 +281,7 @@ export default (props: Props) => {
   const showEncryptFileButton = canEncryptFile && fileIn && !fileOut
   return (
     <Box display="flex" flex={1} flexDirection="column">
-      <Box style={{marginLeft: left, marginTop: contentTop, marginBottom: 8}}>
+      <Box style={{marginLeft: left, marginTop: contentTop, marginBottom: 6}}>
         <Typography variant="h4">Encrypt</Typography>
       </Box>
       <Box style={{paddingLeft: left, paddingRight: 8}}>

@@ -88,7 +88,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     closeSnack()
     this.setState({loading: true})
     try {
-      const resp = await keys.UserSign({
+      const resp = await keys.userSign({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,
@@ -127,7 +127,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     closeSnack()
     this.setState({loading: true})
     try {
-      const resp = await keys.UserAdd({
+      const resp = await keys.userAdd({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,

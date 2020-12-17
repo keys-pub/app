@@ -1,19 +1,6 @@
 import * as React from 'react'
 
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Typography,
-} from '@material-ui/core'
+import {Box, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
 import Header from '../header'
 
@@ -48,7 +35,7 @@ export default class DBView extends React.Component<Props, State> {
       db: this.props.db,
       parent: '',
     }
-    const resp = await keys.Collections(req)
+    const resp = await keys.collections(req)
 
     this.setState({
       collections: resp.collections || [],
@@ -64,7 +51,7 @@ export default class DBView extends React.Component<Props, State> {
       prefix: col.path + '/',
       db: this.props.db,
     }
-    const resp = await keys.Documents(req)
+    const resp = await keys.documents(req)
     this.setState({
       documents: resp.documents || [],
     })

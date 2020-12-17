@@ -24,7 +24,7 @@ import Header from '../../header'
 import Logo from '../../logo'
 import AuthRecover from '../recover'
 import AuthReset from '../reset'
-import {Link} from '../../components'
+import Link from '../../components/link'
 import Dialog from '../../components/dialog'
 
 type Props = {

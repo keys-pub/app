@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Box, Button, Divider, LinearProgress, Typography} from '@material-ui/core'
 
 import {shell} from 'electron'
-import {Link} from '../components'
+import Link from '../components/link'
 import {mono, contentTop} from '../theme'
 
 // import EnableDialog from './enable'
@@ -48,7 +48,7 @@ export default (_: {}) => {
   const reloadStatus = async () => {
     try {
       const req: VaultStatusRequest = {}
-      const resp = await keys.VaultStatus(req)
+      const resp = await keys.vaultStatus(req)
       console.log('Vault status:', resp)
       store.update((s) => {
         s.status = resp
@@ -61,7 +61,7 @@ export default (_: {}) => {
   const generateAuth = async () => {
     setLoading(true)
     try {
-      const resp = await keys.VaultAuth({})
+      const resp = await keys.vaultAuth({})
       store.update((s) => {
         s.phrase = resp.phrase || ''
       })
@@ -81,7 +81,7 @@ export default (_: {}) => {
   const sync = async () => {
     setLoading(true)
     try {
-      const resp = await keys.VaultSync({})
+      const resp = await keys.vaultSync({})
       setLoading(false)
       reloadStatus()
     } catch (err) {

@@ -4,7 +4,7 @@ import {Avatar, Box, Button, Dialog, Fade, DialogActions, DialogContent, Typogra
 
 import {breakWords} from '../theme'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 import KeyView from './view'
 
 import {keys} from '../rpc/client'
@@ -57,7 +57,7 @@ export default class KeyDialog extends React.Component<Props, State> {
 
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await keys.Key({
+      const resp = await keys.key({
         key: this.props.kid,
         search: !!this.props.search,
         update: update,
@@ -89,7 +89,7 @@ export default class KeyDialog extends React.Component<Props, State> {
       key: this.props.kid,
     }
     try {
-      const resp = await keys.Pull(req)
+      const resp = await keys.pull(req)
       this.setState({loading: false})
       this.close('Imported key')
       if (this.props.reload) {

@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {Link} from '../components'
+import Link from '../components/link'
 import {ipcRenderer} from 'electron'
 
 import {creds} from '../rpc/client'

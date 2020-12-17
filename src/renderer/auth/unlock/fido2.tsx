@@ -4,7 +4,7 @@ import {Box, Button, FormControl, FormHelperText, TextField, Typography} from '@
 
 import Header from '../../header'
 import Logo from '../../logo'
-import {Link} from '../../components'
+import Link from '../../components/link'
 
 import {keys} from '../../rpc/client'
 import {AuthType} from '@keys-pub/tsclient/lib/keys'
@@ -35,7 +35,7 @@ export default (props: Props) => {
 
     try {
       openSnack({message: 'You may need to interact with the device', alert: 'info'})
-      const resp = await keys.AuthUnlock({
+      const resp = await keys.authUnlock({
         secret: input,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         client: 'app',

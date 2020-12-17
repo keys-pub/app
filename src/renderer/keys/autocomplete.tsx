@@ -56,7 +56,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
   search = async (q: string) => {
     this.setState({loading: true}) // , options: []
     try {
-      const resp = await keys.Keys({
+      const resp = await keys.keys({
         query: q,
         types: this.props.keyTypes,
       })
@@ -72,6 +72,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
 
       this.setState({options: results, loading: false})
     } catch (err) {
+      // TODO: Show error
       this.setState({loading: false, options: []})
     }
   }

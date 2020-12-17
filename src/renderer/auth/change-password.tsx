@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
-import {Link} from '../components'
+import Link from '../components/link'
 import Dialog from '../components/dialog'
 
 import {keys} from '../rpc/client'
@@ -54,7 +54,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      await keys.AuthPasswordChange({
+      await keys.authPasswordChange({
         old: oldPassword,
         new: password,
       })

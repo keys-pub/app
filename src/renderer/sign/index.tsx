@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Button, Divider, LinearProgress, IconButton, Input, Typography, Box} from '@material-ui/core'
 
-import {Link} from '../components'
+import Link from '../components/link'
 import {CopyIcon} from '../icons'
 
 import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
@@ -79,7 +79,7 @@ const signInput = async (input: string, signer?: Key) => {
   console.log('Signing...')
   try {
     const data = new TextEncoder().encode(input)
-    const resp = await keys.Sign({
+    const resp = await keys.sign({
       data: data,
       armored: true,
       signer: signer?.id,
@@ -114,7 +114,7 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.SignFile()
+  const stream = keys.signFile()
   stream.on('data', (resp: SignFileOutput) => {
     store.update((s) => {
       s.output = ''
@@ -196,7 +196,7 @@ export default (props: Props) => {
             signer: s.signer?.id,
           },
         }
-        const set = async () => await keys.ConfigSet({name: 'sign', config})
+        const set = async () => await keys.configSet({name: 'sign', config})
         set()
       }
     )

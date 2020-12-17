@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
-import {Link} from '../../components'
+import Link from '../../components/link'
 
 import {keys} from '../../rpc/client'
 import {
@@ -49,11 +49,11 @@ export default (props: Props) => {
     setLoading(true)
     setError(undefined)
     try {
-      const setup: AuthSetupResponse = await keys.AuthSetup({
+      const setup: AuthSetupResponse = await keys.authSetup({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
       })
-      const resp: AuthUnlockResponse = await keys.AuthUnlock({
+      const resp: AuthUnlockResponse = await keys.authUnlock({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
         client: 'app',

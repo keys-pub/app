@@ -21,6 +21,7 @@ import {
   LeftArrowIcon,
   RightArrowIcon,
   CryptoToolsIcon,
+  ChannelsIcon,
   SettingsIcon,
   WormholeIcon,
   SecretsIcon,
@@ -48,7 +49,7 @@ const lock = async () => {
   store.update((s) => {
     s.unlocked = false
   })
-  await keys.AuthLock({})
+  await keys.authLock({})
 }
 
 export default (props: {}) => {
@@ -87,6 +88,12 @@ export default (props: {}) => {
       location: '/tools',
       id: 'navToolsItemIcon',
     },
+    // {
+    //   label: 'Channels',
+    //   icon: ChannelsIcon,
+    //   location: '/channels',
+    //   id: 'navChannelsItemIcon',
+    // },
     {
       label: 'Settings',
       icon: SettingsIcon,

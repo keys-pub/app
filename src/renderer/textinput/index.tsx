@@ -15,7 +15,7 @@ type State = {
   value: string
 }
 
-export default class MessageInputView extends React.Component<Props, State> {
+export default class TextInputView extends React.Component<Props, State> {
   state = {
     defaultValue: '',
     value: this.props.defaultValue || '',
@@ -58,29 +58,43 @@ export default class MessageInputView extends React.Component<Props, State> {
       <Box
         display="flex"
         flex={1}
-        flexDirection="row"
-        alignItems="center"
         style={{
-          ...cstyles,
-          paddingLeft: 8,
-          paddingTop: 4,
-          paddingBottom: 4,
-          paddingRight: 5,
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          marginRight: 8,
         }}
       >
-        <Input
-          autoFocus
-          disableUnderline
-          fullWidth
-          multiline
-          onChange={this.onChange}
-          onKeyPress={this.onKeyPress}
-          rows={1}
-          rowsMax={5}
-          value={this.state.value}
-          placeholder={placeholder}
-          disabled={this.props.disabled}
-        />
+        <Box
+          display="flex"
+          flex={1}
+          style={{
+            ...cstyles,
+            marginLeft: 10,
+            marginRight: 10,
+            marginTop: 10,
+            marginBottom: 10,
+            border: '1px solid #efefef',
+            borderRadius: 10,
+            paddingLeft: 8,
+            paddingTop: 4,
+            paddingBottom: 4,
+            paddingRight: 5,
+          }}
+        >
+          <Input
+            autoFocus
+            disableUnderline
+            fullWidth
+            multiline
+            onChange={this.onChange}
+            onKeyPress={this.onKeyPress}
+            rows={1}
+            rowsMax={5}
+            value={this.state.value}
+            placeholder={placeholder}
+            disabled={this.props.disabled}
+          />
+        </Box>
       </Box>
     )
   }

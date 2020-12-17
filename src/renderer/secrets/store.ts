@@ -31,7 +31,7 @@ const list = async (query: string, sortField?: string, sortDirection?: SortDirec
     sortField: sortField,
     sortDirection: sortDirection,
   }
-  const resp = await keys.Secrets(req)
+  const resp = await keys.secrets(req)
   const secrets = resp.secrets || []
   store.update((s) => {
     if (!s.selected && secrets.length > 0) {
@@ -44,7 +44,7 @@ const list = async (query: string, sortField?: string, sortDirection?: SortDirec
 }
 
 export const loadStore = async () => {
-  const resp = await keys.RuntimeStatus({})
+  const resp = await keys.runtimeStatus({})
   store.update((s) => {
     s.syncEnabled = !!resp.sync
 

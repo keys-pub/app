@@ -11,12 +11,14 @@ import {
 import * as getenv from 'getenv'
 
 import {lock, errored} from '../store'
+import {ConsoleLogger} from './logger'
 
 const port = getenv.int('KEYS_PORT', 22405)
 
 export const creds: Credentials = new Credentials(certPath())
 
 export const keys = keysService('localhost:' + port, creds)
+keys.log = new ConsoleLogger()
 keys.on('unauthenticated', (e: RPCError) => {
   lock()
 })

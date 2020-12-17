@@ -106,7 +106,7 @@ export default class AuthVaultView extends React.Component<Props, State> {
   authVault = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await keys.AuthVault({
+      const resp = await keys.authVault({
         phrase: this.state.phrase,
       })
       this.props.setup()

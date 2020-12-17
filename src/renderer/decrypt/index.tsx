@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Divider, Button, Box, IconButton, Input, LinearProgress, Typography} from '@material-ui/core'
 
 import {SignIcon, CopyIcon} from '../icons'
-import {Link} from '../components'
+import Link from '../components/link'
 import {mono} from '../theme'
 import {clipboard, shell, ipcRenderer, OpenDialogReturnValue} from 'electron'
 import * as grpc from '@grpc/grpc-js'
@@ -93,7 +93,7 @@ const openFolder = (value: string) => {
 
 const reloadSender = async (kid: string) => {
   try {
-    const resp = await keys.Key({
+    const resp = await keys.key({
       key: kid,
       search: false,
       update: false,
@@ -119,7 +119,7 @@ const decryptInput = async (input: string) => {
     const req: DecryptRequest = {
       data: data,
     }
-    const resp = await keys.Decrypt(req)
+    const resp = await keys.decrypt(req)
     const decrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.sender = resp.sender
@@ -146,7 +146,7 @@ const decryptFileIn = (fileIn: string, dir: string) => {
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.DecryptFile()
+  const stream = keys.decryptFile()
   stream.on('data', (resp: DecryptFileOutput) => {
     store.update((s) => {
       s.output = ''

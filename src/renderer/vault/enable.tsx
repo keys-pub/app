@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 
 import {keys} from '../rpc/client'
 import {VaultSyncRequest, VaultSyncResponse} from '@keys-pub/tsclient/lib/keys'
@@ -47,7 +47,7 @@ export default class EnableDialog extends React.Component<Props, State> {
   enable = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await keys.VaultSync({})
+      const resp = await keys.vaultSync({})
       this.setState({loading: false})
       this.close('Sync enabled')
     } catch (err) {

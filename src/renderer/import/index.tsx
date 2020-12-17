@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 
 import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys'
 import {keys} from '../rpc/client'
@@ -53,7 +53,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
     this.setState({loading: true, error: undefined})
     const input = new TextEncoder().encode(this.state.in)
     try {
-      const resp = await keys.KeyImport({
+      const resp = await keys.keyImport({
         in: input,
         password: this.state.password,
       })

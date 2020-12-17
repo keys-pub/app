@@ -14,7 +14,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle, Link} from '../components'
+import Link from '../components/link'
+import {DialogTitle} from '../components/dialog'
 
 import UserSignDialog from '../user/sign'
 import ServiceSelect from '../user/service'
@@ -76,7 +77,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         type: this.state.type,
       }
       try {
-        const resp = await keys.KeyGenerate(req)
+        const resp = await keys.keyGenerate(req)
         this.props.onChange()
         this.setState({kid: resp.kid, step: 'CREATED', loading: false})
       } catch (err) {

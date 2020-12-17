@@ -40,7 +40,7 @@ export default (props: Props) => {
         query: '',
         types: [EDX25519],
       }
-      const resp = await keys.Keys(req)
+      const resp = await keys.keys(req)
       setOptions(resp.keys || [])
     } catch (err) {
       openSnackError(err)

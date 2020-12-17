@@ -71,7 +71,7 @@ export const spawnProc = (path: string, args: string, killOnExit: boolean): Prom
         })
       }
 
-      resolve()
+      resolve(null)
     })
   })
 }

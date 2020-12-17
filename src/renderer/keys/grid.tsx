@@ -20,7 +20,7 @@ import {clipboard, ipcRenderer} from 'electron'
 import {AddIcon, ImportIcon, SyncIcon, SearchIcon, UserIcon} from '../icons'
 
 import UserLabel from '../user/label'
-import {IDLabel, isKeyPrivate} from '../key/label'
+import {IDLabel} from '../key/label'
 
 import Header from '../header'
 
@@ -178,7 +178,7 @@ export default (_: {}) => {
       s.syncing = true
     })
     try {
-      const resp = await keys.VaultUpdate({})
+      const resp = await keys.vaultUpdate({})
       reload()
       store.update((s) => {
         s.syncing = false
@@ -203,7 +203,7 @@ export default (_: {}) => {
 
       const key = results.find((k: Key) => kid == k.id)
       if (!key) return
-      const isPrivate = key.type == X25519 || key.type == EDX25519
+      const isPrivate = key.isPrivate
 
       let labels = []
       if (isPrivate) {
@@ -299,7 +299,6 @@ export default (_: {}) => {
           <Table size="small">
             <TableBody>
               {results.map((key: Key, index: number) => {
-                // const isPrivate = isKeyPrivate(key)
                 return (
                   <TableRow
                     hover

@@ -11,7 +11,7 @@ import {shell} from 'electron'
 import {Key, UserStatus} from '@keys-pub/tsclient/lib/keys'
 import {EDX25519, X25519} from '../rpc/keys'
 import ServiceSelect from '../user/service'
-import {Link} from '../components'
+import Link from '../components/link'
 import UserLabel from '../user/label'
 
 import {keyTypeLabel, dateString} from '../helper'
@@ -33,7 +33,7 @@ const UserRow = (props: UserRowProps) => {
   const key = props.k
   const user = key.user
   const signable = key.type == EDX25519
-  const isPrivate = key.type == X25519 || key.type == EDX25519
+  const isPrivate = key.isPrivate
 
   const [service, setService] = React.useState('github')
 

@@ -21,7 +21,7 @@ export default (props: Props) => {
   const {provision} = props
 
   const deprovision = async () => {
-    const resp = await keys.AuthDeprovision({id: provision?.id})
+    const resp = await keys.authDeprovision({id: provision?.id})
     props.close(true)
   }
 

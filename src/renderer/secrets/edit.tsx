@@ -18,7 +18,7 @@ import {
 
 import Alert from '@material-ui/lab/Alert'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 import {deepCopy} from '../helper'
 import {mono} from '../theme'
 
@@ -74,7 +74,7 @@ export default class SecretEditView extends React.Component<Props, State> {
       const req: SecretSaveRequest = {
         secret: this.state.secret,
       }
-      const resp = await keys.SecretSave(req)
+      const resp = await keys.secretSave(req)
       this.setState({loading: false, secret: resp.secret!})
       this.props.onChange(resp.secret!)
     } catch (err) {
@@ -94,7 +94,7 @@ export default class SecretEditView extends React.Component<Props, State> {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
     try {
-      const resp = await keys.RandPassword({length: 16})
+      const resp = await keys.randPassword({length: 16})
       const secret = deepCopy(this.state.secret)
       secret.password = resp.password
       this.setState({secret})

@@ -19,10 +19,7 @@ import Errors from './errors'
 import UpdateAlert from './update/alert'
 import UpdateSplash from './update/splash'
 
-import {updateCheck} from './update'
-
-import {keys} from './rpc/client'
-import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/keys'
+import {keysStart} from './run'
 
 import './app.css'
 
@@ -32,6 +29,10 @@ const Root = (_: {}) => {
     unlocked: s.unlocked,
     updating: s.updating,
   }))
+
+  React.useEffect(() => {
+    if (!ready) keysStart()
+  }, [])
 
   ipcRenderer.removeAllListeners('preferences')
   ipcRenderer.on('preferences', (event, message) => {
@@ -87,41 +88,6 @@ ipcRenderer.on('log', (event, text) => {
   console.log('Main process:', text)
 })
 
-// Keys start
-ipcRenderer.removeAllListeners('keys-started')
-ipcRenderer.on('keys-started', (event, err) => {
-  if (err) {
-    errored(err)
-    return
-  }
-
-  store.update((s) => {
-    s.ready = true
-  })
-
-  // Update check
-  updateCheck()
-
-  const ping = async () => {
-    await keys.RuntimeStatus({})
-  }
-
-  const online = () => {
-    console.log('Online')
-    ping()
-  }
-  window.addEventListener('online', online)
-  // window.addEventListener('offline', offlineFn)
-
-  ipcRenderer.removeAllListeners('focus')
-  ipcRenderer.on('focus', (event, message) => {
-    ping()
-  })
-})
-
-// Start keysd
-ipcRenderer.send('keys-start')
-
 // ipcRenderer.on('unresponsive', (event, message) => {})
 
 // ipcRenderer.on('responsive', (event, message) => {})
@@ -133,6 +99,6 @@ ipcRenderer.send('keys-start')
 
 window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault()
-  // console.log('Unhandled rejection', event)
+  console.error('Unhandled rejection')
   errored(event.reason)
 })

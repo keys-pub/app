@@ -13,13 +13,9 @@ type IDLabelProps = {
   style?: CSSProperties
 }
 
-export const isKeyPrivate = (key: Key): boolean => {
-  return key.type == X25519 || key.type == EDX25519
-}
-
 export const IDLabel = (props: IDLabelProps) => {
   const key = props.k
-  const isPrivate = isKeyPrivate(key)
+  const isPrivate = key.isPrivate
   let style: CSSProperties = {}
   if (isPrivate && props.em) style.fontWeight = 500
   // width: 520, wordWrap: 'break-word', wordBreak: 'break-all'

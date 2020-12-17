@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import * as grpc from '@grpc/grpc-js'
+
 import Routes from './routes'
 import {store} from './store'
 
@@ -8,7 +10,9 @@ import Nav from './nav'
 import {Box} from '@material-ui/core'
 
 import {keys} from './rpc/client'
+import {RPCError} from '@keys-pub/tsclient'
 import {Config} from '@keys-pub/tsclient/lib/keys'
+import {openSnackError} from './snack'
 
 export default (_: {}) => {
   React.useEffect(() => {
@@ -26,7 +30,7 @@ export default (_: {}) => {
             navMinimized: s.navMinimized,
           },
         }
-        const set = async () => await keys.ConfigSet({name: 'app', config})
+        const set = async () => await keys.configSet({name: 'app', config})
         set()
       }
     )

@@ -61,7 +61,7 @@ export default class SearchView extends React.Component<Props, State> {
   search = async (query: string) => {
     this.setState({loading: true})
     try {
-      const resp = await keys.Search({query: query})
+      const resp = await keys.search({query: query})
       if (this.state.input == query) {
         const keys = resp.keys || []
         this.setState({

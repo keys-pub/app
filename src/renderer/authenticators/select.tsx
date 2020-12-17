@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core'
 import {RefreshIcon} from '../icons'
 
-import {Link} from '../components'
+import Link from '../components/link'
 import Dialog from '../components/dialog'
 
 import {keys, fido2} from '../rpc/client'
@@ -32,7 +32,7 @@ export default (props: Props) => {
 
   const onFIDO2Devices = async () => {
     try {
-      const resp = await fido2.Devices({})
+      const resp = await fido2.devices({})
       const devices = resp.devices || []
       setDevices(devices)
       if (devices.length == 0) {

@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import {DialogTitle} from '../components'
+import {DialogTitle} from '../components/dialog'
 
 type Props = {
   open: boolean

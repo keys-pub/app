@@ -11,7 +11,7 @@ export const column2Color = '#FAFAFA'
 const font = 'Open Sans'
 const monoFont = 'Roboto Mono'
 
-export const contentTop = 18
+export const contentTop = 16
 
 export const mono: CSSProperties = {
   fontFamily: monoFont,
@@ -170,7 +170,8 @@ export const colors = {
   reddit: '#FF5700',
 }
 
-export const serviceColor = (service: string): string => {
+export const serviceColor = (service?: string): string => {
+  if (!service) return ''
   switch (service) {
     case 'github':
       return colors.github
@@ -180,6 +181,8 @@ export const serviceColor = (service: string): string => {
       return colors.reddit
     case 'https':
       return '#669'
+    case 'echo':
+      return '#699'
     default:
       return '#666'
   }

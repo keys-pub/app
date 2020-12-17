@@ -44,7 +44,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const resp = await keys.AuthRecover({
+      const resp = await keys.authRecover({
         paperKey,
         newPassword,
       })

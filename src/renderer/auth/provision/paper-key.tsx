@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
-import {Link} from '../../components'
+import Link from '../../components/link'
 import Dialog from '../../components/dialog'
 
 import {keys} from '../../rpc/client'
@@ -20,7 +20,7 @@ export default (props: Props) => {
   React.useEffect(() => {
     const init = async () => {
       try {
-        const resp = await keys.Rand({numBytes: 32, encoding: Encoding.BIP39})
+        const resp = await keys.rand({numBytes: 32, encoding: Encoding.BIP39})
         setPaperKey(resp.data || '')
       } catch (err) {
         openSnackError(err)
@@ -33,7 +33,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const resp = await keys.AuthProvision({
+      const resp = await keys.authProvision({
         secret: paperKey,
         type: AuthType.PAPER_KEY_AUTH,
       })
