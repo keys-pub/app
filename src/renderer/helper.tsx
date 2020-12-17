@@ -10,15 +10,17 @@ import * as Long from 'long'
 export const keyTypeLabel = (key: Key): string => {
   switch (key.type) {
     case X25519:
-      return 'Curve25519 Private Key'
-    case 'x25519-public':
+      if (key.isPrivate) {
+        return 'Curve25519 Private Key'
+      }
       return 'Curve25519 Public Key'
     case EDX25519:
-      return 'EdX25519 Private Key'
-    case 'ed25519-public':
+      if (key.isPrivate) {
+        return 'EdX25519 Private Key'
+      }
       return 'EdX25519 Public Key'
     default:
-      return ''
+      return 'Unknown'
   }
 }
 
