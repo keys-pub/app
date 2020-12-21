@@ -9,7 +9,7 @@
 
 ## Prerelease to Release
 
-- Update website with new version and deploy. Check links from home page.
 - Edit release and uncheck prerelease (same with keys-pub/keys-ext).
+- Update website with new version and deploy. Check links from home page.
 - Run `./scripts/release-pkgs.sh` for brew, cask, scoop.
 - Run `./scripts/aptly.sh` in keys-ext for apt.
