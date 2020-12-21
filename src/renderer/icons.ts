@@ -33,6 +33,7 @@ import {
   VisibilityOutlined as VerifyIcon,
   VpnKeySharp as KeysIcon,
   VpnLock as PasswordIcon,
+  Warning as WarningIcon,
 } from '@material-ui/icons'
 
 export {
@@ -67,5 +68,6 @@ export {
   UserIcon,
   UserLinkIcon,
   VerifyIcon,
+  WarningIcon,
   WormholeIcon,
 }

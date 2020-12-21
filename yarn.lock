@@ -1612,10 +1612,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@keys-pub/tsclient@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@keys-pub/tsclient/-/tsclient-0.1.4.tgz#8f08136b57b377dcfe8bb879312317c601c39789"
-  integrity sha512-roAs7jRioS4Fi/07gOOAGcfuNgsNFMd0zRqEkKEy4dlY2FgJ5Gpjy/cxHCd62LMI7UEpTfVDeThJnyBU7ODaDA==
+"@keys-pub/tsclient@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@keys-pub/tsclient/-/tsclient-0.1.5.tgz#4a2d30fdb0f8a2c1e9a2b8e97cfb21c6eb697213"
+  integrity sha512-oH+1RqkB3O24wqZq0QhbEjsJ7oeVt11XfWy6v35AIA+Vfl/lqjZSAqsXxKXaloUnSWj16J2g4GrqE6Zq9QsFDg==
   dependencies:
     "@grpc/grpc-js" "^1.1.7"
     getenv "^1.0.0"

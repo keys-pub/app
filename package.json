@@ -1,7 +1,7 @@
 {
   "name": "keys",
   "productName": "Keys",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Key management, signing and encryption.",
   "scripts": {
     "check": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet 'src/**/*.ts' 'src/**/*.tsx'",
@@ -158,7 +158,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.0.3",
     "@grpc/proto-loader": "^0.5.5",
-    "@keys-pub/tsclient": "^0.1.4",
+    "@keys-pub/tsclient": "0.1.5",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.39",

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box, Button, IconButton, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core'
 
-import {UserLinkIcon} from '../icons'
+import {UserLinkIcon, WarningIcon} from '../icons'
 
 import {IDLabel} from './label'
 
@@ -161,6 +161,7 @@ export default (props: Props) => {
                     Update
                   </Link>
                 </Typography>
+                {key.user?.proxied && <Typography style={{color: '#666'}}>via keys.pub proxy</Typography>}
               </TableCell>
             </TableRow>
           )}
