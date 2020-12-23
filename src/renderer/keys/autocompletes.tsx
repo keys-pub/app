@@ -5,7 +5,7 @@ import {Box, InputProps, Popper, PopperProps, TextField, TextFieldProps, Typogra
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import {KeyLabel} from '../key/label'
-import matchSorter, {rankings} from 'match-sorter'
+import {matchSorter, rankings} from 'match-sorter'
 
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'

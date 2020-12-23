@@ -10,7 +10,7 @@ import Autocomplete, {
 } from '@material-ui/lab/Autocomplete'
 
 import {KeyLabel} from '../key/label'
-import matchSorter from 'match-sorter'
+import {matchSorter} from 'match-sorter'
 
 import {keys} from '../rpc/client'
 import {Key, SortDirection, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/keys'
