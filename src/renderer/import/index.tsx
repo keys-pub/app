@@ -3,12 +3,14 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   Divider,
   LinearProgress,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   TextField,
   Typography,
@@ -30,6 +32,7 @@ type State = {
   loading: boolean
   password: string
   imported: string
+  update: boolean
 }
 
 export default class KeyImportDialog extends React.Component<Props, State> {
@@ -38,6 +41,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
     in: '',
     loading: false,
     password: '',
+    update: true,
   }
 
   reset = () => {
@@ -56,6 +60,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
       const resp = await keys.keyImport({
         in: input,
         password: this.state.password,
+        update: this.state.update,
       })
       this.setState({loading: false, imported: resp.kid || ''})
     } catch (err) {
@@ -77,7 +82,6 @@ export default class KeyImportDialog extends React.Component<Props, State> {
   renderImport() {
     return (
       <Box display="flex" flexDirection="column">
-        <Typography style={{paddingBottom: 16}}>You can specify a key ID, an SSH or Saltpack key:</Typography>
         <TextField
           multiline
           autoFocus
@@ -98,6 +102,18 @@ export default class KeyImportDialog extends React.Component<Props, State> {
           type="password"
           onChange={this.onPasswordInputChange}
           value={this.state.password}
+        />
+        <Box style={{margin: 4}} />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={this.state.update}
+              color="primary"
+              onChange={() => this.setState({update: !this.state.update})}
+              style={{paddingTop: 0, paddingBottom: 0}}
+            />
+          }
+          label="Update from keys.pub"
         />
       </Box>
     )

@@ -63,13 +63,15 @@ export default (props: Props) => {
     // }
 
     try {
+      console.log('List messages...')
       setLoading(true)
       const resp = await keys.messages({
         channel: props.channel.id,
-        user: props.user.kid,
       })
       // messageCache.set(props.channel.id!, resp.messages!)
-      setMessages(resp.messages || [])
+      const msgs = resp.messages || []
+      setMessages(msgs)
+      console.log('Messages', msgs.length)
       setLoading(false)
     } catch (err) {
       setLoading(false)
@@ -81,22 +83,28 @@ export default (props: Props) => {
     const sp: ScrollPosition | void = scrollPositions.get(props.channel.id!)
     // console.log('Scroll position:', sp)
     if (!sp || sp.lockToBottom) {
+      // console.log('Lock to bottom')
       endRef.current?.scrollIntoView({}) // behavior: 'smooth'
     } else {
+      // console.log('Scroll to', sp)
       // listRef.scrollTop(sp.scrollTop)
       listRef.current?.scrollTo({top: sp.scrollTop})
     }
-  }, [messages])
+  }, [props.channel.id, messages])
 
-  const onScroll = React.useCallback((e: any) => {
-    const t = e.target
-    if (t.scrollTop == 0) {
-      return
-    }
-    const lockToBottom = t.scrollHeight - t.scrollTop - 20 <= t.clientHeight
-    const sp: ScrollPosition = {scrollTop: t.scrollTop, lockToBottom}
-    scrollPositions.set(props.channel.id!, sp)
-  }, [])
+  const onScroll = React.useCallback(
+    (e: any) => {
+      const t = e.target
+      if (t.scrollTop == 0) {
+        return
+      }
+      const lockToBottom = t.scrollHeight - t.scrollTop - 20 <= t.clientHeight
+      const sp: ScrollPosition = {scrollTop: t.scrollTop, lockToBottom}
+      // console.log('Scroll', sp)
+      scrollPositions.set(props.channel.id!, sp)
+    },
+    [props.channel.id]
+  )
 
   const addMessage = (add: Message) => {
     const next = [...messages, add]

@@ -35,7 +35,6 @@ type Props = {
   connect: () => void
   disconnect: () => void
   selectUser: (user: User) => void
-  openInvites: () => void
 }
 
 const connectStatus = (status: ConnectStatus): string => {
@@ -124,19 +123,6 @@ export default (props: Props) => {
               <UserLabel user={user} />
             </ButtonBase>
           ))}
-
-          {props.user && (
-            <Button
-              color="primary"
-              fullWidth
-              onClick={() => {
-                close()
-                props.openInvites()
-              }}
-            >
-              Invites
-            </Button>
-          )}
 
           {props.connectStatus == ConnectStatus.Connected && (
             <Button

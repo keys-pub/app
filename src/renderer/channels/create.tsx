@@ -91,8 +91,8 @@ export default (props: Props) => {
         />
         <Box height={10} />
         <Typography paragraph>
-          For more details about how channel information is encrypted see{' '}
-          <Link inline onClick={() => shell.openExternal('https://keys.pub/docs/specs/channel.html')}>
+          For more details about channels see{' '}
+          <Link span onClick={() => shell.openExternal('https://keys.pub/docs/specs/channel.html')}>
             keys.pub/docs/specs/channel
           </Link>
           .

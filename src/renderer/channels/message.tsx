@@ -39,7 +39,6 @@ export default (props: Props) => {
     width: 32,
     height: 32,
   }
-
   return (
     <Box
       display="flex"

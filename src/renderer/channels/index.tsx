@@ -34,7 +34,6 @@ import {Config, RelayOutput} from '@keys-pub/tsclient/lib/keys'
 
 import ChannelView from './channel'
 import ChannelCreateView from './create'
-import ChannelInvitesView from './invites'
 import StatusView, {ConnectStatus} from './status'
 
 type Props = {}
@@ -53,11 +52,10 @@ const initialState: State = {
 
 const store = new Store(initialState)
 
-const refresh = async (user?: User, selected?: Channel) => {
+const refresh = async (user?: User) => {
   if (!user) {
     store.update((s) => {
       s.channels = []
-      s.selected = undefined
     })
     return
   }
@@ -65,14 +63,13 @@ const refresh = async (user?: User, selected?: Channel) => {
     const resp = await keys.channels({
       user: user.kid!,
     })
-    let rselected = resp.channels?.find((c: Channel) => c.id == selected?.id)
     const channels = resp.channels || []
-    if (channels.length > 0 && !rselected) {
-      rselected = channels[0]
-    }
     store.update((s) => {
       s.channels = channels
-      s.selected = rselected
+
+      let selected = resp.channels?.find((c: Channel) => c.id == s.selected?.id)
+      if (!selected && channels.length > 0) selected = channels[0]
+      s.selected = selected
     })
   } catch (err) {
     openSnackError(err)
@@ -81,10 +78,10 @@ const refresh = async (user?: User, selected?: Channel) => {
 
 export default (props: Props) => {
   const {channels, selected, user} = store.useState()
+
   const [connectStatus, setConnectStatus] = React.useState(ConnectStatus.Disconnected)
 
   const [createOpen, setCreateOpen] = React.useState(false)
-  const [invitesOpen, setInvitesOpen] = React.useState(false)
 
   const stream = React.useRef<ClientReadableStream<RelayOutput> | null>(null)
 
@@ -96,10 +93,11 @@ export default (props: Props) => {
   }
 
   React.useEffect(() => {
-    refresh(user, selected)
+    refresh(user)
   }, [user])
 
   const select = (channel: Channel) => {
+    console.log('Select channel', channel)
     store.update((s) => {
       s.selected = channel
     })
@@ -115,7 +113,7 @@ export default (props: Props) => {
     stream.current = relay
     relay.on('data', (relay: RelayOutput) => {
       console.log('Relay output', relay)
-      refresh(user, selected)
+      refresh(user)
       setConnectStatus(ConnectStatus.Connected)
     })
     relay.on('error', (err: RPCError) => {
@@ -148,21 +146,8 @@ export default (props: Props) => {
     setCreateOpen(false)
     if (snack) {
       openSnack({message: snack, alert: 'success', duration: 6000})
-      refresh(user, selected)
+      refresh(user)
     }
-  }
-
-  const closeInvites = (snack?: string) => {
-    setInvitesOpen(false)
-    if (snack) {
-      openSnack({message: snack, alert: 'success', duration: 6000})
-      refresh(user, selected)
-    }
-  }
-
-  const joined = (snack: string) => {
-    openSnack({message: snack, alert: 'success', duration: 6000})
-    refresh(user, selected)
   }
 
   return (
@@ -246,7 +231,6 @@ export default (props: Props) => {
                 connect={connect}
                 disconnect={disconnect}
                 selectUser={selectUser}
-                openInvites={() => setInvitesOpen(true)}
               />
             </Box>
           </Box>
@@ -256,7 +240,6 @@ export default (props: Props) => {
         </Box>
       </Box>
       {user && <ChannelCreateView user={user} open={createOpen} close={closeCreate} />}
-      {user && <ChannelInvitesView user={user} open={invitesOpen} close={closeInvites} joined={joined} />}
     </Box>
   )
 }

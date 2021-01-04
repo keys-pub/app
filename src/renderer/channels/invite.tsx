@@ -45,16 +45,16 @@ export default (props: Props) => {
   const {recipients} = store.useState()
 
   const channelInvite = async () => {
-    // try {
-    //   const rids = recipients.map((k: Key) => k.id!)
-    //   const resp = await keys.channelInvitesCreate({
-    //     channel: props.channel,
-    //     sender: props.inbox,
-    //     recipients: rids,
-    //   })
-    // } catch (err) {
-    //   openSnackError(err)
-    // }
+    try {
+      const rids = recipients.map((k: Key) => k.id!)
+      const resp = await keys.channelInvite({
+        channel: props.channel,
+        sender: props.inbox,
+        recipients: rids,
+      })
+    } catch (err) {
+      openSnackError(err)
+    }
   }
 
   return (

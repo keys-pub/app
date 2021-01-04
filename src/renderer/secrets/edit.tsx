@@ -94,7 +94,7 @@ export default class SecretEditView extends React.Component<Props, State> {
     // TODO: Prompt to overwrite
     // TODO: Keep saved password history
     try {
-      const resp = await keys.randPassword({length: 16})
+      const resp = await keys.randPassword({length: 20})
       const secret = deepCopy(this.state.secret)
       secret.password = resp.password
       this.setState({secret})
