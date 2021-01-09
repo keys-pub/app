@@ -20,8 +20,8 @@ import {CloseIcon, InfoIcon} from '../icons'
 import {timeString} from '../helper'
 import {serviceColor} from '../theme'
 
-import {Channel, Message, MessageStatus, User} from '@keys-pub/tsclient/lib/keys'
-import {keys} from '../rpc/client'
+import {Channel, Message, MessageStatus, User} from '@keys-pub/tsclient/lib/rpc'
+import {rpc} from '../rpc/client'
 
 import UserLabel from '../user/label'
 
@@ -65,7 +65,7 @@ export default (props: Props) => {
     try {
       console.log('List messages...')
       setLoading(true)
-      const resp = await keys.messages({
+      const resp = await rpc.messages({
         channel: props.channel.id,
       })
       // messageCache.set(props.channel.id!, resp.messages!)
@@ -172,7 +172,8 @@ export default (props: Props) => {
       >
         <Box style={{height: 'calc(100% - 60px)'}} />
         {messages.map((message: Message, index: number) => {
-          return <MessageView channel={props.channel.id!} message={message} index={index} />
+          const ckey = 'm-' + props.channel.id + '-' + index
+          return <MessageView key={ckey} channel={props.channel.id!} message={message} index={index} />
         })}
         <div ref={endRef as React.RefObject<HTMLDivElement>} key="end" />
       </div>

@@ -4,8 +4,8 @@ import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography
 import Link from '../../components/link'
 import Dialog from '../../components/dialog'
 
-import {keys} from '../../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../../rpc/client'
+import {AuthType} from '@keys-pub/tsclient/lib/rpc'
 import {openSnackError} from '../../snack'
 
 type Props = {
@@ -42,7 +42,7 @@ export default (props: Props) => {
 
     setLoading(true)
     try {
-      const resp = await keys.authProvision({
+      const resp = await rpc.authProvision({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
       })

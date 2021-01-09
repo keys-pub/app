@@ -30,7 +30,7 @@ import {
 import Tooltip from './components/tooltip'
 
 import {setLocation, store} from './store'
-import {keys, creds} from './rpc/client'
+import {rpc, creds} from './rpc/client'
 
 type NavRoute = {
   label: string
@@ -49,7 +49,7 @@ const lock = async () => {
   store.update((s) => {
     s.unlocked = false
   })
-  await keys.authLock({})
+  await rpc.authLock({})
 }
 
 export default (props: {}) => {

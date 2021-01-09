@@ -5,7 +5,7 @@ import {loadStore as secretsLoadStore} from './secrets/store'
 import {loadStore as encryptLoadStore} from './encrypt/store'
 import {loadStore as signLoadStore} from './sign/store'
 
-import {keys, creds} from './rpc/client'
+import {rpc, creds} from './rpc/client'
 import {SnackProps} from './components/snack'
 import * as grpc from '@grpc/grpc-js'
 import {ipcRenderer} from 'electron'
@@ -27,6 +27,7 @@ export type State = {
   location: string
   history: string[]
 
+  focused: boolean
   navMinimized: boolean
   fido2Enabled: boolean
 
@@ -43,19 +44,20 @@ export const store = new Store<State>({
   location: '',
   history: [],
 
+  focused: false,
   navMinimized: false,
   snackOpen: false,
 })
 
 export const loadStatus = async () => {
-  const status = await keys.runtimeStatus({})
+  const status = await rpc.runtimeStatus({})
   store.update((s) => {
     s.fido2Enabled = !!status.fido2
   })
 }
 
 export const loadStore = async () => {
-  const configResp = await keys.configGet({name: 'app'})
+  const configResp = await rpc.configGet({name: 'app'})
   const config = configResp?.config?.app
   // console.log('Config:', config)
   const location = config?.location || '/keys'

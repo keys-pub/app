@@ -18,8 +18,8 @@ import {
 
 import {DialogTitle} from '../components/dialog'
 
-import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/keys'
-import {keys} from '../rpc/client'
+import {KeyImportRequest, KeyImportResponse} from '@keys-pub/tsclient/lib/rpc'
+import {rpc} from '../rpc/client'
 import {openSnackError} from '../snack'
 
 type Props = {
@@ -57,7 +57,7 @@ export default class KeyImportDialog extends React.Component<Props, State> {
     this.setState({loading: true})
     const input = new TextEncoder().encode(this.state.in)
     try {
-      const resp = await keys.keyImport({
+      const resp = await rpc.keyImport({
         in: input,
         password: this.state.password,
         update: this.state.update,

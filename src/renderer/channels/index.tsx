@@ -27,10 +27,10 @@ import {contentTop, column2Color} from '../theme'
 import {openSnack, openSnackError} from '../snack'
 
 import * as grpc from '@grpc/grpc-js'
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {RPCError, ClientReadableStream} from '@keys-pub/tsclient'
-import {Channel, User, UserStatus} from '@keys-pub/tsclient/lib/keys'
-import {Config, RelayOutput} from '@keys-pub/tsclient/lib/keys'
+import {Channel, User, UserStatus} from '@keys-pub/tsclient/lib/rpc'
+import {Config, RelayOutput} from '@keys-pub/tsclient/lib/rpc'
 
 import ChannelView from './channel'
 import ChannelCreateView from './create'
@@ -60,7 +60,7 @@ const refresh = async (user?: User) => {
     return
   }
   try {
-    const resp = await keys.channels({
+    const resp = await rpc.channels({
       user: user.kid!,
     })
     const channels = resp.channels || []
@@ -109,7 +109,7 @@ export default (props: Props) => {
     }
     console.log('Relay connect...')
     setConnectStatus(ConnectStatus.Connecting)
-    const relay = keys.relay({keys: [user.kid!]})
+    const relay = rpc.relay({user: user.kid!})
     stream.current = relay
     relay.on('data', (relay: RelayOutput) => {
       console.log('Relay output', relay)
@@ -142,11 +142,12 @@ export default (props: Props) => {
     }
   }, [user])
 
-  const closeCreate = (snack?: string) => {
+  const closeCreate = (channel?: Channel) => {
     setCreateOpen(false)
-    if (snack) {
-      openSnack({message: snack, alert: 'success', duration: 6000})
-      refresh(user)
+    if (channel) {
+      store.update((s) => {
+        s.selected = channel
+      })
     }
   }
 

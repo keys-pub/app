@@ -22,9 +22,9 @@ import ServiceSelect from '../user/service'
 
 import {shell} from 'electron'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {EDX25519, X25519} from '../rpc/keys'
-import {KeyGenerateRequest, KeyGenerateResponse} from '@keys-pub/tsclient/lib/keys'
+import {KeyGenerateRequest, KeyGenerateResponse} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   open: boolean
@@ -77,7 +77,7 @@ export default class KeyCreateDialog extends React.Component<Props> {
         type: this.state.type,
       }
       try {
-        const resp = await keys.keyGenerate(req)
+        const resp = await rpc.keyGenerate(req)
         this.props.onChange()
         this.setState({kid: resp.kid, step: 'CREATED', loading: false})
       } catch (err) {

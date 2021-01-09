@@ -5,7 +5,7 @@ import {Box, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@
 import Header from '../header'
 
 import {dateString} from '../helper'
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {
   Collection,
   Document,
@@ -13,7 +13,7 @@ import {
   CollectionsResponse,
   DocumentsRequest,
   DocumentsResponse,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   db: string
@@ -35,7 +35,7 @@ export default class DBView extends React.Component<Props, State> {
       db: this.props.db,
       parent: '',
     }
-    const resp = await keys.collections(req)
+    const resp = await rpc.collections(req)
 
     this.setState({
       collections: resp.collections || [],
@@ -51,7 +51,7 @@ export default class DBView extends React.Component<Props, State> {
       prefix: col.path + '/',
       db: this.props.db,
     }
-    const resp = await keys.documents(req)
+    const resp = await rpc.documents(req)
     this.setState({
       documents: resp.documents || [],
     })

@@ -4,9 +4,9 @@ import {Box, Divider, FormControl, InputLabel, MenuItem, Select, Typography} fro
 
 import {KeyLabel} from '../key/label'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {EDX25519, X25519} from '../rpc/keys'
-import {KeysRequest, KeysResponse, Key, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {KeysRequest, KeysResponse, Key, SortDirection} from '@keys-pub/tsclient/lib/rpc'
 import {openSnack, openSnackError, closeSnack} from '../snack'
 
 export type Props = {
@@ -40,7 +40,7 @@ export default (props: Props) => {
         query: '',
         types: [EDX25519],
       }
-      const resp = await keys.keys(req)
+      const resp = await rpc.keys(req)
       const ks = resp.keys?.filter((k: Key) => k.isPrivate) || []
       setOptions(ks)
     } catch (err) {

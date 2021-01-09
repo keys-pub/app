@@ -6,8 +6,8 @@ import Header from '../../header'
 import Logo from '../../logo'
 import Link from '../../components/link'
 
-import {keys} from '../../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../../rpc/client'
+import {AuthType} from '@keys-pub/tsclient/lib/rpc'
 import SelectDevice from '../../authenticators/select'
 
 import {store, unlock} from '../../store'
@@ -35,7 +35,7 @@ export default (props: Props) => {
 
     try {
       openSnack({message: 'You may need to interact with the device', alert: 'info'})
-      const resp = await keys.authUnlock({
+      const resp = await rpc.authUnlock({
         secret: input,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         client: 'app',

@@ -16,9 +16,9 @@ import Dialog from '../../components/dialog'
 import SelectDevice from '../../authenticators/select'
 import {openSnack, openSnackError, closeSnack} from '../../snack'
 
-import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/rpc'
 import {Device} from '@keys-pub/tsclient/lib/fido2'
-import {keys, fido2} from '../../rpc/client'
+import {rpc, fido2} from '../../rpc/client'
 
 type Props = {
   open: boolean
@@ -45,7 +45,7 @@ export default (props: Props) => {
     setLoading(true)
     try {
       openSnack({message: 'Creating the credential, you may need to interact with the device', alert: 'info'})
-      const gen = await keys.authProvision({
+      const gen = await rpc.authProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,
@@ -57,7 +57,7 @@ export default (props: Props) => {
         alert: 'info',
       })
 
-      const provision = await keys.authProvision({
+      const provision = await rpc.authProvision({
         secret: pin,
         type: AuthType.FIDO2_HMAC_SECRET_AUTH,
         device: selectedDevice?.path,
@@ -81,7 +81,7 @@ export default (props: Props) => {
       title="FIDO2 Key"
       close={{label: 'Close', action: () => props.close()}}
       actions={[{label: 'Provision', color: 'primary', action: () => onAuthProvision()}]}
-      disabled={loading}
+      loading={loading}
     >
       <Box display="flex" flex={1} flexDirection="column" alignItems="center">
         <Box style={{marginLeft: 44.5}}>

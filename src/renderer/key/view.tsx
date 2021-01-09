@@ -6,7 +6,7 @@ import KeyContentView from './content'
 import UserSignDialog from '../user/sign'
 import UserRevokeDialog from '../user/revoke'
 
-import {Key} from '@keys-pub/tsclient/lib/keys'
+import {Key} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   k: Key

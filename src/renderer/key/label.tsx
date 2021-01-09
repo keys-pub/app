@@ -4,7 +4,7 @@ import {Box, Typography} from '@material-ui/core'
 
 import UserLabel from '../user/label'
 
-import {Key, User} from '@keys-pub/tsclient/lib/keys'
+import {Key, User} from '@keys-pub/tsclient/lib/rpc'
 import {EDX25519, X25519} from '../rpc/keys'
 
 type IDLabelProps = {

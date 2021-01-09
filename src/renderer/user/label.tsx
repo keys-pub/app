@@ -5,7 +5,7 @@ import {Box, Typography} from '@material-ui/core'
 
 import {serviceColor} from '../theme'
 
-import {User, UserStatus} from '@keys-pub/tsclient/lib/keys'
+import {User, UserStatus} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   user: User

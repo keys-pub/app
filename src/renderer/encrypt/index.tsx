@@ -32,7 +32,7 @@ import {store, loadStore} from './store'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import {contentTop, column2Color} from '../theme'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
@@ -43,7 +43,7 @@ import {
   EncryptResponse,
   EncryptFileInput,
   EncryptFileOutput,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 
 const openFile = async () => {
   clear(true)
@@ -119,7 +119,7 @@ const encryptFileIn = (
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.encryptFile()
+  const stream = rpc.encryptFile()
   stream.on('data', (resp: EncryptFileOutput) => {
     store.update((s) => {
       s.output = ''
@@ -173,7 +173,7 @@ const encryptInput = async (
       sender: sender?.id,
       options: {armored: true, noSenderRecipient, noSign},
     }
-    const resp = await keys.encrypt(req)
+    const resp = await rpc.encrypt(req)
     const encrypted = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.output = encrypted
@@ -221,7 +221,7 @@ const createReaction = (): (() => void) => {
           noSign: s.noSign,
         },
       }
-      const set = async () => await keys.configSet({name: 'encrypt', config})
+      const set = async () => await rpc.configSet({name: 'encrypt', config})
       set()
     }
   )

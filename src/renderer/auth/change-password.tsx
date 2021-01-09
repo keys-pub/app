@@ -4,7 +4,7 @@ import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography
 import Link from '../components/link'
 import Dialog from '../components/dialog'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {openSnack, openSnackError, closeSnack} from '../snack'
 
 type Props = {
@@ -54,7 +54,7 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      await keys.authPasswordChange({
+      await rpc.authPasswordChange({
         old: oldPassword,
         new: password,
       })
@@ -72,7 +72,7 @@ export default (props: Props) => {
       open={props.open}
       close={{label: 'Close', action: () => props.close()}}
       actions={[{label: 'Change', color: 'primary', action: changePassword}]}
-      disabled={loading}
+      loading={loading}
     >
       <Box display="flex" flexDirection="column" alignItems="center">
         <TextField

@@ -1,5 +1,5 @@
-import {keys} from '../rpc/client'
-import {Key} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key} from '@keys-pub/tsclient/lib/rpc'
 import {Store} from 'pullstate'
 import {openSnackError} from '../snack'
 
@@ -22,10 +22,10 @@ export const store = new Store<State>({
 
 export const loadStore = async () => {
   try {
-    const configResp = await keys.configGet({name: 'sign'})
+    const configResp = await rpc.configGet({name: 'sign'})
     const config = configResp?.config?.sign
 
-    const keysResp = await keys.keys({query: config?.signer})
+    const keysResp = await rpc.keys({query: config?.signer})
     const signer = keysResp.keys?.find((k: Key) => k.id == config?.signer)
 
     store.update((s) => {

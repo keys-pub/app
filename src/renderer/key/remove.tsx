@@ -6,9 +6,9 @@ import Dialog from '../components/dialog'
 import {KeyLabel} from './label'
 import {openSnack, openSnackError} from '../snack'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {EDX25519, X25519} from '../rpc/keys'
-import {Key} from '@keys-pub/tsclient/lib/keys'
+import {Key} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   open?: boolean
@@ -19,7 +19,7 @@ type Props = {
 export default (props: Props) => {
   const removeKey = async () => {
     try {
-      const resp = await keys.keyRemove({kid: props.k.id})
+      const resp = await rpc.keyRemove({kid: props.k.id})
       props.close(true)
     } catch (err) {
       openSnackError(err)

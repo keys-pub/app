@@ -18,8 +18,8 @@ import UserLabel from '../user/label'
 import {CloseIcon, InfoIcon} from '../icons'
 import {breakWords} from '../theme'
 
-import {keys} from '../rpc/client'
-import {Key, User} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key, User} from '@keys-pub/tsclient/lib/rpc'
 
 import {Theme, withStyles, createStyles} from '@material-ui/core/styles'
 
@@ -64,7 +64,7 @@ export default (props: Props) => {
 
   React.useEffect(() => {
     const fn = async () => {
-      const resp = await keys.keys({})
+      const resp = await rpc.keys({})
       const users = resp.keys?.filter((k: Key) => k.isPrivate && !!k.user).map((k: Key) => k.user!) || []
       setUsers(users as User[])
       if (!props.user && users.length > 0) {
@@ -112,6 +112,7 @@ export default (props: Props) => {
         <Box display="flex" flexDirection="column" flex={1} style={{width: 270}}>
           {users.map((user: User) => (
             <ButtonBase
+              key={user.id}
               focusRipple
               aria-haspopup="true"
               onClick={() => {

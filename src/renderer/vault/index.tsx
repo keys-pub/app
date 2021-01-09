@@ -15,7 +15,7 @@ import {dateString} from '../helper'
 import {Store} from 'pullstate'
 import {openSnack, openSnackError} from '../snack'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {
   VaultAuthRequest,
   VaultAuthResponse,
@@ -23,7 +23,7 @@ import {
   VaultSyncResponse,
   VaultStatusRequest,
   VaultStatusResponse,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 
 type State = {
   phrase: string
@@ -48,7 +48,7 @@ export default (_: {}) => {
   const reloadStatus = async () => {
     try {
       const req: VaultStatusRequest = {}
-      const resp = await keys.vaultStatus(req)
+      const resp = await rpc.vaultStatus(req)
       console.log('Vault status:', resp)
       store.update((s) => {
         s.status = resp
@@ -61,7 +61,7 @@ export default (_: {}) => {
   const generateAuth = async () => {
     setLoading(true)
     try {
-      const resp = await keys.vaultAuth({})
+      const resp = await rpc.vaultAuth({})
       store.update((s) => {
         s.phrase = resp.phrase || ''
       })
@@ -81,7 +81,7 @@ export default (_: {}) => {
   const sync = async () => {
     setLoading(true)
     try {
-      const resp = await keys.vaultSync({})
+      const resp = await rpc.vaultSync({})
       setLoading(false)
       reloadStatus()
     } catch (err) {

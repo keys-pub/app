@@ -18,8 +18,8 @@ import Link from '../components/link'
 import {DialogTitle} from '../components/dialog'
 import {shell} from 'electron'
 
-import {keys} from '../rpc/client'
-import {VaultUnsyncRequest, VaultUnsyncResponse} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {VaultUnsyncRequest, VaultUnsyncResponse} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   open: boolean
@@ -48,7 +48,7 @@ export default class DisableDialog extends React.Component<Props, State> {
   vaultDelete = async () => {
     this.setState({loading: true, error: undefined})
     try {
-      const resp = await keys.vaultUnsync({})
+      const resp = await rpc.vaultUnsync({})
       this.setState({loading: false})
       this.close('')
     } catch (err) {

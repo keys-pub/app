@@ -18,7 +18,7 @@ import {
 import {CloseIcon, InfoIcon} from '../icons'
 import {breakWords} from '../theme'
 
-import {Channel} from '@keys-pub/tsclient/lib/keys'
+import {Channel} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   open: boolean

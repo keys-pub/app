@@ -1,4 +1,4 @@
-import {AuthType} from '@keys-pub/tsclient/lib/keys'
+import {AuthType} from '@keys-pub/tsclient/lib/rpc'
 
 export const authTypeDescription = (t?: AuthType, titleCase?: boolean) => {
   switch (t) {

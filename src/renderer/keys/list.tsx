@@ -33,9 +33,9 @@ import KeyView from '../key/view'
 import SearchDialog from '../search/dialog'
 import {directionString, flipDirection} from '../helper'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {EDX25519, X25519} from '../rpc/keys'
-import {Key, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/keys'
+import {Key, SortDirection, KeysRequest} from '@keys-pub/tsclient/lib/rpc'
 
 import {store, loadStore} from './store'
 import {openSnack, openSnackError} from '../snack'
@@ -173,7 +173,7 @@ export default (_: {}) => {
       s.syncing = true
     })
     try {
-      const resp = await keys.vaultUpdate({})
+      const resp = await rpc.vaultUpdate({})
       reload()
       store.update((s) => {
         s.syncing = false

@@ -17,14 +17,14 @@ import {CopyIcon} from '../icons'
 import {KeyLabel} from '../key/label'
 import {clipboard, shell} from 'electron'
 
-import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys'
+import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/rpc'
 import Snack, {SnackProps} from '../components/snack'
 
 import Dialog from '../components/dialog'
 import Link from '../components/link'
 
-import {keys} from '../rpc/client'
-import {User} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Channel, User} from '@keys-pub/tsclient/lib/rpc'
 
 import {Store} from 'pullstate'
 import {openSnack, openSnackError} from '../snack'
@@ -32,7 +32,7 @@ import {openSnack, openSnackError} from '../snack'
 type Props = {
   user: User
   open: boolean
-  close: (snack?: string) => void
+  close: (channel?: Channel) => void
 }
 
 export default (props: Props) => {
@@ -53,12 +53,12 @@ export default (props: Props) => {
   const channelCreate = async () => {
     try {
       setLoading(true)
-      const resp = await keys.channelCreate({
+      const resp = await rpc.channelCreate({
         name: name,
         user: props.user.kid,
       })
       setLoading(false)
-      props.close('Channel created.')
+      props.close(resp.channel)
     } catch (err) {
       setLoading(false)
       openSnackError(err)

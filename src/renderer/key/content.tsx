@@ -8,7 +8,7 @@ import {IDLabel} from './label'
 
 import {shell} from 'electron'
 
-import {Key, UserStatus} from '@keys-pub/tsclient/lib/keys'
+import {Key, UserStatus} from '@keys-pub/tsclient/lib/rpc'
 import {EDX25519, X25519} from '../rpc/keys'
 import ServiceSelect from '../user/service'
 import Link from '../components/link'

@@ -12,7 +12,7 @@ import {column2Color, contentTop} from '../theme'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import SignerView from '../verify/signer'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
@@ -23,7 +23,7 @@ import {
   VerifyFileOutput,
   VerifyRequest,
   VerifyResponse,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 
 type State = {
   input: string
@@ -90,7 +90,7 @@ const openFolder = (value: string) => {
 
 const reloadSender = async (kid: string) => {
   try {
-    const resp = await keys.key({
+    const resp = await rpc.key({
       key: kid,
       search: false,
       update: false,
@@ -116,7 +116,7 @@ const verifyInput = async (input: string) => {
     const req: VerifyRequest = {
       data: data,
     }
-    const resp = await keys.verify(req)
+    const resp = await rpc.verify(req)
     const verifyed = new TextDecoder().decode(resp.data)
     store.update((s) => {
       s.signer = resp.signer
@@ -142,7 +142,7 @@ const verifyFileIn = (fileIn: string, dir: string) => {
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.verifyFile()
+  const stream = rpc.verifyFile()
   stream.on('data', (resp: VerifyFileOutput) => {
     store.update((s) => {
       s.output = ''

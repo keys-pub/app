@@ -21,8 +21,8 @@ import UserLabel from '../user/label'
 
 import Snack, {SnackProps} from '../components/snack'
 
-import {Key, SearchRequest, SearchResponse} from '@keys-pub/tsclient/lib/keys'
-import {keys} from '../rpc/client'
+import {Key, SearchRequest, SearchResponse} from '@keys-pub/tsclient/lib/rpc'
+import {rpc} from '../rpc/client'
 
 import {debounce, throttle} from 'lodash'
 
@@ -61,7 +61,7 @@ export default class SearchView extends React.Component<Props, State> {
   search = async (query: string) => {
     this.setState({loading: true})
     try {
-      const resp = await keys.search({query: query})
+      const resp = await rpc.search({query: query})
       if (this.state.input == query) {
         const keys = resp.keys || []
         this.setState({

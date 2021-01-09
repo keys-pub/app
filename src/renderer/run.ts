@@ -1,8 +1,8 @@
 import {ipcRenderer} from 'electron'
 import {store, setLocation, errored} from './store'
 import {updateCheck} from './update'
-import {keys} from './rpc/client'
-import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from './rpc/client'
+import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/rpc'
 
 export const keysStart = () => {
   // Keys start
@@ -21,7 +21,7 @@ export const keysStart = () => {
     updateCheck()
 
     const ping = async () => {
-      await keys.runtimeStatus({})
+      await rpc.runtimeStatus({})
     }
 
     const online = () => {
@@ -33,7 +33,16 @@ export const keysStart = () => {
 
     ipcRenderer.removeAllListeners('focus')
     ipcRenderer.on('focus', (event, message) => {
+      store.update((s) => {
+        s.focused = true
+      })
       ping()
+    })
+
+    ipcRenderer.on('blur', (event, message) => {
+      store.update((s) => {
+        s.focused = false
+      })
     })
   })
 

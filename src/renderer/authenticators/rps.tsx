@@ -21,7 +21,7 @@ import {
 } from '@keys-pub/tsclient/lib/fido2'
 import {toHex} from '../helper'
 
-import {SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {SortDirection} from '@keys-pub/tsclient/lib/rpc'
 
 import {directionString, flipDirection} from '../helper'
 

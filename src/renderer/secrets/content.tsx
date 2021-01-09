@@ -9,7 +9,7 @@ import {dateString} from '../helper'
 
 import PasswordOptions from './pw'
 
-import {Secret, SecretType} from '@keys-pub/tsclient/lib/keys'
+import {Secret, SecretType} from '@keys-pub/tsclient/lib/rpc'
 
 type Props = {
   secret?: Secret

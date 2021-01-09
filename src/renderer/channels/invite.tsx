@@ -16,13 +16,13 @@ import {CopyIcon} from '../icons'
 import {KeyLabel} from '../key/label'
 import {clipboard} from 'electron'
 
-import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/keys'
+import {Key, ExportType, KeyExportRequest, KeyExportResponse} from '@keys-pub/tsclient/lib/rpc'
 import Snack, {SnackProps} from '../components/snack'
 
 import AutocompletesView from '../keys/autocompletes'
 import Dialog from '../components/dialog'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {Store} from 'pullstate'
 import {openSnack, openSnackError} from '../snack'
 
@@ -47,7 +47,7 @@ export default (props: Props) => {
   const channelInvite = async () => {
     try {
       const rids = recipients.map((k: Key) => k.id!)
-      const resp = await keys.channelInvite({
+      const resp = await rpc.channelInvite({
         channel: props.channel,
         sender: props.inbox,
         recipients: rids,

@@ -3,14 +3,14 @@ import * as React from 'react'
 import {Box, Button, Divider, FormControl, FormHelperText, TextField, Typography} from '@material-ui/core'
 import Link from '../../components/link'
 
-import {keys} from '../../rpc/client'
+import {rpc} from '../../rpc/client'
 import {
   AuthSetupRequest,
   AuthSetupResponse,
   AuthUnlockRequest,
   AuthUnlockResponse,
   AuthType,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 import {ipcRenderer} from 'electron'
 
 import {setLocation, store, unlock} from '../../store'
@@ -49,11 +49,11 @@ export default (props: Props) => {
     setLoading(true)
     setError(undefined)
     try {
-      const setup: AuthSetupResponse = await keys.authSetup({
+      const setup: AuthSetupResponse = await rpc.authSetup({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
       })
-      const resp: AuthUnlockResponse = await keys.authUnlock({
+      const resp: AuthUnlockResponse = await rpc.authUnlock({
         secret: password,
         type: AuthType.PASSWORD_AUTH,
         client: 'app',

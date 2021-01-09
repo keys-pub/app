@@ -1,9 +1,9 @@
 import emoji from 'node-emoji'
 
-import {keys} from './rpc/client'
+import {rpc} from './rpc/client'
 import {EDX25519, X25519} from './rpc/keys'
 import dayjs from 'dayjs'
-import {Key, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {Key, Encoding, RandRequest, RandResponse, SortDirection} from '@keys-pub/tsclient/lib/rpc'
 
 import * as Long from 'long'
 
@@ -66,7 +66,7 @@ export const timeString = (ms?: any): string => {
 }
 
 export const generateID = async (): Promise<string> => {
-  const resp = await keys.rand({numBytes: 32, encoding: Encoding.BASE62})
+  const resp = await rpc.rand({numBytes: 32, encoding: Encoding.BASE62})
   return resp.data || ''
 }
 

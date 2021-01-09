@@ -16,8 +16,8 @@ import Logo from '../logo'
 import {mono} from '../theme'
 import {ipcRenderer} from 'electron'
 
-import {keys} from '../rpc/client'
-import {Encoding} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Encoding} from '@keys-pub/tsclient/lib/rpc'
 import {openSnackError, closeSnack} from '../snack'
 
 type Props = {
@@ -41,8 +41,8 @@ export default (props: Props) => {
     setLoading(true)
     closeSnack()
     try {
-      const status = await keys.runtimeStatus({})
-      const resp = await keys.authReset({appName: status.appName})
+      const status = await rpc.runtimeStatus({})
+      const resp = await rpc.authReset({appName: status.appName})
       setLoading(false)
       props.close()
     } catch (err) {

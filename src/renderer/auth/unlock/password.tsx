@@ -6,8 +6,8 @@ import Header from '../../header'
 import Logo from '../../logo'
 import Link from '../../components/link'
 
-import {keys} from '../../rpc/client'
-import {AuthType} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../../rpc/client'
+import {AuthType} from '@keys-pub/tsclient/lib/rpc'
 
 import {store, unlock} from '../../store'
 import {openSnackError, closeSnack} from '../../snack'
@@ -46,7 +46,7 @@ export default (props: Props) => {
     closeSnack()
 
     try {
-      const resp = await keys.authUnlock({
+      const resp = await rpc.authUnlock({
         secret: input,
         type: AuthType.PASSWORD_AUTH,
         client: 'app',

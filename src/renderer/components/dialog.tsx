@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog as MuiDialog,
   DialogActions,
   DialogContent,
@@ -58,7 +59,6 @@ type Props = {
   children?: React.ReactNode
   close?: DialogAction
   actions?: DialogAction[]
-  disabled?: boolean
 }
 
 const Dialog = (props: Props) => {
@@ -70,20 +70,17 @@ const Dialog = (props: Props) => {
       maxWidth="sm"
       disableBackdropClick
     >
-      {props.title && (
-        <DialogTitle loading={props.loading} onClose={props.close?.action}>
-          {props.title}
-        </DialogTitle>
-      )}
+      {props.title && <DialogTitle onClose={props.close?.action}>{props.title}</DialogTitle>}
       <DialogContent>{props.children}</DialogContent>
       <DialogActions>
+        {props.loading && <CircularProgress size={24} />}
         {props.close && (
           <Button onClick={props.close.action} color={props.close.color} key="close">
             {props.close.label}
           </Button>
         )}
         {props.actions?.map((action: DialogAction) => (
-          <Button onClick={action.action} color={action.color} key={action.label} disabled={props.disabled}>
+          <Button onClick={action.action} color={action.color} key={action.label} disabled={props.loading}>
             {action.label}
           </Button>
         ))}

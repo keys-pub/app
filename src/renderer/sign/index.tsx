@@ -11,7 +11,7 @@ import * as path from 'path'
 
 import SignKeySelectView from '../keys/select'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {RPCError} from '@keys-pub/tsclient'
 import {
   Key,
@@ -20,7 +20,7 @@ import {
   SignResponse,
   SignFileInput,
   SignFileOutput,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 import {store, loadStore} from './store'
 import {closeSnack, openSnack, openSnackError} from '../snack'
 import {contentTop, column2Color} from '../theme'
@@ -79,7 +79,7 @@ const signInput = async (input: string, signer?: Key) => {
   console.log('Signing...')
   try {
     const data = new TextEncoder().encode(input)
-    const resp = await keys.sign({
+    const resp = await rpc.sign({
       data: data,
       armored: true,
       signer: signer?.id,
@@ -114,7 +114,7 @@ const signFileIn = (fileIn: string, dir: string, signer: Key) => {
   store.update((s) => {
     s.loading = true
   })
-  const stream = keys.signFile()
+  const stream = rpc.signFile()
   stream.on('data', (resp: SignFileOutput) => {
     store.update((s) => {
       s.output = ''
@@ -196,7 +196,7 @@ export default (props: Props) => {
             signer: s.signer?.id,
           },
         }
-        const set = async () => await keys.configSet({name: 'sign', config})
+        const set = async () => await rpc.configSet({name: 'sign', config})
         set()
       }
     )

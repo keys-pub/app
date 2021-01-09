@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
-import {keys} from '../rpc/client'
-import {Key, KeysRequest, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key, KeysRequest, SortDirection} from '@keys-pub/tsclient/lib/rpc'
 import {openSnack, openSnackError} from '../snack'
 
 type State = {
@@ -47,7 +47,7 @@ const list = async (query: string, intro: boolean, sortField?: string, sortDirec
       sortDirection: sortDirection,
       types: [],
     }
-    const resp = await keys.keys(req)
+    const resp = await rpc.keys(req)
     const results = resp.keys || []
     store.update((s) => {
       s.results = results
@@ -67,7 +67,7 @@ const list = async (query: string, intro: boolean, sortField?: string, sortDirec
 }
 
 export const loadStore = async () => {
-  const resp = await keys.runtimeStatus({})
+  const resp = await rpc.runtimeStatus({})
   store.update((s) => {
     s.syncEnabled = !!resp.sync
 

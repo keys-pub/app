@@ -10,8 +10,8 @@ import {matchSorter, rankings} from 'match-sorter'
 import SearchDialog from '../search/dialog'
 import KeyImportDialog from '../import'
 
-import {keys} from '../rpc/client'
-import {Key, KeysRequest, KeysResponse, SortDirection} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key, KeysRequest, KeysResponse, SortDirection} from '@keys-pub/tsclient/lib/rpc'
 import {openSnackError} from '../snack'
 
 type Props = {
@@ -103,7 +103,7 @@ export default (props: Props) => {
   const search = async () => {
     try {
       // Filtering happens with matchSorter.
-      const resp = await keys.keys({})
+      const resp = await rpc.keys({})
       const results = createOptions(resp.keys || [], !!props.searchOption, !!props.importOption)
       setOptions(results || [])
     } catch (err) {

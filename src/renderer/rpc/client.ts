@@ -1,9 +1,9 @@
 import {
   certPath,
   Credentials,
-  keysService,
+  rpcService,
   fido2Service,
-  KeysService,
+  RPCService,
   FIDO2Service,
   RPCError,
 } from '@keys-pub/tsclient'
@@ -17,12 +17,12 @@ const port = getenv.int('KEYS_PORT', 22405)
 
 export const creds: Credentials = new Credentials(certPath())
 
-export const keys = keysService('localhost:' + port, creds)
-keys.log = new ConsoleLogger()
-keys.on('unauthenticated', (e: RPCError) => {
+export const rpc = rpcService('localhost:' + port, creds)
+rpc.log = new ConsoleLogger()
+rpc.on('unauthenticated', (e: RPCError) => {
   lock()
 })
-keys.on('unavailable', (e: RPCError) => {
+rpc.on('unavailable', (e: RPCError) => {
   errored(e)
 })
 

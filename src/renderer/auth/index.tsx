@@ -4,15 +4,15 @@ import AuthSetupView from './setup'
 import AuthUnlockView from './unlock'
 import AuthSplash from './splash'
 
-import {keys} from '../rpc/client'
-import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {RuntimeStatusRequest, RuntimeStatusResponse, AuthStatus} from '@keys-pub/tsclient/lib/rpc'
 import {errored} from '../store'
 
 export default (props: {}) => {
   const [status, setStatus] = React.useState(AuthStatus.AUTH_UNKNOWN)
 
   const refresh = async () => {
-    const resp = await keys.runtimeStatus({})
+    const resp = await rpc.runtimeStatus({})
     setStatus(resp.authStatus!)
   }
 

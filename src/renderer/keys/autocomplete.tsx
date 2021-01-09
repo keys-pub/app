@@ -12,8 +12,8 @@ import Autocomplete, {
 import {KeyLabel} from '../key/label'
 import {matchSorter} from 'match-sorter'
 
-import {keys} from '../rpc/client'
-import {Key, SortDirection, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key, SortDirection, KeysRequest, KeysResponse} from '@keys-pub/tsclient/lib/rpc'
 import {serviceColor} from '../theme'
 
 import SearchDialog from '../search/dialog'
@@ -56,7 +56,7 @@ export default class AutocompleteView extends React.Component<Props, State> {
   search = async (q: string) => {
     this.setState({loading: true}) // , options: []
     try {
-      const resp = await keys.keys({
+      const resp = await rpc.keys({
         query: q,
         types: this.props.keyTypes,
       })

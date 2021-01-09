@@ -21,7 +21,7 @@ import {openSnack, openSnackError, closeSnack} from '../snack'
 import {status} from '@grpc/grpc-js'
 import {ErrorConflict} from './error'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 
 type Props = {
   kid: string
@@ -90,7 +90,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     closeSnack()
     this.setState({loading: true})
     try {
-      const resp = await keys.userSign({
+      const resp = await rpc.userSign({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,
@@ -129,7 +129,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
     closeSnack()
     this.setState({loading: true})
     try {
-      const resp = await keys.userAdd({
+      const resp = await rpc.userAdd({
         kid: this.props.kid,
         service: this.props.service,
         name: this.state.name,

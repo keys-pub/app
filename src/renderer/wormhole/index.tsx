@@ -26,14 +26,14 @@ import {
   errorStatus,
 } from './status'
 
-import {keys} from '../rpc/client'
+import {rpc} from '../rpc/client'
 import {EDX25519, EDX25519Public} from '../rpc/keys'
 import {
   WormholeStatus,
   WormholeInput,
   WormholeOutput,
   WormholeMessageStatus,
-} from '@keys-pub/tsclient/lib/keys'
+} from '@keys-pub/tsclient/lib/rpc'
 import {ClientDuplexStream, RPCError} from '@keys-pub/tsclient'
 
 import {WormholeMessage, WormholeMessageType} from './types'
@@ -102,7 +102,7 @@ class WormholeView extends React.Component<Props, State> {
     this.addRow(connectingStatus(this.props.recipient))
 
     this.setState({loading: true, connected: false})
-    this.wormhole = keys.wormhole()
+    this.wormhole = rpc.wormhole()
     this.wormhole.on('error', (err: RPCError) => {
       this.setState({loading: false, connected: false})
       if (err.code == grpc.status.CANCELLED || err.message == 'closed') {

@@ -1,7 +1,7 @@
 import {Store} from 'pullstate'
 
-import {keys} from '../rpc/client'
-import {Key} from '@keys-pub/tsclient/lib/keys'
+import {rpc} from '../rpc/client'
+import {Key} from '@keys-pub/tsclient/lib/rpc'
 import {openSnackError} from '../snack'
 
 type State = {
@@ -31,10 +31,10 @@ export const store = new Store(initialState)
 
 export const loadStore = async () => {
   try {
-    const configResp = await keys.configGet({name: 'encrypt'})
+    const configResp = await rpc.configGet({name: 'encrypt'})
     const config = configResp?.config?.encrypt
 
-    const keysResp = await keys.keys({})
+    const keysResp = await rpc.keys({})
     const recipients = (config?.recipients || [])
       .map((kid: string) => keysResp.keys?.find((k: Key) => k.id == kid))
       .filter((k?: Key) => k) as Key[]

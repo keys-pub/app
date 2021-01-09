@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-import {Channel, Message, MessageStatus, User} from '@keys-pub/tsclient/lib/keys'
-import {keys} from '../rpc/client'
+import {Channel, Message, MessageStatus, User} from '@keys-pub/tsclient/lib/rpc'
+import {rpc} from '../rpc/client'
 
 import {Box, Button, CircularProgress, Divider, Input} from '@material-ui/core'
 
@@ -19,7 +19,7 @@ export default (props: Props) => {
 
   const sendMessage = async (text: string) => {
     try {
-      const prepare = await keys.messagePrepare({
+      const prepare = await rpc.messagePrepare({
         channel: props.channel.id,
         sender: props.user.kid,
         text: text,
@@ -27,7 +27,7 @@ export default (props: Props) => {
       props.addMessage(prepare.message!)
 
       try {
-        const create = await keys.messageCreate({
+        const create = await rpc.messageCreate({
           channel: props.channel.id,
           sender: props.user.kid,
           text: text,

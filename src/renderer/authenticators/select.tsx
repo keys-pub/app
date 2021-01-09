@@ -17,8 +17,8 @@ import {RefreshIcon} from '../icons'
 import Link from '../components/link'
 import Dialog from '../components/dialog'
 
-import {keys, fido2} from '../rpc/client'
-import {AuthType, Encoding} from '@keys-pub/tsclient/lib/keys'
+import {rpc, fido2} from '../rpc/client'
+import {AuthType, Encoding} from '@keys-pub/tsclient/lib/rpc'
 import {Device} from '@keys-pub/tsclient/lib/fido2'
 import {openSnackError} from '../snack'
 

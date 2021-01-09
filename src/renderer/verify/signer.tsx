@@ -8,7 +8,7 @@ import Snack, {SnackProps} from '../components/snack'
 
 import KeyDialog from '../key'
 
-import {Key, EncryptMode} from '@keys-pub/tsclient/lib/keys'
+import {Key, EncryptMode} from '@keys-pub/tsclient/lib/rpc'
 import {KeyLabel} from '../key/label'
 import {column2Color} from '../theme'
 
