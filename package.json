@@ -157,7 +157,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.0.3",
     "@grpc/proto-loader": "^0.5.5",
-    "@keys-pub/tsclient": "0.1.5",
+    "@keys-pub/tsclient": "^0.1.6",
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.39",
