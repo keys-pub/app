@@ -1,18 +1,11 @@
 import * as React from 'react'
 
-import * as grpc from '@grpc/grpc-js'
-
 import Routes from './routes'
 import {store} from './store'
-
 import Nav from './nav'
-
 import {Box} from '@material-ui/core'
-
 import {rpc} from './rpc/client'
-import {RPCError} from '@keys-pub/tsclient'
 import {Config} from '@keys-pub/tsclient/lib/rpc'
-import {openSnackError} from './snack'
 
 export default (_: {}) => {
   React.useEffect(() => {

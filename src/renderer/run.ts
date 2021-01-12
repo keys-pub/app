@@ -2,12 +2,11 @@ import {ipcRenderer} from 'electron'
 import {store, setLocation, errored} from './store'
 import {updateCheck} from './update'
 import {rpc} from './rpc/client'
-import {Config, RuntimeStatusRequest, RuntimeStatusResponse} from '@keys-pub/tsclient/lib/rpc'
 
-export const keysStart = () => {
+export const serviceStart = () => {
   // Keys start
-  ipcRenderer.removeAllListeners('keys-started')
-  ipcRenderer.on('keys-started', (event, err) => {
+  ipcRenderer.removeAllListeners('service-started')
+  ipcRenderer.on('service-started', (event, err) => {
     if (err) {
       errored(err)
       return
@@ -46,6 +45,6 @@ export const keysStart = () => {
     })
   })
 
-  // Start keysd
-  ipcRenderer.send('keys-start')
+  // Start service
+  ipcRenderer.send('service-start')
 }

@@ -19,7 +19,7 @@ import Errors from './errors'
 import UpdateAlert from './update/alert'
 import UpdateSplash from './update/splash'
 
-import {keysStart} from './run'
+import {serviceStart} from './run'
 
 import './app.css'
 
@@ -31,7 +31,7 @@ const Root = (_: {}) => {
   }))
 
   React.useEffect(() => {
-    if (!ready) keysStart()
+    if (!ready) serviceStart()
   }, [])
 
   ipcRenderer.removeAllListeners('preferences')

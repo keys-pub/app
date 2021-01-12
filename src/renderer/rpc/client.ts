@@ -13,7 +13,7 @@ import * as getenv from 'getenv'
 import {lock, errored} from '../store'
 import {ConsoleLogger} from './logger'
 
-const port = getenv.int('KEYS_PORT', 22405)
+const port = getenv.int('KP_PORT')
 
 export const creds: Credentials = new Credentials(certPath())
 

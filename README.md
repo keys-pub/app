@@ -44,5 +44,5 @@ keysd -app Keys2 -port 22406
 
 # Start app (Keys2)
 yarn server
-KEYS_APP=Keys2 KEYS_PORT=22406 yarn start
+KP_APP=Keys2 KP_PORT=22406 yarn start
 ```
