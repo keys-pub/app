@@ -88,12 +88,12 @@ export default (props: {}) => {
       location: '/tools',
       id: 'navToolsItemIcon',
     },
-    {
-      label: 'Channels',
-      icon: ChannelsIcon,
-      location: '/channels',
-      id: 'navChannelsItemIcon',
-    },
+    // {
+    //   label: 'Channels',
+    //   icon: ChannelsIcon,
+    //   location: '/channels',
+    //   id: 'navChannelsItemIcon',
+    // },
     {
       label: 'Settings',
       icon: SettingsIcon,

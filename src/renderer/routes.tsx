@@ -7,7 +7,7 @@ import SecretsView from './secrets'
 import WormholeView from './wormhole'
 
 import SettingsView from './settings'
-import ChannelsView from './channels'
+// import ChannelsView from './channels'
 
 import KeysView from './keys'
 import ToolsView from './tools'
@@ -23,7 +23,7 @@ export const routes: Array<RouteInfo> = [
   {location: '/keys', component: () => <KeysView />},
   {location: '/secrets', component: () => <SecretsView />},
   {location: '/tools', component: () => <ToolsView />},
-  {location: '/channels', component: () => <ChannelsView />},
+  // {location: '/channels', component: () => <ChannelsView />},
   {location: '/settings', component: () => <SettingsView />},
 
   // Experimental
