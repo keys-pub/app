@@ -30,6 +30,15 @@ import {update, UpdateResult} from './updater'
 
 import {reloadApp} from './app'
 
+// Set default env
+if (!process.env.KEYS_APP) {
+  process.env.KEYS_APP = 'Keys'
+}
+
+if (!process.env.KEYS_PORT) {
+  process.env.KEYS_PORT = '22405'
+}
+
 let mainWindow: BrowserWindow | null = null
 
 app.on('window-all-closed', () => {

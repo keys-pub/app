@@ -3,9 +3,6 @@ import * as getenv from 'getenv'
 import {binPath} from './paths'
 import {execProc, spawnProc} from './run'
 
-const defaultAppName = 'Keys'
-const defaultPort = 22405
-
 const keysPath = (): string => {
   let path = ''
   if (process.env.NODE_ENV == 'production') {
@@ -19,7 +16,7 @@ const keysPath = (): string => {
 }
 
 export const getAppName = (): string => {
-  return getenv.string('KEYS_APP', defaultAppName)
+  return getenv.string('KEYS_APP')
 }
 
 const getPort = (): number => {
@@ -34,14 +31,8 @@ export const keysStart = (): Promise<{}> => {
   const appName = getAppName()
   const port = getPort()
 
-  let arg = ''
-  if (appName != defaultAppName) {
-    arg = '--app=' + appName
-  }
-  let start = 'start --from=app'
-  if (port != defaultPort) {
-    start = start + ' --port=' + port
-  }
+  const arg = '--app=' + appName
+  const start = 'start --from=app --port=' + port
 
   // This returns when the service is ready.
   return execProc(path, arg + ' ' + start)
@@ -51,10 +42,7 @@ export const keysStop = (): Promise<any> => {
   const path = keysPath()
   if (path) {
     const appName = getAppName()
-    let arg = ''
-    if (appName != defaultAppName) {
-      arg = '--app=' + appName
-    }
+    const arg = '--app=' + appName
     return execProc(path, arg + ' stop')
   }
   return Promise.resolve()
