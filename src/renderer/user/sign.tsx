@@ -236,12 +236,14 @@ export default class UserSignDialog extends React.Component<Props, State> {
         urlLabel = "What's the location (URL) on twitter.com where the tweet was saved?"
         break
       case 'reddit':
-        instructions = <Typography>Save it as a post on r/keyspubmsgs.</Typography>
-        openLabel = 'Open reddit.com/r/keyspubmsgs/submit'
+        instructions = <Typography>Save it as a post to your user subreddit.</Typography>
+        openLabel = 'Open reddit.com/user/' + this.state.name + '/submit'
         const postTitle = this.state.name + ' ' + this.props.kid
         openAction = () =>
           shell.openExternal(
-            'https://old.reddit.com/r/keyspubmsgs/submit?title=' +
+            'https://www.reddit.com/user/' +
+              this.state.name +
+              '/submit?title=' +
               postTitle +
               '&text=' +
               this.state.signedMessage
