@@ -32,7 +32,7 @@ var dateOptions = {
   minute: 'numeric',
   second: 'numeric',
   timeZoneName: undefined, // 'short',
-}
+} as const
 
 export const date = (ms?: any): Date | undefined => {
   // ms can be a number or Long
