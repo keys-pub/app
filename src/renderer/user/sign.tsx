@@ -176,8 +176,7 @@ export default class UserSignDialog extends React.Component<Props, State> {
         break
       case 'reddit':
         question = "What's your Reddit username?"
-        next =
-          "In the next step, we'll create a signed message using this key that you can post on r/keyspubmsgs."
+        next = "In the next step, we'll create a signed message using this key that you can post on reddit."
         break
       case 'https':
         question = "What's the domain name?"
