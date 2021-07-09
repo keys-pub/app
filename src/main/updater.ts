@@ -88,7 +88,7 @@ export const update = (version: string, apply: boolean): Promise<UpdateResult> =
 
       if (platform() == 'win32') {
         // Copy updater to support path, so we can update over the installed version.
-        const updaterDest = filepath.join(appDir(), 'updater.exe')
+        const updaterDest = filepath.join(appDir(appName), 'updater.exe')
         if (fs.existsSync(updaterDest)) {
           fs.unlinkSync(updaterDest)
         }
